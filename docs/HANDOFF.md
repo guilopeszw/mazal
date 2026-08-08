@@ -21,7 +21,7 @@ Entry format:
 |---|---|---|
 | A — engine | Miguel | [`plan/A-engine.md`](plan/A-engine.md) |
 | B — data & simulator | Guilherme | [`plan/B-data.md`](plan/B-data.md) |
-| C — ingest | Mateus | [`plan/C-ingest.md`](plan/C-ingest.md) — **ingest only**, see below |
+| C — ingest & contracts | Mateus | [`plan/C-ingest.md`](plan/C-ingest.md) |
 | D — frontend | *(unassigned)* | [`plan/D-frontend.md`](plan/D-frontend.md) |
 | E — agent, deco, pitch | *(unassigned)* | [`plan/E-agent.md`](plan/E-agent.md) |
 
@@ -29,13 +29,13 @@ Fill a name in as each person starts. If you are opening a session and your lett
 
 ---
 
-## 2026-08-08 · Guilherme · ownership change
+## 2026-08-08 · Guilherme · ownership settled
 
-**Done:** Miguel on A, Mateus on C.
+**Done:** Miguel on A, Mateus on C. Mateus is already writing `packages/contracts`, so it stays his, exactly as [`plan/C-ingest.md`](plan/C-ingest.md) describes — brief unchanged, guardian duty his. An earlier entry moved it to Guilherme; that reassignment is cancelled and was never acted on.
 
-**Next:** `packages/contracts` stays with **Guilherme**, not Mateus. Mateus owns `packages/ingest` only — the Meta CSV parser, the Product Card schema, the event log — and starts there directly. Guardian duty for the frozen contract follows ownership and is Guilherme's. [`plan/C-ingest.md`](plan/C-ingest.md) part 1 describes contracts work that is no longer Mateus's; the rest of that brief stands.
+**Next:** Guilherme goes straight to `packages/data` — Olist download, `derive.ts`, per-category distributions — then the simulator. Nobody is waiting on Guilherme now.
 
-**Blocked / watch out:** Mateus is blocked on `packages/contracts` existing before ingest can compile. It is Guilherme's next commit and is twenty minutes away — Mateus can read `docs/contracts.md` and write the CSV parser test fixture meanwhile, since neither needs the package to exist.
+**Blocked / watch out:** Review `packages/contracts` against [`../contracts.md`](../contracts.md) once Mateus pushes, before anyone builds on it. The one thing to check hardest: no type carries a rate field, and `metrics.ts` has the assertion that `ctr(aggregate(days))` differs from the mean of daily CTRs. Everything downstream inherits whatever lands there. D and E are still unassigned.
 
 ---
 
