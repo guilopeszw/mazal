@@ -29,6 +29,27 @@ Fill a name in as each person starts. If you are opening a session and your lett
 
 ---
 
+## 2026-08-08 14:55 · Guilherme · branch policy in review, bugs logged
+
+**Done:** The stricter branch policy — every change on a branch, `stage` takes merges rather than commits — was merged straight into `stage` and then reverted back out (`a29550d`, `9e7a64d`). `stage` is byte-identical to `03032fc` again; nothing was rewritten. The policy is now a PR against `stage`, which is the point of the policy, and it waits for a reviewer.
+
+**Next:** Someone other than Guilherme reviews and merges that PR. Then `packages/sim`, still blocked on `@mazal/contracts`.
+
+**Blocked / watch out:** Bugs found so far this session, all fixed unless marked:
+
+| What | Symptom | Fix |
+|---|---|---|
+| BOM in `product_category_name_translation.csv` | Every category lookup missed and the whole table collapsed to **one** category. The run reported success. | `parseCsv` strips it; test in `packages/data/derive.test.ts`. |
+| Olist CSVs nested after unzip | `derive.ts` could not find files that were plainly there. | Indexes `data/raw/` and one directory below. |
+| facebook-ad-campaign is not a media benchmark | 78.5M impressions against 13,293 clicks — 0.017% CTR, CPM 0.26 in an unstated currency. | Published BRL priors shipped instead, `n: 0`. Measured values printed every run. **Open decision, reversible in one constant.** |
+| `stage/<thing>` branch names are impossible | `fatal: cannot lock ref ... 'refs/heads/stage' exists`. A ref cannot be both a file and a directory. | Branches are `<type>/<thing>` — `feat/`, `fix/`, `docs/`. This is what the PR changes. |
+| `pnpm install` stalls silently | esbuild is an unapproved build script; install exits 0 having done nothing. | `allowBuilds: esbuild: true` in `pnpm-workspace.yaml`. |
+| `tsconfig.tsbuildinfo` was committed | Build cache in git, conflicts on every pull. | `*.tsbuildinfo` gitignored, file removed from the index. |
+
+The earlier entries in this log say `stage/<letter>-<thing>`. That naming does not work in git; read this row, not those.
+
+---
+
 ## 2026-08-08 14:40 · Guilherme · benchmarks landed
 
 **Done:** `packages/data` is real (`761f822`, on `stage`). Kaggle CSVs downloaded to `data/raw/`, `pnpm derive` run, `benchmarks.json` and `categories.ts` committed — **62 categories**, 9 skipped under 30 orders. `index.ts` exports `benchmarks`. `pnpm test` green (5), `pnpm typecheck` clean. **A and D are unblocked on data.**

@@ -36,14 +36,20 @@ Hackathon build. Deadline Sunday 2026-08-09 23:59, code freeze 19:00.
 
 `main` is the demo build. It stays green, it is what gets cloned cold, and **nobody pushes to it directly.**
 
-`stage` is where the weekend happens. Branch from it, merge back into it, push it.
+`stage` is where the weekend integrates. **Nothing is committed to it directly either.** Work happens on a branch, the branch merges into `stage`, and `stage` merges into `main`.
 
-- Work inside your own package: commit straight to `stage`.
-- Anything that runs longer than an hour, or touches a file outside your package: `stage/<letter>-<thing>` off `stage`, merged back with `--no-ff` when green.
+```
+<type>/<thing>  →  stage  →  main
+```
+
+- Branch off `stage` for every piece of work, however small. Conventional types: `feat/`, `fix/`, `refactor/`, `test/`, `docs/`, `chore/`. So `feat/olist-benchmarks`, `fix/csv-bom`, `docs/branch-policy`.
+- Not `stage/<thing>`: git cannot hold a branch called `stage` and a branch called `stage/x` at the same time, because one would have to be both a file and a directory.
+- Merge back into `stage` with `--no-ff` when green, so the branch stays legible as one unit of work in the history.
+- Delete your branch after it merges. It is yours; nobody else's is.
 - `stage` → `main` at block boundaries only, only with `pnpm test` green, and say so before you do it.
-- Never force push, never rewrite `main` or `stage`, never delete a branch you did not create.
+- Never force push. Never rewrite `main` or `stage`.
 
-Commit on green, every time — a red `stage` blocks four people.
+Commit on green, every time. Small commits on your branch, often — a red `stage` blocks four people, and the branch is what keeps a red one from ever reaching them.
 
 ## Tests
 
@@ -55,7 +61,7 @@ Invoke `mattpocock-skills:tdd` when starting work in either of those packages. I
 
 The team sleeps Saturday night with sessions running and occasional checks. While unattended, an agent writes code, runs tests, and commits **within its own package**.
 
-Stop and append to [`docs/HANDOFF.md`](docs/HANDOFF.md) when tests go red, when a change would touch `packages/contracts`, or when a change would touch another owner's package. An unattended session never merges to `main` — it commits to `stage` or to its own `stage/<letter>-<thing>` branch and leaves the merge for someone awake.
+Stop and append to [`docs/HANDOFF.md`](docs/HANDOFF.md) when tests go red, when a change would touch `packages/contracts`, or when a change would touch another owner's package. An unattended session never merges to `main` — it commits to its own `<type>/<thing>` branch, merges into `stage` only on green, and leaves `main` for someone awake.
 
 Every session appends to `docs/HANDOFF.md` before it ends, attended or not — what landed, the single next action, and anything that will bite the next person. It is how a new session picks up without being told anything.
 
