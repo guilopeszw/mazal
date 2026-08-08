@@ -11,7 +11,8 @@
     "typecheck": "tsc --build",
     "derive": "node packages/data/derive.ts",
     "sim:eyeball": "node packages/sim/eyeball.ts",
-    "sim:fixtures": "node packages/sim/write-fixtures.ts"
+    "sim:fixtures": "node packages/sim/write-fixtures.ts",
+    "sim:backtest": "node packages/sim/run-backtest.ts"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

@@ -29,6 +29,7 @@ export function generateCampaign(seed: number, fault: FaultKind = 'none'): Label
   };
 }
 
+export { alwaysHealthy, runBacktestWith, type Diagnoser } from './backtest.ts';
 export { COHORT_SIZE, HELD_OUT, cohortPlan, generateCohort, splitCohort } from './cohort.ts';
 export { FAULT_KINDS } from './faults.ts';
 export { FAULT_STAGES, formatConfusion, score, scoreOne, type Scored } from './score.ts';
