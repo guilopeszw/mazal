@@ -9,7 +9,8 @@
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --build",
-    "derive": "node packages/data/derive.ts"
+    "derive": "node packages/data/derive.ts",
+    "sim:eyeball": "node packages/sim/eyeball.ts"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
