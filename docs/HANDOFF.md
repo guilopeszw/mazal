@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-08 14:12 BRT · C-agent (ingest & contracts) · SAT-A handoff
+
+**Done:** `packages/contracts` complete (metrics + frozen types + tests), `packages/ingest` complete (`parseMetaCsv`, `parseEventLog`, `productCardSchema` + tests). Monorepo scaffolded.
+
+**Next:** C moves to frontend to assist D with CSV upload integration. B unblocks data (`benchmarks.json`). A starts `packages/engine`.
+
+**Blocked / watch out:** Commit working tree to `stage` branch before pushing.
+
+---
+
 ## Who is who
 
 | Letter | Person | Brief |
@@ -24,8 +34,6 @@ Entry format:
 | C — ingest & contracts | Mateus | [`plan/C-ingest.md`](plan/C-ingest.md) |
 | D — frontend | *(unassigned)* | [`plan/D-frontend.md`](plan/D-frontend.md) |
 | E — agent, deco, pitch | *(unassigned)* | [`plan/E-agent.md`](plan/E-agent.md) |
-
-Fill a name in as each person starts. If you are opening a session and your letter is not here, ask before assuming one — two people on the same package is worse than one package unstarted.
 
 ---
 

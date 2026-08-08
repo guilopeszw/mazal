@@ -5,7 +5,11 @@
 
 import type { CampaignDay } from './index.ts';
 
-/** Returns 0 for 0/0 rather than NaN. NaN propagates silently through the engine; 0 does not. */
+/**
+ * Returns 0 for 0/0 and x/0 rather than NaN or Infinity. NaN/Infinity propagate silently through the engine; 0 does not.
+ * Note: For metrics like CPA, AOV, or CPC where division by zero (e.g. 0 purchases) is mathematically undefined,
+ * callers and the diagnosis engine must check sample sizes / counts (e.g. purchases > 0) before rendering or interpreting rates.
+ */
 export const safeDiv = (a: number, b: number): number => (b === 0 ? 0 : a / b);
 
 /** Sums a window of days into one CampaignDay so every rate function works on ranges too. */

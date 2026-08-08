@@ -3,36 +3,33 @@
 // Match columns loosely. Ignore rate columns. Handle all the quirks.
 
 import type { CampaignDay } from '@mazal/contracts';
+import { parseCsvLine, normaliseDate } from './csv.ts';
 
 /** Column mapping: normalised header substring → CampaignDay field or metadata key. */
-const COLUMN_MAP: Array<{ match: string; field: keyof CampaignDay | '_dateEnd' | '_skip'; priority: number }> = [
-  // Higher priority = matched first. Order matters for overlapping substrings.
-  { match: 'reporting start',             field: 'date',                priority: 100 },
-  { match: 'reporting end',               field: '_dateEnd',            priority: 99 },
-  { match: 'campaign name',               field: 'campaignId',          priority: 98 },
-  { match: 'purchases conversion value',  field: 'revenue',             priority: 97 },
-  { match: 'amount spent',                field: 'spend',               priority: 96 },
-  { match: 'impressions',                 field: 'impressions',         priority: 95 },
-  { match: 'reach',                       field: 'reach',               priority: 94 },
-  { match: 'link click',                  field: 'clicks',              priority: 93 },
-  { match: 'adds to cart',                field: 'addToCarts',          priority: 92 },
-  { match: 'add to cart',                 field: 'addToCarts',          priority: 91 },
-  { match: 'checkouts initiated',         field: 'checkoutsInitiated',  priority: 90 },
-  { match: 'purchases',                   field: 'purchases',           priority: 50 }, // low priority — "purchases conversion value" must match first
-  // Rate columns — skip them entirely (must be higher priority than field matches they contain)
-  { match: 'cost per',                    field: '_skip',               priority: 93 },
-  { match: 'ctr',                         field: '_skip',               priority: 80 },
-  { match: 'cpc',                         field: '_skip',               priority: 79 },
-  { match: 'cpm',                         field: '_skip',               priority: 78 },
-  { match: 'roas',                        field: '_skip',               priority: 77 },
-  { match: 'frequency',                   field: '_skip',               priority: 75 },
+const COLUMN_MAP: Array<{ match: string; field: keyof CampaignDay | '_dateEnd' | '_skip' }> = [
+  { match: 'reporting start',             field: 'date' },
+  { match: 'reporting end',               field: '_dateEnd' },
+  { match: 'campaign name',               field: 'campaignId' },
+  { match: 'purchases conversion value',  field: 'revenue' },
+  // Rate columns — skip them entirely (must be mapped before field matches they contain, e.g. 'cost per' before 'link click')
+  { match: 'cost per',                    field: '_skip' },
+  { match: 'ctr',                         field: '_skip' },
+  { match: 'cpc',                         field: '_skip' },
+  { match: 'cpm',                         field: '_skip' },
+  { match: 'roas',                        field: '_skip' },
+  { match: 'frequency',                   field: '_skip' },
+  { match: 'amount spent',                field: 'spend' },
+  { match: 'impressions',                 field: 'impressions' },
+  { match: 'reach',                       field: 'reach' },
+  { match: 'adds to cart',                field: 'addToCarts' },
+  { match: 'add to cart',                 field: 'addToCarts' },
+  { match: 'checkouts initiated',         field: 'checkoutsInitiated' },
+  { match: 'link click',                  field: 'clicks' },
+  { match: 'purchases',                   field: 'purchases' },
   // Other skippable columns
-  { match: 'ad set name',                 field: '_skip',               priority: 60 },
-  { match: 'ad name',                     field: '_skip',               priority: 59 },
+  { match: 'ad set name',                 field: '_skip' },
+  { match: 'ad name',                     field: '_skip' },
 ];
-
-// Sort by priority descending so higher-priority matches are tested first
-const SORTED_COLUMNS = [...COLUMN_MAP].sort((a, b) => b.priority - a.priority);
 
 export type MetaCsvResult = {
   days: CampaignDay[];
@@ -40,71 +37,32 @@ export type MetaCsvResult = {
   currency?: string;
 };
 
-/**
- * Parses a Meta Ads Manager CSV export into CampaignDay[].
- * Handles pt-BR numbers, missing values, date formats, aggregated rows, and totals.
- */
-export function parseMetaCsv(text: string): MetaCsvResult {
-  const warnings: string[] = [];
-  const days: CampaignDay[] = [];
-  let currency: string | undefined;
+/** The numeric fields on CampaignDay that we parse from CSV values. */
+const NUMERIC_FIELDS: ReadonlySet<string> = new Set([
+  'spend', 'impressions', 'reach', 'clicks',
+  'addToCarts', 'checkoutsInitiated', 'purchases', 'revenue',
+]);
 
-  const lines = text.split('\n');
-  if (lines.length < 2) {
-    return { days, warnings, currency };
-  }
-
-  // Parse header
-  const headerLine = lines[0]!;              // lines.length >= 2, checked above
-  const headers = parseCsvLine(headerLine);
-
-  // Map each column index to a CampaignDay field
-  const columnMapping = mapColumns(headers);
-
-  // Extract currency from header
-  currency = extractCurrency(headers);
-
-  // Parse data rows
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i]!.trim();
-    if (line === '') continue; // skip empty lines
-
-    const values = parseCsvLine(line);
-
-    // Detect totals rows: campaign name is empty or starts with "Total"
-    const campaignIdx = columnMapping.findIndex(c => c?.field === 'campaignId');
-    const campaignValue = campaignIdx >= 0 ? values[campaignIdx]?.trim() : undefined;
-
-    if (campaignValue !== undefined && (campaignValue === '' || campaignValue.toLowerCase().startsWith('total'))) {
-      warnings.push('Dropped totals row');
-      continue;
-    }
-
-    // Build the CampaignDay
-    const day = buildCampaignDay(values, columnMapping, warnings);
-    if (day) {
-      days.push(day);
-    }
-  }
-
-  return { days, warnings, currency };
+/** Missing value sentinels. */
+function isMissingValue(value: string): boolean {
+  const trimmed = value.trim();
+  return trimmed === '' || trimmed === '—' || trimmed === '--' || trimmed === '-';
 }
-
-// ─── internal helpers ────────────────────────────────────────────────────
 
 type ColumnInfo = { field: keyof CampaignDay | '_dateEnd' | '_skip'; header: string } | null;
 
+/** Map each header to ColumnInfo by iterating COLUMN_MAP in declared order. */
 function mapColumns(headers: string[]): ColumnInfo[] {
   return headers.map(raw => {
     const normalised = normaliseHeader(raw);
 
-    for (const col of SORTED_COLUMNS) {
+    for (const col of COLUMN_MAP) {
       if (normalised.includes(col.match)) {
         return { field: col.field, header: raw };
       }
     }
 
-    return null; // unknown column, ignore
+    return null;
   });
 }
 
@@ -122,160 +80,228 @@ function normaliseHeader(raw: string): string {
 function extractCurrency(headers: string[]): string | undefined {
   for (const h of headers) {
     const match = h.match(/amount spent\s*\((\w+)\)/i);
-    if (match) return match[1]!.toUpperCase();  // one capture group, so a match has it
+    if (match) return match[1]!.toUpperCase();   // one capture group, so a match has it
   }
   return undefined;
 }
 
-/** Parse a single CSV line, handling quoted fields. */
-function parseCsvLine(line: string): string[] {
-  const fields: string[] = [];
-  let current = '';
-  let inQuotes = false;
+/**
+ * Scans a numeric column across data rows to detect if it uses pt-BR formatting
+ * (dots as thousands separators e.g. "10.240" or comma as decimal e.g. "0,50").
+ */
+function detectColumnPtBr(rows: string[][], colIdx: number): boolean {
+  for (const row of rows) {
+    if (colIdx >= row.length) continue;
+    const val = row[colIdx]!.trim().replace(/%$/, '');   // colIdx < row.length, checked above
+    if (isMissingValue(val)) continue;
 
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-
-    if (ch === '"') {
-      if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
-        // Escaped quote
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (ch === ',' && !inQuotes) {
-      fields.push(current);
-      current = '';
-    } else {
-      current += ch;
+    // Check if value matches thousand-dot pattern e.g. 10.240 or 1.024 or 1.240.500
+    if (/\b\d{1,3}(\.\d{3})+/.test(val)) {
+      return true;
+    }
+    // Check if comma is used as decimal e.g. "0,50" or "1240,50"
+    const lastComma = val.lastIndexOf(',');
+    const lastDot = val.lastIndexOf('.');
+    if (lastComma >= 0 && lastComma > lastDot) {
+      return true;
+    }
+    if (lastComma >= 0 && lastDot < 0) {
+      return true;
     }
   }
 
-  fields.push(current);
-  return fields;
-}
-
-/** The numeric fields on CampaignDay that we parse from CSV values. */
-const NUMERIC_FIELDS: ReadonlySet<string> = new Set([
-  'spend', 'impressions', 'reach', 'clicks',
-  'addToCarts', 'checkoutsInitiated', 'purchases', 'revenue',
-]);
-
-/** Missing value sentinels. */
-function isMissingValue(value: string): boolean {
-  const trimmed = value.trim();
-  return trimmed === '' || trimmed === '—' || trimmed === '--' || trimmed === '-';
+  return false;
 }
 
 /**
- * Parse a numeric string, handling pt-BR format.
- * pt-BR: "1.240,50" = 1240.50 (dots as thousands separators, comma as decimal)
- * Standard: "1240.50" or "1,240.50"
+ * Parses a numeric string using column-level pt-BR formatting rules.
  */
-function parseNumber(raw: string): number {
-  let value = raw.trim();
+function parseNumberValue(raw: string, isPtBrColumn: boolean): { num: number; isValid: boolean } {
+  let value = raw.trim().replace(/%$/, '');
+  if (value === '') return { num: 0, isValid: true };
 
-  // Strip percentage signs
-  value = value.replace(/%$/, '');
+  if (isPtBrColumn) {
+    const lastComma = value.lastIndexOf(',');
+    const lastDot = value.lastIndexOf('.');
 
-  if (value === '') return 0;
-
-  // Detect pt-BR: if value has comma AND digits after comma that look like decimals
-  // pt-BR pattern: dots for thousands, comma for decimal → "1.240,50"
-  // US pattern: commas for thousands, dot for decimal → "1,240.50"
-  const lastComma = value.lastIndexOf(',');
-  const lastDot = value.lastIndexOf('.');
-
-  if (lastComma > lastDot) {
-    // Comma comes after dot → pt-BR format: "1.240,50"
-    // Dots are thousands separators, comma is decimal
-    value = value.replace(/\./g, '').replace(',', '.');
-  } else if (lastDot > lastComma && lastComma >= 0) {
-    // Dot comes after comma → US format: "1,240.50"
-    // Commas are thousands separators
-    value = value.replace(/,/g, '');
-  }
-  // If only comma (no dot): "1240,50" → pt-BR decimal
-  else if (lastComma >= 0 && lastDot < 0) {
-    value = value.replace(',', '.');
-  }
-  // If only dot: "1240.50" → standard decimal (no change needed)
-
-  const num = Number(value);
-  return Number.isNaN(num) ? 0 : num;
-}
-
-/** Normalise date to ISO 8601 YYYY-MM-DD. */
-function normaliseDate(raw: string): string {
-  const trimmed = raw.trim();
-
-  // Already ISO: YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-    return trimmed;
-  }
-
-  // DD/MM/YYYY format
-  const slashMatch = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (slashMatch) {
-    const [, dd, mm, yyyy] = slashMatch;
-    return `${yyyy}-${mm}-${dd}`;
-  }
-
-  // Fallback: return as-is
-  return trimmed;
-}
-
-function buildCampaignDay(
-  values: string[],
-  columnMapping: ColumnInfo[],
-  warnings: string[],
-): CampaignDay | null {
-  let date = '';
-  let dateEnd = '';
-  let campaignId = '';
-  const numericValues: Record<string, number> = {};
-
-  for (let i = 0; i < columnMapping.length; i++) {
-    const col = columnMapping[i];
-    if (!col || col.field === '_skip') continue;
-
-    const raw = values[i] ?? '';
-
-    if (col.field === 'date') {
-      date = normaliseDate(raw);
-    } else if (col.field === '_dateEnd') {
-      dateEnd = normaliseDate(raw);
-    } else if (col.field === 'campaignId') {
-      campaignId = raw.trim();
-    } else if (NUMERIC_FIELDS.has(col.field)) {
-      if (isMissingValue(raw)) {
-        numericValues[col.field] = 0;
-        const fieldLabel = col.field as string;
-        warnings.push(`${fieldLabel} missing on ${date}`);
-      } else {
-        numericValues[col.field] = parseNumber(raw);
-      }
+    if (lastComma > lastDot) {
+      // e.g. "1.240,50" -> strip dots, comma to dot
+      value = value.replace(/\./g, '').replace(',', '.');
+    } else if (lastDot > lastComma && lastComma >= 0) {
+      value = value.replace(/,/g, '');
+    } else if (lastComma >= 0 && lastDot < 0) {
+      // e.g. "1240,50" -> comma to dot
+      value = value.replace(',', '.');
+    } else if (/\b\d{1,3}(\.\d{3})+\b/.test(value)) {
+      // e.g. "10.240" or "1.024" -> strip dots
+      value = value.replace(/\./g, '');
+    }
+  } else {
+    // US format
+    const lastComma = value.lastIndexOf(',');
+    const lastDot = value.lastIndexOf('.');
+    if (lastDot > lastComma && lastComma >= 0) {
+      value = value.replace(/,/g, '');
     }
   }
 
-  // Detect aggregated rows
-  if (dateEnd && date && dateEnd !== date) {
-    warnings.push(`Row for ${campaignId || 'unknown'} is aggregated (${date} to ${dateEnd}), in-flight diagnosis needs daily rows`);
+  const num = Number(value);
+  const isValid = !Number.isNaN(num);
+  return { num: isValid ? num : 0, isValid };
+}
+
+/**
+ * Parses a Meta Ads Manager CSV export into CampaignDay[].
+ * Handles pt-BR numbers, missing values, date formats, aggregated rows, and totals.
+ */
+export function parseMetaCsv(text: string): MetaCsvResult {
+  const warnings: string[] = [];
+  const days: CampaignDay[] = [];
+  let currency: string | undefined;
+
+  const lines = text.split('\n');
+  if (lines.length < 1) {
+    return { days, warnings, currency };
   }
 
-  const day: CampaignDay = {
-    date,
-    campaignId,
-    spend: numericValues['spend'] ?? 0,
-    impressions: numericValues['impressions'] ?? 0,
-    reach: numericValues['reach'] ?? 0,
-    clicks: numericValues['clicks'] ?? 0,
-    addToCarts: numericValues['addToCarts'] ?? 0,
-    checkoutsInitiated: numericValues['checkoutsInitiated'] ?? 0,
-    purchases: numericValues['purchases'] ?? 0,
-    revenue: numericValues['revenue'] ?? 0,
-  };
+  // Parse header
+  const headerLine = lines[0]!;   // String.split always yields at least one element
+  const headers = parseCsvLine(headerLine);
 
-  return day;
+  // Extract currency from header
+  currency = extractCurrency(headers);
+
+  if (lines.length < 2) {
+    warnings.push('CSV has no data rows');
+    return { days, warnings, currency };
+  }
+
+  // Map each column index to a CampaignDay field
+  const columnMapping = mapColumns(headers);
+
+  // Check if any recognized columns matched
+  const hasDateCol = columnMapping.some(c => c?.field === 'date');
+  const hasMetricCol = columnMapping.some(c => c && NUMERIC_FIELDS.has(c.field as string));
+
+  if (!hasDateCol && !hasMetricCol) {
+    warnings.push('No recognised Meta Ads headers found in CSV');
+    return { days, warnings, currency };
+  }
+
+  // Check for missing metric columns in the preset and emit top-level warnings
+  const mappedFields = new Set(columnMapping.filter(Boolean).map(c => c!.field));
+  for (const field of NUMERIC_FIELDS) {
+    if (!mappedFields.has(field as keyof CampaignDay)) {
+      warnings.push(`Column "${field}" missing from CSV export — values defaulted to 0`);
+    }
+  }
+
+  // Split and clean data rows
+  const dataRows: string[][] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i]!.trim();
+    if (line === '') continue;
+    dataRows.push(parseCsvLine(line));
+  }
+
+  if (dataRows.length === 0) {
+    warnings.push('CSV has no data rows');
+    return { days, warnings, currency };
+  }
+
+  // Hoist column lookups
+  const campaignIdx = columnMapping.findIndex(c => c?.field === 'campaignId');
+  const dateIdx = columnMapping.findIndex(c => c?.field === 'date');
+  const dateEndIdx = columnMapping.findIndex(c => c?.field === '_dateEnd');
+
+  // Detect pt-BR formatting per column
+  const ptBrColumns: boolean[] = columnMapping.map((col, idx) => {
+    if (!col || !NUMERIC_FIELDS.has(col.field as string)) return false;
+    return detectColumnPtBr(dataRows, idx);
+  });
+
+  // Process data rows
+  for (const values of dataRows) {
+    // Detect totals rows: any cell starting with "Total", or campaign name is empty and date is empty
+    const campaignVal = campaignIdx >= 0 ? (values[campaignIdx] ?? '').trim() : '';
+    const dateVal = dateIdx >= 0 ? (values[dateIdx] ?? '').trim() : '';
+    const isTotalRow = values.some(v => v.trim().toLowerCase().startsWith('total')) ||
+      (campaignVal === '' && (dateVal === '' || dateVal.toLowerCase().startsWith('total')));
+
+    if (isTotalRow) {
+      warnings.push('Dropped totals row');
+      continue;
+    }
+
+    // First pass: resolve dates and campaignId
+    let date = '';
+    let dateEnd = '';
+    let campaignId = '';
+
+    for (let i = 0; i < columnMapping.length; i++) {
+      const col = columnMapping[i];
+      if (!col || col.field === '_skip') continue;
+      const raw = values[i] ?? '';
+
+      if (col.field === 'date') {
+        const norm = normaliseDate(raw);
+        date = norm.date;
+        if (norm.warning) warnings.push(norm.warning);
+      } else if (col.field === '_dateEnd') {
+        const norm = normaliseDate(raw);
+        dateEnd = norm.date;
+        if (norm.warning) warnings.push(norm.warning);
+      } else if (col.field === 'campaignId') {
+        campaignId = raw.trim();
+      }
+    }
+
+    // Detect aggregated rows (start !== end): drop from daily array with warning
+    if (dateEnd && date && dateEnd !== date) {
+      warnings.push(`Dropped aggregated row (${date} to ${dateEnd}) for ${campaignId || 'unknown'}`);
+      continue;
+    }
+
+    // Second pass: process numeric fields with date resolved
+    const numericValues: Record<string, number> = {};
+
+    for (let i = 0; i < columnMapping.length; i++) {
+      const col = columnMapping[i];
+      if (!col || col.field === '_skip') continue;
+      if (!NUMERIC_FIELDS.has(col.field as string)) continue;
+
+      const fieldName = col.field as string;
+      const raw = values[i] ?? '';
+
+      if (isMissingValue(raw)) {
+        numericValues[fieldName] = 0;
+        warnings.push(`${fieldName} missing on ${date || 'unknown date'}`);
+      } else {
+        const isPtBr = ptBrColumns[i] ?? false;
+        const { num, isValid } = parseNumberValue(raw, isPtBr);
+        numericValues[fieldName] = num;
+
+        if (!isValid) {
+          warnings.push(`Unparseable ${fieldName} value "${raw.trim()}" on ${date || 'unknown date'}`);
+        }
+      }
+    }
+
+    const day: CampaignDay = {
+      date,
+      campaignId,
+      spend: numericValues['spend'] ?? 0,
+      impressions: numericValues['impressions'] ?? 0,
+      reach: numericValues['reach'] ?? 0,
+      clicks: numericValues['clicks'] ?? 0,
+      addToCarts: numericValues['addToCarts'] ?? 0,
+      checkoutsInitiated: numericValues['checkoutsInitiated'] ?? 0,
+      purchases: numericValues['purchases'] ?? 0,
+      revenue: numericValues['revenue'] ?? 0,
+    };
+
+    days.push(day);
+  }
+
+  return { days, warnings, currency };
 }
