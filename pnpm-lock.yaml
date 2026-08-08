@@ -35,6 +35,15 @@ importers:
         specifier: ^3.25.0
         version: 3.25.76
 
+  packages/sim:
+    dependencies:
+      '@mazal/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mazal/data':
+        specifier: workspace:*
+        version: link:../data
+
 packages:
 
   '@esbuild/aix-ppc64@0.28.1':
