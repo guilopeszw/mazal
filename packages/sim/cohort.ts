@@ -18,19 +18,27 @@ export const HELD_OUT = 100;
 const BASE = 700000;
 
 /**
- * Faults are assigned round-robin, which gives `none` 45 of 400 — the same
- * share as every other class.
+ * One campaign in four is healthy; the eight broken kinds share the rest.
  *
- * That is a deliberate over-representation of broken campaigns relative to any
- * real account, and it is the right call for a confusion matrix, which needs
- * every cell populated. It does mean **the false-alarm rate here is measured on
- * 45 healthy campaigns of a possible 400**, and the slide should quote the
- * denominator rather than the percentage alone.
+ * Plain round-robin over nine kinds gave `none` one ninth of the cohort, which
+ * left **eleven** healthy campaigns in the held-out hundred. A false-alarm rate
+ * on eleven campaigns carries about fifteen points of standard error, and the
+ * false-alarm rate is the number B-data.md says a judge who has shipped a
+ * monitoring product asks about first. Quoting it to one decimal place off
+ * eleven samples would be the most confident wrong number on the slide.
+ *
+ * A quarter healthy is also closer to a real account than a ninth, and every
+ * broken class still lands ~37 campaigns, which is enough to fill the confusion
+ * matrix. It is still nothing like a real account's ratio — most campaigns in
+ * the world are fine — so the false-alarm rate stays a floor, not a forecast.
  */
+const BROKEN = FAULT_KINDS.filter((k) => k !== 'none');
+
 export function cohortPlan(): { seed: number; fault: FaultKind }[] {
+  let broken = 0;
   return Array.from({ length: COHORT_SIZE }, (_, i) => ({
     seed: BASE + i,
-    fault: FAULT_KINDS[i % FAULT_KINDS.length]!,
+    fault: i % 4 === 0 ? ('none' as FaultKind) : BROKEN[broken++ % BROKEN.length]!,
   }));
 }
 

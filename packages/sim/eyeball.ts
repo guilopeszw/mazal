@@ -280,6 +280,10 @@ function checkCohort(): void {
   if (new Set(plan.map((p) => p.seed)).size !== plan.length) fails.push('seeds are not unique');
   if (kindsIn(train).size !== FAULT_KINDS.length) fails.push('a fault kind is missing from the training half');
   if (kindsIn(held).size !== FAULT_KINDS.length) fails.push('a fault kind is missing from the held-out half');
+  // Guards the defect that running the backtest at full scale exposed: a
+  // held-out half too thin on healthy campaigns to measure a false-alarm rate.
+  const heldHealthy = held.filter((p) => p.fault === 'none').length;
+  if (heldHealthy < 20) fails.push(`only ${heldHealthy} healthy campaigns held out; need >= 20`);
 
   if (fails.length > 0) {
     console.log('\nCOHORT CHECKS FAILED');
@@ -287,9 +291,9 @@ function checkCohort(): void {
     process.exitCode = 1;
     return;
   }
-  const noneCount = plan.filter((p) => p.fault === 'none').length;
+  const heldNone = held.filter((p) => p.fault === 'none').length;
   console.log(`cohort: ${COHORT_SIZE} campaigns, ${HELD_OUT} held out, every fault in both halves. ok` +
-    `\n  (the false-alarm rate will rest on ${noneCount} healthy campaigns — quote that denominator)`);
+    `\n  (the false-alarm rate rests on ${heldNone} healthy held-out campaigns — quote that denominator)`);
 }
 
 function printFaults(): void {
