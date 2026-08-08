@@ -42,10 +42,13 @@ TDD is mandatory in `packages/engine` and `packages/ingest`. Everywhere else is 
 
 The team sleeps Saturday night with sessions running and occasional checks. While unattended, an agent writes code, runs tests, and commits **within its own package**.
 
-Stop and append to `docs/HANDOFF.md` — what was done, what is unresolved, what to look at first — when tests go red, when a change would touch `packages/contracts`, or when a change would touch another owner's package. Destructive git is never available: no `reset --hard`, no force push, no branch deletion.
+Stop and append to [`docs/HANDOFF.md`](docs/HANDOFF.md) when tests go red, when a change would touch `packages/contracts`, or when a change would touch another owner's package. Destructive git is never available: no `reset --hard`, no force push, no branch deletion.
+
+Every session appends to `docs/HANDOFF.md` before it ends, attended or not — what landed, the single next action, and anything that will bite the next person. It is how a new session picks up without being told anything.
 
 ## Where to look
 
+- **Starting a session** → [`docs/HANDOFF.md`](docs/HANDOFF.md) — who is who, what landed, what is next. Read it before anything else, and append to it when you stop.
 - **Building anything** → [`docs/contracts.md`](docs/contracts.md) — the frozen types and every package's public API.
 - **Writing a test** → [`docs/testing.md`](docs/testing.md).
 - **Deciding whether something is done** → [`docs/acceptance.md`](docs/acceptance.md) — the ten claims Mazal must be able to make, each with its demo beat and its test.
