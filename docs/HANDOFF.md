@@ -29,6 +29,45 @@ Fill a name in as each person starts. If you are opening a session and your lett
 
 ---
 
+## 2026-08-08 15:20 · Guilherme · session state, four open PRs, two collisions
+
+Read this entry alone and you have the whole picture. **Nothing is merged by an agent; a human reviews and merges.**
+
+### Where the code is
+
+`stage` = `49113f2`: workspace scaffold, `packages/data` with 62 derived categories, branch policy. Green: `pnpm test` 5 passing, `pnpm typecheck` clean. `main` = `b3fa8df`, docs only, no code at all.
+
+| PR | Head → base | State | What it is |
+|---|---|---|---|
+| [#1](https://github.com/guilopeszw/mazal/pull/1) | `feat/packages/contracts` → **`main`** | open, Mateus | `packages/contracts` and `packages/ingest`, v1 |
+| [#3](https://github.com/guilopeszw/mazal/pull/3) | `stage` → `main` | open | The scaffold and the benchmarks, first review they have had |
+| [#4](https://github.com/guilopeszw/mazal/pull/4) | `docs/conventional-commits` → `stage` | open | Conventional commits for messages and PR titles |
+| #2 | merged | — | Branch-per-change policy |
+
+### Two collisions to resolve before anything else is built
+
+**Both PRs introduce a different root workspace.** #1 branched from `main`, so it never saw the scaffold on `stage`. Its `package.json` is `pnpm@9.15.4` with `scripts: { build: 'pnpm -r build', test: 'pnpm -r test' }`; `stage`'s is `pnpm@11.5.1` with vitest at the root, `engines: node >= 24`, and `pnpm derive`. Both bring their own `pnpm-lock.yaml`, and #1 also adds `tsconfig.base.json` beside `stage`'s `tsconfig.json`. Whichever merges second conflicts on all four files.
+
+**Two module strategies.** `packages/contracts` in #1 builds with `tsc` and points `main` at `./dist/index.js`, so it must be built before anyone can import it. `packages/data` on `stage` has no build step — Node 24 runs the TypeScript directly and `exports` points at `./index.ts`. One of these has to give, and it decides whether the weekend has a build step at all.
+
+Cheapest resolution, and it is a decision, not a fact: rebase #1 onto `stage`, keep `stage`'s root, keep contracts' `dist` build only if `apps/web` turns out to need it.
+
+### What is wrong with what is already merged
+
+- **The media priors have no citation.** `cpm`, `ctr`, `cvr`, `atcRate`, `icRate` in `benchmarks.json` are published medians for Brazilian retail written from memory. `n: 0` marks them as estimates, which is honest about *kind* but not about *provenance*. Before slide 6 claims rigour, either cite a source per number or say on the slide that five of twelve metrics are priors. The measured Kaggle values print on every `pnpm derive` run.
+- **`source: 'olist' | 'kaggle_meta'` mislabels them.** Five metrics say `kaggle_meta` and did not come from Kaggle. #1 ships this union unchanged, so the moment to add `'prior'` is while #1 is still open.
+- **`OlistCategory` in #1 is `'health_beauty' | ... | string`, which TypeScript collapses to `string`.** It type-checks anything, including a typo. The real 62-member union is generated at `packages/data/categories.ts` and needs wiring into the contract.
+- **`packages/data/index.ts` exports `benchmarks` untyped.** Nothing checks the JSON against `BenchmarkTable`, so a missing metric surfaces in the engine at hour 30 rather than here. One `satisfies` fixes it once #1 lands.
+- **No test asserts the shape of `benchmarks.json`.** The tests cover the CSV parser and the quantiles, not the output — 62 categories × 12 metrics is asserted by nobody.
+- **`derive.ts` byte-reproducibility is unverified.** SUN-B requires identical output on a second machine and it has only ever run on one.
+- **Two unvalidated modelling assumptions**, both in `derive.ts`: an order's category is its first item's, and `deliveryDays` is the promised ETA rather than the actual delivery.
+- **Process cost.** The branch policy was written, merged, reverted, rewritten and re-merged inside an hour. That hour bought a real rule, and it came out of the build.
+- **`docs/PERSON-HANDOFF.md` appears in #1.** Two handoff files means the state channel forks. Pick this one or that one before both are half-true.
+
+**Next:** A human decides #1's base and the build-step question, then merges in the order #4, #3, #1. After that: wire `OlistCategory` and type `index.ts` against `BenchmarkTable`, then `packages/sim`, which is what B is actually here to build.
+
+---
+
 ## 2026-08-08 14:55 · Guilherme · branch policy in review, bugs logged
 
 **Done:** The stricter branch policy — every change on a branch, `stage` takes merges rather than commits — was merged straight into `stage` and then reverted back out (`a29550d`, `9e7a64d`). `stage` is byte-identical to `03032fc` again; nothing was rewritten. The policy is now a PR against `stage`, which is the point of the policy, and it waits for a reviewer.
