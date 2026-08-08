@@ -3,7 +3,7 @@
 // Every quirk from docs/plan/C-ingest.md becomes a test case here.
 
 import { describe, expect, test } from 'vitest';
-import { parseMetaCsv } from './meta-csv.js';
+import { parseMetaCsv } from './meta-csv.ts';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

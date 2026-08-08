@@ -3,7 +3,7 @@
 // Match columns loosely. Ignore rate columns. Handle all the quirks.
 
 import type { CampaignDay } from '@mazal/contracts';
-import { parseCsvLine, normaliseDate } from './csv.js';
+import { parseCsvLine, normaliseDate } from './csv.ts';
 
 /** Column mapping: normalised header substring → CampaignDay field or metadata key. */
 const COLUMN_MAP: Array<{ match: string; field: keyof CampaignDay | '_dateEnd' | '_skip' }> = [
@@ -43,13 +43,19 @@ const NUMERIC_FIELDS: ReadonlySet<string> = new Set([
   'addToCarts', 'checkoutsInitiated', 'purchases', 'revenue',
 ]);
 
+/** True when the comma is the decimal point rather than a thousands separator. */
+function commaIsDecimal(value: string): boolean {
+  const lastComma = value.lastIndexOf(',');
+  return lastComma >= 0 && lastComma > value.lastIndexOf('.');
+}
+
 /** Missing value sentinels. */
 function isMissingValue(value: string): boolean {
   const trimmed = value.trim();
   return trimmed === '' || trimmed === '—' || trimmed === '--' || trimmed === '-';
 }
 
-type ColumnInfo = { field: keyof CampaignDay | '_dateEnd' | '_skip'; header: string } | null;
+type ColumnInfo = { field: keyof CampaignDay | '_dateEnd' | '_skip' } | null;
 
 /** Map each header to ColumnInfo by iterating COLUMN_MAP in declared order. */
 function mapColumns(headers: string[]): ColumnInfo[] {
@@ -58,7 +64,7 @@ function mapColumns(headers: string[]): ColumnInfo[] {
 
     for (const col of COLUMN_MAP) {
       if (normalised.includes(col.match)) {
-        return { field: col.field, header: raw };
+        return { field: col.field };
       }
     }
 
@@ -80,7 +86,7 @@ function normaliseHeader(raw: string): string {
 function extractCurrency(headers: string[]): string | undefined {
   for (const h of headers) {
     const match = h.match(/amount spent\s*\((\w+)\)/i);
-    if (match) return match[1].toUpperCase();
+    if (match) return match[1]!.toUpperCase();   // one capture group, so a match has it
   }
   return undefined;
 }
@@ -92,22 +98,13 @@ function extractCurrency(headers: string[]): string | undefined {
 function detectColumnPtBr(rows: string[][], colIdx: number): boolean {
   for (const row of rows) {
     if (colIdx >= row.length) continue;
-    const val = row[colIdx].trim().replace(/%$/, '');
+    const val = row[colIdx]!.trim().replace(/%$/, '');   // colIdx < row.length, checked above
     if (isMissingValue(val)) continue;
 
-    // Check if value matches thousand-dot pattern e.g. 10.240 or 1.024 or 1.240.500
-    if (/\b\d{1,3}(\.\d{3})+/.test(val)) {
-      return true;
-    }
-    // Check if comma is used as decimal e.g. "0,50" or "1240,50"
-    const lastComma = val.lastIndexOf(',');
-    const lastDot = val.lastIndexOf('.');
-    if (lastComma >= 0 && lastComma > lastDot) {
-      return true;
-    }
-    if (lastComma >= 0 && lastDot < 0) {
-      return true;
-    }
+    // Dots grouping thousands ("10.240", "1.240.500"), or a comma sitting to the
+    // right of any dot, which only happens when the comma is the decimal point.
+    if (/\b\d{1,3}(\.\d{3})+/.test(val)) return true;
+    if (commaIsDecimal(val)) return true;
   }
 
   return false;
@@ -120,29 +117,16 @@ function parseNumberValue(raw: string, isPtBrColumn: boolean): { num: number; is
   let value = raw.trim().replace(/%$/, '');
   if (value === '') return { num: 0, isValid: true };
 
-  if (isPtBrColumn) {
-    const lastComma = value.lastIndexOf(',');
-    const lastDot = value.lastIndexOf('.');
-
-    if (lastComma > lastDot) {
-      // e.g. "1.240,50" -> strip dots, comma to dot
-      value = value.replace(/\./g, '').replace(',', '.');
-    } else if (lastDot > lastComma && lastComma >= 0) {
-      value = value.replace(/,/g, '');
-    } else if (lastComma >= 0 && lastDot < 0) {
-      // e.g. "1240,50" -> comma to dot
-      value = value.replace(',', '.');
-    } else if (/\b\d{1,3}(\.\d{3})+\b/.test(value)) {
-      // e.g. "10.240" or "1.024" -> strip dots
-      value = value.replace(/\./g, '');
-    }
+  if (isPtBrColumn && commaIsDecimal(value)) {
+    // "1.240,50" or "1240,50" — dots group thousands, the comma is the point.
+    value = value.replace(/\./g, '').replace(',', '.');
+  } else if (isPtBrColumn && /\b\d{1,3}(\.\d{3})+\b/.test(value)) {
+    // "10.240" — dots group thousands and there is no decimal part.
+    value = value.replace(/\./g, '');
   } else {
-    // US format
-    const lastComma = value.lastIndexOf(',');
-    const lastDot = value.lastIndexOf('.');
-    if (lastDot > lastComma && lastComma >= 0) {
-      value = value.replace(/,/g, '');
-    }
+    // "1,240.50" — commas group thousands. True of US columns and of a pt-BR column
+    // whose values happen to be written the other way round.
+    value = value.replace(/,/g, '');
   }
 
   const num = Number(value);
@@ -160,12 +144,9 @@ export function parseMetaCsv(text: string): MetaCsvResult {
   let currency: string | undefined;
 
   const lines = text.split('\n');
-  if (lines.length < 1) {
-    return { days, warnings, currency };
-  }
 
   // Parse header
-  const headerLine = lines[0];
+  const headerLine = lines[0]!;   // String.split always yields at least one element
   const headers = parseCsvLine(headerLine);
 
   // Extract currency from header
@@ -199,7 +180,7 @@ export function parseMetaCsv(text: string): MetaCsvResult {
   // Split and clean data rows
   const dataRows: string[][] = [];
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const line = lines[i]!.trim();
     if (line === '') continue;
     dataRows.push(parseCsvLine(line));
   }
@@ -212,7 +193,6 @@ export function parseMetaCsv(text: string): MetaCsvResult {
   // Hoist column lookups
   const campaignIdx = columnMapping.findIndex(c => c?.field === 'campaignId');
   const dateIdx = columnMapping.findIndex(c => c?.field === 'date');
-  const dateEndIdx = columnMapping.findIndex(c => c?.field === '_dateEnd');
 
   // Detect pt-BR formatting per column
   const ptBrColumns: boolean[] = columnMapping.map((col, idx) => {
@@ -223,8 +203,8 @@ export function parseMetaCsv(text: string): MetaCsvResult {
   // Process data rows
   for (const values of dataRows) {
     // Detect totals rows: any cell starting with "Total", or campaign name is empty and date is empty
-    const campaignVal = campaignIdx >= 0 && campaignIdx < values.length ? values[campaignIdx].trim() : '';
-    const dateVal = dateIdx >= 0 && dateIdx < values.length ? values[dateIdx].trim() : '';
+    const campaignVal = campaignIdx >= 0 ? (values[campaignIdx] ?? '').trim() : '';
+    const dateVal = dateIdx >= 0 ? (values[dateIdx] ?? '').trim() : '';
     const isTotalRow = values.some(v => v.trim().toLowerCase().startsWith('total')) ||
       (campaignVal === '' && (dateVal === '' || dateVal.toLowerCase().startsWith('total')));
 
@@ -241,7 +221,7 @@ export function parseMetaCsv(text: string): MetaCsvResult {
     for (let i = 0; i < columnMapping.length; i++) {
       const col = columnMapping[i];
       if (!col || col.field === '_skip') continue;
-      const raw = i < values.length ? values[i] : '';
+      const raw = values[i] ?? '';
 
       if (col.field === 'date') {
         const norm = normaliseDate(raw);
@@ -271,13 +251,13 @@ export function parseMetaCsv(text: string): MetaCsvResult {
       if (!NUMERIC_FIELDS.has(col.field as string)) continue;
 
       const fieldName = col.field as string;
-      const raw = i < values.length ? values[i] : '';
+      const raw = values[i] ?? '';
 
       if (isMissingValue(raw)) {
         numericValues[fieldName] = 0;
         warnings.push(`${fieldName} missing on ${date || 'unknown date'}`);
       } else {
-        const isPtBr = ptBrColumns[i];
+        const isPtBr = ptBrColumns[i] ?? false;
         const { num, isValid } = parseNumberValue(raw, isPtBr);
         numericValues[fieldName] = num;
 

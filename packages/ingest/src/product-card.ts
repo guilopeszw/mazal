@@ -3,10 +3,14 @@
 // The form component lives in apps/web; this schema is what it means.
 
 import { z } from 'zod';
-import type { ProductCard } from '@mazal/contracts';
+import { OLIST_CATEGORIES, type ProductCard } from '@mazal/contracts';
 
 export const productCardSchema: z.ZodType<ProductCard> = z.object({
-  category: z.string().min(1, 'Category is required'),
+  // The 62 categories `pnpm derive` found in Olist. It was `z.string().min(1)`, which
+  // accepted any string — and typechecked, because `OlistCategory` was declared with a
+  // `| string` arm that collapsed the whole union. A category with no benchmark behind
+  // it reaches the engine as a lookup that silently misses.
+  category: z.enum(OLIST_CATEGORIES),
   price: z.number().positive('Price must be positive'),
   grossMargin: z.number().gt(0, 'Gross margin must be greater than 0').max(1, 'Gross margin must be between 0 and 1'),
   shippingCost: z.number().min(0, 'Shipping cost cannot be negative'),

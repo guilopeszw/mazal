@@ -9,9 +9,10 @@ The ingest package parses seller inputs into standard `@mazal/contracts` types f
    - Returns `{ days: CampaignDay[]; warnings: string[]; currency?: string }`.
    - Handles pt-BR thousands separators (`10.240` -> `10240`, `1.240,50` -> `1240.50`), parenthetical currencies (`Amount spent (BRL)`), totals rows dropping, missing value sentinels (`—`, `--`, `-`), and rate column filtering.
 
-2. `parseEventLog(text: string): { events: StoreEvent[]; warnings: string[] }`
+2. `parseEventLog(text: string): StoreEvent[]`
    - Parses store event log CSV or JSON text into `StoreEvent[]`.
-   - Validates event types against `StoreEventType` union using Zod.
+   - Validates event types against `STORE_EVENT_TYPES` from `@mazal/contracts` using Zod.
+   - **Drops invalid rows silently.** There is no warnings channel here, unlike `parseMetaCsv` — a malformed event log looks like a short one.
 
 3. `productCardSchema`
    - Strict Zod schema for validating the 12 ProductCard fields.

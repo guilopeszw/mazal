@@ -32,8 +32,181 @@ Entry format:
 | A — engine | Miguel | [`plan/A-engine.md`](plan/A-engine.md) |
 | B — data & simulator | Guilherme | [`plan/B-data.md`](plan/B-data.md) |
 | C — ingest & contracts | Mateus | [`plan/C-ingest.md`](plan/C-ingest.md) |
-| D — frontend | *(unassigned)* | [`plan/D-frontend.md`](plan/D-frontend.md) |
-| E — agent, deco, pitch | *(unassigned)* | [`plan/E-agent.md`](plan/E-agent.md) |
+| D — frontend | Bringel | [`plan/D-frontend.md`](plan/D-frontend.md) |
+| E — agent, deco, pitch | Joaquim | [`plan/E-agent.md`](plan/E-agent.md) |
+
+---
+
+## 2026-08-08 20:10 · Guilherme · main reconciled with stage; D and E named
+
+**Done:** two things, both housekeeping, one of them overdue.
+
+**D is Bringel and E is Joaquim.** The table above is filled in. Neither `apps/web` nor `apps/mcp` exists yet and neither has pushed a branch, so the two of them are starting from the scaffolding steps in [`plan/D-frontend.md`](plan/D-frontend.md) and [`plan/E-agent.md`](plan/E-agent.md).
+
+Two things land on D immediately, both consequences of contract changes already merged:
+
+- **The category field must be a `<select>` over `OLIST_CATEGORIES`, not a text input.** `productCardSchema` is `z.enum(OLIST_CATEGORIES)` now; free text fails validation.
+- **Print `n` beside any benchmark shown to a seller.** Five of twelve metrics are priors at `n: 0`, and `photos`/`descriptionLength` bottom out at `n: 9` in six categories. [`benchmark-provenance.md`](benchmark-provenance.md) has the whole picture and the sentence slide 6 should carry.
+
+For E: `diagnose` does not exist yet, so the MCP tools have nothing to wrap. `generateCampaign` and the two committed fixtures in `packages/sim/fixtures/` are real and importable today, which is enough to build and demo the tool surface against fixed data while A's package is still missing.
+
+**`main` reconciled with `stage`.** `main` was 16 commits behind and `stage` was a strict superset of it, so this was a fast-forward-in-substance merge, not a reconciliation of two histories — nothing was dropped and nothing was rewritten. Said out loud before it happened, per `AGENTS.md`, and green when it did: `pnpm typecheck` clean, `pnpm test` 54 passing, `pnpm sim:eyeball` green on all four check groups.
+
+Until now, cloning `main` cold — which is what `AGENTS.md` says `main` is *for* — gave a tree with no simulator, no `packages/data` wiring, `OlistCategory` collapsed to `string`, `z.string()` accepting any category, and the silent date guess. That is fixed.
+
+**Next:** unchanged and still A's. `packages/engine` is the only thing on the critical path.
+
+**Blocked / watch out:** the branch direction inverted once already this weekend, when #1 and #3 both merged into `main` while a PR was open against `stage`. It cost an afternoon of reconciliation. `<type>/<thing>` → `stage` → `main`, and **nothing merges into `main` except `stage`.**
+
+---
+
+## 2026-08-08 19:55 · Guilherme · everything B can do without the engine is done
+
+**Read this entry and the one below it and you have all of B's state.**
+
+**Done:** the last of B's unblocked work, on `feat/sim-scoring`. `pnpm typecheck` clean, `pnpm test` 54 passing, `pnpm sim:eyeball` green on all four check groups.
+
+**`packages/sim/score.ts` — the backtest was only half blocked.** Scoring is a pure function of `(label, Diagnosis)` pairs, and `Diagnosis` is in the contract. It is written and checked against hand-made diagnoses. When `diagnose` exists, the remaining work is the handful of lines that call it and hand the pairs over. Keeping the split also makes the firewall structural: nothing in `score.ts` can reach into how the answer was made.
+
+**`packages/sim/cohort.ts` — the 400 campaigns and the 100 held out are fixed now**, before anyone has seen a score. A split chosen after the first result is not a held-out set, it is a choice about which result to report. Round-robin over the nine kinds, so **the false-alarm rate will rest on 45 healthy campaigns — quote that denominator, not the percentage alone.**
+
+**`docs/benchmark-provenance.md`** — which seven benchmarks are measured and which five are priors, with the sentence slide 6 should say. "Derived from Kaggle" is true of seven twelfths of that table.
+
+**The nine uncovered categories are 0.16% of orders — 159 of 97,256.** `flowers` is the largest at 29 orders. **This closes the question, and it closes it in A's favour: `ReferenceMode` does not need a fallback arm for the demo.** The slide line is "62 of Olist's 71 categories, covering 99.84% of orders."
+
+**`top-2` is redefined, and the deck must say so.** `B-data.md` asks for "the strongest secondary finding's implied cause", but `Diagnosis` carries one `suspectedCause` and a `Finding` carries a `causeLayer`, not a `FaultKind` — no finding has an implied cause to read, and reading it out of `packages/engine` is what the firewall forbids. `scoreOne` asks the computable version of the same question: **did it name the right stage?** A stockout called a thin PDP is a near miss — both break stage 3, and the seller is sent to the right part of the funnel. A stockout called a budget cap is not. The exact metric needs an optional `impliedCause?: FaultKind` on `Finding`; that is C's call and an announcement.
+
+**Next — and it is one command, for whoever picks this up after `diagnose` lands:**
+
+```ts
+// packages/sim/backtest.ts — add "@mazal/engine": "workspace:*" to package.json first
+import { benchmarks } from '@mazal/data';
+import { diagnose } from '@mazal/engine';
+import { generateCohort, score, splitCohort, formatConfusion } from './index.ts';
+
+const { train, held } = splitCohort(generateCohort());
+const pairs = held.map((c) => ({
+  fault: c.fault,
+  diagnosis: diagnose({ days: c.days, card: c.card, events: c.events,
+    reference: { kind: 'benchmark', table: benchmarks } }),
+}));
+console.log(score(pairs));          // held-out: the reported number
+// Show A the TRAINING confusion matrix only — never a per-class breakdown of `held`.
+```
+
+**Blocked / watch out:** **`packages/engine` still does not exist and A has pushed nothing all weekend.** Every remaining B deliverable — the accuracy number, the confusion matrix, the calibration check — is downstream of `diagnose` and of nothing else. There is no more B work to bring forward.
+
+**`main` is 15 commits behind `stage`.** It is the build that gets cloned cold and it has no simulator, no contract fixes, `z.string()` for category and the silent date guess. `stage` is a strict superset and green. Needs announcing, then merging.
+
+**SUN-B's second-machine check has never run.** Clone `stage` elsewhere, `pnpm derive && pnpm sim:fixtures`, confirm `git status` is clean. It cannot be done on this machine by definition.
+
+---
+
+## 2026-08-08 19:30 · Guilherme · the simulator is on stage; SAT-B and most of SUN-A done
+
+**Done:** `packages/sim` is real and merged (`fa7be86`). `generateCampaign(seed, fault)` covers **all nine** fault kinds — SAT-B asked for three — and both demo fixtures are committed. `pnpm test` 54 passing, `pnpm typecheck` clean, `pnpm sim:eyeball` green across 360 campaigns, `pnpm sim:fixtures` byte-reproducible on a rerun. The plan is at [`superpowers/plans/2026-08-08-packages-sim.md`](superpowers/plans/2026-08-08-packages-sim.md).
+
+`packages/sim` is test-exempt per `docs/testing.md`, so the check it carries is a script: `pnpm sim:eyeball` prints a series per fault and then asserts each one deforms the stages `B-data.md`'s table names **and no others**, over 40 seeds per fault. Writing that found three bugs that would each have poisoned the backtest quietly.
+
+**`Math.round` collapsed the funnel for small advertisers.** A seller on R$60/day gets ~20 clicks, so ~1 add-to-cart, and `Math.round(1 × 0.45)` is 0 — thirty days of zero checkouts and zero purchases on a campaign labelled `none`. Every small advertiser in the training set would have been a false alarm, and the false-alarm rate is the number `B-data.md` says a judge asks about first. Stochastic rounding keeps the expectation at small counts.
+
+**A blind squeeze did not survive the generator's own variance.** Campaigns draw their base rates at sigma 0.2–0.3, so scaling ATC by 0.4 left a high-drawing store above a low-drawing healthy one: a fault label on healthy numbers, teaching the engine that the fault sometimes does nothing. Faults now name the *rate they put the stage on*, whatever the base happens to be.
+
+**Shipping was drawn from a second, independent price**, so a R$5 item could carry R$24 of freight. Olist holds those two as a ratio; there is one draw now.
+
+**Next:** `runBacktest` — the file is specced in the plan's Task 6 and blocked on nothing but `diagnose`.
+
+**Blocked / watch out:** **`packages/engine` does not exist and A has pushed nothing all weekend.** SUN-A wants a real accuracy number by 13:00 and it cannot exist until `diagnose` does. That is the escalation, and it is more urgent than anything left in this package.
+
+**`top-2` cannot be computed exactly across the firewall.** `Diagnosis` carries one `suspectedCause` and `Finding` carries a `causeLayer`, not a `FaultKind`, so "the strongest secondary finding's implied cause" has no exact reading without opening `packages/engine`, which B may not do. Task 6 approximates it with the secondary's cause layer and the slide must say so. The clean fix is an optional `impliedCause?: FaultKind` on `Finding` — C's call, and an announcement.
+
+**Frequency is now a simulated stage.** `creative_fatigue` is the only fault that moves it, and it is the only fault with two signals rather than one: a CTR that decays *without* the frequency climb is a creative that was never good, which is a different diagnosis. If the engine only reads CTR it will confuse the two.
+
+---
+
+## 2026-08-08 16:50 · Guilherme · #1 and #3 merged to main; #7 reviewed and fixed
+
+**Read this entry alone and you have the whole picture.**
+
+### Where the code is
+
+**`main` is now six commits ahead of `stage`, which inverts the direction AGENTS.md sets.** #1 went `feat/packages/contracts` → `main` and #3 went `stage` → `main`, both merged while #7 was open, and `8988993` landed on `main` directly after. `stage` has not moved since `31bace6`. Nothing is wrong with the code on `main`; the flow is just running backwards, and the next `stage` → `main` will look like a revert unless `main` is merged down into `stage` first.
+
+**`main` carries the *unfixed* contracts and ingest.** Everything the reviews found is fixed on `feat/integrate-contracts` and nowhere else: the build step, `OlistCategory = … | string`, `source` without `'prior'`, `productCardSchema` accepting any string as a category, and the silent date guess.
+
+| PR | Head → base | State |
+|---|---|---|
+| [#7](https://github.com/guilopeszw/mazal/pull/7) | `feat/integrate-contracts` → `stage` | open, reviewed, fixed, green |
+| [#6](https://github.com/guilopeszw/mazal/pull/6) | `test/benchmarks-shape` → `stage` | open, contained in #7 |
+| #1, #3 | → `main` | merged |
+
+#7 now contains `origin/main` in full, so merging it cannot revert anything. `pnpm test` 54 passing, `pnpm typecheck` clean, `pnpm derive` byte-reproducible.
+
+### What the review changed
+
+Two passes over #7 — one for over-engineering, one on the standards and spec axes — plus the fixes, in `aae224c`:
+
+- **`normaliseDate('07/01/2026')` returned 7 January and said nothing.** `plan/C-ingest.md` asks it to reject rather than guess. Both readings are real dates so nothing rejects; it now returns the DD/MM reading *with a warning*, and only when neither number settles it. `packages/ingest/src/csv.test.ts` covers the four cases.
+- **`LabelledCampaign` and `BacktestReport` were never written.** `contracts.md` lists them under `// packages/sim`; the engine's block was implemented in contracts and the simulator's was skipped. Added — B cannot type `runBacktest` without them.
+- **`STORE_EVENT_TYPES`** joins `OLIST_CATEGORIES` as a runtime array with its union derived from it. `packages/ingest` had its own `z.enum` of the same seven strings.
+- Dead code and duplication out of `packages/ingest`: net −45 lines, no behaviour change except that a US-format `1,240` used to become NaN and a warning, and now parses.
+- `packages/ingest/README.md` documented `parseEventLog` returning `{ events, warnings }`. It returns `StoreEvent[]` and drops invalid rows silently, which the README now says.
+
+**Left unfixed on purpose, all of them someone else's call:** `meta-csv.test.ts` inlines CSV literals in ten tests where `docs/testing.md` says fixtures live in files — C's suite, and a drift risk rather than a bug. `safeDiv` is exported while `contracts.md` declares it module-private and `testing.md` mandates asserting on it — the two documents disagree. And `packages/data/derive.ts` and `packages/ingest/src/csv.ts` are two hand-rolled CSV parsers, of which only `derive.ts`'s handles a quoted newline or a BOM.
+
+**Next:** merge `main` down into `stage`, then #6, then #7. After that B goes to `packages/sim`, which is what the rest of B's weekend is.
+
+**Blocked / watch out:** **D and E are assigned — the names are not in the table below yet, and whoever knows them should fill them in.** Both packages are still unstarted, the deadline is Sunday 23:59 with freeze at 19:00, and `apps/web` and `apps/mcp` do not exist.
+
+**`apps/web`'s category field must be a select over `OLIST_CATEGORIES`, not a text input** — and nine real Olist categories are outside it, so `ReferenceMode` still needs an arm for a category with no benchmark row. That one is A's.
+
+---
+
+## 2026-08-08 15:55 · Guilherme · contracts and ingest integrated onto stage, on a branch
+
+**This entry announces changes to `packages/contracts`, which AGENTS.md says are announced before they are pushed.** They are on `feat/integrate-contracts` and in a PR, not on `stage`. Mateus reviews before it merges — the type edits are his call and two of them are decisions, not fixes.
+
+**Done:** #1's tree merged into a branch off `stage`, so **#1 itself is untouched** — no rebase, no force-push of someone else's branch. `pnpm test` 50 passing (was 9 + #1's 41), `pnpm typecheck` clean, `pnpm derive` byte-reproducible after all of it.
+
+Resolutions, each one a decision someone can reverse:
+
+- **`stage`'s root wins.** The three conflicts were `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, all config. `stage`'s root is `pnpm@11.5.1`, Node ≥24, root vitest, `pnpm derive`; #1's was six lines. `tsconfig.base.json` never conflicted — different filename — and is deleted along with `packages/{contracts,ingest}/tsconfig.json`, which only existed to configure a build.
+- **No build step.** contracts and ingest now export `./src/index.ts` directly, `build` scripts gone, `.js` specifiers rewritten to `.ts`. Node 24 runs TypeScript natively and `packages/data` already relied on it. If `apps/web` turns out to need built packages, the cost there is `transpilePackages: ['@mazal/contracts']`, not a build step for the whole weekend.
+- **`OlistCategory` is now the real 62-member union**, generated by `pnpm derive` into `packages/contracts/src/categories.ts` rather than `packages/data/`, so the contract stays the leaf every package imports. It ships a runtime `OLIST_CATEGORIES` array with the type derived from it, because a bare type erases and nothing downstream can validate against it.
+- **`source` gained `'prior'`** and the five media priors now carry it. They said `kaggle_meta` and did not come from Kaggle.
+- **`docs/PERSON-HANDOFF.md` is kept, not deleted** — it has an architecture overview this file does not. It now opens with a line saying this file is the state channel.
+
+**Next:** Mateus reviews [#7](https://github.com/guilopeszw/mazal/pull/7). Merge order: #6, then #7, then #3 carries the lot to `main` in one review. After that B goes to `packages/sim`, which is now genuinely unblocked.
+
+**Blocked / watch out:** Four things, two of them bugs that were being hidden.
+
+**`docs/HANDOFF.md` on `feat/packages/contracts` has committed conflict markers** — `<<<<<<< HEAD` on line 1, `>>>>>>> b3fa8df` on line 227. An unresolved merge was committed as content. This branch resolves it to `stage`'s version; if #1 is ever merged by another route, that has to be fixed there too.
+
+**`productCardSchema` was not validating category.** It had `z.string().min(1)` and typechecked against `OlistCategory` only because the union carried a `| string` arm that collapsed it to `string`. Any string passed — including a category with no benchmark row, which reaches the engine as a lookup that silently misses. It is `z.enum(OLIST_CATEGORIES)` now, and that is a behaviour change: input that used to validate now fails. **`apps/web`'s category field must be a select over `OLIST_CATEGORIES`, not a text input.**
+
+**And nine real Olist categories are now rejected outright** — `derive.ts` skips anything under 30 orders, so `fashion_sport`, `la_cuisine`, `home_comfort_2`, `cds_dvds_musicals`, `flowers`, `arts_and_craftmanship`, `diapers_and_hygiene`, `fashion_childrens_clothes` and `security_and_services` never reach the union. They used to pass validation and then miss the benchmark lookup silently, so this trades a silent wrong answer for a loud refusal, which is the better failure — but a seller in one of them has no path through the form at all. **The missing piece is A's: `ReferenceMode` has no arm for a category with no benchmark row.** Either the engine falls back to `{ kind: 'self' }` for these nine, or the demo says out loud that Mazal covers 62 of Olist's 71 categories. Do not fix it by lowering `MIN_ORDERS` — quartiles over nine products are noise either way.
+
+**`noUncheckedIndexedAccess` had never been applied to #1's code.** `stage`'s root tsconfig sets it; `tsconfig.base.json` did not. It surfaced ~25 sites in `packages/ingest` and two in `packages/contracts/src/metrics.ts`. Every one was provably safe under a guard already present, so the fixes are `!` and two rewrites to `??` and `.at(-1)`. Nothing about the parsing changed, and all 41 of C's tests still pass — but they are edits in C's package, made by B, and they are what most needs a second pair of eyes in review.
+
+**`packages/data/index.ts` casts rather than `satisfies`.** A JSON import widens every string literal, so `source` arrives as `string` and never assigns to the union — `satisfies BenchmarkTable` cannot compile, on any correct table. The checking moved to `benchmarks.test.ts`, which reads the real file. The one compile-time check that does survive is in that test: assigning the raw JSON to `Record<OlistCategory, unknown>` fails if `derive.ts` ever writes a table missing a category the union declares.
+
+---
+
+## 2026-08-08 15:00 · Guilherme · benchmark table has a test; thin-sample metrics found
+
+**Done:** Two of the gaps from the entry below are closed, both inside `packages/data`, neither touching `packages/contracts`.
+
+`derive.ts` is byte-reproducible on a rerun — `pnpm derive` against the same `data/raw/` leaves `git status` clean. That is same-machine determinism only; SUN-B asks for a second machine and that has still never happened.
+
+`packages/data/benchmarks.test.ts` asserts the committed output: 62 rows, twelve metrics each, `p25 ≤ median ≤ p75`, every distribution finite, `source` in the union, priors at `n: 0` and measurements above it. `pnpm test` 9 passing, `pnpm typecheck` clean (`b02e938`).
+
+**Next:** Unchanged and still a human's — decide #1's base and the build-step question, merge #3 then #1. Everything B has left (`OlistCategory` into the contract, `index.ts` typed against `BenchmarkTable`, then `packages/sim`) imports `@mazal/contracts`.
+
+**Blocked / watch out:** Writing the test found one thing, and it is the kind that reads fine until a seller sees it.
+
+**`MIN_ORDERS` does not gate the two product-level metrics.** The threshold counts orders per category, but `photos` and `descriptionLength` are counted per distinct *product*. A category can clear 30 orders on nine products: `tablets_printing_image` quotes both metrics off `n: 9`, and `furniture_mattress_and_upholstery` off `n: 10`. Twelve metric-category pairs sit under 30, all of them one of those two metrics, and no other metric is affected — `aov`, `price`, `freightRatio`, `deliveryDays` and `reviewAvg` bottom out at 37.
+
+They still ship. Dropping a metric would make it optional in `BenchmarkTable`, and that type is in review in #1; `n` is already in the JSON, so the decision belongs to whoever quotes the number. **Anything that shows a seller a benchmark reads `n` first** — that is A's engine and D's UI, and it is the same rule the `n: 0` priors already need, so it is one check covering both. The test pins the twelve as a known exception; it fails if the set changes.
 
 ---
 
@@ -157,4 +330,3 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 **Next:** `packages/contracts` — the six types from `docs/contracts.md` plus `metrics.ts` with its three assertions. This is C's package, but it is the only hard blocker for the other four people and B is the only one online, so B ships it and hands guardianship to C on arrival. Twenty minutes. Then `packages/data` (Olist derivation), then the simulator.
 
 **Blocked / watch out:** Nobody else is online yet. A arrives Saturday night and takes `packages/engine`; tell them about the A/B firewall the moment they start, because it is the one rule that cannot be fixed retroactively — once B's fault-injection logic has been read by A, the backtest number is worthless for the rest of the weekend.
-

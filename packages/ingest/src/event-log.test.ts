@@ -2,7 +2,7 @@
 // Tests for the event log parser.
 
 import { describe, expect, test } from 'vitest';
-import { parseEventLog } from './event-log.js';
+import { parseEventLog } from './event-log.ts';
 
 describe('parseEventLog', () => {
   test('parses CSV format with header', () => {
@@ -15,10 +15,10 @@ describe('parseEventLog', () => {
     const events = parseEventLog(csv);
 
     expect(events).toHaveLength(2);
-    expect(events[0].date).toBe('2026-07-03');
-    expect(events[0].type).toBe('stockout');
-    expect(events[0].detail).toBe('Supplier ran out of SKU-1234');
-    expect(events[1].type).toBe('price_change');
+    expect(events[0]!.date).toBe('2026-07-03');
+    expect(events[0]!.type).toBe('stockout');
+    expect(events[0]!.detail).toBe('Supplier ran out of SKU-1234');
+    expect(events[1]!.type).toBe('price_change');
   });
 
   test('parses headerless CSV format without losing line 0', () => {
@@ -30,8 +30,8 @@ describe('parseEventLog', () => {
     const events = parseEventLog(csv);
 
     expect(events).toHaveLength(2);
-    expect(events[0].date).toBe('2026-07-03');
-    expect(events[0].type).toBe('stockout');
+    expect(events[0]!.date).toBe('2026-07-03');
+    expect(events[0]!.type).toBe('stockout');
   });
 
   test('parses JSON format', () => {
@@ -43,9 +43,9 @@ describe('parseEventLog', () => {
     const events = parseEventLog(json);
 
     expect(events).toHaveLength(2);
-    expect(events[0].type).toBe('eta_change');
-    expect(events[0].detail).toBe('supplier ETA 9d → 22d');
-    expect(events[1].type).toBe('creative_refresh');
+    expect(events[0]!.type).toBe('eta_change');
+    expect(events[0]!.detail).toBe('supplier ETA 9d → 22d');
+    expect(events[1]!.type).toBe('creative_refresh');
   });
 
   test('skips invalid event type without throwing or discarding valid events', () => {
@@ -58,8 +58,8 @@ describe('parseEventLog', () => {
     const events = parseEventLog(json);
 
     expect(events).toHaveLength(2);
-    expect(events[0].type).toBe('stockout');
-    expect(events[1].type).toBe('price_change');
+    expect(events[0]!.type).toBe('stockout');
+    expect(events[1]!.type).toBe('price_change');
   });
 
   test('skips malformed CSV rows without throwing', () => {
@@ -73,8 +73,8 @@ describe('parseEventLog', () => {
     const events = parseEventLog(csv);
 
     expect(events).toHaveLength(2);
-    expect(events[0].type).toBe('stockout');
-    expect(events[1].type).toBe('price_change');
+    expect(events[0]!.type).toBe('stockout');
+    expect(events[1]!.type).toBe('price_change');
   });
 
   test('handles all valid event types', () => {
@@ -86,7 +86,7 @@ describe('parseEventLog', () => {
     for (const type of validTypes) {
       const json = JSON.stringify([{ date: '2026-07-01', type, detail: `Test ${type}` }]);
       const events = parseEventLog(json);
-      expect(events[0].type).toBe(type);
+      expect(events[0]!.type).toBe(type);
     }
   });
 
@@ -98,7 +98,7 @@ describe('parseEventLog', () => {
 
     const events = parseEventLog(csv);
 
-    expect(events[0].date).toBe('2026-07-15');
+    expect(events[0]!.date).toBe('2026-07-15');
   });
 
   test('handles empty input', () => {

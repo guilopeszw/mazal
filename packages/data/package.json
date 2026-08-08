@@ -9,5 +9,8 @@
   "scripts": {
     "derive": "node derive.ts",
     "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@mazal/contracts": "workspace:*"
   }
 }

@@ -2,7 +2,7 @@
 // Tests for the ProductCard Zod schema.
 
 import { describe, expect, test } from 'vitest';
-import { productCardSchema } from './product-card.js';
+import { productCardSchema } from './product-card.ts';
 
 /** A valid product card for testing. */
 const validCard = {

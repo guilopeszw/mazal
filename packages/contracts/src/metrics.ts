@@ -3,7 +3,7 @@
 // Every rate is derived here. No ctr, cvr, roas, or atcRate field exists
 // in any type — import these functions instead.
 
-import type { CampaignDay } from './index.js';
+import type { CampaignDay } from './index.ts';
 
 /**
  * Returns 0 for 0/0 and x/0 rather than NaN or Infinity. NaN/Infinity propagate silently through the engine; 0 does not.
@@ -15,8 +15,8 @@ export const safeDiv = (a: number, b: number): number => (b === 0 ? 0 : a / b);
 /** Sums a window of days into one CampaignDay so every rate function works on ranges too. */
 export const aggregate = (days: CampaignDay[]): CampaignDay => {
   const sum: CampaignDay = {
-    date: days.length > 0 ? days[days.length - 1].date : '',
-    campaignId: days.length > 0 ? days[0].campaignId : '',
+    date: days.at(-1)?.date ?? '',
+    campaignId: days[0]?.campaignId ?? '',
     spend: 0,
     impressions: 0,
     reach: 0,

@@ -1,16 +1,16 @@
 {
-  "name": "@mazal/ingest",
-  "version": "0.1.0",
+  "name": "@mazal/sim",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./index.ts"
   },
   "scripts": {
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@mazal/contracts": "workspace:*",
-    "zod": "^3.25.0"
+    "@mazal/data": "workspace:*"
   }
 }

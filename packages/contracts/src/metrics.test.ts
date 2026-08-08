@@ -6,8 +6,8 @@
 //      — this is the bug the "store counts, derive rates" rule exists to prevent
 
 import { describe, expect, test } from 'vitest';
-import { safeDiv, aggregate, ctr } from './metrics.js';
-import type { CampaignDay } from './index.js';
+import { safeDiv, aggregate, ctr } from './metrics.ts';
+import type { CampaignDay } from './index.ts';
 
 /** Helper: builds a minimal CampaignDay with overrides. */
 function day(overrides: Partial<CampaignDay> & { date: string }): CampaignDay {
@@ -64,7 +64,7 @@ describe('metrics', () => {
     ];
 
     const correctCtr = ctr(aggregate(days));       // 110 / 10100 ≈ 0.01089
-    const naiveMean = (ctr(days[0]) + ctr(days[1])) / 2; // (0.01 + 0.10) / 2 = 0.055
+    const naiveMean = (ctr(days[0]!) + ctr(days[1]!)) / 2; // (0.01 + 0.10) / 2 = 0.055
 
     // They must differ — this is the bug the rule exists to prevent.
     // The naive mean (0.055) is ~5× too high because it treats a 100-impression
