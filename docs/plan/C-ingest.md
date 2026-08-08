@@ -1,5 +1,7 @@
 # C — Ingest and contracts
 
+> **Ownership override, 2026-08-08:** `packages/contracts` and guardian duty stay with Guilherme (B). C owns `packages/ingest` only. Part 1 below is background — read it, because everything you build depends on those types, but you do not write that package. Check [`../HANDOFF.md`](../HANDOFF.md) for the current split before starting.
+
 ## Own
 
 `packages/contracts` — the frozen types. You are their guardian.
