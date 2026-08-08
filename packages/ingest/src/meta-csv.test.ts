@@ -22,16 +22,17 @@ describe('parseMetaCsv', () => {
     const { days, warnings } = parseMetaCsv(csv);
 
     expect(days).toHaveLength(1);
-    expect(days[0]!.date).toBe('2026-07-01');
-    expect(days[0]!.campaignId).toBe('Verao 2026');
-    expect(days[0]!.spend).toBe(500);
-    expect(days[0]!.impressions).toBe(10000);
-    expect(days[0]!.reach).toBe(8500);
-    expect(days[0]!.clicks).toBe(200);
-    expect(days[0]!.addToCarts).toBe(20);
-    expect(days[0]!.checkoutsInitiated).toBe(15);
-    expect(days[0]!.purchases).toBe(5);
-    expect(days[0]!.revenue).toBe(1500);
+    const day = days[0]!;
+    expect(day.date).toBe('2026-07-01');
+    expect(day.campaignId).toBe('Verao 2026');
+    expect(day.spend).toBe(500);
+    expect(day.impressions).toBe(10000);
+    expect(day.reach).toBe(8500);
+    expect(day.clicks).toBe(200);
+    expect(day.addToCarts).toBe(20);
+    expect(day.checkoutsInitiated).toBe(15);
+    expect(day.purchases).toBe(5);
+    expect(day.revenue).toBe(1500);
     expect(warnings).toHaveLength(0);
   });
 
@@ -44,9 +45,10 @@ describe('parseMetaCsv', () => {
     ].join('\n');
 
     const { days } = parseMetaCsv(csv);
+    const day = days[0]!;
 
-    expect(days[0]!.clicks).toBe(200);
-    expect(days[0]!.spend).toBe(100);
+    expect(day.clicks).toBe(200);
+    expect(day.spend).toBe(100);
   });
 
   // ─── missing column preset warnings ───────────────────────────────
@@ -72,9 +74,10 @@ describe('parseMetaCsv', () => {
     ].join('\n');
 
     const { days, warnings } = parseMetaCsv(csv);
+    const day = days[0]!;
 
-    expect(days[0]!.spend).toBe(1240.5);
-    expect(days[0]!.addToCarts).toBe(0);
+    expect(day.spend).toBe(1240.5);
+    expect(day.addToCarts).toBe(0);
     expect(warnings).toContain('addToCarts missing on 2026-07-01');
   });
 
@@ -85,8 +88,9 @@ describe('parseMetaCsv', () => {
     ].join('\n');
 
     const { days, warnings } = parseMetaCsv(csv);
+    const day = days[0]!;
 
-    expect(days[0]!.checkoutsInitiated).toBe(0);
+    expect(day.checkoutsInitiated).toBe(0);
     expect(warnings).toContain('checkoutsInitiated missing on 2026-07-04');
   });
 
@@ -97,8 +101,9 @@ describe('parseMetaCsv', () => {
     ].join('\n');
 
     const { days, warnings } = parseMetaCsv(csv);
+    const day = days[0]!;
 
-    expect(days[0]!.addToCarts).toBe(0);
+    expect(day.addToCarts).toBe(0);
     expect(warnings.some(w => w.includes('Unparseable addToCarts value "N/A" on 2026-07-07'))).toBe(true);
   });
 
@@ -111,9 +116,10 @@ describe('parseMetaCsv', () => {
     ].join('\n');
 
     const { days } = parseMetaCsv(csv);
+    const day = days[0]!;
 
-    expect(days[0]!.spend).toBe(1240.5);
-    expect(days[0]!.revenue).toBe(3480.0);
+    expect(day.spend).toBe(1240.5);
+    expect(day.revenue).toBe(3480.0);
   });
 
   test('parses pt-BR thousand separators "10.240" and "1.024" correctly', () => {
@@ -123,9 +129,10 @@ describe('parseMetaCsv', () => {
     ].join('\n');
 
     const { days } = parseMetaCsv(csv);
+    const day = days[0]!;
 
-    expect(days[0]!.impressions).toBe(10240);
-    expect(days[0]!.clicks).toBe(1024);
+    expect(day.impressions).toBe(10240);
+    expect(day.clicks).toBe(1024);
   });
 
   // ─── header validation ────────────────────────────────────────────────
@@ -181,7 +188,8 @@ describe('parseMetaCsv', () => {
     const { days, warnings } = parseMetaCsv(csv);
 
     expect(days).toHaveLength(1);
-    expect(days[0]!.campaignId).toBe('Verao 2026');
+    const day = days[0]!;
+    expect(day.campaignId).toBe('Verao 2026');
     expect(warnings.some(w => w.includes('totals row'))).toBe(true);
   });
 
@@ -196,19 +204,22 @@ describe('parseMetaCsv', () => {
     expect(currency).toBe('BRL');
 
     // First row: pt-BR spend "1.240,50" → 1240.5
-    expect(days[0]!.date).toBe('2026-07-01');
-    expect(days[0]!.campaignId).toBe('Verao 2026');
-    expect(days[0]!.spend).toBe(1240.5);
-    expect(days[0]!.impressions).toBe(84210);
+    const day0 = days[0]!;
+    expect(day0.date).toBe('2026-07-01');
+    expect(day0.campaignId).toBe('Verao 2026');
+    expect(day0.spend).toBe(1240.5);
+    expect(day0.impressions).toBe(84210);
 
     // Row 6 (2026-07-06): pt-BR thousands separator "10.240" -> 10240, "1.024" -> 1024
-    expect(days[5]!.date).toBe('2026-07-06');
-    expect(days[5]!.impressions).toBe(10240);
-    expect(days[5]!.clicks).toBe(1024);
+    const day5 = days[5]!;
+    expect(day5.date).toBe('2026-07-06');
+    expect(day5.impressions).toBe(10240);
+    expect(day5.clicks).toBe(1024);
 
     // Row 7 (2026-07-07): "N/A" in addToCarts field
-    expect(days[6]!.date).toBe('2026-07-07');
-    expect(days[6]!.addToCarts).toBe(0);
+    const day6 = days[6]!;
+    expect(day6.date).toBe('2026-07-07');
+    expect(day6.addToCarts).toBe(0);
 
     // Warnings check
     expect(warnings.some(w => w.includes('Dropped aggregated row'))).toBe(true);
