@@ -26,6 +26,15 @@ importers:
         specifier: workspace:*
         version: link:../contracts
 
+  packages/engine:
+    dependencies:
+      '@mazal/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mazal/data':
+        specifier: workspace:*
+        version: link:../data
+
   packages/ingest:
     dependencies:
       '@mazal/contracts':
