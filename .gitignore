@@ -5,6 +5,7 @@ node_modules
 .next
 .turbo
 dist
+*.tsbuildinfo
 
 # Raw Kaggle datasets. Olist is CC BY-NC-SA — only aggregate statistics
 # get committed, in packages/data/benchmarks.json. See docs/plan/B-data.md.

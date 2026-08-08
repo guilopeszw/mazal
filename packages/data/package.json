@@ -1,0 +1,13 @@
+{
+  "name": "@mazal/data",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "derive": "node derive.ts",
+    "test": "vitest run --passWithNoTests"
+  }
+}

@@ -1,0 +1,5520 @@
+{
+  "agro_industry_and_commerce": {
+    "category": "agro_industry_and_commerce",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 410.615,
+        "p25": 81.455,
+        "p75": 481.265,
+        "n": 182,
+        "source": "olist"
+      },
+      "price": {
+        "median": 258.65,
+        "p25": 35,
+        "p75": 426,
+        "n": 212,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1004,
+        "p25": 0.062,
+        "p75": 0.4251,
+        "n": 212,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.0425,
+        "p25": 15.4147,
+        "p75": 28.201,
+        "n": 182,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 182,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 74,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 665,
+        "p25": 402.25,
+        "p75": 935.5,
+        "n": 74,
+        "source": "olist"
+      }
+    }
+  },
+  "air_conditioning": {
+    "category": "air_conditioning",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 164.465,
+        "p25": 91.7375,
+        "p75": 264.7225,
+        "n": 252,
+        "source": "olist"
+      },
+      "price": {
+        "median": 139.99,
+        "p25": 75.9,
+        "p75": 199,
+        "n": 297,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1531,
+        "p25": 0.0975,
+        "p75": 0.2609,
+        "n": 297,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 24.2489,
+        "p25": 19.3774,
+        "p75": 30.2438,
+        "n": 252,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 248,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3.25,
+        "n": 124,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 725.5,
+        "p25": 424.25,
+        "p75": 1144.5,
+        "n": 124,
+        "source": "olist"
+      }
+    }
+  },
+  "art": {
+    "category": "art",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 112.02,
+        "p25": 73.9775,
+        "p75": 123.715,
+        "n": 198,
+        "source": "olist"
+      },
+      "price": {
+        "median": 97.5,
+        "p25": 49.9,
+        "p75": 99.99,
+        "n": 209,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2274,
+        "p25": 0.1244,
+        "p75": 0.3618,
+        "n": 209,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.301,
+        "p25": 14.9814,
+        "p75": 28.27,
+        "n": 198,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 196,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 2,
+        "n": 55,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 571,
+        "p25": 217,
+        "p75": 907,
+        "n": 55,
+        "source": "olist"
+      }
+    }
+  },
+  "audio": {
+    "category": "audio",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 103.37,
+        "p25": 37.6975,
+        "p75": 202.165,
+        "n": 346,
+        "source": "olist"
+      },
+      "price": {
+        "median": 89,
+        "p25": 19.9,
+        "p75": 175,
+        "n": 364,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.183,
+        "p25": 0.085,
+        "p75": 0.496,
+        "n": 364,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.3931,
+        "p25": 17.3848,
+        "p75": 27.2055,
+        "n": 346,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 3,
+        "p75": 5,
+        "n": 344,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 58,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 637.5,
+        "p25": 384.25,
+        "p75": 1040.5,
+        "n": 58,
+        "source": "olist"
+      }
+    }
+  },
+  "auto": {
+    "category": "auto",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 110.91,
+        "p25": 57.5,
+        "p75": 188.51,
+        "n": 3881,
+        "source": "olist"
+      },
+      "price": {
+        "median": 84.9,
+        "p25": 39.49,
+        "p75": 157.445,
+        "n": 4235,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2197,
+        "p25": 0.1255,
+        "p75": 0.3981,
+        "n": 4235,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.2721,
+        "p25": 17.1358,
+        "p75": 28.0969,
+        "n": 3881,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 3878,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4,
+        "n": 1900,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 690,
+        "p25": 376.75,
+        "p75": 1037.75,
+        "n": 1900,
+        "source": "olist"
+      }
+    }
+  },
+  "baby": {
+    "category": "baby",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 106.97,
+        "p25": 65.01,
+        "p75": 176.83,
+        "n": 2839,
+        "source": "olist"
+      },
+      "price": {
+        "median": 77.98,
+        "p25": 48.9,
+        "p75": 134.9,
+        "n": 3065,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2244,
+        "p25": 0.1393,
+        "p75": 0.3612,
+        "n": 3065,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.1008,
+        "p25": 17.3941,
+        "p75": 28.4509,
+        "n": 2839,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 2823,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 919,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 728,
+        "p25": 381,
+        "p75": 1133,
+        "n": 919,
+        "source": "olist"
+      }
+    }
+  },
+  "bed_bath_table": {
+    "category": "bed_bath_table",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 105.28,
+        "p25": 71.53,
+        "p75": 162.44,
+        "n": 9315,
+        "source": "olist"
+      },
+      "price": {
+        "median": 79.05,
+        "p25": 47.99,
+        "p75": 115,
+        "n": 11115,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.219,
+        "p25": 0.1465,
+        "p75": 0.3445,
+        "n": 11115,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.0923,
+        "p25": 18.956,
+        "p75": 27.6174,
+        "n": 9315,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 3,
+        "p75": 5,
+        "n": 9327,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 1,
+        "n": 3029,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 365,
+        "p25": 236,
+        "p75": 609,
+        "n": 3029,
+        "source": "olist"
+      }
+    }
+  },
+  "books_general_interest": {
+    "category": "books_general_interest",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 68.35,
+        "p25": 44.1,
+        "p75": 132.05,
+        "n": 509,
+        "source": "olist"
+      },
+      "price": {
+        "median": 44.9,
+        "p25": 29.99,
+        "p75": 115,
+        "n": 553,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2649,
+        "p25": 0.1535,
+        "p75": 0.459,
+        "n": 553,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.0927,
+        "p25": 18.1164,
+        "p75": 27.1028,
+        "n": 509,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 505,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 2,
+        "n": 216,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 801,
+        "p25": 514.5,
+        "p75": 1218,
+        "n": 216,
+        "source": "olist"
+      }
+    }
+  },
+  "books_imported": {
+    "category": "books_imported",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 79.5,
+        "p25": 52.57,
+        "p75": 114.09,
+        "n": 53,
+        "source": "olist"
+      },
+      "price": {
+        "median": 63,
+        "p25": 48.3725,
+        "p75": 77.2475,
+        "n": 60,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1897,
+        "p25": 0.1088,
+        "p75": 0.3229,
+        "n": 60,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 16.311,
+        "p25": 12.1489,
+        "p75": 22.3442,
+        "n": 53,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 53,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 1,
+        "n": 31,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 452,
+        "p25": 226.5,
+        "p75": 558.5,
+        "n": 31,
+        "source": "olist"
+      }
+    }
+  },
+  "books_technical": {
+    "category": "books_technical",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 69.04,
+        "p25": 48.145,
+        "p75": 105.67,
+        "n": 259,
+        "source": "olist"
+      },
+      "price": {
+        "median": 57.49,
+        "p25": 30,
+        "p75": 87.75,
+        "n": 267,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.257,
+        "p25": 0.1778,
+        "p75": 0.4333,
+        "n": 267,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 21.0909,
+        "p25": 15.2946,
+        "p75": 27.3775,
+        "n": 259,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 258,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 1,
+        "n": 123,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 1212,
+        "p25": 720.5,
+        "p75": 1638,
+        "n": 123,
+        "source": "olist"
+      }
+    }
+  },
+  "christmas_supplies": {
+    "category": "christmas_supplies",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 75.815,
+        "p25": 40.56,
+        "p75": 109.5,
+        "n": 128,
+        "source": "olist"
+      },
+      "price": {
+        "median": 44.9,
+        "p25": 13.77,
+        "p75": 79.9,
+        "n": 153,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.3913,
+        "p25": 0.2629,
+        "p75": 0.8331,
+        "n": 153,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 28.1244,
+        "p25": 20.3339,
+        "p75": 32.4005,
+        "n": 128,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 126,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 65,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 298,
+        "p25": 252,
+        "p75": 424,
+        "n": 65,
+        "source": "olist"
+      }
+    }
+  },
+  "cine_photo": {
+    "category": "cine_photo",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 107.42,
+        "p25": 65.03,
+        "p75": 137.55,
+        "n": 65,
+        "source": "olist"
+      },
+      "price": {
+        "median": 72.825,
+        "p25": 49.8,
+        "p75": 102.2425,
+        "n": 72,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2221,
+        "p25": 0.1479,
+        "p75": 0.4648,
+        "n": 72,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 20.5881,
+        "p25": 13.4008,
+        "p75": 25.2831,
+        "n": 65,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 66,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1.5,
+        "p25": 1,
+        "p75": 3,
+        "n": 28,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 710.5,
+        "p25": 424.25,
+        "p75": 1067.75,
+        "n": 28,
+        "source": "olist"
+      }
+    }
+  },
+  "computers": {
+    "category": "computers",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 1250.81,
+        "p25": 799.37,
+        "p75": 1471.51,
+        "n": 180,
+        "source": "olist"
+      },
+      "price": {
+        "median": 1100,
+        "p25": 650,
+        "p75": 1340,
+        "n": 203,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.0396,
+        "p25": 0.0296,
+        "p75": 0.0694,
+        "n": 203,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.596,
+        "p25": 19.6404,
+        "p75": 28.5275,
+        "n": 180,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 177,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4,
+        "n": 30,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 1789.5,
+        "p25": 1102,
+        "p75": 3610,
+        "n": 30,
+        "source": "olist"
+      }
+    }
+  },
+  "computers_accessories": {
+    "category": "computers_accessories",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 103.13,
+        "p25": 59.51,
+        "p75": 178.36,
+        "n": 6661,
+        "source": "olist"
+      },
+      "price": {
+        "median": 81.99,
+        "p25": 39.9,
+        "p75": 149,
+        "n": 7827,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2088,
+        "p25": 0.1221,
+        "p75": 0.3784,
+        "n": 7827,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 24.452,
+        "p25": 20.0122,
+        "p75": 29.5866,
+        "n": 6661,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 6674,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 1639,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 578,
+        "p25": 321,
+        "p75": 998.5,
+        "n": 1639,
+        "source": "olist"
+      }
+    }
+  },
+  "consoles_games": {
+    "category": "consoles_games",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 84.73,
+        "p25": 46.09,
+        "p75": 177.13,
+        "n": 1058,
+        "source": "olist"
+      },
+      "price": {
+        "median": 59,
+        "p25": 24.5,
+        "p75": 139,
+        "n": 1137,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2656,
+        "p25": 0.1129,
+        "p75": 0.4889,
+        "n": 1137,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.2593,
+        "p25": 18.7182,
+        "p75": 29.4271,
+        "n": 1058,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 1049,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 317,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 687,
+        "p25": 379,
+        "p75": 1143,
+        "n": 317,
+        "source": "olist"
+      }
+    }
+  },
+  "construction_tools_construction": {
+    "category": "construction_tools_construction",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 124.92,
+        "p25": 65.48,
+        "p75": 230.045,
+        "n": 740,
+        "source": "olist"
+      },
+      "price": {
+        "median": 89,
+        "p25": 40.9,
+        "p75": 158.95,
+        "n": 929,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2197,
+        "p25": 0.109,
+        "p75": 0.3783,
+        "n": 929,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 21.138,
+        "p25": 14.2722,
+        "p75": 27.0052,
+        "n": 740,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 736,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 400,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 553,
+        "p25": 337,
+        "p75": 1082,
+        "n": 400,
+        "source": "olist"
+      }
+    }
+  },
+  "construction_tools_lights": {
+    "category": "construction_tools_lights",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 182.51,
+        "p25": 94.31,
+        "p75": 284.36,
+        "n": 233,
+        "source": "olist"
+      },
+      "price": {
+        "median": 104.5,
+        "p25": 45,
+        "p75": 228,
+        "n": 304,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1971,
+        "p25": 0.1411,
+        "p75": 0.3335,
+        "n": 304,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 21.0805,
+        "p25": 14.1004,
+        "p75": 25.5323,
+        "n": 233,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 231,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 78,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 581.5,
+        "p25": 336.5,
+        "p75": 979.75,
+        "n": 78,
+        "source": "olist"
+      }
+    }
+  },
+  "construction_tools_safety": {
+    "category": "construction_tools_safety",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 164.595,
+        "p25": 92.19,
+        "p75": 335.2275,
+        "n": 162,
+        "source": "olist"
+      },
+      "price": {
+        "median": 125.575,
+        "p25": 66,
+        "p75": 229.045,
+        "n": 194,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1433,
+        "p25": 0.0764,
+        "p75": 0.2462,
+        "n": 194,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.5265,
+        "p25": 18.0942,
+        "p75": 29.3808,
+        "n": 162,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 3,
+        "p75": 5,
+        "n": 161,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 91,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 969,
+        "p25": 488,
+        "p75": 1653,
+        "n": 91,
+        "source": "olist"
+      }
+    }
+  },
+  "cool_stuff": {
+    "category": "cool_stuff",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 148.67,
+        "p25": 94.93,
+        "p75": 228.8575,
+        "n": 3604,
+        "source": "olist"
+      },
+      "price": {
+        "median": 129.99,
+        "p25": 69.9,
+        "p75": 199,
+        "n": 3796,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1559,
+        "p25": 0.1003,
+        "p75": 0.2585,
+        "n": 3796,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.3105,
+        "p25": 19.1136,
+        "p75": 29.1153,
+        "n": 3604,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 3580,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 789,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 733,
+        "p25": 422,
+        "p75": 1049,
+        "n": 789,
+        "source": "olist"
+      }
+    }
+  },
+  "costruction_tools_garden": {
+    "category": "costruction_tools_garden",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 92.55,
+        "p25": 53.395,
+        "p75": 166.55,
+        "n": 188,
+        "source": "olist"
+      },
+      "price": {
+        "median": 48.945,
+        "p25": 29.45,
+        "p75": 126.725,
+        "n": 238,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.3732,
+        "p25": 0.1706,
+        "p75": 0.5686,
+        "n": 238,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.4784,
+        "p25": 18.5714,
+        "p75": 30.0452,
+        "n": 188,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 190,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 4,
+        "n": 88,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 1104,
+        "p25": 559.5,
+        "p75": 1836.75,
+        "n": 88,
+        "source": "olist"
+      }
+    }
+  },
+  "costruction_tools_tools": {
+    "category": "costruction_tools_tools",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 94.2,
+        "p25": 46.69,
+        "p75": 208.48,
+        "n": 97,
+        "source": "olist"
+      },
+      "price": {
+        "median": 59.99,
+        "p25": 29.9,
+        "p75": 189.95,
+        "n": 103,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2215,
+        "p25": 0.1251,
+        "p75": 0.4824,
+        "n": 103,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.3762,
+        "p25": 20.1382,
+        "p75": 27.5146,
+        "n": 97,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 94,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 2.5,
+        "n": 39,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 444,
+        "p25": 287.5,
+        "p75": 856,
+        "n": 39,
+        "source": "olist"
+      }
+    }
+  },
+  "drinks": {
+    "category": "drinks",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 63.895,
+        "p25": 50.87,
+        "p75": 88.305,
+        "n": 294,
+        "source": "olist"
+      },
+      "price": {
+        "median": 47.49,
+        "p25": 28.4,
+        "p75": 58,
+        "n": 379,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.3191,
+        "p25": 0.2093,
+        "p75": 0.5339,
+        "n": 379,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 19.3466,
+        "p25": 14.1556,
+        "p75": 26.0744,
+        "n": 294,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 294,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 2,
+        "n": 81,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 824,
+        "p25": 497,
+        "p75": 1148,
+        "n": 81,
+        "source": "olist"
+      }
+    }
+  },
+  "dvds_blu_ray": {
+    "category": "dvds_blu_ray",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 45.53,
+        "p25": 37.53,
+        "p75": 99.52,
+        "n": 59,
+        "source": "olist"
+      },
+      "price": {
+        "median": 19.9,
+        "p25": 16.9,
+        "p75": 39.99,
+        "n": 64,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.8303,
+        "p25": 0.3808,
+        "p75": 1.1933,
+        "n": 64,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 25.4269,
+        "p25": 22.2929,
+        "p75": 29.3191,
+        "n": 59,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 58,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 1,
+        "n": 48,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 835.5,
+        "p25": 671,
+        "p75": 1106,
+        "n": 48,
+        "source": "olist"
+      }
+    }
+  },
+  "electronics": {
+    "category": "electronics",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 37.86,
+        "p25": 30.23,
+        "p75": 78.935,
+        "n": 2540,
+        "source": "olist"
+      },
+      "price": {
+        "median": 21.9,
+        "p25": 14.89,
+        "p75": 54.9,
+        "n": 2767,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.6226,
+        "p25": 0.2805,
+        "p75": 0.9161,
+        "n": 2767,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.1639,
+        "p25": 18.4521,
+        "p75": 28.1087,
+        "n": 2540,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 2522,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 517,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 476,
+        "p25": 312,
+        "p75": 879,
+        "n": 517,
+        "source": "olist"
+      }
+    }
+  },
+  "fashio_female_clothing": {
+    "category": "fashio_female_clothing",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 72.68,
+        "p25": 51.13,
+        "p75": 132.755,
+        "n": 39,
+        "source": "olist"
+      },
+      "price": {
+        "median": 49.495,
+        "p25": 29.99,
+        "p75": 65.225,
+        "n": 48,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2469,
+        "p25": 0.1929,
+        "p75": 0.3278,
+        "n": 48,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.3129,
+        "p25": 17.4528,
+        "p75": 28.6535,
+        "n": 39,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 4,
+        "p25": 3,
+        "p75": 5,
+        "n": 41,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 2,
+        "p75": 3.5,
+        "n": 27,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 436,
+        "p25": 341,
+        "p75": 820,
+        "n": 27,
+        "source": "olist"
+      }
+    }
+  },
+  "fashion_bags_accessories": {
+    "category": "fashion_bags_accessories",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 65,
+        "p25": 51.5,
+        "p75": 100.83,
+        "n": 1857,
+        "source": "olist"
+      },
+      "price": {
+        "median": 49,
+        "p25": 34.3,
+        "p75": 77.95,
+        "n": 2031,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2768,
+        "p25": 0.1571,
+        "p75": 0.4357,
+        "n": 2031,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.0674,
+        "p25": 17.4984,
+        "p75": 29.1657,
+        "n": 1857,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 1864,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 3,
+        "p25": 1,
+        "p75": 4,
+        "n": 849,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 409,
+        "p25": 233,
+        "p75": 719,
+        "n": 849,
+        "source": "olist"
+      }
+    }
+  },
+  "fashion_male_clothing": {
+    "category": "fashion_male_clothing",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 82.04,
+        "p25": 60.3175,
+        "p75": 154.195,
+        "n": 112,
+        "source": "olist"
+      },
+      "price": {
+        "median": 59.9,
+        "p25": 40.9,
+        "p75": 121.65,
+        "n": 132,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2279,
+        "p25": 0.1491,
+        "p75": 0.3372,
+        "n": 132,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 25.7623,
+        "p25": 21.1225,
+        "p75": 30.0918,
+        "n": 112,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 2,
+        "p75": 5,
+        "n": 111,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 2,
+        "n": 95,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 541,
+        "p25": 323.5,
+        "p75": 939.5,
+        "n": 95,
+        "source": "olist"
+      }
+    }
+  },
+  "fashion_shoes": {
+    "category": "fashion_shoes",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 102.37,
+        "p25": 55.0875,
+        "p75": 174.3575,
+        "n": 238,
+        "source": "olist"
+      },
+      "price": {
+        "median": 77.4,
+        "p25": 35.9,
+        "p75": 99.9,
+        "n": 262,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2336,
+        "p25": 0.1603,
+        "p75": 0.4117,
+        "n": 262,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 28.2349,
+        "p25": 23.5078,
+        "p75": 33.4945,
+        "n": 238,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 237,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 4,
+        "p25": 4,
+        "p75": 5,
+        "n": 173,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 404,
+        "p25": 344,
+        "p75": 404,
+        "n": 173,
+        "source": "olist"
+      }
+    }
+  },
+  "fashion_underwear_beach": {
+    "category": "fashion_underwear_beach",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 75.07,
+        "p25": 65,
+        "p75": 99.7,
+        "n": 121,
+        "source": "olist"
+      },
+      "price": {
+        "median": 59.9,
+        "p25": 49.9,
+        "p75": 79.9,
+        "n": 131,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2184,
+        "p25": 0.17,
+        "p75": 0.3026,
+        "n": 131,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.1912,
+        "p25": 20.058,
+        "p75": 27.427,
+        "n": 121,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 4,
+        "p25": 3,
+        "p75": 5,
+        "n": 120,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 3,
+        "p25": 1,
+        "p75": 3,
+        "n": 53,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 594,
+        "p25": 471,
+        "p75": 1152,
+        "n": 53,
+        "source": "olist"
+      }
+    }
+  },
+  "fixed_telephony": {
+    "category": "fixed_telephony",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 74.59,
+        "p25": 40.77,
+        "p75": 204.31,
+        "n": 217,
+        "source": "olist"
+      },
+      "price": {
+        "median": 64.485,
+        "p25": 30.65,
+        "p75": 158,
+        "n": 264,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2372,
+        "p25": 0.0871,
+        "p75": 0.5583,
+        "n": 264,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 26.108,
+        "p25": 20.2782,
+        "p75": 33.1483,
+        "n": 217,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 3,
+        "p75": 5,
+        "n": 215,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 3,
+        "p25": 2,
+        "p75": 3.25,
+        "n": 116,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 734.5,
+        "p25": 348.5,
+        "p75": 1328.75,
+        "n": 116,
+        "source": "olist"
+      }
+    }
+  },
+  "food": {
+    "category": "food",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 71.245,
+        "p25": 40.76,
+        "p75": 97.57,
+        "n": 444,
+        "source": "olist"
+      },
+      "price": {
+        "median": 48.945,
+        "p25": 27.9,
+        "p75": 80.49,
+        "n": 510,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2821,
+        "p25": 0.1951,
+        "p75": 0.4584,
+        "n": 510,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 18.5334,
+        "p25": 11.9588,
+        "p75": 25.1292,
+        "n": 444,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 439,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 2,
+        "n": 82,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 869,
+        "p25": 523.25,
+        "p75": 1241.5,
+        "n": 82,
+        "source": "olist"
+      }
+    }
+  },
+  "food_drink": {
+    "category": "food_drink",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 60.24,
+        "p25": 45.8125,
+        "p75": 99.535,
+        "n": 224,
+        "source": "olist"
+      },
+      "price": {
+        "median": 38.745,
+        "p25": 21.6,
+        "p75": 54,
+        "n": 278,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.4174,
+        "p25": 0.2862,
+        "p75": 0.5818,
+        "n": 278,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 21.2799,
+        "p25": 17.1786,
+        "p75": 26.507,
+        "n": 224,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 225,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 2,
+        "n": 104,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 692.5,
+        "p25": 399.75,
+        "p75": 965,
+        "n": 104,
+        "source": "olist"
+      }
+    }
+  },
+  "furniture_bedroom": {
+    "category": "furniture_bedroom",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 239.5,
+        "p25": 198.7975,
+        "p75": 282.8475,
+        "n": 94,
+        "source": "olist"
+      },
+      "price": {
+        "median": 179,
+        "p25": 99.9,
+        "p75": 219,
+        "n": 109,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2528,
+        "p25": 0.1566,
+        "p75": 0.364,
+        "n": 109,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 25.0193,
+        "p25": 18.6951,
+        "p75": 33.8463,
+        "n": 94,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 95,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 2,
+        "n": 45,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 589,
+        "p25": 458,
+        "p75": 776,
+        "n": 45,
+        "source": "olist"
+      }
+    }
+  },
+  "furniture_decor": {
+    "category": "furniture_decor",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 104.59,
+        "p25": 68.04,
+        "p75": 170.325,
+        "n": 6355,
+        "source": "olist"
+      },
+      "price": {
+        "median": 65.49,
+        "p25": 39.9,
+        "p75": 99.9,
+        "n": 8334,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2703,
+        "p25": 0.1753,
+        "p75": 0.412,
+        "n": 8334,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.4151,
+        "p25": 19.2822,
+        "p75": 28.573,
+        "n": 6355,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 3,
+        "p75": 5,
+        "n": 6362,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 2657,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 582,
+        "p25": 314,
+        "p75": 1045,
+        "n": 2657,
+        "source": "olist"
+      }
+    }
+  },
+  "furniture_living_room": {
+    "category": "furniture_living_room",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 151.74,
+        "p25": 102.59,
+        "p75": 218.21,
+        "n": 417,
+        "source": "olist"
+      },
+      "price": {
+        "median": 103.97,
+        "p25": 72.445,
+        "p75": 139.9,
+        "n": 503,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2607,
+        "p25": 0.2023,
+        "p75": 0.4111,
+        "n": 503,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.5483,
+        "p25": 19.5264,
+        "p75": 29.4896,
+        "n": 417,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 415,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 2,
+        "n": 156,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 526.5,
+        "p25": 328.75,
+        "p75": 851,
+        "n": 156,
+        "source": "olist"
+      }
+    }
+  },
+  "furniture_mattress_and_upholstery": {
+    "category": "furniture_mattress_and_upholstery",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 132.31,
+        "p25": 117.76,
+        "p75": 148.97,
+        "n": 38,
+        "source": "olist"
+      },
+      "price": {
+        "median": 85,
+        "p25": 75,
+        "p75": 109.85,
+        "n": 38,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.4483,
+        "p25": 0.3383,
+        "p75": 0.5701,
+        "n": 38,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 19.4333,
+        "p25": 16.3461,
+        "p75": 23.5393,
+        "n": 38,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 4.5,
+        "p25": 3,
+        "p75": 5,
+        "n": 38,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 2,
+        "n": 10,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 837.5,
+        "p25": 789.25,
+        "p75": 1772.25,
+        "n": 10,
+        "source": "olist"
+      }
+    }
+  },
+  "garden_tools": {
+    "category": "garden_tools",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 108.01,
+        "p25": 69.22,
+        "p75": 167.2825,
+        "n": 3482,
+        "source": "olist"
+      },
+      "price": {
+        "median": 59.9,
+        "p25": 49.9,
+        "p75": 99.9,
+        "n": 4347,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.295,
+        "p25": 0.2009,
+        "p75": 0.3961,
+        "n": 4347,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 24.4069,
+        "p25": 20.2879,
+        "p75": 29.0602,
+        "n": 3482,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 3471,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 753,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 595,
+        "p25": 350,
+        "p75": 1091,
+        "n": 753,
+        "source": "olist"
+      }
+    }
+  },
+  "health_beauty": {
+    "category": "health_beauty",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 104.12,
+        "p25": 64.42,
+        "p75": 175.5775,
+        "n": 8796,
+        "source": "olist"
+      },
+      "price": {
+        "median": 79.9,
+        "p25": 39.99,
+        "p75": 129.9,
+        "n": 9670,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2097,
+        "p25": 0.116,
+        "p75": 0.3535,
+        "n": 9670,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.0844,
+        "p25": 17.3011,
+        "p75": 28.4,
+        "n": 8796,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 8786,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 2,
+        "n": 2444,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 913,
+        "p25": 558,
+        "p75": 1482,
+        "n": 2444,
+        "source": "olist"
+      }
+    }
+  },
+  "home_appliances": {
+    "category": "home_appliances",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 63.935,
+        "p25": 43.905,
+        "p75": 133.8825,
+        "n": 764,
+        "source": "olist"
+      },
+      "price": {
+        "median": 47.59,
+        "p25": 27.2,
+        "p75": 113.875,
+        "n": 771,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.3085,
+        "p25": 0.1644,
+        "p75": 0.535,
+        "n": 771,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.3274,
+        "p25": 16.294,
+        "p75": 28.507,
+        "n": 764,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 799,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 2,
+        "n": 370,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 253.5,
+        "p25": 156,
+        "p75": 446.75,
+        "n": 370,
+        "source": "olist"
+      }
+    }
+  },
+  "home_appliances_2": {
+    "category": "home_appliances_2",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 287.27,
+        "p25": 186.43,
+        "p75": 648.9,
+        "n": 233,
+        "source": "olist"
+      },
+      "price": {
+        "median": 225.945,
+        "p25": 159,
+        "p75": 559.675,
+        "n": 238,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1461,
+        "p25": 0.0747,
+        "p75": 0.245,
+        "n": 238,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 25.0255,
+        "p25": 21.0944,
+        "p75": 30.5521,
+        "n": 233,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 233,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 90,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 764.5,
+        "p25": 398.25,
+        "p75": 1010.75,
+        "n": 90,
+        "source": "olist"
+      }
+    }
+  },
+  "home_confort": {
+    "category": "home_confort",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 124.35,
+        "p25": 102.03,
+        "p75": 243.135,
+        "n": 375,
+        "source": "olist"
+      },
+      "price": {
+        "median": 89.9,
+        "p25": 86.9,
+        "p75": 179,
+        "n": 434,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1573,
+        "p25": 0.1024,
+        "p75": 0.2481,
+        "n": 434,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.2017,
+        "p25": 19.1202,
+        "p75": 26.1713,
+        "n": 375,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 3,
+        "p75": 5,
+        "n": 376,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 111,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 249,
+        "p25": 217,
+        "p75": 349,
+        "n": 111,
+        "source": "olist"
+      }
+    }
+  },
+  "home_construction": {
+    "category": "home_construction",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 137.23,
+        "p25": 97.03,
+        "p75": 233.58,
+        "n": 473,
+        "source": "olist"
+      },
+      "price": {
+        "median": 95.2,
+        "p25": 49.95,
+        "p75": 150,
+        "n": 604,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1958,
+        "p25": 0.1242,
+        "p75": 0.3058,
+        "n": 604,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.5907,
+        "p25": 18.3169,
+        "p75": 28.6367,
+        "n": 473,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 471,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 5,
+        "n": 225,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 872,
+        "p25": 539,
+        "p75": 935,
+        "n": 225,
+        "source": "olist"
+      }
+    }
+  },
+  "housewares": {
+    "category": "housewares",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 88.72,
+        "p25": 54.2275,
+        "p75": 159.0475,
+        "n": 5836,
+        "source": "olist"
+      },
+      "price": {
+        "median": 59.8,
+        "p25": 32,
+        "p75": 114.095,
+        "n": 6964,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.29,
+        "p25": 0.1807,
+        "p75": 0.4773,
+        "n": 6964,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.1595,
+        "p25": 16.4564,
+        "p75": 27.3367,
+        "n": 5836,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 5817,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 2335,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 543,
+        "p25": 331,
+        "p75": 853.5,
+        "n": 2335,
+        "source": "olist"
+      }
+    }
+  },
+  "industry_commerce_and_business": {
+    "category": "industry_commerce_and_business",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 128.745,
+        "p25": 111.1075,
+        "p75": 188.285,
+        "n": 232,
+        "source": "olist"
+      },
+      "price": {
+        "median": 103,
+        "p25": 78,
+        "p75": 118.25,
+        "n": 268,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.231,
+        "p25": 0.1485,
+        "p75": 0.3433,
+        "n": 268,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.0797,
+        "p25": 15.8646,
+        "p75": 27.344,
+        "n": 232,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 231,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 68,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 1058,
+        "p25": 687.5,
+        "p75": 1552.25,
+        "n": 68,
+        "source": "olist"
+      }
+    }
+  },
+  "kitchen_dining_laundry_garden_furniture": {
+    "category": "kitchen_dining_laundry_garden_furniture",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 162.83,
+        "p25": 81.2375,
+        "p75": 313.0875,
+        "n": 246,
+        "source": "olist"
+      },
+      "price": {
+        "median": 110,
+        "p25": 54.9,
+        "p75": 209,
+        "n": 281,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.271,
+        "p25": 0.1887,
+        "p75": 0.4487,
+        "n": 281,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.2526,
+        "p25": 16.186,
+        "p75": 30.2943,
+        "n": 246,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 245,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4,
+        "n": 94,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 654.5,
+        "p25": 334.5,
+        "p75": 949.25,
+        "n": 94,
+        "source": "olist"
+      }
+    }
+  },
+  "luggage_accessories": {
+    "category": "luggage_accessories",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 128.13,
+        "p25": 91.615,
+        "p75": 195.835,
+        "n": 1023,
+        "source": "olist"
+      },
+      "price": {
+        "median": 99.945,
+        "p25": 59.99,
+        "p75": 148.625,
+        "n": 1092,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2301,
+        "p25": 0.1479,
+        "p75": 0.327,
+        "n": 1092,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.3826,
+        "p25": 18.6313,
+        "p75": 27.0235,
+        "n": 1023,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 1019,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4,
+        "n": 349,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 488,
+        "p25": 275,
+        "p75": 863,
+        "n": 349,
+        "source": "olist"
+      }
+    }
+  },
+  "market_place": {
+    "category": "market_place",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 82.15,
+        "p25": 49.895,
+        "p75": 156.5825,
+        "n": 274,
+        "source": "olist"
+      },
+      "price": {
+        "median": 62.8,
+        "p25": 30,
+        "p75": 108.445,
+        "n": 311,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2635,
+        "p25": 0.1635,
+        "p75": 0.4084,
+        "n": 311,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.4473,
+        "p25": 19.206,
+        "p75": 29.387,
+        "n": 274,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 272,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3.25,
+        "n": 104,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 732,
+        "p25": 389,
+        "p75": 1129.5,
+        "n": 104,
+        "source": "olist"
+      }
+    }
+  },
+  "music": {
+    "category": "music",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 92.17,
+        "p25": 39.42,
+        "p75": 238.09,
+        "n": 37,
+        "source": "olist"
+      },
+      "price": {
+        "median": 54.89,
+        "p25": 24.9175,
+        "p75": 220,
+        "n": 38,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2726,
+        "p25": 0.0791,
+        "p75": 0.5993,
+        "n": 38,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 26.421,
+        "p25": 20.9464,
+        "p75": 30.1999,
+        "n": 37,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 37,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 27,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 688,
+        "p25": 419,
+        "p75": 1408,
+        "n": 27,
+        "source": "olist"
+      }
+    }
+  },
+  "musical_instruments": {
+    "category": "musical_instruments",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 143.83,
+        "p25": 75.6,
+        "p75": 362.36,
+        "n": 625,
+        "source": "olist"
+      },
+      "price": {
+        "median": 94.835,
+        "p25": 55,
+        "p75": 299.9,
+        "n": 680,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1711,
+        "p25": 0.0815,
+        "p75": 0.3242,
+        "n": 680,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.2552,
+        "p25": 18.6101,
+        "p75": 28.3687,
+        "n": 625,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 619,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4,
+        "n": 289,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 670,
+        "p25": 364,
+        "p75": 996,
+        "n": 289,
+        "source": "olist"
+      }
+    }
+  },
+  "office_furniture": {
+    "category": "office_furniture",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 206.57,
+        "p25": 156.84,
+        "p75": 287.16,
+        "n": 1265,
+        "source": "olist"
+      },
+      "price": {
+        "median": 144.99,
+        "p25": 114.99,
+        "p75": 186.99,
+        "n": 1691,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2436,
+        "p25": 0.1608,
+        "p75": 0.3319,
+        "n": 1691,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 30.3495,
+        "p25": 24.3704,
+        "p75": 38.0852,
+        "n": 1265,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 4,
+        "p25": 3,
+        "p75": 5,
+        "n": 1260,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 1,
+        "n": 309,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 1200,
+        "p25": 1043,
+        "p75": 2081,
+        "n": 309,
+        "source": "olist"
+      }
+    }
+  },
+  "party_supplies": {
+    "category": "party_supplies",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 85.63,
+        "p25": 56.335,
+        "p75": 187.76,
+        "n": 39,
+        "source": "olist"
+      },
+      "price": {
+        "median": 67.9,
+        "p25": 21.9,
+        "p75": 134.9,
+        "n": 43,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2668,
+        "p25": 0.1608,
+        "p75": 0.5351,
+        "n": 43,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.4103,
+        "p25": 17.2949,
+        "p75": 30.2599,
+        "n": 39,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 3,
+        "p75": 5,
+        "n": 39,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 1.75,
+        "n": 26,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 358,
+        "p25": 323,
+        "p75": 489,
+        "n": 26,
+        "source": "olist"
+      }
+    }
+  },
+  "perfumery": {
+    "category": "perfumery",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 111.21,
+        "p25": 67.795,
+        "p75": 184.92,
+        "n": 3151,
+        "source": "olist"
+      },
+      "price": {
+        "median": 84.99,
+        "p25": 49.945,
+        "p75": 149.9,
+        "n": 3419,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1715,
+        "p25": 0.0967,
+        "p75": 0.3011,
+        "n": 3419,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.1183,
+        "p25": 17.5262,
+        "p75": 28.4614,
+        "n": 3151,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 3153,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 2,
+        "n": 868,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 574,
+        "p25": 347,
+        "p75": 866.25,
+        "n": 868,
+        "source": "olist"
+      }
+    }
+  },
+  "pet_shop": {
+    "category": "pet_shop",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 115.16,
+        "p25": 72.83,
+        "p75": 159.82,
+        "n": 1705,
+        "source": "olist"
+      },
+      "price": {
+        "median": 89.7,
+        "p25": 46.9,
+        "p75": 120,
+        "n": 1947,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2127,
+        "p25": 0.1465,
+        "p75": 0.3725,
+        "n": 1947,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.4664,
+        "p25": 17.4709,
+        "p75": 28.1484,
+        "n": 1705,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 1698,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 719,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 721,
+        "p25": 461.5,
+        "p75": 1109.5,
+        "n": 719,
+        "source": "olist"
+      }
+    }
+  },
+  "signaling_and_security": {
+    "category": "signaling_and_security",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 123.08,
+        "p25": 66.355,
+        "p75": 187.1675,
+        "n": 140,
+        "source": "olist"
+      },
+      "price": {
+        "median": 75,
+        "p25": 29.245,
+        "p75": 134,
+        "n": 199,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.3336,
+        "p25": 0.1489,
+        "p75": 0.6039,
+        "n": 199,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 20.4501,
+        "p25": 15.1526,
+        "p75": 28.006,
+        "n": 140,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 138,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 93,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 686,
+        "p25": 513,
+        "p75": 1144,
+        "n": 93,
+        "source": "olist"
+      }
+    }
+  },
+  "small_appliances": {
+    "category": "small_appliances",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 128.62,
+        "p25": 73.92,
+        "p75": 348.365,
+        "n": 627,
+        "source": "olist"
+      },
+      "price": {
+        "median": 99,
+        "p25": 49.5,
+        "p75": 299,
+        "n": 679,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1856,
+        "p25": 0.078,
+        "p75": 0.3429,
+        "n": 679,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.3053,
+        "p25": 18.3134,
+        "p75": 29.0797,
+        "n": 627,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 625,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 231,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 757,
+        "p25": 427,
+        "p75": 1173,
+        "n": 231,
+        "source": "olist"
+      }
+    }
+  },
+  "small_appliances_home_oven_and_coffee": {
+    "category": "small_appliances_home_oven_and_coffee",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 673.47,
+        "p25": 110.585,
+        "p75": 871.3,
+        "n": 75,
+        "source": "olist"
+      },
+      "price": {
+        "median": 587,
+        "p25": 96,
+        "p75": 795,
+        "n": 76,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.082,
+        "p25": 0.0558,
+        "p75": 0.1917,
+        "n": 76,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 20.1252,
+        "p25": 16.2258,
+        "p75": 23.8427,
+        "n": 75,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 75,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 31,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 755,
+        "p25": 400.5,
+        "p75": 1218,
+        "n": 31,
+        "source": "olist"
+      }
+    }
+  },
+  "sports_leisure": {
+    "category": "sports_leisure",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 111.4,
+        "p25": 66.325,
+        "p75": 168.595,
+        "n": 7683,
+        "source": "olist"
+      },
+      "price": {
+        "median": 78,
+        "p25": 44.32,
+        "p75": 129.99,
+        "n": 8641,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2178,
+        "p25": 0.1326,
+        "p75": 0.3559,
+        "n": 8641,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.1364,
+        "p25": 18.4066,
+        "p75": 28.0514,
+        "n": 7683,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 7683,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 1,
+        "p25": 1,
+        "p75": 3,
+        "n": 2867,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 733,
+        "p25": 423,
+        "p75": 1223,
+        "n": 2867,
+        "source": "olist"
+      }
+    }
+  },
+  "stationery": {
+    "category": "stationery",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 102.64,
+        "p25": 67.82,
+        "p75": 147.15,
+        "n": 2295,
+        "source": "olist"
+      },
+      "price": {
+        "median": 79,
+        "p25": 44,
+        "p75": 118,
+        "n": 2517,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.2253,
+        "p25": 0.1518,
+        "p75": 0.3787,
+        "n": 2517,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.5822,
+        "p25": 19.1162,
+        "p75": 29.1874,
+        "n": 2295,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 2286,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4,
+        "n": 849,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 319,
+        "p25": 207,
+        "p75": 552,
+        "n": 849,
+        "source": "olist"
+      }
+    }
+  },
+  "tablets_printing_image": {
+    "category": "tablets_printing_image",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 110.3,
+        "p25": 70.24,
+        "p75": 117.12,
+        "n": 77,
+        "source": "olist"
+      },
+      "price": {
+        "median": 99,
+        "p25": 54.9,
+        "p75": 99,
+        "n": 83,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.163,
+        "p25": 0.1326,
+        "p75": 0.2219,
+        "n": 83,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.0733,
+        "p25": 19.1094,
+        "p75": 32.1089,
+        "n": 77,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 75,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 3,
+        "p25": 1,
+        "p75": 5,
+        "n": 9,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 512,
+        "p25": 150,
+        "p75": 622,
+        "n": 9,
+        "source": "olist"
+      }
+    }
+  },
+  "telephony": {
+    "category": "telephony",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 45.45,
+        "p25": 36.09,
+        "p75": 74.125,
+        "n": 4182,
+        "source": "olist"
+      },
+      "price": {
+        "median": 29.99,
+        "p25": 21.99,
+        "p75": 49,
+        "n": 4545,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.4325,
+        "p25": 0.2464,
+        "p75": 0.6747,
+        "n": 4545,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.2239,
+        "p25": 18.1821,
+        "p75": 28.5085,
+        "n": 4182,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 3,
+        "p75": 5,
+        "n": 4156,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4,
+        "n": 1134,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 603.5,
+        "p25": 382,
+        "p75": 865.75,
+        "n": 1134,
+        "source": "olist"
+      }
+    }
+  },
+  "toys": {
+    "category": "toys",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 104.755,
+        "p25": 65.7725,
+        "p75": 163.06,
+        "n": 3862,
+        "source": "olist"
+      },
+      "price": {
+        "median": 79.9,
+        "p25": 47.88,
+        "p75": 129.9,
+        "n": 4117,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1989,
+        "p25": 0.127,
+        "p75": 0.3259,
+        "n": 4117,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 22.4969,
+        "p25": 18.1865,
+        "p75": 27.348,
+        "n": 3862,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 3837,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 1411,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 587,
+        "p25": 346,
+        "p75": 916,
+        "n": 1411,
+        "source": "olist"
+      }
+    }
+  },
+  "watches_gifts": {
+    "category": "watches_gifts",
+    "metrics": {
+      "cpm": {
+        "median": 22,
+        "p25": 14,
+        "p75": 34,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "ctr": {
+        "median": 0.011,
+        "p25": 0.007,
+        "p75": 0.017,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "cvr": {
+        "median": 0.021,
+        "p25": 0.012,
+        "p75": 0.034,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "atcRate": {
+        "median": 0.08,
+        "p25": 0.045,
+        "p75": 0.12,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "icRate": {
+        "median": 0.45,
+        "p25": 0.32,
+        "p75": 0.6,
+        "n": 0,
+        "source": "kaggle_meta"
+      },
+      "aov": {
+        "median": 158.52,
+        "p25": 94.3,
+        "p75": 242.44,
+        "n": 5601,
+        "source": "olist"
+      },
+      "price": {
+        "median": 129,
+        "p25": 59.94,
+        "p75": 209.99,
+        "n": 5991,
+        "source": "olist"
+      },
+      "freightRatio": {
+        "median": 0.1152,
+        "p25": 0.0662,
+        "p75": 0.2204,
+        "n": 5991,
+        "source": "olist"
+      },
+      "deliveryDays": {
+        "median": 23.5265,
+        "p25": 18.6052,
+        "p75": 28.6139,
+        "n": 5601,
+        "source": "olist"
+      },
+      "reviewAvg": {
+        "median": 5,
+        "p25": 4,
+        "p75": 5,
+        "n": 5564,
+        "source": "olist"
+      },
+      "photos": {
+        "median": 2,
+        "p25": 1,
+        "p75": 3,
+        "n": 1329,
+        "source": "olist"
+      },
+      "descriptionLength": {
+        "median": 564,
+        "p25": 402,
+        "p75": 705,
+        "n": 1329,
+        "source": "olist"
+      }
+    }
+  }
+}
