@@ -52,6 +52,9 @@ importers:
       '@mazal/data':
         specifier: workspace:*
         version: link:../data
+      '@mazal/engine':
+        specifier: workspace:*
+        version: link:../engine
 
 packages:
 

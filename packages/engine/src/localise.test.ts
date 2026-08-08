@@ -72,3 +72,26 @@ test('an ETA change on a stage 4 break names the ETA shock', () => {
 
   expect(result.suspectedCause).toBe('eta_shock');
 });
+
+test('diagnoses the campaign as it is now, not as its thirty-day average', () => {
+  // Healthy for twenty days, then ATC collapses for ten. The full-window mean
+  // is comfortably inside the benchmark; the campaign is still broken.
+  const days = healthyDays().map((d, i) =>
+    i < 20 ? d : { ...d, addToCarts: 1, checkoutsInitiated: 0, purchases: 0 });
+
+  const result = diagnose({ days, card: apparelCard, events: [], reference: benchmarkRef });
+
+  expect(result.primary?.stage).toBe(3);
+});
+
+test('calls it a tracking break when the whole conversion funnel dies but the media keeps running', () => {
+  // Impressions and clicks are untouched; everything the pixel reports is gone.
+  // A seller told to refresh their creative here spends another week for nothing.
+  const days = healthyDays().map((d) => ({
+    ...d, addToCarts: 1, checkoutsInitiated: 0, purchases: 0, revenue: 0,
+  }));
+
+  const result = diagnose({ days, card: apparelCard, events: [], reference: benchmarkRef });
+
+  expect(result.suspectedCause).toBe('pixel_break');
+});

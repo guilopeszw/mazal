@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@mazal/contracts": "workspace:*",
-    "@mazal/data": "workspace:*"
+    "@mazal/data": "workspace:*",
+    "@mazal/engine": "workspace:*"
   }
 }

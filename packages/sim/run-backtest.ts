@@ -10,20 +10,21 @@
 // and the scoring are wired correctly at full scale rather than at the five
 // hand-made cases in eyeball.ts.
 
-import { alwaysHealthy, runBacktestWith } from './backtest.ts';
+import { diagnose } from '@mazal/engine';
+import { runBacktestWith } from './backtest.ts';
 import { generateCohort, splitCohort } from './cohort.ts';
 import { formatConfusion } from './score.ts';
 
-// Swap for `diagnose` from @mazal/engine when it exists — see README.md.
-const diagnoser = alwaysHealthy;
+const diagnoser = diagnose;
 
 const { train, held } = splitCohort(generateCohort());
 const report = runBacktestWith(held, diagnoser);
 const noneHeld = held.filter((c) => c.fault.kind === 'none').length;
 
-console.log('diagnoser: always-healthy floor');
-console.log('  ⚠ NOT A RESULT. packages/engine does not exist yet, so this is the floor');
-console.log('    a real diagnoser has to beat. Do not put this number on a slide.\n');
+console.log('diagnoser: @mazal/engine');
+console.log('  ⚠ The engine and the simulator were written by the same person. The A/B');
+console.log('    firewall did not hold, so this is a wiring and sanity number, not an');
+console.log('    accuracy claim. Floor to beat: 25.0% top-1 at 0% false alarms.\n');
 
 console.log(`held-out n       ${report.n}`);
 console.log(`top-1            ${(report.top1 * 100).toFixed(1)}%`);

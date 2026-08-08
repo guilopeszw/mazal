@@ -65,8 +65,24 @@ export function deviation(observed: number, reference: Distribution): number {
 /** A stage is flagged when it is more than one robust sigma below its reference. */
 const FLAG_AT = -1.0;
 
+/**
+ * Days of history the diagnosis actually looks at.
+ *
+ * A campaign that broke on day fifteen is broken *now*, but its thirty-day mean
+ * is half healthy and sits comfortably inside the benchmark — a stockout reads
+ * -0.16 sigma over thirty days and -1.41 over the last seven. Averaging the
+ * break away is how a monitoring product tells a seller nothing is wrong while
+ * their add-to-carts sit at zero.
+ *
+ * Seven days rather than three or fourteen: it covers a full week, so weekday
+ * and weekend traffic are both in the window and neither distorts the rate.
+ */
+const WINDOW_DAYS = 7;
+
 export function diagnose(input: DiagnoseInput): Diagnosis {
-  const total = aggregate(input.days);
+  // Sample minimums are checked against this window too, so a short window
+  // silences a stage rather than letting it speak on thin data.
+  const total = aggregate(input.days.slice(-WINDOW_DAYS));
   const table = input.reference.kind === 'benchmark' ? input.reference.table : null;
   const flagged: Finding[] = [];
 
@@ -121,14 +137,30 @@ function attribute(primary: Finding | null, flagged: Finding[], input: DiagnoseI
   const table = input.reference.kind === 'benchmark' ? input.reference.table : null;
   const row = table?.[input.card.category]?.metrics;
   const frequency = (() => {
-    const t = aggregate(input.days);
+    const t = aggregate(input.days.slice(-WINDOW_DAYS));
     return t.reach === 0 ? 0 : t.impressions / t.reach;
   })();
 
-  // Everything broke at once. A pixel that stopped reporting looks exactly like
-  // this, and it is the most common real "my campaign died" cause — so it is
-  // checked before anything that would have the seller rewrite their creative.
-  if (flagged.length >= 4) return 'pixel_break';
+  // "Everything down uniformly, sudden" — the last row of the brief's signature
+  // table. A pixel that stopped reporting kills every conversion the tracker
+  // sees while impressions and clicks keep running, so stages 3, 4 and 5 all
+  // break together and the media stages do not. It is checked first because it
+  // is the most common real "my campaign died" cause, and because a seller sent
+  // to rewrite their creative here spends another week for nothing.
+  //
+  // Stage 4 cannot be part of the test even though a pixel break kills it too:
+  // when add-to-carts collapse there are fewer than thirty left to judge
+  // checkouts on, so stage 4 silences itself. Requiring it would mean the rule
+  // never fires. Stage 2 is out for the usual reason — it needs analytics.
+  //
+  // A stockout looks identical from the numbers alone, so an event that explains
+  // a single stage wins: the event log is what separates them.
+  const broken = new Set(flagged.map((f) => f.stage));
+  const mediaHealthy = !broken.has(0) && !broken.has(1);
+  const explained = ['stockout', 'eta_change', 'price_change', 'budget_change'] as const;
+  const hasExplanation = explained.some((t) => has(input, t));
+
+  if (mediaHealthy && broken.has(3) && broken.has(5) && !hasExplanation) return 'pixel_break';
 
   switch (primary.stage) {
     case 0:
