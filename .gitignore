@@ -1,0 +1,11 @@
+.serena
+.claude
+
+node_modules
+.next
+.turbo
+dist
+
+# Raw Kaggle datasets. Olist is CC BY-NC-SA — only aggregate statistics
+# get committed, in packages/data/benchmarks.json. See docs/plan/B-data.md.
+data/raw/
