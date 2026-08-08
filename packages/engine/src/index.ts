@@ -5,6 +5,9 @@
 //
 // Firewall: this package never reads packages/sim. See docs/plan/A-engine.md.
 
+export { buildPlan } from './plan.ts';
+export { predict } from './predict.ts';
+
 import type {
   CampaignDay, CauseLayer, Diagnosis, DiagnoseInput, Distribution,
   FaultKind, Finding, FunnelStage, StoreEvent,
