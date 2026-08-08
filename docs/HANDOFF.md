@@ -29,6 +29,26 @@ Fill a name in as each person starts. If you are opening a session and your lett
 
 ---
 
+## 2026-08-08 14:40 · Guilherme · benchmarks landed
+
+**Done:** `packages/data` is real (`761f822`, on `stage`). Kaggle CSVs downloaded to `data/raw/`, `pnpm derive` run, `benchmarks.json` and `categories.ts` committed — **62 categories**, 9 skipped under 30 orders. `index.ts` exports `benchmarks`. `pnpm test` green (5), `pnpm typecheck` clean. **A and D are unblocked on data.**
+
+Two bugs the real files exposed, both fixed: `product_category_name_translation.csv` carries a BOM that hid inside the first header name and collapsed the table to one category, and the CSVs live one directory down after an unzip.
+
+**Next:** `packages/sim` — but it needs `@mazal/contracts`, which still does not exist. Until it does, the honest next action is Mateus's package, not B's.
+
+**Blocked / watch out:** Three things.
+
+**`packages/contracts` is still unpushed.** Everything B does next imports it. This is now the only thing on the critical path.
+
+**The media metrics are priors, not measurements, and this is a decision someone can reverse.** `cpm`, `ctr`, `cvr`, `atcRate` and `icRate` ship as published BRL medians with `n: 0`. The facebook-ad-campaign dataset measures 78.5M impressions against 13,293 clicks — 0.017% CTR at 0.26 CPM in an unstated currency. Shipping that as a Brazilian retail benchmark loses the room to the first judge who buys media. `derive.ts` prints the measured numbers on every run; both belong on the slide.
+
+**Ask C for a third `source` value before contracts freeze.** `source: 'olist' | 'kaggle_meta'` has nowhere honest to put a published prior — five of the twelve metrics are currently labelled `kaggle_meta` and are not from Kaggle. `'prior'` is a one-word addition now and an expensive rename after SAT-A.
+
+Olist numbers to sanity-check against: `health_beauty` median price R$79.90, freight ratio 21%, promised ETA 23 days, review median 5, photos 1, n=9,670. `deliveryDays` is the *promised* ETA, not the actual delivery, and an order's category is its first item's.
+
+---
+
 ## 2026-08-08 14:05 · Guilherme · branches, scaffold, derivation
 
 **Done:** Two things.
