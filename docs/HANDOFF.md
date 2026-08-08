@@ -37,6 +37,28 @@ Entry format:
 
 ---
 
+## 2026-08-08 19:30 · Guilherme · the simulator is on stage; SAT-B and most of SUN-A done
+
+**Done:** `packages/sim` is real and merged (`fa7be86`). `generateCampaign(seed, fault)` covers **all nine** fault kinds — SAT-B asked for three — and both demo fixtures are committed. `pnpm test` 54 passing, `pnpm typecheck` clean, `pnpm sim:eyeball` green across 360 campaigns, `pnpm sim:fixtures` byte-reproducible on a rerun. The plan is at [`superpowers/plans/2026-08-08-packages-sim.md`](superpowers/plans/2026-08-08-packages-sim.md).
+
+`packages/sim` is test-exempt per `docs/testing.md`, so the check it carries is a script: `pnpm sim:eyeball` prints a series per fault and then asserts each one deforms the stages `B-data.md`'s table names **and no others**, over 40 seeds per fault. Writing that found three bugs that would each have poisoned the backtest quietly.
+
+**`Math.round` collapsed the funnel for small advertisers.** A seller on R$60/day gets ~20 clicks, so ~1 add-to-cart, and `Math.round(1 × 0.45)` is 0 — thirty days of zero checkouts and zero purchases on a campaign labelled `none`. Every small advertiser in the training set would have been a false alarm, and the false-alarm rate is the number `B-data.md` says a judge asks about first. Stochastic rounding keeps the expectation at small counts.
+
+**A blind squeeze did not survive the generator's own variance.** Campaigns draw their base rates at sigma 0.2–0.3, so scaling ATC by 0.4 left a high-drawing store above a low-drawing healthy one: a fault label on healthy numbers, teaching the engine that the fault sometimes does nothing. Faults now name the *rate they put the stage on*, whatever the base happens to be.
+
+**Shipping was drawn from a second, independent price**, so a R$5 item could carry R$24 of freight. Olist holds those two as a ratio; there is one draw now.
+
+**Next:** `runBacktest` — the file is specced in the plan's Task 6 and blocked on nothing but `diagnose`.
+
+**Blocked / watch out:** **`packages/engine` does not exist and A has pushed nothing all weekend.** SUN-A wants a real accuracy number by 13:00 and it cannot exist until `diagnose` does. That is the escalation, and it is more urgent than anything left in this package.
+
+**`top-2` cannot be computed exactly across the firewall.** `Diagnosis` carries one `suspectedCause` and `Finding` carries a `causeLayer`, not a `FaultKind`, so "the strongest secondary finding's implied cause" has no exact reading without opening `packages/engine`, which B may not do. Task 6 approximates it with the secondary's cause layer and the slide must say so. The clean fix is an optional `impliedCause?: FaultKind` on `Finding` — C's call, and an announcement.
+
+**Frequency is now a simulated stage.** `creative_fatigue` is the only fault that moves it, and it is the only fault with two signals rather than one: a CTR that decays *without* the frequency climb is a creative that was never good, which is a different diagnosis. If the engine only reads CTR it will confuse the two.
+
+---
+
 ## 2026-08-08 16:50 · Guilherme · #1 and #3 merged to main; #7 reviewed and fixed
 
 **Read this entry alone and you have the whole picture.**
