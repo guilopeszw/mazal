@@ -38,6 +38,8 @@ Direct push to `main`. Commit on green, every time — a red `main` blocks four 
 
 TDD is mandatory in `packages/engine` and `packages/ingest`. Everywhere else is exempt this weekend. Details and the loop: [`docs/testing.md`](docs/testing.md).
 
+Invoke `mattpocock-skills:tdd` when starting work in either of those packages. Invoke `superpowers:writing-plans` before building anything open-ended — the simulator is the one thing this weekend that qualifies; the contract, the derivation script, and the parser are fully specified already and get built directly.
+
 ## Working unattended
 
 The team sleeps Saturday night with sessions running and occasional checks. While unattended, an agent writes code, runs tests, and commits **within its own package**.
