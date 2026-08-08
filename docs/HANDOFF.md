@@ -78,7 +78,15 @@ The floor belongs beside them every time they are quoted. A diagnoser that answe
 
 **The pixel-break rule could never fire.** It required stages 3, 4 and 5 to flag together, but when add-to-carts collapse there are fewer than thirty left to judge stage 4 on, so the stage silences itself. It tests media-healthy plus 3 and 5 broken, and defers to the event log because a stockout looks identical from the numbers alone.
 
-**Next:** `apps/web` and `apps/mcp`. Both `diagnose` and `predict` and `buildPlan` are real and importable now, so Bringel and Joaquim are unblocked on everything.
+**Three bugs found and fixed before merge**, all by reading the brief against the code rather than by a failing test:
+
+- **`ReferenceMode: 'self'` was never implemented.** `diagnose` read the benchmark table and nothing else, so an in-flight call found no reference, flagged nothing and returned `suspectedCause: 'none'`. Not an error — a confident *"your campaign is healthy"* for every caller using the in-flight arm. Both modes share one code path now.
+- **`spread()` is floored at a tenth of the median.** A baseline that barely moved has an IQR near zero, and dividing by it returned a guarded zero that flagged nothing — self mode called a campaign healthy whose add-to-carts had fallen by two thirds.
+- **`Finding.evidence` was never set**, which cost the demo its best sentence. An event attaches when it matches the broken stage *and* lands within a day of the change point. Change points scan three days and report the window's **first** day: a trailing window cannot cross until it has filled with broken days, so dating the break at the window's end puts it two days late and the explaining event never lines up again.
+
+Backtest unchanged at 59% — these paths are orthogonal to benchmark scoring and nothing was tuned against the cohort. Evidence attaches on 28 of 180 sampled campaigns; of the five fault kinds that emit an event, that is the demo line firing when the dates agree.
+
+**Next:** `apps/web` and `apps/mcp`. `diagnose`, `predict` and `buildPlan` are all real and importable, and the in-flight arm now works, so Bringel and Joaquim are unblocked on everything.
 
 **Blocked / watch out:** the 12% false-alarm rate is three healthy campaigns in twenty-five, and `B-data.md` is right that it is the first thing a judge who has shipped monitoring will ask about. It is a floor measured on a cohort a quarter healthy, which is nothing like a real account — quote the denominator.
 
