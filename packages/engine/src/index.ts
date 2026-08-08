@@ -55,12 +55,30 @@ const STAGES: StageSpec[] = [
  */
 const HIGH_IS_BAD = new Set(['cpm', 'cpc', 'cpa', 'costPerAtc']);
 
-/** Robust sigma from the interquartile range — p75 and p25 of a normal sit 1.349σ apart. */
-export function spread(reference: Distribution): number {
-  return (reference.p75 - reference.p25) / 1.349;
+/**
+ * Only the three quantiles are needed to score a deviation, which is what lets
+ * both reference modes share one code path: the benchmark arm passes a
+ * Distribution straight out of @mazal/data, and the self arm builds the same
+ * three numbers out of the campaign's own trailing history.
+ */
+export type Quantiles = Pick<Distribution, 'median' | 'p25' | 'p75'>;
+
+/**
+ * Robust sigma from the interquartile range — p75 and p25 of a normal sit 1.349σ
+ * apart — floored at a tenth of the median.
+ *
+ * The floor is not cosmetic. A campaign whose baseline barely moved has an IQR
+ * of nearly zero, and dividing by that gives either infinity or, as it did here,
+ * a guarded zero that silently flags nothing: self mode returned "healthy" for a
+ * campaign whose add-to-carts had fallen by two thirds. No real metric has zero
+ * variance, so a zero IQR means too few distinct values rather than a campaign
+ * that cannot change.
+ */
+export function spread(reference: Quantiles): number {
+  return Math.max((reference.p75 - reference.p25) / 1.349, Math.abs(reference.median) * 0.1);
 }
 
-export function deviation(observed: number, reference: Distribution): number {
+export function deviation(observed: number, reference: Quantiles): number {
   const s = spread(reference);
   return s === 0 ? 0 : (observed - reference.median) / s;
 }
@@ -82,17 +100,77 @@ const FLAG_AT = -1.0;
  */
 const WINDOW_DAYS = 7;
 
+/**
+ * Self mode compares a shorter window, because it has a baseline to compare
+ * against and does not need seven days to beat down category noise. The brief
+ * names three.
+ */
+const SELF_WINDOW_DAYS = 3;
+
+/** Linear-interpolated quantile on a sorted array. */
+function quantile(sorted: number[], q: number): number {
+  if (sorted.length === 0) return 0;
+  const pos = (sorted.length - 1) * q;
+  const lo = Math.floor(pos);
+  const hi = Math.ceil(pos);
+  const a = sorted[lo] ?? 0;
+  const b = sorted[hi] ?? a;
+  return a + (b - a) * (pos - lo);
+}
+
+/**
+ * The campaign's own trailing baseline, as the same three numbers a benchmark
+ * row carries. Daily values, not one aggregate — the spread of a campaign
+ * against itself *is* its day-to-day variance, and without it there is nothing
+ * to divide a deviation by.
+ */
+function selfReference(baseline: CampaignDay[], observe: (d: CampaignDay) => number): Quantiles | null {
+  // Under a week of history there is no trustworthy shape to compare against,
+  // and a "deviation" measured off three days is noise wearing a sigma.
+  if (baseline.length < 7) return null;
+
+  const values = baseline.map(observe).filter(Number.isFinite).sort((a, b) => a - b);
+  return { median: quantile(values, 0.5), p25: quantile(values, 0.25), p75: quantile(values, 0.75) };
+}
+
+/**
+ * Which events can explain which stage. An event is evidence only when it lands
+ * on the stage that broke — a creative refresh three weeks before an add-to-cart
+ * collapse explains nothing, and attaching it would be the engine inventing a
+ * story out of a coincidence.
+ */
+const STAGE_EVENTS: Partial<Record<FunnelStage, readonly StoreEvent['type'][]>> = {
+  0: ['budget_change'],
+  1: ['creative_refresh'],
+  3: ['stockout', 'price_change'],
+  4: ['eta_change'],
+  5: ['pixel_error', 'policy_flag'],
+};
+
+const daysApart = (a: string, b: string): number =>
+  Math.abs(Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86_400_000;
+
 export function diagnose(input: DiagnoseInput): Diagnosis {
+  const ref = input.reference;
+  const self = ref.kind === 'self';
+  const windowDays = self ? SELF_WINDOW_DAYS : WINDOW_DAYS;
   // Sample minimums are checked against this window too, so a short window
   // silences a stage rather than letting it speak on thin data.
-  const total = aggregate(input.days.slice(-WINDOW_DAYS));
+  const total = aggregate(input.days.slice(-windowDays));
   const table = input.reference.kind === 'benchmark' ? input.reference.table : null;
+  // The baseline never overlaps the window it is compared against: a break that
+  // is inside its own reference cannot deviate from it.
+  const baseline = ref.kind === 'self'
+    ? input.days.slice(0, Math.min(ref.baselineDays, Math.max(input.days.length - windowDays, 0)))
+    : [];
   const flagged: Finding[] = [];
 
   for (const spec of STAGES) {
     if (spec.sample(total) < spec.minSample) continue;
 
-    const reference = table?.[input.card.category]?.metrics[spec.metric as 'atcRate'];
+    const reference = self
+      ? selfReference(baseline, spec.observe)
+      : table?.[input.card.category]?.metrics[spec.metric as 'atcRate'];
     if (!reference) continue;
 
     const observed = spec.observe(total);
@@ -114,13 +192,72 @@ export function diagnose(input: DiagnoseInput): Diagnosis {
     });
   }
 
-  const [primary = null, ...secondary] = flagged;
+  const [first = null, ...rest] = flagged;
+  const changePoint = first ? findChangePoint(input, first, windowDays, self, baseline, table) : undefined;
+
+  // The event log is what turns "ATC collapsed" into "ATC collapsed the day your
+  // supplier ETA moved from 9 days to 22". That sentence is the demo.
+  const evidence = first && changePoint
+    ? input.events.find((e) =>
+        (STAGE_EVENTS[first.stage] ?? []).includes(e.type) && daysApart(e.date, changePoint.date) <= 1)
+    : undefined;
+
+  const primary = first && evidence ? { ...first, evidence } : first;
+
   return {
     primary,
-    secondary: secondary.map((f) => ({ ...f, severity: 'secondary' as const })),
+    secondary: rest.map((f) => ({ ...f, severity: 'secondary' as const })),
     suspectedCause: attribute(primary, flagged, input),
+    ...(changePoint ? { changePoint } : {}),
   };
 }
+
+/**
+ * The first date a rolling window crossed the threshold. Scanned forward, so it
+ * reports when the metric turned rather than when someone noticed — that date is
+ * what an event has to line up with before it counts as an explanation.
+ */
+function findChangePoint(
+  input: DiagnoseInput,
+  finding: Finding,
+  _windowDays: number,
+  self: boolean,
+  baseline: CampaignDay[],
+  table: ReturnType<typeof benchmarkTable>,
+): { date: string; metric: string } | undefined {
+  const spec = STAGES.find((s) => s.metric === finding.metric);
+  if (!spec) return undefined;
+
+  const reference = self
+    ? selfReference(baseline, spec.observe)
+    : table?.[input.card.category]?.metrics[spec.metric as 'atcRate'];
+  if (!reference) return undefined;
+
+  // Three days, in both modes and whatever window the flag itself used. The
+  // question here is different: not "is it broken now" but "which day did it
+  // turn", and a seven-day window answers that five days late — late enough that
+  // the event which explains it no longer lines up.
+  const span = SELF_WINDOW_DAYS;
+  for (let end = Math.max(span, baseline.length); end <= input.days.length; end++) {
+    const window = aggregate(input.days.slice(end - span, end));
+    if (spec.sample(window) < spec.minSample) continue;
+
+    const raw = deviation(spec.observe(window), reference);
+    const dev = HIGH_IS_BAD.has(spec.metric) ? -raw : raw;
+    if (dev < FLAG_AT) {
+      // The first day of the window that crossed, not the last. A trailing
+      // window cannot cross until it has filled with broken days, so reporting
+      // its end dates the break two days after it happened — and the event that
+      // explains it, which has to land within a day, never lines up again.
+      const date = input.days[end - span]?.date;
+      if (date) return { date, metric: spec.metric };
+    }
+  }
+  return undefined;
+}
+
+const benchmarkTable = (input: DiagnoseInput) =>
+  input.reference.kind === 'benchmark' ? input.reference.table : null;
 
 const has = (input: DiagnoseInput, type: StoreEvent['type']): boolean =>
   input.events.some((e) => e.type === type);
