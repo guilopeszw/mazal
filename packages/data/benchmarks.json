@@ -7,35 +7,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 410.615,
@@ -96,35 +96,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 164.465,
@@ -185,35 +185,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 112.02,
@@ -274,35 +274,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 103.37,
@@ -363,35 +363,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 110.91,
@@ -452,35 +452,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 106.97,
@@ -541,35 +541,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 105.28,
@@ -630,35 +630,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 68.35,
@@ -719,35 +719,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 79.5,
@@ -808,35 +808,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 69.04,
@@ -897,35 +897,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 75.815,
@@ -986,35 +986,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 107.42,
@@ -1075,35 +1075,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 1250.81,
@@ -1164,35 +1164,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 103.13,
@@ -1253,35 +1253,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 84.73,
@@ -1342,35 +1342,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 124.92,
@@ -1431,35 +1431,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 182.51,
@@ -1520,35 +1520,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 164.595,
@@ -1609,35 +1609,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 148.67,
@@ -1698,35 +1698,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 92.55,
@@ -1787,35 +1787,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 94.2,
@@ -1876,35 +1876,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 63.895,
@@ -1965,35 +1965,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 45.53,
@@ -2054,35 +2054,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 37.86,
@@ -2143,35 +2143,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 72.68,
@@ -2232,35 +2232,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 65,
@@ -2321,35 +2321,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 82.04,
@@ -2410,35 +2410,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 102.37,
@@ -2499,35 +2499,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 75.07,
@@ -2588,35 +2588,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 74.59,
@@ -2677,35 +2677,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 71.245,
@@ -2766,35 +2766,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 60.24,
@@ -2855,35 +2855,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 239.5,
@@ -2944,35 +2944,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 104.59,
@@ -3033,35 +3033,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 151.74,
@@ -3122,35 +3122,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 132.31,
@@ -3211,35 +3211,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 108.01,
@@ -3300,35 +3300,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 104.12,
@@ -3389,35 +3389,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 63.935,
@@ -3478,35 +3478,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 287.27,
@@ -3567,35 +3567,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 124.35,
@@ -3656,35 +3656,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 137.23,
@@ -3745,35 +3745,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 88.72,
@@ -3834,35 +3834,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 128.745,
@@ -3923,35 +3923,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 162.83,
@@ -4012,35 +4012,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 128.13,
@@ -4101,35 +4101,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 82.15,
@@ -4190,35 +4190,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 92.17,
@@ -4279,35 +4279,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 143.83,
@@ -4368,35 +4368,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 206.57,
@@ -4457,35 +4457,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 85.63,
@@ -4546,35 +4546,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 111.21,
@@ -4635,35 +4635,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 115.16,
@@ -4724,35 +4724,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 123.08,
@@ -4813,35 +4813,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 128.62,
@@ -4902,35 +4902,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 673.47,
@@ -4991,35 +4991,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 111.4,
@@ -5080,35 +5080,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 102.64,
@@ -5169,35 +5169,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 110.3,
@@ -5258,35 +5258,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 45.45,
@@ -5347,35 +5347,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 104.755,
@@ -5436,35 +5436,35 @@
         "p25": 14,
         "p75": 34,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "ctr": {
         "median": 0.011,
         "p25": 0.007,
         "p75": 0.017,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "cvr": {
         "median": 0.021,
         "p25": 0.012,
         "p75": 0.034,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "atcRate": {
         "median": 0.08,
         "p25": 0.045,
         "p75": 0.12,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "icRate": {
         "median": 0.45,
         "p25": 0.32,
         "p75": 0.6,
         "n": 0,
-        "source": "kaggle_meta"
+        "source": "prior"
       },
       "aov": {
         "median": 158.52,

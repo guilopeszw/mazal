@@ -1,13 +1,15 @@
 import { expect, test } from 'vitest';
 import { benchmarks } from './index.ts';
-import type { OlistCategory } from './categories.ts';
+import type { OlistCategory } from '@mazal/contracts';
+import raw from './benchmarks.json' with { type: 'json' };
 
 /**
  * Asserts the committed output, not the code that wrote it — `derive.test.ts` covers
  * the parser and the quantiles, and nothing until now covered the 62 × 12 table they
  * produce. A metric that silently stops being derived surfaces here rather than in the
- * engine. Replace this with `satisfies BenchmarkTable` in `index.ts` once
- * `@mazal/contracts` lands; until then the shape has no type behind it.
+ * engine. It is not redundant with the `BenchmarkTable` cast in `index.ts` — that cast
+ * exists precisely because a JSON import widens every string literal and cannot be
+ * checked. This is where the checking happens.
  */
 const METRICS = [
   'cpm', 'ctr', 'atcRate', 'icRate', 'cvr', 'aov',
@@ -15,7 +17,7 @@ const METRICS = [
   'reviewAvg', 'photos', 'descriptionLength',
 ] as const;
 
-/** Priors, not measurements: `n: 0` is how the UI knows to print them as estimates. */
+/** Priors, not measurements: `source: 'prior'` and `n: 0`, so the UI prints them as estimates. */
 const PRIORS = ['cpm', 'ctr', 'cvr', 'atcRate', 'icRate'];
 
 const entries = Object.entries(benchmarks);
@@ -38,7 +40,7 @@ test('every distribution is ordered, finite, and says where it came from', () =>
       expect(d.p25, where).toBeLessThanOrEqual(d.median);
       expect(d.median, where).toBeLessThanOrEqual(d.p75);
       expect(Number.isFinite(d.median), where).toBe(true);
-      expect(['olist', 'kaggle_meta'], where).toContain(d.source);
+      expect(['olist', 'prior'], where).toContain(d.source);
 
       // A prior is n=0 and a measurement is not. Nothing may sit between them.
       if (PRIORS.includes(metric)) expect(d.n, where).toBe(0);
@@ -63,8 +65,10 @@ test('the two product-level metrics can fall below the order threshold', () => {
 });
 
 test('the generated union and the table name the same categories', () => {
-  // Compile-time: every key must be assignable to OlistCategory.
-  const keys: OlistCategory[] = entries.map(([key]) => key as OlistCategory);
+  // Compile-time, and the reason this import is the raw JSON rather than the cast
+  // export: assigning it to a Record keyed by the union fails to compile the moment
+  // `derive.ts` writes a table missing a category the union still declares.
+  const exhaustive: Record<OlistCategory, unknown> = raw;
 
-  expect(keys).toEqual([...keys].sort());
+  expect(Object.keys(exhaustive)).toEqual([...Object.keys(exhaustive)].sort());
 });
