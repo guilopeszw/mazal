@@ -47,9 +47,23 @@ Hackathon build. Deadline Sunday 2026-08-09 23:59, code freeze 19:00.
 - Merge back into `stage` with `--no-ff` when green, so the branch stays legible as one unit of work in the history.
 - Delete your branch after it merges. It is yours; nobody else's is.
 - `stage` → `main` at block boundaries only, only with `pnpm test` green, and say so before you do it.
-- Never force push. Never rewrite `main` or `stage`.
+- Never rewrite `main` or `stage` — no force push, no reset, no rebase. Your own unmerged branch is yours to amend.
 
 Commit on green, every time. Small commits on your branch, often — a red `stage` blocks four people, and the branch is what keeps a red one from ever reaching them.
+
+## Commits and PR titles
+
+Conventional Commits, same six types as the branches:
+
+```
+feat(data): derive category benchmarks from Olist
+fix(data): strip the BOM before reading a CSV header
+docs: branch for every change, stage takes merges not commits
+```
+
+Scope is the package when one package changes and omitted when several do. Subject is imperative and under 72 characters. The body says *why*, because the diff already says what — and a message that only restates the diff is a message nobody reads twice.
+
+A PR title is the merge commit's subject, so it follows the same rule.
 
 ## Tests
 
