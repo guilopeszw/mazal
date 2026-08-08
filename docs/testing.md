@@ -110,6 +110,6 @@ The demo fixtures are the ones that matter most on Sunday. They are generated fr
 
 ## Commit on green, every time
 
-Five people merge into `stage`. A red `stage` blocks four people, and finding out at 03:00 that it went red at 22:00 costs the night. Run the test, watch it pass, commit to your branch, push. Small commits, often. Green is what earns the merge into `stage`.
+Five people push to `stage`. A red `stage` blocks four people, and finding out at 03:00 that it went red at 22:00 costs the night. Run the test, watch it pass, commit, push. Small commits, often.
 
 `main` only ever receives a green `stage` — see [Branches](../AGENTS.md#branches). If you break `stage`, say so in the group before you start fixing it.
