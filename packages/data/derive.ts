@@ -31,12 +31,24 @@ type BenchmarkMetric =
   | 'reviewAvg' | 'photos' | 'descriptionLength';
 
 /**
- * Mid-funnel priors. The facebook-ad-campaign dataset has impressions, clicks and
- * conversions and nothing between them, so these two are published category medians
- * rather than something measured here. Flagged `kaggle_meta` and printed as an
- * estimate in the UI — do not launder an estimate as a measurement.
+ * Media priors — published Meta benchmarks for Brazilian retail, in BRL. Every one
+ * of these is an estimate, and `n: 0` is how the UI knows to say so. Do not launder
+ * an estimate as a measurement.
+ *
+ * `atcRate` and `icRate` are here because the facebook-ad-campaign dataset has
+ * impressions, clicks and conversions and nothing between them.
+ *
+ * `cpm`, `ctr` and `cvr` are here for a worse reason: that dataset measures 78.5M
+ * impressions against 13,293 clicks, a 0.017% CTR at a CPM of 0.26 in an unstated
+ * currency. Whatever it is, it is not Brazilian retail media in 2026, and a judge
+ * who buys media would spot it in one glance. `derive.ts` prints what the dataset
+ * actually says on every run, so the measured numbers and the reason we did not
+ * ship them are both on the record.
  */
-const MID_FUNNEL_PRIORS: Record<'atcRate' | 'icRate', Distribution> = {
+const MEDIA_PRIORS: Record<'cpm' | 'ctr' | 'cvr' | 'atcRate' | 'icRate', Distribution> = {
+  cpm: { median: 22, p25: 14, p75: 34, n: 0, source: 'kaggle_meta' },
+  ctr: { median: 0.011, p25: 0.007, p75: 0.017, n: 0, source: 'kaggle_meta' },
+  cvr: { median: 0.021, p25: 0.012, p75: 0.034, n: 0, source: 'kaggle_meta' },
   atcRate: { median: 0.08, p25: 0.045, p75: 0.12, n: 0, source: 'kaggle_meta' },
   icRate: { median: 0.45, p25: 0.32, p75: 0.6, n: 0, source: 'kaggle_meta' },
 };
@@ -47,7 +59,10 @@ const MID_FUNNEL_PRIORS: Record<'atcRate' | 'icRate', Distribution> = {
  * Parses RFC-4180-ish CSV: quoted fields, doubled quotes, commas and newlines
  * inside quotes. Olist's review comments contain all three.
  */
-export function parseCsv(text: string): Record<string, string>[] {
+export function parseCsv(input: string): Record<string, string>[] {
+  // product_category_name_translation.csv ships with a BOM. Left in, it hides
+  // itself inside the first header name and every lookup on that column misses.
+  const text = input.charCodeAt(0) === 0xfeff ? input.slice(1) : input;
   const rows: string[][] = [];
   let row: string[] = [];
   let field = '';
@@ -82,11 +97,24 @@ export function parseCsv(text: string): Record<string, string>[] {
     .map((r) => Object.fromEntries(header.map((h, i) => [h, r[i] ?? ''])));
 }
 
+/** CSVs in `data/raw/`, indexed by filename — an unzip puts them one directory down as often as not. */
+const rawFiles = new Map<string, string>();
+for (const entry of existsSync(RAW) ? readdirSync(RAW, { withFileTypes: true }) : []) {
+  if (entry.isFile()) rawFiles.set(entry.name, join(RAW, entry.name));
+  else if (entry.isDirectory()) {
+    for (const nested of readdirSync(join(RAW, entry.name), { withFileTypes: true })) {
+      if (nested.isFile() && !rawFiles.has(nested.name)) {
+        rawFiles.set(nested.name, join(RAW, entry.name, nested.name));
+      }
+    }
+  }
+}
+
 function readCsv(name: string): Record<string, string>[] {
-  const path = join(RAW, name);
-  if (!existsSync(path)) {
+  const path = rawFiles.get(name);
+  if (!path) {
     throw new Error(
-      `Missing ${path}\n\nDownload both datasets into data/raw/ (gitignored) — see docs/plan/B-data.md:\n` +
+      `Missing ${name} under ${RAW}\n\nDownload both datasets into data/raw/ (gitignored) — see docs/plan/B-data.md:\n` +
         `  kaggle datasets download -d olistbr/brazilian-ecommerce --unzip -p data/raw\n` +
         `  kaggle datasets download -d madislemsalu/facebook-ad-campaign --unzip -p data/raw`,
     );
@@ -208,7 +236,7 @@ function main(): void {
 
   // ---- media metrics: one distribution, shared by every category
 
-  const metaFile = readdirSync(RAW).find((f) => /conversion_data|facebook.*ad/i.test(f));
+  const metaFile = [...rawFiles.keys()].find((f) => /conversion_data|facebook.*ad/i.test(f));
   if (!metaFile) {
     throw new Error(
       `No facebook-ad-campaign CSV in ${RAW} — expected KAG_conversion_data.csv.\n` +
@@ -229,11 +257,18 @@ function main(): void {
     }
     if (clicks > 0) cvrValues.push(conversions / clicks);
   }
-  const media: Record<'cpm' | 'ctr' | 'cvr', Distribution> = {
+  // Measured, printed, and deliberately not shipped — see MEDIA_PRIORS.
+  const measured = {
     cpm: distribution(cpmValues, 'kaggle_meta'),
     ctr: distribution(ctrValues, 'kaggle_meta'),
     cvr: distribution(cvrValues, 'kaggle_meta'),
   };
+  console.log(
+    `\n  ${metaFile} measures cpm ${measured.cpm.median}, ctr ${measured.ctr.median}, ` +
+      `cvr ${measured.cvr.median} over ${measured.ctr.n} rows.\n` +
+      `  Shipping published BRL priors instead: cpm ${MEDIA_PRIORS.cpm.median}, ` +
+      `ctr ${MEDIA_PRIORS.ctr.median}, cvr ${MEDIA_PRIORS.cvr.median}, all n=0.`,
+  );
 
   // ---- assemble
 
@@ -249,8 +284,7 @@ function main(): void {
     table[category] = {
       category,
       metrics: {
-        ...media,
-        ...MID_FUNNEL_PRIORS,
+        ...MEDIA_PRIORS,
         aov: distribution(aov.get(category) ?? [], 'olist'),
         price: distribution(price.get(category) ?? [], 'olist'),
         freightRatio: distribution(freightRatio.get(category) ?? [], 'olist'),

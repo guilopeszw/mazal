@@ -17,6 +17,12 @@ test('reads a doubled quote as one literal quote', () => {
   expect(rows[0]!['b']).toBe('say "hi"');
 });
 
+test('strips a BOM instead of hiding it inside the first column name', () => {
+  const rows = parseCsv('﻿product_category_name,product_category_name_english\nbeleza_saude,health_beauty\n');
+
+  expect(rows[0]!['product_category_name']).toBe('beleza_saude');
+});
+
 test('quartiles interpolate and carry the row count behind them', () => {
   const d = distribution([1, 2, 3, 4, 5, 6, 7, 8, 9], 'olist');
 
