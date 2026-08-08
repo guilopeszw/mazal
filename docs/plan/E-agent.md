@@ -116,6 +116,8 @@ Rehearse three times minimum, out loud, timed. Five minutes is much shorter than
 
 **SAT-A** — `apps/mcp` scaffolded with the MCP SDK, one tool answering with a hardcoded `Diagnosis`. deco Studio org created.
 
+> Your SAT-A is the lightest on the team and B's is the heaviest. If B has not committed `benchmarks.json` by 20:00 Saturday, **take `packages/data` from them**: download Olist, write `derive.ts`, emit per-category medians, quartiles, and sample counts, commit the JSON. It is a self-contained script, it unblocks A and D, and it frees B for the simulator — which is the long pole and the thing slide 6 depends on. Your brief in [`B-data.md`](B-data.md) part 1 has the column map and the licence rule.
+
 **SAT-B** — all four tools wired to the real engine. Deployed. Narration prompt drafted and producing something in the right register. Deck outline started.
 
 **SUN-A** — **deco Studio connection live and answering "what happened to my campaign?" end to end.** This is the insurance policy and it must work today. `/api/chat` wired into D's sidebar.

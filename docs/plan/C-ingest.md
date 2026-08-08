@@ -6,7 +6,7 @@
 
 `packages/ingest` — the Meta CSV parser, the Product Card schema and form, the event log parser.
 
-Then, from SUN-A, you move to the frontend with D. Say that out loud now so nobody is surprised at 08:00 Sunday.
+Then you move to the frontend with D — **as soon as ingest is done**, whether that is Saturday night or Sunday morning. `apps/web` is the heaviest single workload on the team. Do not sit on finished ingest work waiting for a clock. Tell D on Saturday night roughly when you expect to land, so they can decide which components to hand you before you arrive.
 
 ## Consume
 

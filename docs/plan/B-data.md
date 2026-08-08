@@ -134,6 +134,8 @@ Report what you measure. If a class does badly, say which and why on the slide �
 
 **SAT-A** — Kaggle datasets downloaded to gitignored `data/raw/`. `derive.ts` written. `benchmarks.json` and the `OlistCategory` union committed. **This unblocks A and D, so it is the first thing that ships this weekend.**
 
+> You own two packages and the longest pole on the critical path. If derivation is not done by 20:00 Saturday, **hand `packages/data` to E** and put everything into the simulator. Derivation is a self-contained script and transferring it costs nothing; a late simulator costs the backtest, and the backtest is slide 6.
+
 **SAT-B** — `generateCampaign` producing 30-day series for `none`, `stockout`, and `eta_shock`, with matching event logs. Eyeball one series per fault: does the chart look like something a media buyer would recognise? If it does not, the backtest number is meaningless.
 
 **SUN-A** — all nine fault kinds. 400 campaigns generated, 100 held out. First backtest run against A's public API. **A real accuracy number in hand by 13:00.**

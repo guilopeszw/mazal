@@ -31,7 +31,7 @@ The screen. And, for E: a way to drive the demo — a fixture switcher that swap
 
 `packages/*` source, `apps/mcp`. `packages/contracts` after SAT-A.
 
-From SUN-A, C joins you. Have work ready to hand them at 08:00 Sunday — decide on Saturday night which components you will delegate, so the handoff costs five minutes rather than an hour.
+C joins you as soon as their ingest work is done — possibly Saturday night, not necessarily Sunday morning. Decide on Saturday night which components you will delegate, so the handoff costs five minutes rather than an hour. Ask C when they expect to land.
 
 ---
 

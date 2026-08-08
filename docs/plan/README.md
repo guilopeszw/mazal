@@ -51,6 +51,29 @@ Anything below #5 is the demo itself and is not on the ladder.
 
 Roles are ownership, not walls — but nobody edits another package without saying so first. Direct push to `main`. `packages/contracts` is frozen after SAT-A and changes there need all-hands agreement, because everyone is coding against it.
 
+### Dependencies
+
+One hard blocker exists in the entire weekend: **`packages/contracts`**. Everything else has a stub path already written into the briefs.
+
+| Owner | Hard blocker | Soft dependency | Escape hatch while waiting |
+|---|---|---|---|
+| C | — | — | — |
+| B | contracts | — | — |
+| A | contracts | B's `benchmarks.json` | stub a two-category table in own fixtures |
+| D | contracts | — | mock a `Diagnosis`; never wait on the engine |
+| E | contracts | A's `diagnose` | return a hardcoded `Diagnosis` that satisfies the contract |
+
+Whoever is at a keyboard first writes `packages/contracts`, regardless of whose name is on it. Twenty minutes, and four people can start cold when they arrive.
+
+One two-way dependency: B's backtest needs A's `diagnose`, and A's tuning needs B's number. Sequence — A ships `diagnose` by the end of SAT-B, B runs the backtest SUN-A morning, A tunes the rules, B re-runs once. **Two cycles, then stop.** A third cycle on Sunday afternoon is tuning against the held-out set, which is the thing this plan pre-committed not to do.
+
+### Staggered arrivals
+
+The team does not start at the same hour. Two load transfers exist for when that bites — both conditional, decided out loud, not on a clock:
+
+- **Olist derivation moves from B to E** if B is still on it at 20:00 Saturday. B's longest pole is the simulator, and E's SAT-A is light. Derivation is a self-contained script and it touches no firewall — only fault labels are firewalled, benchmarks are shared by design.
+- **C joins D as soon as ingest is done**, whether that is Saturday night or Sunday morning. `apps/web` is the heaviest single workload and the funnel visual is the product's identity. C decides on Saturday night which components to take, so the handoff costs five minutes rather than an hour.
+
 ## Risks
 
 | Risk | Mitigation |
