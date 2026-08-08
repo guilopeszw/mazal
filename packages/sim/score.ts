@@ -96,6 +96,18 @@ export function score(results: Scored[]): BacktestReport {
   };
 }
 
+/** Per-class recall from a report: how often each injected fault was named correctly. */
+export function perClassRecall(report: BacktestReport): { fault: FaultKind; n: number; correct: number }[] {
+  return FAULT_KINDS.map((fault) => {
+    const row = report.confusion[fault];
+    return {
+      fault,
+      n: FAULT_KINDS.reduce((sum, p) => sum + row[p], 0),
+      correct: row[fault],
+    };
+  });
+}
+
 /** The confusion matrix as fixed-width text, for the deck. */
 export function formatConfusion(report: BacktestReport): string {
   const w = Math.max(...FAULT_KINDS.map((k) => k.length));

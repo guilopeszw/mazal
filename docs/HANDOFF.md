@@ -37,6 +37,63 @@ Entry format:
 
 ---
 
+## 2026-08-08 21:40 · Guilherme · packages/engine exists — and the firewall did not hold
+
+**Read this before anyone puts a number on slide 6.**
+
+A could not work today, so B wrote `packages/engine`. That closes the critical path and it costs the one thing `AGENTS.md` says cannot be repaired retroactively.
+
+### The disclosure, in the form it has to take on the slide
+
+**The engine and the simulator were written by the same person.** `AGENTS.md`: *"Engine and simulator have separate owners who do not read each other's code… This is what makes the accuracy number mean something."* It no longer means what it was designed to mean.
+
+Three things limit the damage, and they are worth stating rather than hiding behind:
+
+- **The correspondence is specified, not invented.** The engine's cause-attribution table is in `docs/plan/A-engine.md` and the simulator's fault table is in `docs/plan/B-data.md`. Both were written before either package existed. An engine faithful to one scoring well against a simulator faithful to the other is the design working, not the author cheating.
+- **No threshold was tuned to fit.** The engine uses the brief's `-1.0` sigma and the brief's sample minimums, unchanged. Two fault classes score zero because of that and were left scoring zero — see below.
+- **The firewall holds in the code.** `packages/engine` imports nothing from `packages/sim`; `grep` confirms it. Its fixtures are hand-built from the contract. What leaked is in one person's head, not in the import graph.
+
+**The honest sentence for slide 6:** *"A dropped out, so the same person wrote the generator and the diagnoser. This is a wiring and sanity number, not an independent accuracy claim — and here is the floor it is measured against."*
+
+### The numbers
+
+| | held-out, n=100 |
+|---|---|
+| top-1 | **59.0%** |
+| top-2 (stage-level) | **59.0%** |
+| false alarm rate | **12.0%** on 25 healthy campaigns |
+| always-healthy floor | 25.0% top-1 at 0% false alarms |
+
+The floor belongs beside them every time they are quoted. A diagnoser that answers "nothing is wrong" to everything scores 25% on this cohort.
+
+### Two classes score zero, and that is a real finding
+
+`thin_pdp` and `price_too_high` are never caught. Both halve add-to-cart rate — 8% down to ~3.2% — and that is a deviation of **-0.86 sigma**, inside the brief's `-1.0` flag threshold. The cause is the *benchmark*, not the engine: `atcRate` is one of the five published priors and its IQR runs 4.5% to 12%, so the robust sigma is 5.6 points and a fault has to more than halve a rate to trip one sigma.
+
+**This was left unfixed on purpose.** Moving the threshold to catch faults I wrote myself is exactly the contamination this entry is disclosing. It is A's call on the engine side, or it is an argument for measuring `atcRate` rather than shipping it as a prior.
+
+### Two bugs the backtest found that no unit test would have
+
+**`diagnose` averaged all thirty days.** A campaign that broke on day fifteen read as half healthy: a stockout scored `-0.16` sigma over thirty days and `-1.41` over the last seven. It reads a seven-day trailing window now. That single change moved top-1 from 24% to 50% — *below* the always-healthy floor to twice it.
+
+**The pixel-break rule could never fire.** It required stages 3, 4 and 5 to flag together, but when add-to-carts collapse there are fewer than thirty left to judge stage 4 on, so the stage silences itself. It tests media-healthy plus 3 and 5 broken, and defers to the event log because a stockout looks identical from the numbers alone.
+
+**Three bugs found and fixed before merge**, all by reading the brief against the code rather than by a failing test:
+
+- **`ReferenceMode: 'self'` was never implemented.** `diagnose` read the benchmark table and nothing else, so an in-flight call found no reference, flagged nothing and returned `suspectedCause: 'none'`. Not an error — a confident *"your campaign is healthy"* for every caller using the in-flight arm. Both modes share one code path now.
+- **`spread()` is floored at a tenth of the median.** A baseline that barely moved has an IQR near zero, and dividing by it returned a guarded zero that flagged nothing — self mode called a campaign healthy whose add-to-carts had fallen by two thirds.
+- **`Finding.evidence` was never set**, which cost the demo its best sentence. An event attaches when it matches the broken stage *and* lands within a day of the change point. Change points scan three days and report the window's **first** day: a trailing window cannot cross until it has filled with broken days, so dating the break at the window's end puts it two days late and the explaining event never lines up again.
+
+Backtest unchanged at 59% — these paths are orthogonal to benchmark scoring and nothing was tuned against the cohort. Evidence attaches on 28 of 180 sampled campaigns; of the five fault kinds that emit an event, that is the demo line firing when the dates agree.
+
+**Next:** `apps/web` and `apps/mcp`. `diagnose`, `predict` and `buildPlan` are all real and importable, and the in-flight arm now works, so Bringel and Joaquim are unblocked on everything.
+
+**Blocked / watch out:** the 12% false-alarm rate is three healthy campaigns in twenty-five, and `B-data.md` is right that it is the first thing a judge who has shipped monitoring will ask about. It is a floor measured on a cohort a quarter healthy, which is nothing like a real account — quote the denominator.
+
+`buildPlan` returns `projected: { p10: 0, p50: 0, p90: 0 }`. The plan's projected recovery is not modelled; the actions and their expected effects are real. Do not put the projection on screen.
+
+---
+
 ## 2026-08-08 20:40 · Guilherme · the backtest runs; B has nothing left that the engine does not gate
 
 **Done:** `feat/sim-backtest`, in a PR against `stage`. The backtest was never fully blocked — only the `diagnose` *call* was.
