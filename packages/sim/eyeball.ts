@@ -9,7 +9,8 @@
 
 import type { CampaignDay } from '@mazal/contracts';
 import { aggregate, atcRate, ctr, cvr, icRate, roas } from '@mazal/contracts/metrics';
-import { FAULT_KINDS, generateCampaign } from './index.ts';
+import type { Diagnosis, Finding, FunnelStage } from '@mazal/contracts';
+import { COHORT_SIZE, FAULT_KINDS, HELD_OUT, cohortPlan, generateCampaign, score, splitCohort } from './index.ts';
 import { makeRng } from './rng.ts';
 import { sampleStore } from './store.ts';
 
@@ -217,6 +218,80 @@ function checkSignatures(): void {
     `\n  (${skipped} assertions skipped — campaigns too small pre-injection to measure a ratio on)`);
 }
 
+/**
+ * Scoring is a pure function of (label, diagnosis) pairs, so it can be checked
+ * against hand-made diagnoses long before packages/engine exists. These are the
+ * three numbers slide 6 shows; getting them wrong is worse than not having them.
+ */
+function checkScoring(): void {
+  const finding = (stage: FunnelStage): Finding => ({
+    stage, severity: 'primary', metric: 'atcRate', observed: 0.01, reference: 0.08,
+    spread: 0.02, deviation: -3.5, sampleSize: 400, rule: 'test', causeLayer: 'product',
+  });
+  const dx = (suspectedCause: Diagnosis['suspectedCause'], primary: Finding | null,
+    secondary: Finding[] = []): Diagnosis => ({ primary, secondary, suspectedCause });
+
+  const fails: string[] = [];
+  const expect = (what: string, ok: boolean) => { if (!ok) fails.push(what); };
+
+  // Exactly right.
+  const exact = score([{ fault: { kind: 'stockout' }, diagnosis: dx('stockout', finding(3)) }]);
+  expect('top1 counts an exact hit', exact.top1 === 1 && exact.top2 === 1);
+
+  // Wrong cause, right stage — both break stage 3, so the seller is sent to the
+  // right part of the funnel. A near miss, not a hit.
+  const near = score([{ fault: { kind: 'stockout' }, diagnosis: dx('thin_pdp', finding(3)) }]);
+  expect('a wrong cause on the right stage is top2 but not top1', near.top1 === 0 && near.top2 === 1);
+
+  // Wrong cause, wrong stage.
+  const miss = score([{ fault: { kind: 'stockout' }, diagnosis: dx('budget_cap', finding(0)) }]);
+  expect('a wrong cause on the wrong stage scores nothing', miss.top1 === 0 && miss.top2 === 0);
+
+  // A healthy campaign with any primary finding is a false alarm.
+  const alarm = score([
+    { fault: { kind: 'none' }, diagnosis: dx('none', finding(3)) },
+    { fault: { kind: 'none' }, diagnosis: dx('none', null) },
+  ]);
+  expect('false alarms are counted on the none class only',
+    alarm.falseAlarmRate === 0.5 && alarm.n === 2);
+
+  // 'none' has no stages, so a missed healthy campaign cannot collect a free top2.
+  const freebie = score([{ fault: { kind: 'none' }, diagnosis: dx('stockout', finding(3)) }]);
+  expect('a false alarm earns no top2 credit', freebie.top2 === 0);
+
+  if (fails.length > 0) {
+    console.log('\nSCORING CHECKS FAILED');
+    for (const f of fails) console.log(`  ✗ ${f}`);
+    process.exitCode = 1;
+    return;
+  }
+  console.log('scoring: top-1, top-2 and the false-alarm rate behave. ok');
+}
+
+/** The cohort must be fixed and balanced before any score is ever seen. */
+function checkCohort(): void {
+  const plan = cohortPlan();
+  const { train, held } = splitCohort(plan);
+  const kindsIn = (xs: { fault: string }[]) => new Set(xs.map((x) => x.fault));
+
+  const fails: string[] = [];
+  if (plan.length !== COHORT_SIZE) fails.push(`cohort is ${plan.length}, not ${COHORT_SIZE}`);
+  if (held.length !== HELD_OUT) fails.push(`held-out is ${held.length}, not ${HELD_OUT}`);
+  if (new Set(plan.map((p) => p.seed)).size !== plan.length) fails.push('seeds are not unique');
+  if (kindsIn(train).size !== FAULT_KINDS.length) fails.push('a fault kind is missing from the training half');
+  if (kindsIn(held).size !== FAULT_KINDS.length) fails.push('a fault kind is missing from the held-out half');
+
+  if (fails.length > 0) {
+    console.log('\nCOHORT CHECKS FAILED');
+    for (const f of fails) console.log(`  ✗ ${f}`);
+    process.exitCode = 1;
+    return;
+  }
+  const noneCount = plan.filter((p) => p.fault === 'none').length;
+  console.log(`cohort: ${COHORT_SIZE} campaigns, ${HELD_OUT} held out, every fault in both halves. ok` +
+    `\n  (the false-alarm rate will rest on ${noneCount} healthy campaigns — quote that denominator)`);
+}
+
 function printFaults(): void {
   for (const [i, kind] of FAULT_KINDS.entries()) {
     const c = generateCampaign(101 + i, kind);
@@ -231,3 +306,5 @@ checkDeterminism();
 printStores();
 printFaults();
 checkSignatures();
+checkScoring();
+checkCohort();
