@@ -32,8 +32,31 @@ Entry format:
 | A — engine | Miguel | [`plan/A-engine.md`](plan/A-engine.md) |
 | B — data & simulator | Guilherme | [`plan/B-data.md`](plan/B-data.md) |
 | C — ingest & contracts | Mateus | [`plan/C-ingest.md`](plan/C-ingest.md) |
-| D — frontend | *(unassigned)* | [`plan/D-frontend.md`](plan/D-frontend.md) |
-| E — agent, deco, pitch | *(unassigned)* | [`plan/E-agent.md`](plan/E-agent.md) |
+| D — frontend | Bringel | [`plan/D-frontend.md`](plan/D-frontend.md) |
+| E — agent, deco, pitch | Joaquim | [`plan/E-agent.md`](plan/E-agent.md) |
+
+---
+
+## 2026-08-08 20:10 · Guilherme · main reconciled with stage; D and E named
+
+**Done:** two things, both housekeeping, one of them overdue.
+
+**D is Bringel and E is Joaquim.** The table above is filled in. Neither `apps/web` nor `apps/mcp` exists yet and neither has pushed a branch, so the two of them are starting from the scaffolding steps in [`plan/D-frontend.md`](plan/D-frontend.md) and [`plan/E-agent.md`](plan/E-agent.md).
+
+Two things land on D immediately, both consequences of contract changes already merged:
+
+- **The category field must be a `<select>` over `OLIST_CATEGORIES`, not a text input.** `productCardSchema` is `z.enum(OLIST_CATEGORIES)` now; free text fails validation.
+- **Print `n` beside any benchmark shown to a seller.** Five of twelve metrics are priors at `n: 0`, and `photos`/`descriptionLength` bottom out at `n: 9` in six categories. [`benchmark-provenance.md`](benchmark-provenance.md) has the whole picture and the sentence slide 6 should carry.
+
+For E: `diagnose` does not exist yet, so the MCP tools have nothing to wrap. `generateCampaign` and the two committed fixtures in `packages/sim/fixtures/` are real and importable today, which is enough to build and demo the tool surface against fixed data while A's package is still missing.
+
+**`main` reconciled with `stage`.** `main` was 16 commits behind and `stage` was a strict superset of it, so this was a fast-forward-in-substance merge, not a reconciliation of two histories — nothing was dropped and nothing was rewritten. Said out loud before it happened, per `AGENTS.md`, and green when it did: `pnpm typecheck` clean, `pnpm test` 54 passing, `pnpm sim:eyeball` green on all four check groups.
+
+Until now, cloning `main` cold — which is what `AGENTS.md` says `main` is *for* — gave a tree with no simulator, no `packages/data` wiring, `OlistCategory` collapsed to `string`, `z.string()` accepting any category, and the silent date guess. That is fixed.
+
+**Next:** unchanged and still A's. `packages/engine` is the only thing on the critical path.
+
+**Blocked / watch out:** the branch direction inverted once already this weekend, when #1 and #3 both merged into `main` while a PR was open against `stage`. It cost an afternoon of reconciliation. `<type>/<thing>` → `stage` → `main`, and **nothing merges into `main` except `stage`.**
 
 ---
 
