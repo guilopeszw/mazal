@@ -30,15 +30,18 @@ export function healthyDays(): CampaignDay[] {
     addToCarts: 18,        // atcRate ~8.2%
     checkoutsInitiated: 8, // icRate ~44%
     purchases: 5,          // cvr ~2.3%
-    revenue: 750,          // aov 150
+    revenue: 345,          // aov 69, against a category median of 65
   }));
 }
 
 export const apparelCard: ProductCard = {
   category: APPAREL,
-  price: 150,
+  // Deliberately at the category median. A card priced above the category p75
+  // makes `price_too_high` the honest attribution for any stage 3 break, which
+  // is correct engine behaviour and would confound every other stage 3 test.
+  price: 49,
   grossMargin: 0.45,
-  shippingCost: 20,
+  shippingCost: 20,   // aov = price + shipping = 69
   deliveryEtaDays: 12,
   stockOnHand: 200,
   reviewCount: 80,
