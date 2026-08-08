@@ -39,10 +39,10 @@ Hackathon build. Deadline Sunday 2026-08-09 23:59, code freeze 19:00.
 `stage` is where the weekend integrates. **Nothing is committed to it directly either.** Work happens on a branch, the branch merges into `stage`, and `stage` merges into `main`.
 
 ```
-<letter>/<thing>  →  stage  →  main
+<type>/<thing>  →  stage  →  main
 ```
 
-- Branch off `stage` for every piece of work, however small: `b/benchmarks`, `a/localise`, `c/meta-parser`. Your letter, then what you are doing — a name says who to ask without opening the diff.
+- Branch off `stage` for every piece of work, however small. Conventional types: `feat/`, `fix/`, `refactor/`, `test/`, `docs/`, `chore/`. So `feat/olist-benchmarks`, `fix/csv-bom`, `docs/branch-policy`.
 - Not `stage/<thing>`: git cannot hold a branch called `stage` and a branch called `stage/x` at the same time, because one would have to be both a file and a directory.
 - Merge back into `stage` with `--no-ff` when green, so the branch stays legible as one unit of work in the history.
 - Delete your branch after it merges. It is yours; nobody else's is.
@@ -61,7 +61,7 @@ Invoke `mattpocock-skills:tdd` when starting work in either of those packages. I
 
 The team sleeps Saturday night with sessions running and occasional checks. While unattended, an agent writes code, runs tests, and commits **within its own package**.
 
-Stop and append to [`docs/HANDOFF.md`](docs/HANDOFF.md) when tests go red, when a change would touch `packages/contracts`, or when a change would touch another owner's package. An unattended session never merges to `main` — it commits to its own `<letter>/<thing>` branch, merges into `stage` only on green, and leaves `main` for someone awake.
+Stop and append to [`docs/HANDOFF.md`](docs/HANDOFF.md) when tests go red, when a change would touch `packages/contracts`, or when a change would touch another owner's package. An unattended session never merges to `main` — it commits to its own `<type>/<thing>` branch, merges into `stage` only on green, and leaves `main` for someone awake.
 
 Every session appends to `docs/HANDOFF.md` before it ends, attended or not — what landed, the single next action, and anything that will bite the next person. It is how a new session picks up without being told anything.
 
