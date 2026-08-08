@@ -1,6 +1,6 @@
 // ─── packages/ingest/src/index.ts ────────────────────────────────────────
-// Public API: the three exports every other package consumes.
+// Public API: the exports other packages consume.
 
-export { parseMetaCsv } from './meta-csv.js';
-export { parseEventLog } from './event-log.js';
+export { parseMetaCsv, type MetaCsvResult } from './meta-csv.js';
+export { parseEventLog, storeEventSchema, storeEventTypeSchema } from './event-log.js';
 export { productCardSchema } from './product-card.js';

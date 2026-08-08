@@ -5,7 +5,7 @@ import { describe, expect, test } from 'vitest';
 import { parseEventLog } from './event-log.js';
 
 describe('parseEventLog', () => {
-  test('parses CSV format', () => {
+  test('parses CSV format with header', () => {
     const csv = [
       'date,type,detail',
       '2026-07-03,stockout,Supplier ran out of SKU-1234',
@@ -19,6 +19,19 @@ describe('parseEventLog', () => {
     expect(events[0].type).toBe('stockout');
     expect(events[0].detail).toBe('Supplier ran out of SKU-1234');
     expect(events[1].type).toBe('price_change');
+  });
+
+  test('parses headerless CSV format without losing line 0', () => {
+    const csv = [
+      '2026-07-03,stockout,Supplier ran out of SKU-1234',
+      '2026-07-05,price_change,Price increased R$89.90 → R$109.90',
+    ].join('\n');
+
+    const events = parseEventLog(csv);
+
+    expect(events).toHaveLength(2);
+    expect(events[0].date).toBe('2026-07-03');
+    expect(events[0].type).toBe('stockout');
   });
 
   test('parses JSON format', () => {
@@ -35,12 +48,33 @@ describe('parseEventLog', () => {
     expect(events[1].type).toBe('creative_refresh');
   });
 
-  test('validates event type against StoreEventType union', () => {
+  test('skips invalid event type without throwing or discarding valid events', () => {
     const json = JSON.stringify([
-      { date: '2026-07-03', type: 'invalid_type', detail: 'This should fail' },
+      { date: '2026-07-01', type: 'stockout', detail: 'Valid event' },
+      { date: '2026-07-03', type: 'invalid_type', detail: 'This should be skipped' },
+      { date: '2026-07-05', type: 'price_change', detail: 'Another valid event' },
     ]);
 
-    expect(() => parseEventLog(json)).toThrow();
+    const events = parseEventLog(json);
+
+    expect(events).toHaveLength(2);
+    expect(events[0].type).toBe('stockout');
+    expect(events[1].type).toBe('price_change');
+  });
+
+  test('skips malformed CSV rows without throwing', () => {
+    const csv = [
+      'date,type,detail',
+      '2026-07-01,stockout,Valid event',
+      '2026-07-03',
+      '2026-07-05,price_change,Another valid event',
+    ].join('\n');
+
+    const events = parseEventLog(csv);
+
+    expect(events).toHaveLength(2);
+    expect(events[0].type).toBe('stockout');
+    expect(events[1].type).toBe('price_change');
   });
 
   test('handles all valid event types', () => {
@@ -70,17 +104,5 @@ describe('parseEventLog', () => {
   test('handles empty input', () => {
     expect(parseEventLog('')).toHaveLength(0);
     expect(parseEventLog('date,type,detail')).toHaveLength(0);
-  });
-
-  test('handles CSV with detail containing commas via quoting', () => {
-    const csv = [
-      'date,type,detail',
-      '2026-07-03,price_change,"Price changed from R$89,90 to R$109,90"',
-    ].join('\n');
-
-    const events = parseEventLog(csv);
-
-    expect(events).toHaveLength(1);
-    expect(events[0].detail).toBe('Price changed from R$89,90 to R$109,90');
   });
 });

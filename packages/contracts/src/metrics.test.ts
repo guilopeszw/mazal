@@ -26,10 +26,14 @@ function day(overrides: Partial<CampaignDay> & { date: string }): CampaignDay {
 }
 
 describe('metrics', () => {
-  test('safeDiv returns 0 for 0/0 rather than NaN', () => {
-    const result = safeDiv(0, 0);
-    expect(result).toBe(0);
-    expect(Number.isNaN(result)).toBe(false);
+  test('safeDiv returns 0 for 0/0 and x/0 rather than NaN or Infinity', () => {
+    const result0 = safeDiv(0, 0);
+    expect(result0).toBe(0);
+    expect(Number.isNaN(result0)).toBe(false);
+
+    const result100 = safeDiv(100, 0);
+    expect(result100).toBe(0);
+    expect(Number.isFinite(result100)).toBe(true);
   });
 
   test('aggregate sums counts across days', () => {

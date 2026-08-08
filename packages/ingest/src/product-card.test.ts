@@ -27,6 +27,21 @@ describe('productCardSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  test('accepts deliveryEtaDays of 0 (same-day delivery)', () => {
+    const result = productCardSchema.safeParse({ ...validCard, deliveryEtaDays: 0 });
+    expect(result.success).toBe(true);
+  });
+
+  test('rejects unknown extra keys due to .strict()', () => {
+    const result = productCardSchema.safeParse({ ...validCard, unknownKey: 'extra' });
+    expect(result.success).toBe(false);
+  });
+
+  test('rejects grossMargin of 0 to avoid division by zero in break-even ROAS', () => {
+    const result = productCardSchema.safeParse({ ...validCard, grossMargin: 0 });
+    expect(result.success).toBe(false);
+  });
+
   test('rejects grossMargin below 0', () => {
     const result = productCardSchema.safeParse({ ...validCard, grossMargin: -0.1 });
     expect(result.success).toBe(false);
@@ -35,6 +50,11 @@ describe('productCardSchema', () => {
   test('rejects grossMargin above 1', () => {
     const result = productCardSchema.safeParse({ ...validCard, grossMargin: 1.5 });
     expect(result.success).toBe(false);
+  });
+
+  test('accepts positive grossMargin up to 1', () => {
+    expect(productCardSchema.safeParse({ ...validCard, grossMargin: 0.01 }).success).toBe(true);
+    expect(productCardSchema.safeParse({ ...validCard, grossMargin: 1 }).success).toBe(true);
   });
 
   test('rejects empty paymentMethods array', () => {
@@ -102,11 +122,6 @@ describe('productCardSchema', () => {
       const result = productCardSchema.safeParse({ ...validCard, offer });
       expect(result.success).toBe(true);
     }
-  });
-
-  test('accepts grossMargin at boundary values 0 and 1', () => {
-    expect(productCardSchema.safeParse({ ...validCard, grossMargin: 0 }).success).toBe(true);
-    expect(productCardSchema.safeParse({ ...validCard, grossMargin: 1 }).success).toBe(true);
   });
 
   test('accepts shippingCost of 0 (free shipping)', () => {
