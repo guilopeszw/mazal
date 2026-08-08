@@ -1,0 +1,13 @@
+{
+  "name": "@mazal/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./metrics": "./src/metrics.ts"
+  },
+  "scripts": {
+    "test": "vitest run --passWithNoTests"
+  }
+}

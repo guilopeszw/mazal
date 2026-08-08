@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-08 14:12 BRT · C-agent (ingest & contracts) · SAT-A handoff
+
+**Done:** `packages/contracts` complete (metrics + frozen types + tests), `packages/ingest` complete (`parseMetaCsv`, `parseEventLog`, `productCardSchema` + tests). Monorepo scaffolded.
+
+**Next:** C moves to frontend to assist D with CSV upload integration. B unblocks data (`benchmarks.json`). A starts `packages/engine`.
+
+**Blocked / watch out:** Commit working tree to `stage` branch before pushing.
+
+---
+
 ## Who is who
 
 | Letter | Person | Brief |
@@ -25,7 +35,73 @@ Entry format:
 | D — frontend | *(unassigned)* | [`plan/D-frontend.md`](plan/D-frontend.md) |
 | E — agent, deco, pitch | *(unassigned)* | [`plan/E-agent.md`](plan/E-agent.md) |
 
-Fill a name in as each person starts. If you are opening a session and your letter is not here, ask before assuming one — two people on the same package is worse than one package unstarted.
+---
+
+## 2026-08-08 16:50 · Guilherme · #1 and #3 merged to main; #7 reviewed and fixed
+
+**Read this entry alone and you have the whole picture.**
+
+### Where the code is
+
+**`main` is now six commits ahead of `stage`, which inverts the direction AGENTS.md sets.** #1 went `feat/packages/contracts` → `main` and #3 went `stage` → `main`, both merged while #7 was open, and `8988993` landed on `main` directly after. `stage` has not moved since `31bace6`. Nothing is wrong with the code on `main`; the flow is just running backwards, and the next `stage` → `main` will look like a revert unless `main` is merged down into `stage` first.
+
+**`main` carries the *unfixed* contracts and ingest.** Everything the reviews found is fixed on `feat/integrate-contracts` and nowhere else: the build step, `OlistCategory = … | string`, `source` without `'prior'`, `productCardSchema` accepting any string as a category, and the silent date guess.
+
+| PR | Head → base | State |
+|---|---|---|
+| [#7](https://github.com/guilopeszw/mazal/pull/7) | `feat/integrate-contracts` → `stage` | open, reviewed, fixed, green |
+| [#6](https://github.com/guilopeszw/mazal/pull/6) | `test/benchmarks-shape` → `stage` | open, contained in #7 |
+| #1, #3 | → `main` | merged |
+
+#7 now contains `origin/main` in full, so merging it cannot revert anything. `pnpm test` 54 passing, `pnpm typecheck` clean, `pnpm derive` byte-reproducible.
+
+### What the review changed
+
+Two passes over #7 — one for over-engineering, one on the standards and spec axes — plus the fixes, in `aae224c`:
+
+- **`normaliseDate('07/01/2026')` returned 7 January and said nothing.** `plan/C-ingest.md` asks it to reject rather than guess. Both readings are real dates so nothing rejects; it now returns the DD/MM reading *with a warning*, and only when neither number settles it. `packages/ingest/src/csv.test.ts` covers the four cases.
+- **`LabelledCampaign` and `BacktestReport` were never written.** `contracts.md` lists them under `// packages/sim`; the engine's block was implemented in contracts and the simulator's was skipped. Added — B cannot type `runBacktest` without them.
+- **`STORE_EVENT_TYPES`** joins `OLIST_CATEGORIES` as a runtime array with its union derived from it. `packages/ingest` had its own `z.enum` of the same seven strings.
+- Dead code and duplication out of `packages/ingest`: net −45 lines, no behaviour change except that a US-format `1,240` used to become NaN and a warning, and now parses.
+- `packages/ingest/README.md` documented `parseEventLog` returning `{ events, warnings }`. It returns `StoreEvent[]` and drops invalid rows silently, which the README now says.
+
+**Left unfixed on purpose, all of them someone else's call:** `meta-csv.test.ts` inlines CSV literals in ten tests where `docs/testing.md` says fixtures live in files — C's suite, and a drift risk rather than a bug. `safeDiv` is exported while `contracts.md` declares it module-private and `testing.md` mandates asserting on it — the two documents disagree. And `packages/data/derive.ts` and `packages/ingest/src/csv.ts` are two hand-rolled CSV parsers, of which only `derive.ts`'s handles a quoted newline or a BOM.
+
+**Next:** merge `main` down into `stage`, then #6, then #7. After that B goes to `packages/sim`, which is what the rest of B's weekend is.
+
+**Blocked / watch out:** **D and E are assigned — the names are not in the table below yet, and whoever knows them should fill them in.** Both packages are still unstarted, the deadline is Sunday 23:59 with freeze at 19:00, and `apps/web` and `apps/mcp` do not exist.
+
+**`apps/web`'s category field must be a select over `OLIST_CATEGORIES`, not a text input** — and nine real Olist categories are outside it, so `ReferenceMode` still needs an arm for a category with no benchmark row. That one is A's.
+
+---
+
+## 2026-08-08 15:55 · Guilherme · contracts and ingest integrated onto stage, on a branch
+
+**This entry announces changes to `packages/contracts`, which AGENTS.md says are announced before they are pushed.** They are on `feat/integrate-contracts` and in a PR, not on `stage`. Mateus reviews before it merges — the type edits are his call and two of them are decisions, not fixes.
+
+**Done:** #1's tree merged into a branch off `stage`, so **#1 itself is untouched** — no rebase, no force-push of someone else's branch. `pnpm test` 50 passing (was 9 + #1's 41), `pnpm typecheck` clean, `pnpm derive` byte-reproducible after all of it.
+
+Resolutions, each one a decision someone can reverse:
+
+- **`stage`'s root wins.** The three conflicts were `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, all config. `stage`'s root is `pnpm@11.5.1`, Node ≥24, root vitest, `pnpm derive`; #1's was six lines. `tsconfig.base.json` never conflicted — different filename — and is deleted along with `packages/{contracts,ingest}/tsconfig.json`, which only existed to configure a build.
+- **No build step.** contracts and ingest now export `./src/index.ts` directly, `build` scripts gone, `.js` specifiers rewritten to `.ts`. Node 24 runs TypeScript natively and `packages/data` already relied on it. If `apps/web` turns out to need built packages, the cost there is `transpilePackages: ['@mazal/contracts']`, not a build step for the whole weekend.
+- **`OlistCategory` is now the real 62-member union**, generated by `pnpm derive` into `packages/contracts/src/categories.ts` rather than `packages/data/`, so the contract stays the leaf every package imports. It ships a runtime `OLIST_CATEGORIES` array with the type derived from it, because a bare type erases and nothing downstream can validate against it.
+- **`source` gained `'prior'`** and the five media priors now carry it. They said `kaggle_meta` and did not come from Kaggle.
+- **`docs/PERSON-HANDOFF.md` is kept, not deleted** — it has an architecture overview this file does not. It now opens with a line saying this file is the state channel.
+
+**Next:** Mateus reviews [#7](https://github.com/guilopeszw/mazal/pull/7). Merge order: #6, then #7, then #3 carries the lot to `main` in one review. After that B goes to `packages/sim`, which is now genuinely unblocked.
+
+**Blocked / watch out:** Four things, two of them bugs that were being hidden.
+
+**`docs/HANDOFF.md` on `feat/packages/contracts` has committed conflict markers** — `<<<<<<< HEAD` on line 1, `>>>>>>> b3fa8df` on line 227. An unresolved merge was committed as content. This branch resolves it to `stage`'s version; if #1 is ever merged by another route, that has to be fixed there too.
+
+**`productCardSchema` was not validating category.** It had `z.string().min(1)` and typechecked against `OlistCategory` only because the union carried a `| string` arm that collapsed it to `string`. Any string passed — including a category with no benchmark row, which reaches the engine as a lookup that silently misses. It is `z.enum(OLIST_CATEGORIES)` now, and that is a behaviour change: input that used to validate now fails. **`apps/web`'s category field must be a select over `OLIST_CATEGORIES`, not a text input.**
+
+**And nine real Olist categories are now rejected outright** — `derive.ts` skips anything under 30 orders, so `fashion_sport`, `la_cuisine`, `home_comfort_2`, `cds_dvds_musicals`, `flowers`, `arts_and_craftmanship`, `diapers_and_hygiene`, `fashion_childrens_clothes` and `security_and_services` never reach the union. They used to pass validation and then miss the benchmark lookup silently, so this trades a silent wrong answer for a loud refusal, which is the better failure — but a seller in one of them has no path through the form at all. **The missing piece is A's: `ReferenceMode` has no arm for a category with no benchmark row.** Either the engine falls back to `{ kind: 'self' }` for these nine, or the demo says out loud that Mazal covers 62 of Olist's 71 categories. Do not fix it by lowering `MIN_ORDERS` — quartiles over nine products are noise either way.
+
+**`noUncheckedIndexedAccess` had never been applied to #1's code.** `stage`'s root tsconfig sets it; `tsconfig.base.json` did not. It surfaced ~25 sites in `packages/ingest` and two in `packages/contracts/src/metrics.ts`. Every one was provably safe under a guard already present, so the fixes are `!` and two rewrites to `??` and `.at(-1)`. Nothing about the parsing changed, and all 41 of C's tests still pass — but they are edits in C's package, made by B, and they are what most needs a second pair of eyes in review.
+
+**`packages/data/index.ts` casts rather than `satisfies`.** A JSON import widens every string literal, so `source` arrives as `string` and never assigns to the union — `satisfies BenchmarkTable` cannot compile, on any correct table. The checking moved to `benchmarks.test.ts`, which reads the real file. The one compile-time check that does survive is in that test: assigning the raw JSON to `Record<OlistCategory, unknown>` fails if `derive.ts` ever writes a table missing a category the union declares.
 
 ---
 

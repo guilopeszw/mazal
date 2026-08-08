@@ -18,7 +18,22 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@24.13.3)
 
-  packages/data: {}
+  packages/contracts: {}
+
+  packages/data:
+    dependencies:
+      '@mazal/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+
+  packages/ingest:
+    dependencies:
+      '@mazal/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
 
 packages:
 
@@ -589,6 +604,9 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
 snapshots:
 
   '@esbuild/aix-ppc64@0.28.1':
@@ -1035,3 +1053,5 @@ snapshots:
     dependencies:
       siginfo: 2.0.0
       stackback: 0.0.2
+
+  zod@3.25.76: {}
