@@ -50,14 +50,22 @@ export type StoreEvent = {
   detail: string;                  // human-readable, e.g. "supplier ETA 9d → 22d"
 };
 
-export type StoreEventType =
-  | 'stockout'
-  | 'price_change'
-  | 'eta_change'
-  | 'creative_refresh'
-  | 'budget_change'
-  | 'pixel_error'
-  | 'policy_flag';
+/**
+ * The runtime array is the source, the union is derived from it. `packages/ingest`
+ * had its own `z.enum([...])` of the same seven strings, which is two lists to keep
+ * in step and one place for them to drift.
+ */
+export const STORE_EVENT_TYPES = [
+  'stockout',
+  'price_change',
+  'eta_change',
+  'creative_refresh',
+  'budget_change',
+  'pixel_error',
+  'policy_flag',
+] as const;
+
+export type StoreEventType = (typeof STORE_EVENT_TYPES)[number];
 
 // ─── outputs ─────────────────────────────────────────────────────────────
 
@@ -176,6 +184,26 @@ export type PredictInput = {
 export type RecoveryPlan = {
   actions: Action[];
   projected: { p10: number; p50: number; p90: number };
+};
+
+// ─── simulator API types ─────────────────────────────────────────────────
+// docs/contracts.md § packages/sim. They live here for the same reason the engine's
+// do: B injects the fault and A predicts it, and the backtest only means anything if
+// neither side gets to define the shape it is scored on.
+
+export type LabelledCampaign = {
+  days: CampaignDay[];
+  card: ProductCard;
+  events: StoreEvent[];
+  fault: { kind: FaultKind; injectedOn?: string };
+};
+
+export type BacktestReport = {
+  top1: number;                    // 0–1
+  top2: number;
+  falseAlarmRate: number;          // on fault: 'none' campaigns
+  confusion: Record<FaultKind, Record<FaultKind, number>>;
+  n: number;
 };
 
 // ─── metrics (re-export) ─────────────────────────────────────────────────

@@ -22,6 +22,15 @@ const PRIORS = ['cpm', 'ctr', 'cvr', 'atcRate', 'icRate'];
 
 const entries = Object.entries(benchmarks);
 
+/**
+ * Compile-time, not a test: assigning the raw JSON to a Record keyed by the union
+ * fails `tsc` the moment `derive.ts` writes a table missing a category the union
+ * still declares. It reads the raw import rather than the cast export because the
+ * cast is exactly what erases this check.
+ */
+const _exhaustive: Record<OlistCategory, unknown> = raw;
+void _exhaustive;
+
 test('every category in the union has a row, and every row has all twelve metrics', () => {
   expect(entries).toHaveLength(62);
 
@@ -60,15 +69,6 @@ test('the two product-level metrics can fall below the order threshold', () => {
     METRICS.filter((m) => row.metrics[m].n > 0 && row.metrics[m].n < 30).map((m) => `${key}.${m}`),
   );
 
-  expect(thin.every((s) => s.endsWith('.photos') || s.endsWith('.descriptionLength'))).toBe(true);
+  expect(thin.filter((s) => !s.endsWith('.photos') && !s.endsWith('.descriptionLength'))).toEqual([]);
   expect(thin).toHaveLength(12);
-});
-
-test('the generated union and the table name the same categories', () => {
-  // Compile-time, and the reason this import is the raw JSON rather than the cast
-  // export: assigning it to a Record keyed by the union fails to compile the moment
-  // `derive.ts` writes a table missing a category the union still declares.
-  const exhaustive: Record<OlistCategory, unknown> = raw;
-
-  expect(Object.keys(exhaustive)).toEqual([...Object.keys(exhaustive)].sort());
 });

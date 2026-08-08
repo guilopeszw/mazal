@@ -53,28 +53,20 @@ export function normaliseDate(raw: string): { date: string; warning?: string } {
     const part1 = slashMatch[1]!;
     const part2 = slashMatch[2]!;
     const yyyy = slashMatch[3]!;
-    const num1 = parseInt(part1, 10);
-    const num2 = parseInt(part2, 10);
 
-    let dd: string;
-    let mm: string;
-
-    if (num1 > 12) {
-      // Must be DD/MM/YYYY
-      dd = part1.padStart(2, '0');
-      mm = part2.padStart(2, '0');
-    } else if (num2 > 12) {
-      // Must be MM/DD/YYYY
-      mm = part1.padStart(2, '0');
-      dd = part2.padStart(2, '0');
-    } else {
-      // Default to DD/MM/YYYY for Brazilian locale convention
-      dd = part1.padStart(2, '0');
-      mm = part2.padStart(2, '0');
-    }
-
+    // Only the second number being over 12 forces MM/DD; every other case reads as
+    // DD/MM, which is what a Brazilian export means. When neither number settles it,
+    // say so — 07/01/2026 is two different days and the seller is the one who knows
+    // which. C-ingest.md: "reject ambiguously if unsure rather than guessing".
+    const monthFirst = parseInt(part2, 10) > 12;
+    const dd = (monthFirst ? part2 : part1).padStart(2, '0');
+    const mm = (monthFirst ? part1 : part2).padStart(2, '0');
     const iso = `${yyyy}-${mm}-${dd}`;
-    return { date: iso };
+
+    const ambiguous = parseInt(part1, 10) <= 12 && parseInt(part2, 10) <= 12;
+    return ambiguous
+      ? { date: iso, warning: `Date "${trimmed}" is ambiguous — read as DD/MM/YYYY (${iso}). Export in YYYY-MM-DD to be sure.` }
+      : { date: iso };
   }
 
   // Textual date e.g. "July 3 2026" or "Jul 3, 2026"
