@@ -29,6 +29,24 @@ Fill a name in as each person starts. If you are opening a session and your lett
 
 ---
 
+## 2026-08-08 15:00 · Guilherme · benchmark table has a test; thin-sample metrics found
+
+**Done:** Two of the gaps from the entry below are closed, both inside `packages/data`, neither touching `packages/contracts`.
+
+`derive.ts` is byte-reproducible on a rerun — `pnpm derive` against the same `data/raw/` leaves `git status` clean. That is same-machine determinism only; SUN-B asks for a second machine and that has still never happened.
+
+`packages/data/benchmarks.test.ts` asserts the committed output: 62 rows, twelve metrics each, `p25 ≤ median ≤ p75`, every distribution finite, `source` in the union, priors at `n: 0` and measurements above it. `pnpm test` 9 passing, `pnpm typecheck` clean (`b02e938`).
+
+**Next:** Unchanged and still a human's — decide #1's base and the build-step question, merge #3 then #1. Everything B has left (`OlistCategory` into the contract, `index.ts` typed against `BenchmarkTable`, then `packages/sim`) imports `@mazal/contracts`.
+
+**Blocked / watch out:** Writing the test found one thing, and it is the kind that reads fine until a seller sees it.
+
+**`MIN_ORDERS` does not gate the two product-level metrics.** The threshold counts orders per category, but `photos` and `descriptionLength` are counted per distinct *product*. A category can clear 30 orders on nine products: `tablets_printing_image` quotes both metrics off `n: 9`, and `furniture_mattress_and_upholstery` off `n: 10`. Twelve metric-category pairs sit under 30, all of them one of those two metrics, and no other metric is affected — `aov`, `price`, `freightRatio`, `deliveryDays` and `reviewAvg` bottom out at 37.
+
+They still ship. Dropping a metric would make it optional in `BenchmarkTable`, and that type is in review in #1; `n` is already in the JSON, so the decision belongs to whoever quotes the number. **Anything that shows a seller a benchmark reads `n` first** — that is A's engine and D's UI, and it is the same rule the `n: 0` priors already need, so it is one check covering both. The test pins the twelve as a known exception; it fails if the set changes.
+
+---
+
 ## 2026-08-08 15:20 · Guilherme · session state, four open PRs, two collisions
 
 Read this entry alone and you have the whole picture. **Nothing is merged by an agent; a human reviews and merges.**
