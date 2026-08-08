@@ -49,7 +49,7 @@ Anything below #5 is the demo itself and is not on the ladder.
 | **D** | `apps/web` | [D-frontend.md](D-frontend.md) |
 | **E** | `apps/mcp`, deck, demo | [E-agent.md](E-agent.md) |
 
-Roles are ownership, not walls — but nobody edits another package without saying so first. Direct push to `main`. `packages/contracts` is frozen after SAT-A and changes there need all-hands agreement, because everyone is coding against it.
+Roles are ownership, not walls — but nobody edits another package without saying so first. Work lands on `stage`, and `stage` merges to `main` at block boundaries — the rules are in [`AGENTS.md`](../../AGENTS.md#branches). `packages/contracts` is frozen after SAT-A and changes there need all-hands agreement, because everyone is coding against it.
 
 ### Dependencies
 

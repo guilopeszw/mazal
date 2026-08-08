@@ -32,20 +32,36 @@ Hackathon build. Deadline Sunday 2026-08-09 23:59, code freeze 19:00.
 | `apps/web` | D (C joins Sunday) | E owns `POST /api/chat` only |
 | `apps/mcp` | E | — |
 
-Direct push to `main`. Commit on green, every time — a red `main` blocks four people.
+## Branches
+
+`main` is the demo build. It stays green, it is what gets cloned cold, and **nobody pushes to it directly.**
+
+`stage` is where the weekend happens. Branch from it, merge back into it, push it.
+
+- Work inside your own package: commit straight to `stage`.
+- Anything that runs longer than an hour, or touches a file outside your package: `stage/<letter>-<thing>` off `stage`, merged back with `--no-ff` when green.
+- `stage` → `main` at block boundaries only, only with `pnpm test` green, and say so before you do it.
+- Never force push, never rewrite `main` or `stage`, never delete a branch you did not create.
+
+Commit on green, every time — a red `stage` blocks four people.
 
 ## Tests
 
 TDD is mandatory in `packages/engine` and `packages/ingest`. Everywhere else is exempt this weekend. Details and the loop: [`docs/testing.md`](docs/testing.md).
 
+Invoke `mattpocock-skills:tdd` when starting work in either of those packages. Invoke `superpowers:writing-plans` before building anything open-ended — the simulator is the one thing this weekend that qualifies; the contract, the derivation script, and the parser are fully specified already and get built directly.
+
 ## Working unattended
 
 The team sleeps Saturday night with sessions running and occasional checks. While unattended, an agent writes code, runs tests, and commits **within its own package**.
 
-Stop and append to `docs/HANDOFF.md` — what was done, what is unresolved, what to look at first — when tests go red, when a change would touch `packages/contracts`, or when a change would touch another owner's package. Destructive git is never available: no `reset --hard`, no force push, no branch deletion.
+Stop and append to [`docs/HANDOFF.md`](docs/HANDOFF.md) when tests go red, when a change would touch `packages/contracts`, or when a change would touch another owner's package. An unattended session never merges to `main` — it commits to `stage` or to its own `stage/<letter>-<thing>` branch and leaves the merge for someone awake.
+
+Every session appends to `docs/HANDOFF.md` before it ends, attended or not — what landed, the single next action, and anything that will bite the next person. It is how a new session picks up without being told anything.
 
 ## Where to look
 
+- **Starting a session** → [`docs/HANDOFF.md`](docs/HANDOFF.md) — who is who, what landed, what is next. Read it before anything else, and append to it when you stop.
 - **Building anything** → [`docs/contracts.md`](docs/contracts.md) — the frozen types and every package's public API.
 - **Writing a test** → [`docs/testing.md`](docs/testing.md).
 - **Deciding whether something is done** → [`docs/acceptance.md`](docs/acceptance.md) — the ten claims Mazal must be able to make, each with its demo beat and its test.
