@@ -8,9 +8,8 @@
 // it does not know what the engine is.
 //
 // docs/contracts.md specifies `runBacktest(campaigns): BacktestReport`. That
-// exact signature arrives as a three-line wrapper the moment `diagnose` does —
-// see `runBacktest` at the bottom, currently commented out because the import
-// would not resolve.
+// exact signature arrives as a three-line wrapper the moment `diagnose` does;
+// README.md has the wrapper and the one dependency to add with it.
 
 import type { BacktestReport, Diagnosis, DiagnoseInput, LabelledCampaign } from '@mazal/contracts';
 import { benchmarks } from '@mazal/data';
@@ -20,8 +19,8 @@ import { score, type Scored } from './score.ts';
 export type Diagnoser = (input: DiagnoseInput) => Diagnosis;
 
 /** Every campaign is diagnosed against the category benchmarks — the pre-flight arm. */
-export function diagnoseAll(campaigns: LabelledCampaign[], diagnose: Diagnoser): Scored[] {
-  return campaigns.map((c) => ({
+export function runBacktestWith(campaigns: LabelledCampaign[], diagnose: Diagnoser): BacktestReport {
+  const scored: Scored[] = campaigns.map((c) => ({
     fault: c.fault,
     diagnosis: diagnose({
       days: c.days,
@@ -30,29 +29,18 @@ export function diagnoseAll(campaigns: LabelledCampaign[], diagnose: Diagnoser):
       reference: { kind: 'benchmark', table: benchmarks },
     }),
   }));
-}
 
-export function runBacktestWith(campaigns: LabelledCampaign[], diagnose: Diagnoser): BacktestReport {
-  return score(diagnoseAll(campaigns, diagnose));
+  return score(scored);
 }
 
 /**
  * A diagnoser that always answers "healthy". It is the floor every real result
- * has to beat, and it is worth printing beside them: on a cohort that is one
- * ninth `none`, always-healthy already scores 11% top-1 with a 0% false-alarm
- * rate. A number is not evidence until it is compared to that.
+ * has to beat, and it belongs on the slide beside them: the cohort is one
+ * quarter healthy, so saying "nothing is wrong" every time scores 25% top-1 at
+ * a 0% false-alarm rate. Any real diagnoser below that is worse than silence.
  */
 export const alwaysHealthy: Diagnoser = () => ({
   primary: null,
   secondary: [],
   suspectedCause: 'none',
 });
-
-// Once `packages/engine` exports `diagnose`, add "@mazal/engine": "workspace:*"
-// to this package's dependencies and replace this block with:
-//
-//   import { diagnose } from '@mazal/engine';
-//   export const runBacktest = (campaigns: LabelledCampaign[]): BacktestReport =>
-//     runBacktestWith(campaigns, diagnose);
-//
-// Nothing else in this package changes.

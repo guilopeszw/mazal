@@ -37,6 +37,28 @@ Entry format:
 
 ---
 
+## 2026-08-08 20:40 · Guilherme · the backtest runs; B has nothing left that the engine does not gate
+
+**Done:** `feat/sim-backtest`, in a PR against `stage`. The backtest was never fully blocked — only the `diagnose` *call* was.
+
+**`runBacktestWith(campaigns, diagnose)` takes the diagnoser as a parameter.** The whole pipeline is built, wired and running today. It also turns the A/B firewall into a property of the types rather than a promise: `backtest.ts` cannot reach into `packages/engine` because it does not know what the engine is. `docs/contracts.md`'s `runBacktest(campaigns)` arrives as a three-line wrapper the moment `diagnose` does; `packages/sim/README.md` has it written out.
+
+**`pnpm sim:backtest` runs the fixed 400-campaign cohort now**, against an always-healthy diagnoser. That is deliberately **not a result** and the script says so in the output. It is the floor: on a cohort one quarter healthy, answering "nothing is wrong" every time scores **25% top-1 at a 0% false-alarm rate**. Any real diagnoser below 25% is worse than silence, and both numbers belong on slide 6 together.
+
+**Running it at four hundred exposed a defect the five hand-made cases could not.** Round-robin over nine fault kinds gave `none` one ninth of the cohort — **eleven** healthy campaigns in the held-out hundred, about fifteen points of standard error on the number `B-data.md` says a judge asks about first. One campaign in four is healthy now: twenty-five held out, every broken class still lands 37–38, and the cohort check fails below twenty so it cannot drift back.
+
+Held-out per-class counts are 9–10, which is noise — and is exactly why only the *aggregate* is reported for the held-out half and the confusion matrix comes from the training half at 28 per class. That was already the rule in `B-data.md`; it now has a reason attached.
+
+**`packages/sim/README.md`** — what D and E can import today, the two fixtures, the three scripts, and the two caveats the deck must carry.
+
+**Next:** nothing, for B, until `diagnose` exists. Then: swap one constant in `run-backtest.ts`, add the dependency, uncomment the wrapper. Minutes.
+
+**Blocked / watch out:** **every remaining B deliverable is downstream of `packages/engine` and nothing else, and A has still pushed nothing.** There is no more work to bring forward — this entry is the end of what B can do alone.
+
+The one exception is **SUN-B's second-machine check**, which is blocked on hardware rather than code: clone `stage` elsewhere, run `pnpm derive && pnpm sim:fixtures`, confirm `git status` is clean. It has never run, and it is the last unverified claim in B's brief.
+
+---
+
 ## 2026-08-08 20:10 · Guilherme · main reconciled with stage; D and E named
 
 **Done:** two things, both housekeeping, one of them overdue.
