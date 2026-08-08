@@ -37,6 +37,48 @@ Entry format:
 
 ---
 
+## 2026-08-08 19:55 · Guilherme · everything B can do without the engine is done
+
+**Read this entry and the one below it and you have all of B's state.**
+
+**Done:** the last of B's unblocked work, on `feat/sim-scoring`. `pnpm typecheck` clean, `pnpm test` 54 passing, `pnpm sim:eyeball` green on all four check groups.
+
+**`packages/sim/score.ts` — the backtest was only half blocked.** Scoring is a pure function of `(label, Diagnosis)` pairs, and `Diagnosis` is in the contract. It is written and checked against hand-made diagnoses. When `diagnose` exists, the remaining work is the handful of lines that call it and hand the pairs over. Keeping the split also makes the firewall structural: nothing in `score.ts` can reach into how the answer was made.
+
+**`packages/sim/cohort.ts` — the 400 campaigns and the 100 held out are fixed now**, before anyone has seen a score. A split chosen after the first result is not a held-out set, it is a choice about which result to report. Round-robin over the nine kinds, so **the false-alarm rate will rest on 45 healthy campaigns — quote that denominator, not the percentage alone.**
+
+**`docs/benchmark-provenance.md`** — which seven benchmarks are measured and which five are priors, with the sentence slide 6 should say. "Derived from Kaggle" is true of seven twelfths of that table.
+
+**The nine uncovered categories are 0.16% of orders — 159 of 97,256.** `flowers` is the largest at 29 orders. **This closes the question, and it closes it in A's favour: `ReferenceMode` does not need a fallback arm for the demo.** The slide line is "62 of Olist's 71 categories, covering 99.84% of orders."
+
+**`top-2` is redefined, and the deck must say so.** `B-data.md` asks for "the strongest secondary finding's implied cause", but `Diagnosis` carries one `suspectedCause` and a `Finding` carries a `causeLayer`, not a `FaultKind` — no finding has an implied cause to read, and reading it out of `packages/engine` is what the firewall forbids. `scoreOne` asks the computable version of the same question: **did it name the right stage?** A stockout called a thin PDP is a near miss — both break stage 3, and the seller is sent to the right part of the funnel. A stockout called a budget cap is not. The exact metric needs an optional `impliedCause?: FaultKind` on `Finding`; that is C's call and an announcement.
+
+**Next — and it is one command, for whoever picks this up after `diagnose` lands:**
+
+```ts
+// packages/sim/backtest.ts — add "@mazal/engine": "workspace:*" to package.json first
+import { benchmarks } from '@mazal/data';
+import { diagnose } from '@mazal/engine';
+import { generateCohort, score, splitCohort, formatConfusion } from './index.ts';
+
+const { train, held } = splitCohort(generateCohort());
+const pairs = held.map((c) => ({
+  fault: c.fault,
+  diagnosis: diagnose({ days: c.days, card: c.card, events: c.events,
+    reference: { kind: 'benchmark', table: benchmarks } }),
+}));
+console.log(score(pairs));          // held-out: the reported number
+// Show A the TRAINING confusion matrix only — never a per-class breakdown of `held`.
+```
+
+**Blocked / watch out:** **`packages/engine` still does not exist and A has pushed nothing all weekend.** Every remaining B deliverable — the accuracy number, the confusion matrix, the calibration check — is downstream of `diagnose` and of nothing else. There is no more B work to bring forward.
+
+**`main` is 15 commits behind `stage`.** It is the build that gets cloned cold and it has no simulator, no contract fixes, `z.string()` for category and the silent date guess. `stage` is a strict superset and green. Needs announcing, then merging.
+
+**SUN-B's second-machine check has never run.** Clone `stage` elsewhere, `pnpm derive && pnpm sim:fixtures`, confirm `git status` is clean. It cannot be done on this machine by definition.
+
+---
+
 ## 2026-08-08 19:30 · Guilherme · the simulator is on stage; SAT-B and most of SUN-A done
 
 **Done:** `packages/sim` is real and merged (`fa7be86`). `generateCampaign(seed, fault)` covers **all nine** fault kinds — SAT-B asked for three — and both demo fixtures are committed. `pnpm test` 54 passing, `pnpm typecheck` clean, `pnpm sim:eyeball` green across 360 campaigns, `pnpm sim:fixtures` byte-reproducible on a rerun. The plan is at [`superpowers/plans/2026-08-08-packages-sim.md`](superpowers/plans/2026-08-08-packages-sim.md).
