@@ -21,7 +21,7 @@ Entry format:
 |---|---|---|
 | A — engine | Miguel | [`plan/A-engine.md`](plan/A-engine.md) |
 | B — data & simulator | Guilherme | [`plan/B-data.md`](plan/B-data.md) |
-| C — ingest & contracts | unassigned)* | [`plan/C-ingest.md`](plan/C-ingest.md) |
+| C — ingest & contracts | Mateus | [`plan/C-ingest.md`](plan/C-ingest.md) |
 | D — frontend | *(unassigned)* | [`plan/D-frontend.md`](plan/D-frontend.md) |
 | E — agent, deco, pitch | *(unassigned)* | [`plan/E-agent.md`](plan/E-agent.md) |
 
