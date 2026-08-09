@@ -1,71 +1,86 @@
+import { aggregate, roas } from "@mazal/contracts/metrics";
 import { DailyChart } from "@/components/daily-chart";
-import { FindingCard } from "@/components/finding-card";
+import { Despacho } from "@/components/despacho";
+import { DocumentHeader } from "@/components/document/header";
+import { Field, Quadro, Sheet } from "@/components/document/sheet";
+import { FindingEntry } from "@/components/finding-entry";
+import { FunnelBlock } from "@/components/funnel-block";
+import { PlanPanel } from "@/components/plan-panel";
 import { DEMO_CASES } from "@/lib/fixtures";
-import { FUNNEL_STAGES, MEDIA_PRODUCT_BOUNDARY, toneFor } from "@/lib/funnel";
-
-const TONE = {
-  upstream: "bg-emerald-500/90 border-emerald-400",
-  leak: "bg-red-500 border-red-400",
-  downstream: "bg-neutral-800 border-neutral-700 text-neutral-400",
-} as const;
+import { formatBRL, formatCount, formatMetric } from "@/lib/format";
 
 export default function Home() {
   const demo = DEMO_CASES.case2;
-  const { diagnosis, category, reference, days } = demo;
-  const leak = diagnosis.primary?.stage ?? null;
+  const { diagnosis, category, reference, days, card, actions, counter } = demo;
+  const flight = aggregate(days);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-8 p-10">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Mazal</h1>
-        <p className="text-sm text-neutral-500">{demo.moment}</p>
-      </header>
+    <main className="mx-auto flex max-w-[84rem] flex-col gap-6 px-3 py-6 sm:px-6 sm:py-10 lg:flex-row lg:items-start lg:gap-8">
+      <div className="min-w-0 flex-1">
+      <Sheet>
+        <DocumentHeader
+          diagnosis={diagnosis}
+          reference={reference}
+          campaignId={flight.campaignId}
+          lastDate={days[days.length - 1]!.date}
+          moment={demo.moment}
+        />
 
-      <section className="flex flex-col gap-1.5">
-        {FUNNEL_STAGES.map(({ stage, label, metrics }) => (
-          <div key={stage}>
-            {stage === MEDIA_PRODUCT_BOUNDARY && (
-              <div className="flex items-center gap-3 py-3 text-[11px] uppercase tracking-widest text-neutral-500">
-                <span className="h-px flex-1 bg-neutral-700" />
-                mídia · produto
-                <span className="h-px flex-1 bg-neutral-700" />
-              </div>
-            )}
-            <div
-              className={`flex items-baseline justify-between rounded border-l-4 px-4 py-3 text-white ${TONE[toneFor(stage, leak)]}`}
-            >
-              <span className="font-medium">
-                {stage} · {label}
-              </span>
-              <span className="text-xs opacity-80">{metrics}</span>
+        <Quadro title="localização do vazamento" aside="primeiro estágio que desviou">
+          <FunnelBlock leak={diagnosis.primary?.stage ?? null} />
+        </Quadro>
+
+        {diagnosis.primary && (
+          <Quadro title="apuração" aside={`regra ${diagnosis.primary.rule}`}>
+            <FindingEntry
+              finding={diagnosis.primary}
+              category={category}
+              reference={reference}
+            />
+          </Quadro>
+        )}
+
+        <Quadro title="série diária">
+          <DailyChart
+            days={days}
+            metric={diagnosis.changePoint?.metric ?? diagnosis.primary?.metric ?? "atcRate"}
+            changePoint={diagnosis.changePoint?.date}
+          />
+        </Quadro>
+
+        {diagnosis.secondary.length > 0 && (
+          <Quadro title="sintomas a jusante" aside="consequências, não causas">
+            <div className="divide-y divide-rule">
+              {diagnosis.secondary.map((finding) => (
+                <FindingEntry
+                  key={finding.rule}
+                  finding={finding}
+                  category={category}
+                  reference={reference}
+                />
+              ))}
             </div>
+          </Quadro>
+        )}
+
+        <Quadro title="campanha" aside="período completo">
+          <div className="grid gap-x-10 sm:grid-cols-2">
+            <Field label="investido">{formatBRL(flight.spend)}</Field>
+            <Field label="receita">{formatBRL(flight.revenue)}</Field>
+            <Field label="cliques">{formatCount(flight.clicks)}</Field>
+            <Field label="vendas">{formatCount(flight.purchases)}</Field>
+            <Field label="roas">{formatMetric("roas", roas(flight))}</Field>
+            <Field label="roas de equilíbrio">
+              {formatMetric("roas", 1 / card.grossMargin)}
+            </Field>
           </div>
-        ))}
-      </section>
+        </Quadro>
 
-      {diagnosis.primary && (
-        <FindingCard
-          finding={diagnosis.primary}
-          category={category}
-          reference={reference}
-        />
-      )}
-      {diagnosis.primary && (
-        <DailyChart
-          days={days}
-          metric={diagnosis.changePoint?.metric ?? diagnosis.primary.metric}
-          changePoint={diagnosis.changePoint?.date}
-        />
-      )}
+        <PlanPanel actions={actions} counter={counter} />
+      </Sheet>
+      </div>
 
-      {diagnosis.secondary.map((finding) => (
-        <FindingCard
-          key={finding.rule}
-          finding={finding}
-          category={category}
-          reference={reference}
-        />
-      ))}
+      <Despacho diagnosis={diagnosis} reference={reference} actionCount={actions.length} />
     </main>
   );
 }

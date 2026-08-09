@@ -1,4 +1,5 @@
 import type {
+  Action,
   CampaignDay,
   Diagnosis,
   Finding,
@@ -51,6 +52,9 @@ export type DemoCase = {
   days: CampaignDay[];
   reference: ReferenceMode;
   diagnosis: Diagnosis;
+  actions: Action[];
+  /** Prevented waste, or revenue recovered. Derived from the series, never typed in. */
+  counter: { label: string; amount: number; basis: string };
 };
 
 /** Shape and numbers taken from `packages/sim/fixtures/demo-case2.json`'s real card. */
@@ -128,6 +132,58 @@ const case1: DemoCase = {
     ],
     suspectedCause: "thin_pdp",
   },
+  /**
+   * A thin product page is fixed on the page, not in the auction. Claim 3: on a product-layer
+   * fault, nothing here touches the campaign — rebuilding the creative is the move this
+   * product exists to talk the seller out of.
+   */
+  actions: [
+    {
+      id: "pdp-copy",
+      title: "Reescrever a descrição em torno de prazo e garantia",
+      change: "Substituir o texto do fabricante por 900 caracteres que respondem às três dúvidas do checkout",
+      expectedEffect: { metric: "atcRate", from: 0.012, to: 0.034 },
+      confidence: "medium",
+      reversible: true,
+      actor: "mazal",
+    },
+    {
+      id: "offer-pix",
+      title: "Publicar o desconto à vista no anúncio",
+      change: "Mostrar o preço no Pix ao lado do parcelado, em vez de só no checkout",
+      expectedEffect: { metric: "cvr", from: 0.003, to: 0.011 },
+      confidence: "low",
+      reversible: true,
+      actor: "mazal",
+    },
+    {
+      id: "photos",
+      title: "Fotografar o produto em uso",
+      change: "Subir seis fotos além das duas do catálogo do fornecedor",
+      expectedEffect: { metric: "photos", from: 2, to: 8 },
+      confidence: "high",
+      reversible: false,
+      actor: "seller",
+    },
+    {
+      id: "reviews",
+      title: "Pedir avaliação a quem já comprou",
+      change: "Contatar os compradores dos últimos 90 dias",
+      expectedEffect: { metric: "reviewAvg", from: 5, to: 5 },
+      confidence: "low",
+      reversible: false,
+      actor: "seller",
+    },
+  ],
+  /**
+   * Prevented waste, per `demo-script.md` §4: what the next flight would burn, which is what
+   * the last one burned on the same product and the same funnel.
+   */
+  counter: {
+    label: "não gasto",
+    amount: aggregate(case1Days).spend,
+    basis: "o que a campanha anterior queimou no mesmo funil",
+  },
 };
 
 // ─── Case #2 — in-flight ─────────────────────────────────────────────────────────────
@@ -147,6 +203,57 @@ const case2Spread = selfSpread(case2Reference);
 
 const case2CvrReference = cvr(case2Baseline);
 const case2CvrObserved = cvr(case2Window);
+
+/**
+ * The plan for an `eta_shock`, and its shape is load-bearing.
+ *
+ * `docs/acceptance.md` claim 7: for this fault, no `actor: 'mazal'` action may change supplier
+ * lead time — a dropshipper cannot, and Mazal must not offer to do what it cannot do. So
+ * everything Mazal takes on works *around* the delay: state it on the page, price against it,
+ * change the offer. Renegotiating the supplier is real work that has to happen, and it is
+ * printed as the seller's, with nothing to tick.
+ *
+ * Claim 3: the leak is at stage 3, below the media line, so no action here touches the
+ * campaign. "People are still clicking" is the finding; pausing the ads would contradict it.
+ */
+const case2Actions: Action[] = [
+  {
+    id: "pdp-eta",
+    title: "Declarar o prazo real na página do produto",
+    change: "Exibir “chega em até 22 dias” acima do botão de compra, não no rodapé do checkout",
+    expectedEffect: { metric: "atcRate", from: 0.004, to: 0.031 },
+    confidence: "medium",
+    reversible: true,
+    actor: "mazal",
+  },
+  {
+    id: "offer-freight",
+    title: "Compensar a espera com frete grátis",
+    change: "Frete grátis acima de R$ 150 enquanto o prazo do fornecedor estiver acima de 15 dias",
+    expectedEffect: { metric: "icRate", from: 0.27, to: 0.38 },
+    confidence: "medium",
+    reversible: true,
+    actor: "mazal",
+  },
+  {
+    id: "supplier",
+    title: "Renegociar o prazo com o fornecedor",
+    change: "Voltar o lead time para os 9 dias praticados até 11 de julho",
+    expectedEffect: { metric: "deliveryDays", from: 22, to: 9 },
+    confidence: "low",
+    reversible: false,
+    actor: "seller",
+  },
+  {
+    id: "stock-local",
+    title: "Manter estoque local dos dois SKUs que giram",
+    change: "Comprar 40 unidades para expedição própria, cortando o fornecedor do caminho",
+    expectedEffect: { metric: "deliveryDays", from: 22, to: 4 },
+    confidence: "medium",
+    reversible: false,
+    actor: "seller",
+  },
+];
 
 const case2: DemoCase = {
   id: "case2",
@@ -194,6 +301,20 @@ const case2: DemoCase = {
     ],
     suspectedCause: "eta_shock",
     changePoint: { date: CHANGE_POINT, metric: "atcRate" },
+  },
+  actions: case2Actions,
+  /**
+   * `demo-script.md` §4: recovered revenue is (days of downtime avoided) × (daily revenue at
+   * baseline). Both factors come out of the series — the baseline is the eleven days before
+   * the rupture, and the downtime is the days that have run broken since. Typing the script's
+   * illustrative figure here instead would be the one invented number on a sheet whose whole
+   * argument is that it has none.
+   */
+  counter: {
+    label: "recuperável",
+    amount:
+      (case2Baseline.revenue / baseline.length) * (case2Days.length - baseline.length),
+    basis: `${case2Days.length - baseline.length} dias parados × receita diária da linha de base`,
   },
 };
 

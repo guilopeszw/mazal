@@ -59,6 +59,9 @@ export function formatMetric(metric: string, value: number): string {
 
 export const formatCount = (value: number) => int.format(value);
 
+/** Money that is not a metric — spend, revenue, a break-even. */
+export const formatBRL = (value: number) => brl.format(value);
+
 /**
  * "−8,3σ". `toFixed` would print `-8.3` with a full stop next to values Intl has already
  * rendered as `0,3%` — two decimal separators in one card, four centimetres apart.

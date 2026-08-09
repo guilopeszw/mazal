@@ -1,26 +1,104 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/**
+ * Via do Cliente — the world's materials.
+ *
+ * The ground is not cream. Brazilian carbonless copy paper (papel autocopiativo) comes in a
+ * fixed set of vias: white first, pink second, green third, yellow fourth. This surface is
+ * the green via — the copy that stays with the customer — and that is a chalky institutional
+ * green, not a warm parchment. Getting this wrong turns the whole world into a nostalgia
+ * pastiche of a document rather than a document.
+ *
+ * Three inks, and they carry the funnel's entire message without relying on hue: impact
+ * black is a value the engine judged and passed, aniline red is a stamp, and carbon ghost is
+ * the smudged second impression — what a symptom looks like on a copy nobody judged.
+ */
+@theme {
+  --color-desk: #b9c3ac;
+  --color-paper: #d9e0ce;
+  --color-paper-band: #d0d9c3;
+  --color-paper-edge: #c3cdb4;
+
+  --color-ink: #17190f;
+  --color-ink-soft: #454a38;
+  /**
+   * The carbon ghost has a floor it cannot go under. A second impression really is faint, and
+   * the honest colour for it measured 2.74:1 against this paper — below the 4.5:1 body-text
+   * floor, on the type carrying every downstream stage. It is lifted to 4.68:1 and the
+   * "ghostliness" is carried by what a carbon copy actually does instead: it prints lighter
+   * *and* it prints the word SINTOMA, so the distinction never rests on lightness alone.
+   */
+  --color-ghost: #59634c;
+  --color-rule: #a4ad93;
+  --color-rule-strong: #6e7860;
+
+  --color-stamp: #b32a18;
+  --color-stamp-soft: #d3583f;
+  --color-seal: #46356a;
+
+  --font-form: var(--font-form), ui-sans-serif, system-ui, sans-serif;
+  --font-struck: var(--font-struck), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/**
+ * The sheet sits on a desk, so it casts a real shadow: an offset and a soft blur, never a
+ * zero-offset halo. Paper is thin, so the offset is small and the blur is wide.
+ */
+@utility sheet-shadow {
+  box-shadow:
+    0 1px 2px rgb(23 25 15 / 0.16),
+    0 12px 32px -8px rgb(23 25 15 / 0.28);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/**
+ * Leader dots. A fiscal form runs a dotted rule from a field's label to its value so the eye
+ * cannot land on the wrong row — the same job a zebra stripe does, done with less ink.
+ */
+@utility leader {
+  background-image: radial-gradient(circle, var(--color-rule) 1px, transparent 1px);
+  background-position: 0 bottom;
+  background-size: 6px 3px;
+  background-repeat: repeat-x;
+}
+
+/**
+ * The tear-off. A perforation is a line of punched holes, so it is drawn as holes in the
+ * paper rather than as a dashed border sitting on top of it.
+ */
+@utility perforation {
+  background-image: radial-gradient(
+    circle at center,
+    var(--color-desk) 0 2.5px,
+    transparent 2.5px
+  );
+  background-size: 12px 12px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+/**
+ * Ink bleed. Aniline stamp ink soaks unevenly into fibre: the impression is never solid and
+ * never perfectly aligned. Two overlaid noise gradients at low alpha eat into the fill, and
+ * the whole mark sits slightly off-square. This is the world's one texture and it is a
+ * specific effect, not decoration — a flat red rectangle reads as a UI badge.
+ */
+@utility ink-bleed {
+  mask-image:
+    radial-gradient(ellipse 120% 80% at 30% 40%, #000 62%, rgb(0 0 0 / 0.72) 100%),
+    repeating-linear-gradient(
+      74deg,
+      #000 0 3px,
+      rgb(0 0 0 / 0.86) 3px 4px
+    );
+  mask-composite: intersect;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

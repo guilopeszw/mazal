@@ -1,6 +1,14 @@
 .serena
 .claude
 
+# Per-harness copies of the same locally-installed agent tooling `.claude` already
+# covers. One person's editor setup, not the team's build.
+.agents
+.codex
+.cursor
+.gemini
+.opencode
+
 node_modules
 .next
 .turbo
