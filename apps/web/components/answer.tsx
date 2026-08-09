@@ -1,5 +1,6 @@
 import type { Answer } from "@/lib/answers";
 import { type Reveal, fullReveal, tokenize } from "@/lib/stream";
+import { DailyFigure, FunnelFigure, RadarFigure, RoasFigure } from "./answer-charts";
 import { PlanPanel } from "./plan-panel";
 
 /**
@@ -11,12 +12,6 @@ import { PlanPanel } from "./plan-panel";
  * and a server render both draw the whole answer without knowing the stream exists. No timer
  * lives in this file.
  */
-
-const BAR: Record<"ok" | "broken" | "mute", string> = {
-  ok: "bg-accent",
-  broken: "bg-warn",
-  mute: "bg-line",
-};
 
 export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal }) {
   const shown = reveal ?? fullReveal(answer);
@@ -82,6 +77,14 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
           <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
             Where the funnel breaks
           </h3>
+          {/* The cascade itself — the five count stages, the leak in red. The rows
+              beneath stay as the audit trail: same order, plus the two stages a
+              count cannot draw (unassessed landing, unit economics). */}
+          {answer.charts?.funnel && (
+            <div className="border-b border-line">
+              <FunnelFigure chart={answer.charts.funnel} />
+            </div>
+          )}
           <div className="flex flex-col">
             {answer.stages.slice(0, shown.stageRows).map((s) => (
               <div
@@ -93,10 +96,6 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
                     s.state === "broken" ? "font-[540] text-warn" : "text-ink-soft"
                   }`}
                 >
-                  <span
-                    className={`h-[3px] w-[46px] flex-none rounded-[2px] ${BAR[s.state]}`}
-                    aria-hidden="true"
-                  />
                   {s.name}
                   {s.tag && (
                     <span
@@ -112,6 +111,24 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
               </div>
             ))}
           </div>
+        </section>
+      )}
+
+      {answer.charts?.daily && shown.stages && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
+          <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+            {answer.charts.daily.label}, day by day
+          </h3>
+          <DailyFigure chart={answer.charts.daily} />
+        </section>
+      )}
+
+      {answer.charts?.margin && shown.stages && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
+          <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+            Return against break-even
+          </h3>
+          <RoasFigure chart={answer.charts.margin} />
         </section>
       )}
 
@@ -150,6 +167,15 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
               <span>{answer.band.ends[2]}</span>
             </div>
           </div>
+        </section>
+      )}
+
+      {answer.charts?.radar && shown.band && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
+          <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+            You against your market
+          </h3>
+          <RadarFigure chart={answer.charts.radar} />
         </section>
       )}
 
