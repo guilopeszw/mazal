@@ -163,7 +163,6 @@ const SLIDE = resolve(import.meta.dirname, '../../docs/slide-6.md');
 
 if (existsSync(SLIDE)) {
   const slide = readFileSync(SLIDE, 'utf8');
-  const heldNoneCount = String(heldHealthy);
   const falseAlarms = Math.round(report.falseAlarmRate * heldHealthy);
 
   /**
@@ -177,23 +176,24 @@ if (existsSync(SLIDE)) {
     return m?.[1] === undefined ? null : Number(m[1]);
   };
 
-  const required: [string, number, number | null][] = [
-    ['Names the right cause', report.top1 * 100, rowValue('Names the right cause')],
-    ['Names the right funnel stage', report.top2 * 100, rowValue('Names the right funnel stage')],
-    ['False alarms on healthy campaigns', report.falseAlarmRate * 100, rowValue('False alarms on healthy campaigns')],
-  ];
-
-  const stale = required
-    .filter(([, expected, found]) => found === null || Math.abs(found - expected) > 0.05)
-    .map(([label, expected, found]) =>
-      [label, `${expected.toFixed(1)}% (slide says ${found === null ? 'nothing' : `${found}%`})`] as [string, string]);
-
-  if (!slide.includes(`${falseAlarms} of ${heldNoneCount}`)) {
-    stale.push(['false alarm denominator', `${falseAlarms} of ${heldNoneCount}`]);
+  const stale: string[] = [];
+  for (const [label, expected] of [
+    ['Names the right cause', report.top1 * 100],
+    ['Names the right funnel stage', report.top2 * 100],
+    ['False alarms on healthy campaigns', report.falseAlarmRate * 100],
+  ] as [string, number][]) {
+    const found = rowValue(label);
+    if (found === null || Math.abs(found - expected) > 0.05) {
+      stale.push(`${label}: ${expected.toFixed(1)}% (slide says ${found === null ? 'nothing' : `${found}%`})`);
+    }
   }
+  if (!slide.includes(`${falseAlarms} of ${heldHealthy}`)) {
+    stale.push(`false alarm denominator: ${falseAlarms} of ${heldHealthy}`);
+  }
+
   if (stale.length > 0) {
     console.log('\n⚠ docs/slide-6.md is stale — it no longer quotes:');
-    for (const [label, detail] of stale) console.log(`    ${label}: ${detail}`);
+    for (const line of stale) console.log(`    ${line}`);
     console.log('  Update the slide before anyone presents it.');
     process.exitCode = 1;
   } else {
