@@ -1,6 +1,10 @@
 import { expect, test } from 'vitest';
 
+import type { Action } from '@mazal/contracts';
+
+import { InMemoryActionLog } from './action-log.js';
 import { createMcpHandler } from './server.js';
+import { mazalAction } from './tools/test-fixtures.js';
 
 const handshake = {
   jsonrpc: '2.0',
@@ -145,6 +149,46 @@ test('builds a fresh server and registers tools for each authorized request', as
   }
 
   expect(registrations).toBe(2);
+});
+
+test('isolates simulated action logs across two authenticated MCP requests', async () => {
+  const actionLogs: InMemoryActionLog[] = [];
+  const app = createMcpHandler({
+    bearerToken: 'test-token',
+    createActionLog: () => {
+      const actionLog = new InMemoryActionLog();
+      actionLogs.push(actionLog);
+      return actionLog;
+    },
+  });
+  const secondAction: Action = { ...mazalAction, id: 'stockout.2' };
+
+  for (const [id, action] of [[1, mazalAction], [2, secondAction]] as const) {
+    const response = await app.request('/mcp', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json, text/event-stream',
+        Authorization: 'Bearer test-token',
+        'Content-Type': 'application/json',
+        Host: 'localhost',
+        'MCP-Protocol-Version': '2025-06-18',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id,
+        method: 'tools/call',
+        params: { name: 'execute_plan', arguments: { actions: [action] } },
+      }),
+    });
+
+    expect(response.status).toBe(200);
+  }
+
+  expect(actionLogs).toHaveLength(2);
+  expect(actionLogs.map((actionLog) => actionLog.snapshot())).toEqual([
+    [mazalAction],
+    [secondAction],
+  ]);
 });
 
 test.each([undefined, 'Bearer test-taken', 'Bearer wrong-token'])(

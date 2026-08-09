@@ -7,16 +7,18 @@ import {
 } from '@modelcontextprotocol/server';
 import { Hono, type Context } from 'hono';
 
+import { InMemoryActionLog, type ActionLog } from './action-log.js';
 import { hasValidBearerToken } from './auth.js';
 import { registerMazalTools } from './tools/index.js';
 
-export type RegisterTools = (server: McpServer) => void;
+export type RegisterTools = (server: McpServer, actionLog?: ActionLog) => void;
 
 export type CreateMcpHandlerOptions = {
   allowedHosts?: string[];
   allowedOrigins?: string[];
   bearerToken?: string;
   registerTools?: RegisterTools;
+  createActionLog?: () => ActionLog;
 };
 
 function readHostnameAllowlist(value: string | undefined): string[] | undefined {
@@ -28,9 +30,12 @@ function readHostnameAllowlist(value: string | undefined): string[] | undefined 
   return hostnames?.length ? hostnames : undefined;
 }
 
-export function createMazalMcpServer(registerTools: RegisterTools = registerMazalTools): McpServer {
+export function createMazalMcpServer(
+  registerTools: RegisterTools = registerMazalTools,
+  actionLog: ActionLog = new InMemoryActionLog(),
+): McpServer {
   const server = new McpServer({ name: 'Mazal MCP', version: '0.1.0' });
-  registerTools(server);
+  registerTools(server, actionLog);
   return server;
 }
 
@@ -42,7 +47,10 @@ export function createMcpHandler(options: CreateMcpHandlerOptions = {}) {
     options.allowedOrigins ??
     readHostnameAllowlist(process.env.MAZAL_MCP_ALLOWED_ORIGINS) ??
     allowedHosts;
-  const handler = createSdkMcpHandler(() => createMazalMcpServer(options.registerTools));
+  const createActionLog = options.createActionLog ?? (() => new InMemoryActionLog());
+  const handler = createSdkMcpHandler(
+    () => createMazalMcpServer(options.registerTools, createActionLog()),
+  );
   const app = new Hono();
 
   app.use('/mcp', hostHeaderValidation(allowedHosts ?? localhostAllowedHostnames()));

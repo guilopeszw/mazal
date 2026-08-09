@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 02:40 BRT · E-agent (Joaquim) · corretivo HIGH/MEDIUM do MCP
+
+**Done:** removido o singleton de `InMemoryActionLog`: cada `McpServer`/request autenticada recebe log novo, comprovado por teste HTTP cruzando dois `execute_plan`. A réplica Zod 4 agora exige `price > 0` e ao menos um `paymentMethod`; 32/32 MCP e 117/117 global passaram em Node 24, com typechecks focalizado/global e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-2-fix-report.md`.
+
+**Next:** executar o PRD 04 de deploy/conexão Deco sem alterar a superfície dos quatro tools.
+
+**Blocked / watch out:** o LOW conhecido permanece: `pnpm typecheck` raiz não inclui `apps/mcp`, portanto manter também o typecheck focalizado. O log continua intencionalmente volátil por request e a execução é somente simulada.
+
+---
+
 ## 2026-08-09 02:29 BRT · E-agent (Joaquim) · quatro tools MCP determinísticos
 
 **Done:** PRD 03 implementado no commit que contém esta entrada: `diagnose_campaign`, `predict_campaign`, `build_recovery_plan` e `execute_plan` são os únicos tools públicos. Benchmarks são injetados no servidor, respostas numéricas vêm diretamente do engine, e execução aceita somente ações `mazal`, grava em memória e retorna recibo SHA-256 canônico. TDD em Node 24 registrou três REDs e terminou com 29/29 no MCP e 114/114 global; typechecks focalizado/global e `git diff --check` verdes.

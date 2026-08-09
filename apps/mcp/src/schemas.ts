@@ -31,7 +31,7 @@ export const campaignDaySchema: z.ZodType<CampaignDay> = z.object({
 
 export const productCardSchema: z.ZodType<ProductCard> = z.object({
   category: z.enum(OLIST_CATEGORIES),
-  price: nonNegativeNumber,
+  price: finiteNumber.positive(),
   grossMargin: finiteNumber.gt(0).max(1),
   shippingCost: nonNegativeNumber,
   deliveryEtaDays: count,
@@ -41,7 +41,7 @@ export const productCardSchema: z.ZodType<ProductCard> = z.object({
   pdpImages: count,
   pdpDescriptionLength: count,
   returnPolicyDays: count,
-  paymentMethods: z.array(z.enum(['credit', 'debit', 'pix', 'boleto', 'installments'])),
+  paymentMethods: z.array(z.enum(['credit', 'debit', 'pix', 'boleto', 'installments'])).min(1),
   offer: z.enum(['none', 'discount', 'bundle', 'free_shipping_threshold']),
 }).strict();
 

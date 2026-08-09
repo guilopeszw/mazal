@@ -19,8 +19,6 @@ export const MAZAL_TOOL_NAMES = [
   'execute_plan',
 ] as const;
 
-const defaultActionLog = new InMemoryActionLog();
-
 function jsonResult(value: object) {
   return {
     content: [{ type: 'text' as const, text: JSON.stringify(value) }],
@@ -30,7 +28,7 @@ function jsonResult(value: object) {
 
 export function registerMazalTools(
   server: McpServer,
-  actionLog: ActionLog = defaultActionLog,
+  actionLog: ActionLog = new InMemoryActionLog(),
 ): void {
   server.registerTool(
     'diagnose_campaign',

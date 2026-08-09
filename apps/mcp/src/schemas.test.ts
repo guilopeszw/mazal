@@ -5,6 +5,7 @@ import {
   diagnoseCampaignInputSchema,
   executePlanInputSchema,
   predictCampaignInputSchema,
+  productCardSchema,
 } from './schemas.js';
 import {
   apparelCard,
@@ -62,5 +63,13 @@ describe('public tool schemas', () => {
     expect(executePlanInputSchema.safeParse({
       actions: [{ ...mazalAction, expectedEffect: { metric: '', from: 0.01, to: 0.08 } }],
     }).success).toBe(false);
+  });
+
+  test('rejects a product card with a zero price', () => {
+    expect(productCardSchema.safeParse({ ...apparelCard, price: 0 }).success).toBe(false);
+  });
+
+  test('rejects a product card without a payment method', () => {
+    expect(productCardSchema.safeParse({ ...apparelCard, paymentMethods: [] }).success).toBe(false);
   });
 });
