@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "deco-studio": {
+      "type": "http",
+      "url": "${DECO_MCP_URL:-https://studio.decocms.com/api/guilherme-works-btg1/mcp/self}"
+    }
+  }
+}
