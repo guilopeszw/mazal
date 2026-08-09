@@ -328,3 +328,61 @@ function brlToNumber(formatted: string): number {
   const n = Number(formatted.replace(/[^0-9.,-]/g, "").replace(/\.(?=\d{3}\b)/g, "").replace(",", "."));
   return Number.isFinite(n) ? n : 0;
 }
+
+/**
+ * Every product's daily budget on one time axis — the evidence for the advice.
+ *
+ * A response curve is a claim about what a *different* budget would do, and the
+ * only reason Mazal can make one is that these budgets moved. The fit refuses
+ * when they have not. So this is not decoration under the recommendation; it is
+ * the reason the recommendation is allowed to exist, and a seller who has never
+ * varied a budget can look at this and see what they would need.
+ *
+ * One accent still. Three series separated by opacity and dash rather than by
+ * inventing two more hues — the ranking is what matters, and the labels carry
+ * the identity.
+ */
+export const BudgetWalkFigure = memo(function BudgetWalkFigure({
+  chart,
+}: {
+  chart: NonNullable<AnswerCharts["budgetWalk"]>;
+}) {
+  const reduced = useReducedMotion();
+  const data = useMemo(
+    () => chart.points.map((p) => ({ ...p, date: `${p['date'] as string}T12:00:00` })),
+    [chart.points],
+  );
+
+  return (
+    <figure className="m-0" role="img" aria-label={chart.summary}>
+      <MotionConfig reducedMotion="user">
+        <div aria-hidden="true">
+          <AreaChart
+            data={data}
+            animationDuration={reduced ? 0 : 900}
+            margin={{ top: 22, right: 24, bottom: 34, left: 24 }}
+          >
+            <Grid horizontal numTicksRows={3} hideHorizontalEdgeLines />
+            {chart.series.map((s, i) => (
+              <Area
+                key={s.key}
+                dataKey={s.key}
+                // Green marks the product the plan above puts money onto; the
+                // others are drawn in ink. That is the same legend the rest of
+                // the product uses — green is the verdict, ink is everything
+                // else — rather than three hues nobody has to learn.
+                stroke={i === 0 ? "var(--color-accent)" : "var(--color-ink-faint)"}
+                fill={i === 0 ? "var(--color-accent)" : "var(--color-ink-faint)"}
+                strokeWidth={i === 0 ? 2 : 1.25}
+                fillOpacity={i === 0 ? 0.14 : 0.04}
+                showHighlight={false}
+              />
+            ))}
+            <XAxis numTicks={4} />
+          </AreaChart>
+        </div>
+      </MotionConfig>
+      <figcaption className="px-4 pb-3 text-[12.5px] text-ink-soft">{chart.summary}</figcaption>
+    </figure>
+  );
+});

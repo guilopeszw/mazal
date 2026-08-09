@@ -1,6 +1,6 @@
 import type { Answer } from "@/lib/answers";
 import { type Reveal, fullReveal, tokenize } from "@/lib/stream";
-import { DailyFigure, FunnelFigure, MovesFigure, RadarFigure, RoasFigure } from "./answer-charts";
+import { BudgetWalkFigure, DailyFigure, FunnelFigure, MovesFigure, RadarFigure, RoasFigure } from "./answer-charts";
 import { PlanPanel } from "./plan-panel";
 
 /**
@@ -179,6 +179,15 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
             </span>
           </h3>
           <MovesFigure chart={answer.charts.moves} rows={shown.moveRows} />
+        </section>
+      )}
+
+      {answer.charts?.budgetWalk && shown.note && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
+          <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+            Why Mazal can answer this at all
+          </h3>
+          <BudgetWalkFigure chart={answer.charts.budgetWalk} />
         </section>
       )}
 
