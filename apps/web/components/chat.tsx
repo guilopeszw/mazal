@@ -5,6 +5,7 @@ import type { OlistCategory } from "@mazal/contracts";
 import type { Answer, AnswerKey } from "@/lib/answers";
 import { type Reveal, buildTimeline, fullReveal, revealAt } from "@/lib/stream";
 import { AnswerBody } from "./answer";
+import { PlanLoader } from "./plan-loader";
 import { Upload } from "./upload";
 
 /**
@@ -171,7 +172,15 @@ function Thinking() {
 
 type Turn = { id: number; asked: string; answer: Answer };
 
-function TurnView({ turn, active }: { turn: Turn; active: boolean }) {
+function TurnView({
+  turn,
+  active,
+  benchmarkCount,
+}: {
+  turn: Turn;
+  active: boolean;
+  benchmarkCount: number;
+}) {
   const reveal = useAnswerStream(turn.answer, active);
 
   return (
@@ -179,7 +188,18 @@ function TurnView({ turn, active }: { turn: Turn; active: boolean }) {
       <div className="rise max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
         {turn.asked}
       </div>
-      {reveal.thinking ? <Thinking /> : <AnswerBody answer={turn.answer} reveal={reveal} />}
+      {/* The loader appears only when the pending answer carries a plan of
+          action — that is the wait it narrates. Every other answer keeps the
+          breathing mark. */}
+      {reveal.thinking ? (
+        turn.answer.plan ? (
+          <PlanLoader benchmarkCount={benchmarkCount} />
+        ) : (
+          <Thinking />
+        )
+      ) : (
+        <AnswerBody answer={turn.answer} reveal={reveal} />
+      )}
     </div>
   );
 }
@@ -275,7 +295,11 @@ export function Chat({
                  */
                 className="scroll-mt-20"
               >
-                <TurnView turn={turn} active={i === turns.length - 1} />
+                <TurnView
+                  turn={turn}
+                  active={i === turns.length - 1}
+                  benchmarkCount={categories.length}
+                />
               </div>
             ))}
           </div>

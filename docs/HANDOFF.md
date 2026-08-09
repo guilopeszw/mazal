@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 14:05 BRT · Guilherme's agent · plan loader on `feat/plan-loader`
+
+**Done:** `feat/plan-loader` (off `stage`, one commit `5a9042a`) adds a rim-light morphing loading card shown only while an answer that carries a recovery plan is pending. New: `apps/web/components/plan-loader.tsx`, `plan-loader.css`, and `apps/web/lib/ai-lights/mask.ts` (the product owner's canvas mask builder, copied verbatim). Seam: `TIMING.plan` (7s) in `lib/stream.ts` — `buildTimeline` uses it when `answer.plan` exists, and `revealAt.thinking` now ends at the first step rather than at a hardcoded 700ms; `chat.tsx` renders `PlanLoader` instead of `Thinking` for those turns. Three surfaces rotate in the engine's real order: funnel walk (with the media │ produto divider), store event log (the inverted variant), action draft with the actor split. Verified by observation over CDP in both themes: radius travels linearly (14 distinct values over a 17-frame morph, no end snap), glow layers are `display:none` for every morph frame, masks rebuild exactly twice in 6.3s — once per handover, box stable. Root typecheck, 135 root tests, `pnpm --filter web build`, and web lint (for the new file) all green.
+
+**Next:** D reviews and merges the branch to `stage`; the branch owner does not merge. If 7s reads long on the projector, `TIMING.plan` is the single knob and the card degrades gracefully at any value ≥ ~3.1s (one full cycle).
+
+**Blocked / watch out:** two pre-existing web lint errors (`answer.tsx` render-time reassign, `chat.tsx` setState-in-effect) predate this branch and were left alone. Under reduced motion the loader never mounts at all — `useAnswerStream` already short-circuits to the finished answer, so there is no wait to narrate; the card's own reduced-motion behaviour exists but is unreachable. Rainbow tokens are scoped to `.plan-loader`; nothing outside the card changes hue.
+
 ## 2026-08-09 11:55 BRT · Joaquim · main/MCP integration branch
 
 **Done:** created `joaquim/chore/integrate-main-mcp` from current `main` (`afb9a90`) in an isolated worktree and merged `joaquim/feat/agent-mcp`. `.gitignore` and this handoff merged automatically; `pnpm-lock.yaml` was regenerated from the merged workspace. Root tests pass (**132 tests**), root typecheck passes, and `pnpm --filter @mazal/mcp test` passes (**36 tests**, including Vercel bundle coverage). `pnpm sim:eyeball` and `pnpm sim:backtest` pass without changing `docs/backtest-results.md`.
