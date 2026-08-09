@@ -550,3 +550,61 @@ describe('the fit reads the signal that carries the shape', () => {
     expect(got.vMax).toBeGreaterThan(0);
   });
 });
+
+describe('the fit does not claim a ceiling it never tested', () => {
+  const prior = priorCurve({ cpc: 1.2, cvr: 0.02, typicalSpend: 100 });
+
+  it('caps k at twice the largest spend actually seen', () => {
+    // A near-straight stretch of curve fits equally well under any large k, and
+    // the fit will happily pick one — which reads downstream as "this still
+    // scales" and pulls money into a region the data never visited.
+    const truth: ResponseCurve = { vMax: 500, k: 9000, alpha: 1, n: 0, source: 'prior' };
+    const levels = [30, 45, 60, 80, 100];
+    const days = Array.from({ length: 30 }, (_, i) => {
+      const spend = levels[i % levels.length]!;
+      const clicks = Math.round(valueAt(truth, spend) * 200);
+      return {
+        date: `2026-06-${String(i + 1).padStart(2, '0')}`,
+        campaignId: 'c1',
+        spend,
+        impressions: clicks * 90,
+        reach: clicks * 60,
+        clicks,
+        addToCarts: Math.round(clicks * 0.08),
+        checkoutsInitiated: Math.round(clicks * 0.04),
+        purchases: Math.round(valueAt(truth, spend)),
+        revenue: 0,
+      };
+    });
+
+    const got = fitCurve(days, prior);
+    expect(got.k).toBeLessThanOrEqual(100 * 2 + 1e-9);
+  });
+
+  it('reports how much of the movement it explains', () => {
+    const truth: ResponseCurve = { vMax: 8, k: 120, alpha: 1, n: 0, source: 'prior' };
+    const levels = [40, 70, 110, 160, 220];
+    const clean = Array.from({ length: 30 }, (_, i) => {
+      const spend = levels[i % levels.length]!;
+      const v = valueAt(truth, spend);
+      return {
+        date: `2026-06-${String(i + 1).padStart(2, '0')}`,
+        campaignId: 'c1',
+        spend,
+        impressions: 0,
+        reach: 0,
+        clicks: 0,
+        addToCarts: 0,
+        checkoutsInitiated: 0,
+        purchases: v,
+        revenue: 0,
+      };
+    });
+
+    const got = fitCurve(clean, prior);
+    // A curve that explains a noiseless series should be near 1.
+    expect(got.quality).toBeGreaterThan(0.95);
+    // And a prior, which explains nothing, records no quality at all.
+    expect(fitCurve([], prior).quality).toBeUndefined();
+  });
+});
