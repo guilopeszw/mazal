@@ -17,7 +17,7 @@ type Template = Omit<Action, 'id' | 'expectedEffect'>;
 const PLAYBOOK: Record<FaultKind, Template[]> = {
   none: [],
   stockout: [
-    { title: 'Pause the campaign until stock is back', change: 'Set the campaign to paused', confidence: 'high', reversible: true, actor: 'mazal' },
+    { title: 'Pause the campaign until stock is back', change: 'Set the campaign to paused', confidence: 'high', reversible: true, actor: 'mazal', execution: { op: 'pause_campaign' } },
     { title: 'Hide the out-of-stock variant', change: 'Remove the sold-out variant from the product page', confidence: 'high', reversible: true, actor: 'seller' },
   ],
   eta_shock: [
@@ -32,11 +32,11 @@ const PLAYBOOK: Record<FaultKind, Template[]> = {
      * convert until the promise changes. Stopping that is squarely something
      * Mazal can do.
      */
-    { title: 'Pause the campaign until the ETA recovers', change: 'Set the campaign to paused', confidence: 'medium', reversible: true, actor: 'mazal' },
+    { title: 'Pause the campaign until the ETA recovers', change: 'Set the campaign to paused', confidence: 'medium', reversible: true, actor: 'mazal', execution: { op: 'pause_campaign' } },
   ],
   creative_fatigue: [
     { title: 'Refresh the creative', change: 'Rotate in a new primary image and headline', confidence: 'high', reversible: true, actor: 'seller' },
-    { title: 'Cap the frequency', change: 'Set a frequency cap of 3 per week and expand the audience', confidence: 'medium', reversible: true, actor: 'mazal' },
+    { title: 'Cap the frequency', change: 'Set a frequency cap of 3 per week and expand the audience', confidence: 'medium', reversible: true, actor: 'mazal', execution: { op: 'set_frequency_cap', perWeek: 3 } },
   ],
   price_too_high: [
     { title: 'Test a lower price point', change: 'Reduce the listed price toward the category median', confidence: 'medium', reversible: true, actor: 'seller' },
@@ -48,10 +48,10 @@ const PLAYBOOK: Record<FaultKind, Template[]> = {
   ],
   pixel_break: [
     { title: 'Verify the pixel before spending another real', change: 'Check the purchase event is firing, and the account is not restricted', confidence: 'high', reversible: true, actor: 'seller' },
-    { title: 'Pause spend until tracking is confirmed', change: 'Set the campaign to paused', confidence: 'high', reversible: true, actor: 'mazal' },
+    { title: 'Pause spend until tracking is confirmed', change: 'Set the campaign to paused', confidence: 'high', reversible: true, actor: 'mazal', execution: { op: 'pause_campaign' } },
   ],
   budget_cap: [
-    { title: 'Raise the bid or accept lower volume', change: 'Increase the bid cap, or hold the budget and expect fewer impressions', confidence: 'medium', reversible: true, actor: 'mazal' },
+    { title: 'Raise the bid or accept lower volume', change: 'Increase the daily budget by 20%, or hold it and expect fewer impressions', confidence: 'medium', reversible: true, actor: 'mazal', execution: { op: 'set_daily_budget', multiplier: 1.2 } },
   ],
   thin_pdp: [
     { title: 'Add product photos', change: 'Bring the product page to at least six images, including one in use', confidence: 'medium', reversible: true, actor: 'seller' },

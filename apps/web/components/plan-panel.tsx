@@ -30,7 +30,12 @@ export function PlanPanel({
   const [mode, setMode] = useState<Mode>("choice");
   const [off, setOff] = useState<ReadonlySet<string>>(new Set());
   const [busy, setBusy] = useState(false);
-  const [receipt, setReceipt] = useState<{ code: string; count: number } | null>(null);
+  const [receipt, setReceipt] = useState<{
+    code: string;
+    count: number;
+    mode: "simulated" | "live";
+    results: { id: string; detail: string; ok: boolean }[];
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const selected = runnable.filter((a) => !off.has(a.id));
@@ -53,8 +58,17 @@ export function PlanPanel({
         body: JSON.stringify({ actions: selected }),
       });
       if (!res.ok) throw new Error(`execute returned ${res.status}`);
-      const data = (await res.json()) as { receipt: string };
-      setReceipt({ code: data.receipt, count: selected.length });
+      const data = (await res.json()) as {
+        receipt: string;
+        mode: "simulated" | "live";
+        results?: { id: string; detail: string; ok: boolean }[];
+      };
+      setReceipt({
+        code: data.receipt,
+        count: selected.length,
+        mode: data.mode ?? "simulated",
+        results: data.results ?? [],
+      });
     } catch {
       setError("Could not reach the execution log. Nothing was run.");
     } finally {
@@ -126,12 +140,26 @@ export function PlanPanel({
         {receipt ? (
           <div className="rounded-[10px] border border-line bg-sunken px-3.5 py-3 text-sm">
             <p className="tnum m-0 font-[560] text-ink">
-              Receipt {receipt.code} — {receipt.count} action{receipt.count === 1 ? "" : "s"} logged.
+              Receipt {receipt.code} — {receipt.count} action{receipt.count === 1 ? "" : "s"}{" "}
+              {receipt.mode === "live" ? "run" : "logged"}.
             </p>
+            {/*
+              * The mode comes from the server on every run and is never assumed
+              * here. "We paused your campaign" and "we wrote this down" are
+              * different claims, and only one of them is worth trusting.
+              */}
             <p className="m-0 mt-1 text-[13px] text-ink-soft">
-              Simulated. This build has no ad-platform client — the write went to an approval
-              log and nothing touched your account. The absence is the guarantee.
+              {receipt.mode === "live"
+                ? "Sent to Meta. Every action here is reversible, and Mazal will not raise a budget beyond the ceiling you set."
+                : "Simulated. This build has no ad-platform credentials — the write went to an approval log and nothing touched your account. The absence is the guarantee."}
             </p>
+            {receipt.results.length > 0 && (
+              <ul className="m-0 mt-2 list-disc pl-4 text-[13px] text-ink-soft">
+                {receipt.results.map((r) => (
+                  <li key={r.id}>{r.detail}</li>
+                ))}
+              </ul>
+            )}
           </div>
         ) : mode === "declined" ? (
           <p className="m-0 text-sm text-ink-soft">
@@ -171,8 +199,9 @@ export function PlanPanel({
               </button>
             </div>
             <p className="m-0 text-[12.5px] text-ink-faint">
-              Writes are simulated — this build has no ad-platform client. Running appends to
-              an approval log and returns a receipt.
+              Every action here is reversible, and nothing runs until you press the button.
+              Without ad-platform credentials this build only writes to an approval log — the
+              receipt says which it did.
             </p>
             {error && <p className="m-0 text-[13px] font-[540] text-warn">{error}</p>}
           </>
