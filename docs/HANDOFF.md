@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 01:33 BRT · E-agent (Joaquim) · planejamento de MCP, Deco e demo
+
+**Done:** auditoria completa do brief de E, decisões de arquitetura fechadas com o responsável e plano salvo em `docs/superpowers/plans/2026-08-09-e-agent.md`. Branch `joaquim/feat/agent-mcp` criada a partir de `main`; nenhuma implementação iniciada.
+
+**Next:** obter aprovação do plano e então gerar os onze PRDs autocontidos na ordem de execução.
+
+**Blocked / watch out:** as duas fixtures de demo atuais retornam diagnóstico saudável e plano vazio; A/B precisam substituí-las. `apps/web` ainda depende de D. A branch `stage` não existe no clone/remoto e o destino de integração precisa ser decidido pelo time.
+
 ## 2026-08-08 14:12 BRT · C-agent (ingest & contracts) · SAT-A handoff
 
 **Done:** `packages/contracts` complete (metrics + frozen types + tests), `packages/ingest` complete (`parseMetaCsv`, `parseEventLog`, `productCardSchema` + tests). Monorepo scaffolded.
