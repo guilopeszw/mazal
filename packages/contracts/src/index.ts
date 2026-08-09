@@ -340,6 +340,35 @@ export type BacktestReport = {
   n: number;
 };
 
+// ─── the allocator ───────────────────────────────────────────────────────
+
+/**
+ * Conversions per day as a function of daily spend, for one adset.
+ *
+ * `V(s) = vMax · s^α / (k^α + s^α)` — `vMax` is the ceiling, `k` the spend at
+ * which half of it is reached, `α` how sharply it bends. The engine holds `α`
+ * at 1: two free parameters is what a fortnight of history can identify, and at
+ * α ≤ 1 the curve is concave everywhere, which is what makes the allocation
+ * exactly solvable rather than approximately.
+ *
+ * This is the one object the whole feature rests on. Diminishing returns is why
+ * doubling a budget does not double sales; every seller half-knows it and none
+ * of them can see it.
+ */
+export type ResponseCurve = {
+  vMax: number;
+  k: number;
+  alpha: number;
+  /** Days of the campaign's own history behind the fit. 0 means pure prior. */
+  n: number;
+  /**
+   * Where the numbers came from, printed in the UI beside them. A curve that is
+   * mostly its category's prior must not be presented as if the seller's own
+   * campaign had earned it.
+   */
+  source: 'prior' | 'blended' | 'fitted';
+};
+
 // ─── metrics (re-export) ─────────────────────────────────────────────────
 
 export {

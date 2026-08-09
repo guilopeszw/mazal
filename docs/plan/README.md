@@ -47,7 +47,7 @@ Anything below #5 is the demo itself and is not on the ladder.
 | **B** | `packages/data`, `packages/sim` | [B-data.md](B-data.md) |
 | **C** | `packages/ingest`, `packages/contracts` | [C-ingest.md](C-ingest.md) |
 | **D** | `apps/web` | [D-frontend.md](D-frontend.md) |
-| **E** | `apps/mcp`, deck, demo | [E-agent.md](E-agent.md) |
+| **E** | `apps/mcp`, optional Meta Ads MCP adapter, deck, demo | [E-agent.md](E-agent.md) |
 
 Roles are ownership, not walls — but nobody edits another package without saying so first. Work lands on `stage`, and `stage` merges to `main` at block boundaries — the rules are in [`AGENTS.md`](../../AGENTS.md#branches). `packages/contracts` is frozen after SAT-A and changes there need all-hands agreement, because everyone is coding against it.
 
@@ -82,6 +82,7 @@ The team does not start at the same hour. Two load transfers exist for when that
 | **The simulator grades its own homework** | A and B never read each other's code, and the shared vocabulary is `FaultKind` in `packages/contracts`, so neither package imports the other. Held-out set. The method goes on the slide openly. |
 | **The frontend eats the weekend** | D mocks against the frozen contract from minute one and never waits on the engine. C joins D at SUN-A. If it still slips, the MCP connection in deco Studio is a complete demo path on its own. |
 | **Scope creep to other channels** | Meta only. "Out of scope" is a slide, not an apology. |
+| **Meta MCP integration consumes the demo window** | Keep it read-only, feature-flagged, and behind the stable CSV/fixture path. It is a bonus source of live data, not a prerequisite for the Mazal MCP or Deco demo. |
 | **Judges see an LLM wrapper** | Lead with the deterministic engine and the backtest, not the chat. The model narrates; it never computes. |
 | **Both cases half-built** | Case #2 is the emotional peak. If only one can be finished, finish Case #2. |
 | **A bad backtest number** | Report it as measured. No tuning against the held-out set after looking at it. A disclosed weak class with a stated fix reads as rigour; a suspicious 99% gets interrogated. |

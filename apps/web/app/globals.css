@@ -55,26 +55,26 @@
   --color-accent-ink: #265a3b;
 
   /**
-   * The identity's gold, at the weight the palette gives it — half the green's.
-   * It marks a reference value: the benchmark, the break-even threshold. Not a
-   * judgement, which is why it is not the red.
+   * There is no third hue.
    *
-   * #C9963C itself appears only in the dark theme. It is a mid-tone — 2.2:1 on
-   * the cream — so on paper it cannot carry either a thin rule or a word. Both
-   * light values are that gold walked down its own hue until it clears the bar
-   * for the job: #99722E as a mark (3.3:1, the 1.4.11 threshold for a non-text
-   * UI element), #795A24 as text (5.3:1 on the ground, 4.7:1 on the sunken).
+   * A gold ramp lived here to mark reference values — the benchmark column, the
+   * break-even threshold. It read well, and the reasoning was sound: a threshold
+   * is not a judgement, so it should not be the red. But the product owner's rule
+   * is one accent, and the reference marks already have a colour that carries the
+   * same meaning without adding a hue: none. They are drawn in ink, and the only
+   * two coloured things on screen stay the verdict's green and the leak's red.
+   *
+   * The green/ink/red split is the whole legend, and a seller can hold it.
    */
-  --color-ref: #99722e;
-  --color-ref-soft: #f4e9d3;
-  --color-ref-ink: #795a24;
 
   /**
    * A judgement against the seller's interest gets its own colour, used once.
-   * Aniline stamp red rather than a signal red — it belongs to the warm paper.
+   * A true red, not a terracotta — an orange-leaning warning reads as a brand
+   * accent rather than a caution, and this is the one mark on screen that has to
+   * read as "check this".
    */
-  --color-warn: #a63d28;
-  --color-warn-soft: #f5e3dc;
+  --color-warn: #c62222;
+  --color-warn-soft: #fdecec;
 
   /** Newsreader for the wordmark, the headline, and the verdict. Nothing else. */
   --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
@@ -115,12 +115,8 @@
       --color-accent-soft: #17301f;
       --color-accent-ink: #8ed0a5;
 
-      --color-ref: #d9ae5c;
-      --color-ref-soft: #2c2415;
-      --color-ref-ink: #e6c688;
-
-      --color-warn: #e08268;
-      --color-warn-soft: #2e1a14;
+      --color-warn: #ff7d70;
+      --color-warn-soft: #2c1413;
     }
   }
 
@@ -140,12 +136,8 @@
     --color-accent-soft: #17301f;
     --color-accent-ink: #8ed0a5;
 
-    --color-ref: #d9ae5c;
-    --color-ref-soft: #2c2415;
-    --color-ref-ink: #e6c688;
-
-    --color-warn: #e08268;
-    --color-warn-soft: #2e1a14;
+    --color-warn: #ff7d70;
+    --color-warn-soft: #2c1413;
   }
 
   html {
@@ -218,4 +210,89 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+/**
+ * Chart tokens — the bklit components in `components/charts` read these.
+ *
+ * The installer shipped a neutral grey ramp defined only under `:root`, with a
+ * `.dark` override behind `@custom-variant dark (&:is(.dark *))` — a class this
+ * app never sets — so every chart drew its light palette in dark mode. Replaced
+ * wholesale.
+ *
+ * Every value here is a reference to an identity token above; none carries a
+ * colour of its own. The identity tokens are the ones defined in all three
+ * theme states (bare `@theme`, the `prefers-color-scheme` block, and
+ * `[data-theme="dark"]`), and a `var()` reference resolves where it is *used*,
+ * so every chart token is defined in the default un-stamped state and follows
+ * the theme by construction — there is no second ramp to keep in step.
+ *
+ * One accent, as everywhere else: green is the conclusion, red is the leak,
+ * and series otherwise separate on the ink ramp by weight, dash, and opacity.
+ * No hue lives here that the identity does not already own.
+ */
+:root {
+  --chart-1: var(--color-ink);
+  --chart-2: var(--color-ink-soft);
+  --chart-3: var(--color-ink-faint);
+  --chart-4: var(--color-line-strong);
+  --chart-5: var(--color-line);
+
+  --chart-background: var(--color-raised);
+  --chart-foreground: var(--color-ink);
+  --chart-foreground-muted: var(--color-ink-soft);
+  /* Axis dates and radar labels are 11–12px text on the raised card, so this
+     is ink-soft rather than ink-faint: ink-faint reads ~3.5:1 against raised
+     and fails the 4.5:1 text bar; ink-soft clears it in both themes. */
+  --chart-label: var(--color-ink-soft);
+  --chart-grid: var(--color-line);
+  --chart-crosshair: var(--color-ink-soft);
+  --chart-brush-border: var(--color-line-strong);
+
+  --chart-line-primary: var(--color-accent);
+  --chart-line-secondary: var(--color-ink-soft);
+  --chart-indicator-color: var(--color-accent);
+  --chart-indicator-secondary-color: var(--color-ink-soft);
+
+  --chart-tooltip-background: var(--color-ink);
+  --chart-tooltip-foreground: var(--color-ground);
+  --chart-tooltip-muted: var(--color-line-strong);
+  --chart-marker-background: var(--color-raised);
+  --chart-marker-border: var(--color-line-strong);
+  --chart-marker-foreground: var(--color-ink);
+  --chart-marker-badge-background: var(--color-accent-soft);
+  --chart-marker-badge-foreground: var(--color-accent-ink);
+  --chart-segment-background: var(--color-accent-soft);
+  --chart-segment-line: var(--color-accent);
+
+  --legend: var(--color-raised);
+  --legend-foreground: var(--color-ink);
+  --legend-muted: var(--color-sunken);
+  --legend-muted-foreground: var(--color-ink-soft);
+  --legend-track: var(--color-sunken);
+
+  /* Names the components inherited from their home design system. */
+  --foreground: var(--color-ink);
+  --background: var(--color-raised);
+  --border: var(--color-line);
+  --muted-foreground: var(--color-ink-soft);
+  --color-muted: var(--color-sunken);
+}
+
+/* The chart-token utility classes the components use (`text-chart-label`,
+   `bg-legend-track`, …). `inline` keeps each one a live reference, so the
+   utilities move with the theme like everything above. */
+@theme inline {
+  --color-chart-label: var(--chart-label);
+  --color-chart-tooltip-background: var(--chart-tooltip-background);
+  --color-chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --color-chart-tooltip-muted: var(--chart-tooltip-muted);
+  --color-legend: var(--legend);
+  --color-legend-foreground: var(--legend-foreground);
+  --color-legend-muted: var(--legend-muted);
+  --color-legend-muted-foreground: var(--legend-muted-foreground);
+  --color-legend-track: var(--legend-track);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-border: var(--border);
+  --color-muted-foreground: var(--muted-foreground);
 }
