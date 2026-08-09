@@ -235,3 +235,34 @@ test.each([undefined, 'Bearer test-taken'])(
     expect(await response.text()).toBe('Unauthorized');
   },
 );
+
+test('keeps one action log across requests when the caller does not supply one', async () => {
+  // Built per request, the array `execute_plan` appended to was discarded the
+  // moment the response ended — so every receipt it returned pointed at a log
+  // that no longer existed. The test above pins that a caller CAN still ask for
+  // per-request isolation; this pins that the default does not do it silently.
+  const seen = new Set<unknown>();
+  const app = createMcpHandler({
+    bearerToken: 'test-token',
+    registerTools: (_server, actionLog) => {
+      seen.add(actionLog);
+    },
+  });
+
+  for (const id of [1, 2]) {
+    const response = await app.request('/mcp', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json, text/event-stream',
+        Authorization: 'Bearer test-token',
+        'Content-Type': 'application/json',
+        Host: 'localhost',
+        'MCP-Protocol-Version': '2025-06-18',
+      },
+      body: JSON.stringify({ ...handshake, id }),
+    });
+    expect(response.status).toBe(200);
+  }
+
+  expect(seen.size).toBe(1);
+});

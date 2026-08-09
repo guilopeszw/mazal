@@ -19,17 +19,19 @@ import {
   diagnose,
   fitCurve,
   priorCurve,
+  reallocate,
   valueAt,
   measurability,
   predict,
   profileCard,
 } from "@mazal/engine";
-import { demoCases } from "./fixtures.ts";
+import { demoAccount, demoCases } from "./fixtures.ts";
 import {
   EVENT_LABELS,
   denominatorOf,
   formatBRL,
   formatCount,
+  formatMoney,
   formatDate,
   formatDeviation,
   formatMetric,
@@ -51,7 +53,7 @@ import { provenanceFor } from "./reference.ts";
  * budget arithmetic the contract has no vocabulary for.
  */
 
-export type AnswerKey = "diagnose" | "atc" | "predict";
+export type AnswerKey = "diagnose" | "atc" | "predict" | "allocate";
 
 export type VerdictSegment = { text: string; tone?: "good" | "bad" };
 
@@ -100,6 +102,43 @@ export type AnswerCharts = {
    * carries its own provenance, and it is not drawn at all unless the campaign
    * has earned it.
    */
+  /**
+   * The reallocation: where the seller's money is, where it should be, and the
+   * difference. Held at the same total by construction — `reallocate` reads the
+   * budget off the current spends and redistributes exactly that.
+   */
+  moves?: {
+    budget: string;
+    gain: string;
+    gainMonthly: string;
+    rows: {
+      product: string;
+      from: string;
+      to: string;
+      delta: string;
+      direction: "up" | "down" | "hold";
+      /** Reais of margin on one sale of this product. */
+      value: string;
+      /** Conversions per day this product's own days support at its ceiling. */
+      basis: string;
+    }[];
+    summary: string;
+  };
+  /**
+   * Each product's daily spend across the flight, on one time axis.
+   *
+   * This is the evidence for the advice above it rather than decoration. A
+   * response curve is a claim about what a different budget would do, and the
+   * only reason Mazal can make one here is that these budgets moved — the
+   * fit refuses when they have not. Showing the walk is showing why it is
+   * allowed to speak.
+   */
+  budgetWalk?: {
+    /** One row per date, one key per product, plus the date itself. */
+    points: Record<string, string | number>[];
+    series: { key: string; label: string }[];
+    summary: string;
+  };
   money?: {
     /** Sampled along the fitted curve. Profit in BRL per day. */
     points: { spend: number; profit: number }[];
@@ -513,6 +552,159 @@ export function buildUploadAnswer(
   });
 }
 
+/**
+ * The Allocator's answer: the seller's own money, in the wrong place.
+ *
+ * This is the only answer that is not about one campaign. Everything else asks
+ * what happened to a flight; this asks where a wallet should sit across three
+ * products that do not convert into the same reais — a R$200 blender and a R$30
+ * broom share a budget and nothing else.
+ *
+ * Every number is engine output. The curves are fitted here from the fixture's
+ * own days, exactly as they would be from an uploaded account, and if any of
+ * them came back as anything but `fitted` the answer would be refusing to speak
+ * rather than guessing — `pnpm sim:fixtures` fails the build if that happens.
+ */
+function allocateAnswer(): Answer {
+  const funded = demoAccount.products.map((p) => {
+    const m = benchmarks[p.card.category].metrics;
+    // CPM and CTR are published; CPC is the two of them rearranged.
+    const cpc = m.ctr.median > 0 ? m.cpm.median / 1000 / m.ctr.median : 0;
+    const spent = p.days.filter((d) => d.spend > 0);
+    const typical = spent.reduce((sum, d) => sum + d.spend, 0) / Math.max(1, spent.length);
+    return {
+      id: p.id,
+      card: p.card,
+      curve: fitCurve(p.days, priorCurve({ cpc, cvr: m.cvr.median, typicalSpend: typical })),
+      valuePerConversion: p.card.price * p.card.grossMargin,
+      spend: p.currentSpend,
+    };
+  });
+
+  const advice = reallocate(funded, {});
+  const nameOf = (id: string) =>
+    (funded.find((f) => f.id === id)?.card.category ?? id).replace(/_/g, " ");
+
+  const rows = advice.best
+    .map((b) => {
+      const f = funded.find((x) => x.id === b.id)!;
+      const delta = b.spend - f.spend;
+      return {
+        product: nameOf(b.id),
+        from: formatMoney(f.spend),
+        to: formatMoney(b.spend),
+        delta: `${delta > 0 ? "+" : delta < 0 ? "−" : ""}${formatMoney(Math.abs(delta))}`,
+        direction: (delta > 1 ? "up" : delta < -1 ? "down" : "hold") as "up" | "down" | "hold",
+        value: formatMoney(f.valuePerConversion),
+        basis: `${f.curve.n} days`,
+      };
+    })
+    .sort((a, b) => (a.direction === "up" ? -1 : b.direction === "up" ? 1 : 0));
+
+  // What actually crosses between products: the money leaving, which by
+  // construction equals the money arriving.
+  const moved = advice.moves
+    .filter((m) => m.delta < 0)
+    .reduce((sum, m) => sum - m.delta, 0);
+
+  /**
+   * The spend walk. Read straight off the fixture's days — no rate is computed
+   * here, and the series keys are the product ids so nothing has to be matched
+   * back up by label.
+   */
+  const dates = funded[0]!.card ? demoAccount.products[0]!.days.map((d) => d.date) : [];
+  const budgetWalk = {
+    points: dates.map((date, i) => {
+      const row: Record<string, string | number> = { date };
+      for (const p of demoAccount.products) row[p.id] = p.days[i]?.spend ?? 0;
+      return row;
+    }),
+    series: demoAccount.products.map((p) => ({ key: p.id, label: nameOf(p.id) })),
+    summary: `Each product's daily budget over the flight. Mazal can only draw a curve for a product whose budget actually moved — these span more than 2× from their lowest day to their highest, which is what makes the advice above possible at all. A budget held flat carries no evidence about any other budget, and Mazal says so rather than guessing.`,
+  };
+
+  const moves = {
+    budget: formatMoney(advice.budget),
+    gain: formatMoney(advice.gain),
+    gainMonthly: formatMoney(advice.gain * 30),
+    rows,
+    summary: `Three products sharing ${formatMoney(advice.budget)} a day. The split that earns most at that same total is worth ${formatMoney(advice.gain)} a day more than the one running now — the money moves, the budget does not.`,
+  };
+
+  return {
+    asked: "Where should my budget go?",
+    verdict: [
+      { text: "You are leaving " },
+      { text: `${formatMoney(advice.gain * 30)} ` },
+      { text: "a month on the table. Same budget, different split." },
+    ],
+    said: `Your three products do not earn the same amount per sale, so the one that converts most often is not the one worth the most money. ${rows[0]!.product} earns ${rows[0]!.value} a sale and is still hungry; the others have stopped paying for what they get. Moving ${formatMoney(moved)} between them changes nothing about what you spend.`,
+    /**
+     * No table. `MovesFigure` already is one, and repeating it underneath said
+     * the same thing twice — in red, because `hit` paints a row with the warning
+     * colour. Red in this product means the one stage that broke; a product
+     * that should spend less has not broken, it is full.
+     */
+    rows: [],
+    /**
+     * The reallocation as a plan the seller approves, and the guarantee made
+     * visible in the process.
+     *
+     * A reallocation is money off some products and onto another. Mazal can do
+     * the first half and structurally cannot do the second: `ExecutableOp` has
+     * `reduce_daily_budget` with a multiplier of at most 1 and nothing that
+     * raises. So the cuts arrive as `actor: 'mazal'` with a real operation
+     * attached, and the raise arrives as `actor: 'seller'` — the plan panel
+     * already renders that as "yours to do — Mazal can't".
+     *
+     * That split is not a limitation to apologise for. It is the clearest
+     * statement the product makes: Mazal will take money off what is full, and
+     * the decision to spend more is always the seller's.
+     */
+    plan: {
+      actions: advice.best.flatMap((b): Action[] => {
+        const f = funded.find((x) => x.id === b.id)!;
+        const delta = b.spend - f.spend;
+        if (Math.abs(delta) < 1) return [];
+        const name = nameOf(b.id);
+
+        if (delta < 0) {
+          return [{
+            id: `allocate.reduce.${b.id}`,
+            title: `Take ${formatMoney(-delta)} a day off ${name}`,
+            // Not the numbers again — the row below already prints them. This
+            // says why, which is the only thing a seller cannot read off the
+            // arrow.
+            change: `It is past the point where another real earns one back. The money does more on ${nameOf(advice.moves.find((mv) => mv.delta > 0)?.id ?? b.id)}.`,
+            expectedEffect: { metric: 'dailyBudget', from: f.spend, to: b.spend },
+            confidence: 'medium' as const,
+            reversible: true,
+            actor: 'mazal' as const,
+            execution: {
+              op: 'reduce_daily_budget' as const,
+              multiplier: Math.min(1, b.spend / f.spend),
+            },
+          }];
+        }
+
+        return [{
+          id: `allocate.raise.${b.id}`,
+          title: `Put ${formatMoney(delta)} a day onto ${name}`,
+          change: `This is the only product still earning more than it costs at the margin. Mazal never raises a budget, so this one is yours to do.`,
+          expectedEffect: { metric: 'dailyBudget', from: f.spend, to: b.spend },
+          confidence: 'medium' as const,
+          reversible: true,
+          actor: 'seller' as const,
+        }];
+      }),
+      projected: `${formatMoney(advice.currentProfit)} → ${formatMoney(advice.bestProfit)} a day, at the same spend`,
+      assumption: `Every figure comes from each product's own curve, fitted to ${funded[0]!.curve.n} days. Mazal can make the reductions; raising a budget is a decision to spend more and stays yours. The two halves are the same size, so approving only the cuts lowers your spend rather than moving it.`,
+    },
+    charts: { moves, budgetWalk },
+    note: `Curves fitted from each product's own ${funded[0]!.curve.n} days of spending, which varied by more than 2× — a budget that never moved carries no evidence about any other budget, and Mazal declines rather than guessing. Measured against known curves on 200 simulated accounts this captures 71% of the achievable profit, against 25% for an even split; docs/allocator-results.md has the rest, including what it does not do.`,
+  };
+}
+
 export function buildAnswers(): Record<AnswerKey, Answer> {
   const { case1, case2 } = demoCases;
 
@@ -709,5 +901,10 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
     note: replicationNote + silentNote,
   };
 
-  return { diagnose: diagnoseAns, atc: atcAnswer, predict: predictAnswer };
+  return {
+    diagnose: diagnoseAns,
+    atc: atcAnswer,
+    predict: predictAnswer,
+    allocate: allocateAnswer(),
+  };
 }

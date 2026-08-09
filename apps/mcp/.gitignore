@@ -1,2 +1,3 @@
 .vercel
-/api/mcp.mjs
+# The build now writes Vercel's Build Output API tree, which `.vercel` already
+# covers. `/api/mcp.mjs` was the old target and no longer exists.

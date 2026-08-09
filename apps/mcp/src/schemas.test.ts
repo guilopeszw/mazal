@@ -73,3 +73,27 @@ describe('public tool schemas', () => {
     expect(productCardSchema.safeParse({ ...apparelCard, paymentMethods: [] }).success).toBe(false);
   });
 });
+
+test('rejects an unbounded day series at the tool boundary', () => {
+  // Every array here was unbounded, so an authenticated caller could post a
+  // million CampaignDays and make the engine chew through all of them inside one
+  // request. The web route has capped its own sink since the day it was written.
+  const days = healthyDays();
+  const tooMany = Array.from({ length: 1101 }, () => days[0]!);
+  expect(diagnoseCampaignInputSchema.safeParse({
+    days: tooMany,
+    card: apparelCard,
+    events: [],
+    reference: { kind: 'benchmark' },
+  }).success).toBe(false);
+});
+
+test('rejects a string long enough to be a payload', () => {
+  const days = healthyDays();
+  expect(diagnoseCampaignInputSchema.safeParse({
+    days: [{ ...days[0]!, campaignId: 'x'.repeat(121) }],
+    card: apparelCard,
+    events: [],
+    reference: { kind: 'benchmark' },
+  }).success).toBe(false);
+});

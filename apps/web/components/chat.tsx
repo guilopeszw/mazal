@@ -20,11 +20,34 @@ const CHIPS: { key: AnswerKey; text: string }[] = [
   { key: "diagnose", text: "My ROAS dropped this week" },
   { key: "atc", text: "Why is my ATC rate low?" },
   { key: "predict", text: "Should I launch this campaign?" },
+  { key: "allocate", text: "Where should my budget go?" },
 ];
 
+/**
+ * Which of the three answers a typed question gets.
+ *
+ * Chips are exact, but a seller types, and so does whoever is presenting. The
+ * first version matched `launch|should i|predict` and nothing else, so "will
+ * this campaign work before I spend?" — the phrasing in `docs/demo-runbook.md`
+ * — fell through to the diagnosis and silently answered a different question.
+ * It looked fine on screen, which is what made it dangerous.
+ *
+ * Both languages, because the sellers this is for do not ask in English. Order
+ * matters: prediction is checked first, since "vale a pena investir mais nesse
+ * carrinho" is about the future and mentions a cart.
+ */
 function routeOf(question: string): AnswerKey {
-  if (/launch|should i|predict/i.test(question)) return "predict";
-  if (/atc|add.?to.?cart/i.test(question)) return "atc";
+  // Allocation is checked first: "where should my budget go" is about the
+  // future and would otherwise be caught by the prediction pattern.
+  const split =
+    /budget|orçamento|orcamento|allocat|realloc|split|divid|where should|onde (colocar|investir)|spread|between (my )?(products|campaigns)|entre (os )?produtos|distribu/i;
+  const forward =
+    /launch|should i|predict|before i spend|worth it|is it worth|will (this|it) work|going to work|lan(ç|c)ar|vale a pena|antes de (gastar|investir)|devo|vai funcionar/i;
+  const cart = /atc|add.?to.?cart|added to cart|carrinho|adiciona/i;
+
+  if (split.test(question)) return "allocate";
+  if (forward.test(question)) return "predict";
+  if (cart.test(question)) return "atc";
   return "diagnose";
 }
 

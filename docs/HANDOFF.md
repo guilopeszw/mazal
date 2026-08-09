@@ -15,6 +15,22 @@ Entry format:
 
 ---
 
+## 2026-08-09 18:10 BRT · Guilherme's agent · end of the build day
+
+**Done:** `main` is at `2350fd4` and green — 169 tests, `@mazal/mcp` 39, typecheck (now including `apps/mcp`), `next build`, and both demo fixtures pass their beat guard. Verified from a fresh `--frozen-lockfile` checkout, not from this working tree.
+
+Landed today, newest first: per-entity margin in the Allocator; question routing fixed; MCP bounds, one shared action log, and a root typecheck that actually runs `apps/mcp`; claim 10 rewritten; `docs/demo-runbook.md`; the Allocator itself; the four bklit charts; the rim-light plan loader; the Deco MCP config; branch protection on `main`.
+
+**Two bugs worth remembering, both found by running the thing rather than reading it:**
+
+`routeOf` matched `launch|should i|predict` and nothing else, so *"Will this campaign work before I spend?"* — the phrasing in our own runbook — fell through to the diagnosis and rendered a complete, confident answer to a question nobody asked. Found by driving the three beats through headless Chrome and noticing beat 3 returned beat 1's payload. The chips always worked; it only bit someone typing, which on stage is the presenter.
+
+An adversarial review of `allocate` found six ways to break it, four of which broke the spend guarantee — a NaN budget produced a split of R$24,494,697/day and `reallocate` rendered it as a move; `alpha = 2` spent R$574 of a R$300 budget. All reproduced, all fixed, all pinned by regression tests. **I had merged before that review landed**, on my own audit, because the reviewers had gone idle twice. My audit covered the frontend axes and caught a real contrast bug; it did not probe the math adversarially, which was exactly what I had delegated. Do not merge on a partial audit when a review is outstanding.
+
+**Next:** the Allocator has no UI. `reallocate` is exported, tested, and called by nothing. The blocker is data, not code — every fixture is a single campaign at a flat daily budget, and a campaign at a flat budget contains no evidence about any other budget (`fitCurve` returns `k ≈ R$1` on 1.15x spread and now refuses, labelling `blended` rather than `fitted`). To put a number on screen, `packages/sim` needs to generate a multi-product account with real spend variation. That is the single highest-value next task.
+
+**Blocked / watch out:** Vercel — `mazal-mcp` has Deployment Protection on and it does not turn off from the project panel; the MCP is deployed and correct but not publicly reachable. `mazal-mcp.vercel.app` belongs to someone else; the real host is `mazal-mcp-guilopeszws-projects.vercel.app`. Vercel is Guilherme's alone — no one else has project access. Deco Studio needs two interactive prompts on the Mac (`/mcp`: approve, then authenticate) and neither can be done remotely. Four contract additions are announced and still unapproved by C. `main` is now protected: PRs only, and a commit authored by anyone without Vercel project access blocks the production deploy.
+---
 ## 2026-08-09 16:15 BRT · Bringel's agent · the chat shell's chrome, and stage→main
 
 **Done:** three things, in this order.
@@ -35,6 +51,22 @@ Open and unmerged: **`fix/sidebar-narrow-overlay`** (off `stage`, one commit `73
 - **`pnpm --filter web lint` reports 46 problems (41 errors, 5 warnings) and that is the floor, not a regression.** They are all in the vendored `components/charts` library. Verified by running eslint against a pristine `origin/stage` worktree: same 46. The two long-standing ones are still there too — `answer.tsx` render-time reassign, and the theme `setState`-in-effect, which now lives in `sidebar.tsx` because the toggle moved.
 - **`--rail` is the coupling between `chat.tsx` and `sidebar.tsx`.** The composer's dock is `fixed`, so it is positioned against the viewport and no ancestor's padding reaches it — it reads `left-[var(--rail)]` directly. Change the rail's width in one place and the dock silently stops meeting the panel's edge. It is padding rather than a transform on purpose: a transformed ancestor would become that dock's containing block and overflow the right edge.
 - **None of this chrome is visually verified.** There is no browser automation in the repo, so the sidebar, the push, the FLIP and the hover swap were checked against the served markup and the generated CSS, not against a screen. Someone should look at it before the projector does.
+
+## 2026-08-09 19:20 BRT · Guilherme's agent · contract additions, reviewed and taken
+
+**Done:** the four additions below — five now, with `ResponseCurve.quality` — were sitting unapproved waiting on C. Guilherme's call: stop waiting, review them here. So they are reviewed rather than rubber-stamped, and two things came out of it.
+
+`'replicates' | 'inconsistent'` was written inline twice, on `LeverReplication` and on `CardFinding` — two places to change and two chances to disagree about what the strings mean. Extracted as `LeverEvidence`. And `SellerLeverName` was used by `SellerBenchmark` before it was declared; type hoisting made it compile and made it harder to read. Both fixed.
+
+The substantive check: every addition is additive — new exported types, no renames, no removals, nothing made required — and root typecheck is clean across every package with 174 tests green. The one change that can reject input the old type accepted is the `OlistCategory` narrowing, from `... | string` (which collapsed the union and typechecked nothing) to the 62-member generated union. Taken deliberately.
+
+`docs/contracts.md` now documents all six groups. It documented none of them before, which was the actual gap — `AGENTS.md` points at that file as "the frozen types and every package's public API", and it had been stale since SAT-A.
+
+**Next:** nothing. These are settled. If C disagrees with any of them later it is a rename or a revert, not a redesign.
+
+**Blocked / watch out:** `ExecutableOp` is the type the spend guarantee rests on. It is a closed union and must not grow a spend-raising member without a conversation — `packages/engine/src/execution.test.ts` fails the moment one appears, which is the intended behaviour and not a broken test.
+
+---
 
 ## 2026-08-09 15:50 BRT · Guilherme's agent · contract additions, announced late
 

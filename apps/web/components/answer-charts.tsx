@@ -240,3 +240,149 @@ export const RadarFigure = memo(function RadarFigure({
     </figure>
   );
 });
+
+/**
+ * The reallocation: where the money is, where it should be, and the difference.
+ *
+ * Deliberately a table rather than a chart. The seller's question is "how much
+ * do I move and to what", and a bar pair makes them read a length back into
+ * reais; the numbers are already the answer. The one graphic element is the
+ * bar under each row showing the two spends against the largest, which is there
+ * to make "this one is much bigger" legible at a glance rather than to be
+ * measured.
+ *
+ * Direction carries an arrow AND a word, never colour alone. Green marks money
+ * arriving because that is the verdict of the whole answer; money leaving is
+ * drawn in ink rather than red — it is a correction, not a leak, and red in this
+ * product means the one stage that broke.
+ */
+export const MovesFigure = memo(function MovesFigure({
+  chart,
+  rows,
+}: {
+  chart: NonNullable<AnswerCharts["moves"]>;
+  /** How many rows the reveal has reached. */
+  rows: number;
+}) {
+  const widest = Math.max(
+    ...chart.rows.map((r) => Math.max(brlToNumber(r.from), brlToNumber(r.to))),
+    1,
+  );
+
+  return (
+    <figure className="m-0">
+      <div className="flex flex-col">
+        {chart.rows.slice(0, rows).map((r) => (
+          <div key={r.product} className="border-b border-line px-4 py-3 last:border-b-0">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[14px] font-[560] capitalize">{r.product}</span>
+              <span className="tnum flex items-baseline gap-2 text-[13px]">
+                <span className="text-ink-faint">{r.from}</span>
+                <span className="text-ink-faint" aria-hidden="true">→</span>
+                <span className="font-[580]">{r.to}</span>
+              </span>
+            </div>
+
+            <div className="mt-1.5 flex items-center justify-between gap-3">
+              <span className="text-[12px] text-ink-soft">
+                {r.value} margin a sale · {r.basis} of history
+              </span>
+              <span
+                className={`tnum text-[12.5px] font-[560] ${
+                  r.direction === "up" ? "text-accent-ink" : "text-ink-soft"
+                }`}
+              >
+                {r.direction === "up" ? "↑ more" : r.direction === "down" ? "↓ less" : "hold"}
+                {r.direction === "hold" ? "" : ` ${r.delta}`}
+              </span>
+            </div>
+
+            {/* Two spends against the widest on screen. Ornament, not a measurement. */}
+            <div className="mt-2 flex h-[3px] w-full gap-[3px]" aria-hidden="true">
+              <span
+                className="h-full rounded-full bg-line-strong"
+                style={{ width: `${(brlToNumber(r.from) / widest) * 100}%` }}
+              />
+              <span
+                className={`h-full rounded-full ${r.direction === "up" ? "bg-accent" : "bg-ink-faint"}`}
+                style={{ width: `${(brlToNumber(r.to) / widest) * 100}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      {rows >= chart.rows.length && (
+        <figcaption className="px-4 py-3 text-[12.5px] text-ink-soft">{chart.summary}</figcaption>
+      )}
+    </figure>
+  );
+});
+
+/**
+ * The rows arrive already formatted, because everything in an `Answer` is a
+ * string the engine produced — the client never computes a number. The bar
+ * needs a length, so this reads the formatted value back rather than adding a
+ * second numeric field that could disagree with the one on screen.
+ */
+function brlToNumber(formatted: string): number {
+  const n = Number(formatted.replace(/[^0-9.,-]/g, "").replace(/\.(?=\d{3}\b)/g, "").replace(",", "."));
+  return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * Every product's daily budget on one time axis — the evidence for the advice.
+ *
+ * A response curve is a claim about what a *different* budget would do, and the
+ * only reason Mazal can make one is that these budgets moved. The fit refuses
+ * when they have not. So this is not decoration under the recommendation; it is
+ * the reason the recommendation is allowed to exist, and a seller who has never
+ * varied a budget can look at this and see what they would need.
+ *
+ * One accent still. Three series separated by opacity and dash rather than by
+ * inventing two more hues — the ranking is what matters, and the labels carry
+ * the identity.
+ */
+export const BudgetWalkFigure = memo(function BudgetWalkFigure({
+  chart,
+}: {
+  chart: NonNullable<AnswerCharts["budgetWalk"]>;
+}) {
+  const reduced = useReducedMotion();
+  const data = useMemo(
+    () => chart.points.map((p) => ({ ...p, date: `${p['date'] as string}T12:00:00` })),
+    [chart.points],
+  );
+
+  return (
+    <figure className="m-0" role="img" aria-label={chart.summary}>
+      <MotionConfig reducedMotion="user">
+        <div aria-hidden="true">
+          <AreaChart
+            data={data}
+            animationDuration={reduced ? 0 : 900}
+            margin={{ top: 22, right: 24, bottom: 34, left: 24 }}
+          >
+            <Grid horizontal numTicksRows={3} hideHorizontalEdgeLines />
+            {chart.series.map((s, i) => (
+              <Area
+                key={s.key}
+                dataKey={s.key}
+                // Green marks the product the plan above puts money onto; the
+                // others are drawn in ink. That is the same legend the rest of
+                // the product uses — green is the verdict, ink is everything
+                // else — rather than three hues nobody has to learn.
+                stroke={i === 0 ? "var(--color-accent)" : "var(--color-ink-faint)"}
+                fill={i === 0 ? "var(--color-accent)" : "var(--color-ink-faint)"}
+                strokeWidth={i === 0 ? 2 : 1.25}
+                fillOpacity={i === 0 ? 0.14 : 0.04}
+                showHighlight={false}
+              />
+            ))}
+            <XAxis numTicks={4} />
+          </AreaChart>
+        </div>
+      </MotionConfig>
+      <figcaption className="px-4 pb-3 text-[12.5px] text-ink-soft">{chart.summary}</figcaption>
+    </figure>
+  );
+});

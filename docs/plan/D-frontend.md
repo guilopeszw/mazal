@@ -93,7 +93,9 @@ Three controls, in this order and this wording:
 
 > **Run all · Edit first · I'll do it myself**
 
-Running calls `/api/execute`, which writes to a log and returns a receipt. Render the receipt and say plainly on screen that writes are simulated in this build. The honesty removes a whole category of risk and judges respect it.
+Running calls `/api/execute`, which returns a receipt carrying `mode: 'simulated' | 'live'`. Render the receipt and say plainly on screen which one it was — never infer it, and never assume. With no ad-platform credentials the mode is `simulated`: the log is written and nothing is touched, which is what a cold clone does and what the demo runs. With credentials and a valid 15-minute unlock it is `live` and Meta was actually called.
+
+"We paused your campaign" and "we wrote this down" are different claims and only one of them is worth trusting, so the screen reads the mode off the response rather than deciding it. The honesty removes a whole category of risk and judges respect it.
 
 ### The chat sidebar
 

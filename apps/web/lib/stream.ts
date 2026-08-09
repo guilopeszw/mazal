@@ -67,6 +67,8 @@ type StepKind =
   | "evidence"
   | "stages"
   | "stageRow"
+  | "moves"
+  | "moveRow"
   | "band"
   | "tableRow"
   | "note";
@@ -82,6 +84,8 @@ export type Reveal = {
   evidence: boolean;
   stages: boolean;
   stageRows: number;
+  moves: boolean;
+  moveRows: number;
   band: boolean;
   tableRows: number;
   note: boolean;
@@ -118,6 +122,18 @@ export function buildTimeline(answer: Answer): Step[] {
     for (let i = 0; i < answer.stages.length; i++) step("stageRow", TIMING.row);
   }
 
+  /**
+   * The reallocation gets its own beat rather than riding on `stages`.
+   *
+   * It very nearly rode on it: the section was gated behind `shown.stages`,
+   * which only ever becomes true when the answer HAS a funnel — and an
+   * allocation answer has none, so the whole thing would have rendered never.
+   */
+  if (answer.charts?.moves) {
+    step("moves", TIMING.block);
+    for (let i = 0; i < answer.charts.moves.rows.length; i++) step("moveRow", TIMING.row);
+  }
+
   if (answer.band) step("band", TIMING.block);
   for (let i = 0; i < answer.rows.length; i++) step("tableRow", TIMING.row);
   step("note", TIMING.block);
@@ -134,6 +150,8 @@ export function revealAt(steps: Step[], elapsed: number): Reveal {
     evidence: false,
     stages: false,
     stageRows: 0,
+    moves: false,
+    moveRows: 0,
     band: false,
     tableRows: 0,
     note: false,
@@ -157,6 +175,12 @@ export function revealAt(steps: Step[], elapsed: number): Reveal {
         break;
       case "stageRow":
         reveal.stageRows++;
+        break;
+      case "moves":
+        reveal.moves = true;
+        break;
+      case "moveRow":
+        reveal.moveRows++;
         break;
       case "band":
         reveal.band = true;
@@ -183,6 +207,8 @@ export function fullReveal(answer: Answer): Reveal {
     evidence: true,
     stages: true,
     stageRows: answer.stages?.length ?? 0,
+    moves: true,
+    moveRows: answer.charts?.moves?.rows.length ?? 0,
     band: true,
     tableRows: answer.rows.length,
     note: true,

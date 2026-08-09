@@ -23,8 +23,13 @@ function describe(op: NonNullable<Action["execution"]>): string {
   switch (op.op) {
     case "pause_campaign":
       return "status: ACTIVE → PAUSED";
-    case "reduce_daily_budget":
-      return `daily budget × ${op.multiplier} (a reduction — Mazal cannot raise it)`;
+    case "reduce_daily_budget": {
+      // The multiplier is a solver output and arrives at full float precision.
+      // "daily budget × 0.7780376758418727" is not a sentence anyone can check;
+      // the cut as a percentage is the same fact in a form a seller can hold.
+      const cut = Math.round((1 - op.multiplier) * 100);
+      return `daily budget down ${cut}% (a reduction — Mazal cannot raise it)`;
+    }
     case "set_frequency_cap":
       return `frequency cap: ${op.perWeek} per week`;
   }
