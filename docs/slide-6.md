@@ -23,6 +23,8 @@ B's input to E's deck. Every number here comes from [`backtest-results.md`](back
 >
 > **Where it fails, and why:** two of the nine faults it never catches. Both halve add-to-cart rate, which is −0.86σ against a benchmark whose spread runs 4.5%–12%. We flag at −1.0σ. The reference is too wide, not the detector too blunt — and we did not move the threshold to make this slide look better.
 >
+> **On a sudden break it names the day, 93% of the time within one.** A stockout has a day it happened. Creative fatigue and budget caps do not — they decay a few per cent a day, so no detector can name a day and we do not pretend to.
+>
 > **When it is wrong, it goes quiet.** All three of our worst classes get called *healthy*, not *something else*. For a monitoring product that is the right way to fail.
 
 ---
@@ -42,7 +44,9 @@ Then the three things that limit it, fast:
 
 **3. Quote the denominator on the false-alarm rate.** 12% is 3 campaigns out of 25. And a cohort a quarter healthy is nothing like a real account, where nearly everything is fine — so it is a floor, not a forecast.
 
-**4. Name the failure before the strength.** `price_too_high` and `thin_pdp` at 0%. Then `stockout` 100%, `pixel_break` 96%, `none` 93%. In that order. *"Here is the class we cannot catch and why"* is a stronger sentence than a suspicious 99%, and it is the one that survives questions.
+**4. Claim 1 is the one to volunteer.** *"On a sudden break we name the day it happened, within one day, 93% of the time. On a gradual decay we don't — there is no day, and we say so."* That second half is what makes the first half believed.
+
+**5. Name the failure before the strength.** `price_too_high` and `thin_pdp` at 0%. Then `stockout` 100%, `pixel_break` 96%, `none` 93%. In that order. *"Here is the class we cannot catch and why"* is a stronger sentence than a suspicious 99%, and it is the one that survives questions.
 
 ---
 

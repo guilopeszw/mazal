@@ -10,6 +10,7 @@
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { benchmarks } from '@mazal/data';
 import { diagnose } from '@mazal/engine';
 import { runBacktestWith } from './backtest.ts';
 import { COHORT_SIZE, HELD_OUT, generateCohort, splitCohort } from './cohort.ts';
@@ -24,6 +25,42 @@ const report = runBacktestWith(held, diagnose);
 const trainReport = runBacktestWith(train, diagnose);
 const heldHealthy = held.filter((c) => c.fault.kind === 'none').length;
 
+/**
+ * docs/acceptance.md claim 1: "Diagnosis.changePoint.date lands within +/-1 day
+ * of it across the held-out set."
+ *
+ * Split by fault shape, because the aggregate is misleading. A stockout has a
+ * day it happened; creative fatigue decays a few per cent a day and budget caps
+ * raise CPM gradually, so there is no single day those campaigns broke and no
+ * detector can name one. Reporting them together buries a 93% inside a 70%.
+ */
+const SUDDEN = new Set(['stockout', 'eta_shock', 'pixel_break', 'checkout_friction']);
+const dayGap = (a: string, b: string) =>
+  Math.abs(Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86_400_000;
+
+const changePoint = { detected: 0, named: 0, sudden: 0, suddenOk: 0, gradual: 0, gradualOk: 0 };
+for (const c of held) {
+  if (!c.fault.injectedOn) continue;
+  const d = diagnose({
+    days: c.days, card: c.card, events: c.events,
+    reference: { kind: 'benchmark', table: benchmarks },
+  });
+  if (!d.primary) continue;
+  changePoint.detected += 1;
+  if (!d.changePoint) continue;
+  changePoint.named += 1;
+
+  const ok = dayGap(d.changePoint.date, c.fault.injectedOn) <= 1;
+  if (SUDDEN.has(c.fault.kind)) {
+    changePoint.sudden += 1;
+    if (ok) changePoint.suddenOk += 1;
+  } else {
+    changePoint.gradual += 1;
+    if (ok) changePoint.gradualOk += 1;
+  }
+}
+const share = (a: number, b: number) => (b === 0 ? '—' : `${((a / b) * 100).toFixed(0)}%`);
+
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 
 // ─── terminal ────────────────────────────────────────────────────────────
@@ -37,6 +74,10 @@ console.log(`held-out n       ${report.n}`);
 console.log(`top-1            ${pct(report.top1)}`);
 console.log(`top-2            ${pct(report.top2)}   (stage-level — see score.ts)`);
 console.log(`false alarm rate ${pct(report.falseAlarmRate)}   on ${heldHealthy} healthy campaigns`);
+console.log(`change point named  ${share(changePoint.named, changePoint.detected)} of detected breaks`);
+console.log(`  within +/-1 day   ${share(changePoint.suddenOk, changePoint.sudden)} sudden` +
+  `, ${share(changePoint.gradualOk, changePoint.gradual)} gradual`);
+
 console.log('\nconfusion — TRAINING half only, safe to show A');
 console.log(formatConfusion(trainReport));
 console.log(`\nwrote ${OUT}`);
@@ -116,6 +157,27 @@ top-2 is stage-level, not cause-level: \`Diagnosis\` carries one \`suspectedCaus
 \`Finding\` carries a \`causeLayer\`, not a \`FaultKind\`, so it asks whether the right *stage*
 was named. A stockout called a thin PDP is a near miss — both break stage 3 and the seller
 is sent to the right part of the funnel.
+
+## Change points — claim 1
+
+*"Given a daily series, Mazal names the date performance changed, within a day of when it
+actually did."* Measured against the day the simulator injected the fault, over held-out
+breaks the engine detected at all — it cannot name a date for a break it never found.
+
+| | |
+|---|---|
+| breaks detected | ${changePoint.detected} |
+| a date was named | **${share(changePoint.named, changePoint.detected)}** |
+| within ±1 day — **sudden** breaks | **${share(changePoint.suddenOk, changePoint.sudden)}** (${changePoint.suddenOk}/${changePoint.sudden}) |
+| within ±1 day — **gradual** ramps | **${share(changePoint.gradualOk, changePoint.gradual)}** (${changePoint.gradualOk}/${changePoint.gradual}) |
+
+**Report these separately or the number lies.** A stockout has a day it happened, and the
+engine finds it. \`creative_fatigue\` decays CTR a few per cent a day and \`budget_cap\` lifts
+CPM gradually — there is no single day those campaigns broke, so no detector can name one
+and ours is honestly late rather than wrong. What it reports for a ramp is the day the
+metric *crossed*, which is a true statement about a different event.
+
+The demo runs on \`eta_shock\`, which is a sudden break.
 
 ## Per-class recall — training half only
 

@@ -238,9 +238,18 @@ function findChangePoint(
   // turn", and a seven-day window answers that five days late — late enough that
   // the event which explains it no longer lines up.
   const span = SELF_WINDOW_DAYS;
+
+  /**
+   * The minimum scales with the window it is judged over. A stage is flagged on
+   * seven days and its change point scanned over three, so an unscaled minimum
+   * meant a campaign that cleared the bar comfortably enough to be flagged could
+   * never clear it on the scan — it was told it was broken and never told when.
+   */
+  const minForSpan = Math.ceil((spec.minSample * span) / WINDOW_DAYS);
+
   for (let end = Math.max(span, baseline.length); end <= input.days.length; end++) {
     const window = aggregate(input.days.slice(end - span, end));
-    if (spec.sample(window) < spec.minSample) continue;
+    if (spec.sample(window) < minForSpan) continue;
 
     const raw = deviation(spec.observe(window), reference);
     const dev = HIGH_IS_BAD.has(spec.metric) ? -raw : raw;

@@ -46,6 +46,27 @@ top-2 is stage-level, not cause-level: `Diagnosis` carries one `suspectedCause` 
 was named. A stockout called a thin PDP is a near miss — both break stage 3 and the seller
 is sent to the right part of the funnel.
 
+## Change points — claim 1
+
+*"Given a daily series, Mazal names the date performance changed, within a day of when it
+actually did."* Measured against the day the simulator injected the fault, over held-out
+breaks the engine detected at all — it cannot name a date for a break it never found.
+
+| | |
+|---|---|
+| breaks detected | 37 |
+| a date was named | **100%** |
+| within ±1 day — **sudden** breaks | **93%** (26/28) |
+| within ±1 day — **gradual** ramps | **0%** (0/9) |
+
+**Report these separately or the number lies.** A stockout has a day it happened, and the
+engine finds it. `creative_fatigue` decays CTR a few per cent a day and `budget_cap` lifts
+CPM gradually — there is no single day those campaigns broke, so no detector can name one
+and ours is honestly late rather than wrong. What it reports for a ramp is the day the
+metric *crossed*, which is a true statement about a different event.
+
+The demo runs on `eta_shock`, which is a sudden break.
+
 ## Per-class recall — training half only
 
 A never sees a per-class breakdown of the held-out set (`docs/plan/B-data.md`), only its
