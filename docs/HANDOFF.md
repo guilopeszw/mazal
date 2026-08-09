@@ -15,6 +15,27 @@ Entry format:
 
 ---
 
+## 2026-08-09 15:50 BRT · Guilherme's agent · contract additions, announced late
+
+**Done:** `packages/contracts` is C's package and frozen after SAT-A. `AGENTS.md` allows additive changes but requires they be **announced before they are pushed**. Four went in without that. This is the announcement, late, and it is the record C should review against.
+
+All four are additive — new exported types, no renames, no removals, nothing made required. Nothing that existed before changed shape and root typecheck is clean across every package.
+
+| Added | Why | Landed in |
+|---|---|---|
+| `Verdict.limitingFactor` | names which stage caps the prediction | `feat/peer-market-profile` |
+| `SellerBenchmarkTable`, `SellerBenchmark`, `SellerLever`, `SellerLeverName`, `LeverReplication`, `CardFinding`, `CardProvenance`, `FieldSource` | peer comparison — where a seller stands in their category | `feat/peer-market-profile` |
+| `ExecutableOp`, `Action.execution` | the three operations Mazal may run against Meta | `feat/meta-execution` |
+| `ResponseCurve` | the Allocator's spend-to-conversions curve, with `source` marking prior/blended/fitted | `feat/allocator` |
+
+Two want C's eye specifically. **`ExecutableOp` is the type the spend guarantee rests on** — a closed union of `pause_campaign`, `reduce_daily_budget` (multiplier in `(0, 1]`) and `set_frequency_cap`. Adding a spend-raising member would silently break a promise the product makes on stage, so it must not grow without a conversation. And **`ResponseCurve` arrived inside `feat/money-line`**, a branch labelled as a frontend chart payload: it was stacked on `feat/allocator` and dragged the contract change plus 679 lines of engine with it. That was the wrong way to land it and is why this is late.
+
+Three edits also touched C's existing declarations, all already on `stage`: `StoreEventType` is now derived from a `STORE_EVENT_TYPES` const with the same seven members, so the runtime can iterate them; `Benchmark.source` gained `'prior'`; and `OlistCategory` was narrowed from `... | string` — which collapsed the union and typechecked nothing — to the 62-member union generated from Olist's own CSV.
+
+**Next:** C reads this and says yes or no to each. The only one that can reject input the old type accepted is the `OlistCategory` narrowing.
+
+**Blocked / watch out:** nothing blocks on the answer — all four are already on `stage` and green. If C rejects one, it is a rename or a revert, not a redesign.
+
 ## 2026-08-09 14:05 BRT · Guilherme's agent · plan loader on `feat/plan-loader`
 
 **Done:** `feat/plan-loader` (off `stage`, one commit `5a9042a`) adds a rim-light morphing loading card shown only while an answer that carries a recovery plan is pending. New: `apps/web/components/plan-loader.tsx`, `plan-loader.css`, and `apps/web/lib/ai-lights/mask.ts` (the product owner's canvas mask builder, copied verbatim). Seam: `TIMING.plan` (7s) in `lib/stream.ts` — `buildTimeline` uses it when `answer.plan` exists, and `revealAt.thinking` now ends at the first step rather than at a hardcoded 700ms; `chat.tsx` renders `PlanLoader` instead of `Thinking` for those turns. Three surfaces rotate in the engine's real order: funnel walk (with the media │ produto divider), store event log (the inverted variant), action draft with the actor split. Verified by observation over CDP in both themes: radius travels linearly (14 distinct values over a 17-frame morph, no end snap), glow layers are `display:none` for every morph frame, masks rebuild exactly twice in 6.3s — once per handover, box stable. Root typecheck, 135 root tests, `pnpm --filter web build`, and web lint (for the new file) all green.
