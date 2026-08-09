@@ -262,7 +262,7 @@ export function Upload({
               </p>
             </fieldset>
 
-            {error && <p className="m-0 text-[13px] text-warn">{error}</p>}
+            {error && <p className="m-0 text-[13px] font-[540] text-ink">{error}</p>}
 
             <button
               type="submit"
@@ -278,10 +278,16 @@ export function Upload({
   );
 }
 
-/** The honest half of the parse — dropped totals rows, missing columns, ambiguous dates. */
+/**
+ * The honest half of the parse — dropped totals rows, missing columns, ambiguous dates.
+ *
+ * Rendered neutral, like every other block of text here. These are worth reading, not
+ * worth alarming about: a red panel on a parse that worked teaches a seller to dismiss
+ * the one that matters.
+ */
 function Warnings({ warnings }: { warnings: string[] }) {
   return (
-    <div className="rounded-[10px] bg-warn-soft px-3.5 py-3 text-[13px] text-warn">
+    <div className="rounded-[10px] border border-line bg-sunken px-3.5 py-3 text-[13px] text-ink-soft">
       <p className="m-0 font-[580] uppercase tracking-[0.05em] text-[10.5px]">
         {warnings.length} parser warning{warnings.length === 1 ? "" : "s"}
       </p>
