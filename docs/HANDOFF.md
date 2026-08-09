@@ -15,6 +15,158 @@ Entry format:
 
 ---
 
+## 2026-08-09 14:05 BRT · Guilherme's agent · plan loader on `feat/plan-loader`
+
+**Done:** `feat/plan-loader` (off `stage`, one commit `5a9042a`) adds a rim-light morphing loading card shown only while an answer that carries a recovery plan is pending. New: `apps/web/components/plan-loader.tsx`, `plan-loader.css`, and `apps/web/lib/ai-lights/mask.ts` (the product owner's canvas mask builder, copied verbatim). Seam: `TIMING.plan` (7s) in `lib/stream.ts` — `buildTimeline` uses it when `answer.plan` exists, and `revealAt.thinking` now ends at the first step rather than at a hardcoded 700ms; `chat.tsx` renders `PlanLoader` instead of `Thinking` for those turns. Three surfaces rotate in the engine's real order: funnel walk (with the media │ produto divider), store event log (the inverted variant), action draft with the actor split. Verified by observation over CDP in both themes: radius travels linearly (14 distinct values over a 17-frame morph, no end snap), glow layers are `display:none` for every morph frame, masks rebuild exactly twice in 6.3s — once per handover, box stable. Root typecheck, 135 root tests, `pnpm --filter web build`, and web lint (for the new file) all green.
+
+**Next:** D reviews and merges the branch to `stage`; the branch owner does not merge. If 7s reads long on the projector, `TIMING.plan` is the single knob and the card degrades gracefully at any value ≥ ~3.1s (one full cycle).
+
+**Blocked / watch out:** two pre-existing web lint errors (`answer.tsx` render-time reassign, `chat.tsx` setState-in-effect) predate this branch and were left alone. Under reduced motion the loader never mounts at all — `useAnswerStream` already short-circuits to the finished answer, so there is no wait to narrate; the card's own reduced-motion behaviour exists but is unreachable. Rainbow tokens are scoped to `.plan-loader`; nothing outside the card changes hue.
+
+## 2026-08-09 11:55 BRT · Joaquim · main/MCP integration branch
+
+**Done:** created `joaquim/chore/integrate-main-mcp` from current `main` (`afb9a90`) in an isolated worktree and merged `joaquim/feat/agent-mcp`. `.gitignore` and this handoff merged automatically; `pnpm-lock.yaml` was regenerated from the merged workspace. Root tests pass (**132 tests**), root typecheck passes, and `pnpm --filter @mazal/mcp test` passes (**36 tests**, including Vercel bundle coverage). `pnpm sim:eyeball` and `pnpm sim:backtest` pass without changing `docs/backtest-results.md`.
+
+**Next:** D should make the web `typecheck` script run `next typegen` before `tsc --noEmit` (or commit the generated Next route types in the supported way). After `pnpm --filter web exec next typegen`, the web typecheck passes. Then run a production build in a networked environment or self-host Inter; this machine cannot fetch Google Fonts during `next build`.
+
+**Blocked / watch out:** `apps/web` belongs to D and was not changed. The Vercel project `mazal` has **no production deployment**, no preview deployments, and no Git repository connected; its dashboard says production requires pushing `main`. This integration branch requires Node 24 for its declared engine, while this local verification ran on Node 22 and emitted only engine warnings. The branch must not merge directly to `main`; review/integrate through the project's branch flow.
+
+**Reproducibility follow-up:** the isolated checkout ran `pnpm install --frozen-lockfile` and `pnpm sim:fixtures` without changing the committed fixtures. The required `pnpm derive` second-machine check remains blocked because `data/raw/` is intentionally gitignored and was absent from the clean checkout; repeat it on Node 24 with the approved raw Olist data available locally.
+
+**Network follow-up:** `fonts.googleapis.com` now responds from an unrestricted shell, so the former font error was sandbox DNS isolation. Retrying `pnpm --filter web build` outside that sandbox then reached Turbopack but failed while its CSS worker tried to bind a local port (`Operation not permitted`); this is an execution-environment limitation, not a source error. The Vercel `mazal` dashboard was rechecked: it still has no production or preview deployment and no Git repository connected. Do not connect a repository or publish production from this integration branch without an explicit release decision.
+
+**Node 24 follow-up:** Homebrew installed Node `v24.19.0`. With `PATH=/opt/homebrew/opt/node@24/bin:$PATH`, the MCP gate passes (36 tests, strict and Vercel-compatible typechecks), the root suite passes (132 tests), the root typecheck passes, and `next typegen` plus the web typecheck pass. The web production build reaches the same local Turbopack port restriction, confirming that Node version is not the blocker.
+
+## 2026-08-09 11:34 BRT · E-agent (Joaquim) · produção Vercel e agente Deco
+**Done:** MCP publicado em `https://mcp-cyan-gamma.vercel.app/mcp`, com Host allowlist e bearer somente nos secret managers. A Custom Connection `Mazal MCP` foi criada no Deco e vinculada exclusivamente ao agente `Mazal`; as instruções versionadas estão em `docs/deco-agent-instructions.md`. Smoke real no Studio concluiu `Enable Tool → Diagnose Campaign` em 113 ms, retornou `primary: null`, `secondary: []` e `suspectedCause: "none"`, e está registrado em Settings → Monitor → Chats como `Diagnóstico de campanha de anúncios` (Done, 11:34). O runbook foi atualizado sem segredos.
+**Next:** iniciar o PRD do chat web somente quando D disponibilizar `apps/web`; antes disso, definir o secret manager e escopo de uma API key do agente para a integração servidor-a-servidor.
+**Blocked / watch out:** não criar nem expor uma API key do agente no browser, Git ou documentação sem o destino servidor-a-servidor do `apps/web`; o bearer da conexão atual é separado e não deve ser reutilizado.
+
+---
+
+## 2026-08-09 11:18 BRT · E-agent (Joaquim) · corretivo final da rota pública MCP na Vercel
+**Done:** substituído o `rewrites` por `routes` explícitas: `/mcp` encaminha para `/api/mcp.mjs` antes de `handle: filesystem`, sem `check`. O teste RED→GREEN fixa a ordem e percorre o destino público local até a recusa `401` do handler autenticado. Build limpo Vercel CLI 58.9.0 em Node 24.19.0 gera `api/mcp.func` e manifesta primeiro `^/mcp$ → /api/mcp.mjs`, sem `check`. Node 24: 36/36 MCP, 121/121 raiz, typecheck e diff check verdes.
+**Next:** com autorização, fazer deploy e repetir o smoke remoto de `/mcp` sem bearer (401) e handshake autenticado.
+**Blocked / watch out:** nenhum deploy foi feito. O `task-3-bundle-route-review.md` não rastreado já existia e não faz parte desta correção.
+
+## 2026-08-09 11:08 BRT · E-agent (Joaquim) · corretivo de rota do bundle MCP Vercel
+**Done:** `/mcp` agora reescreve para `/api/mcp.mjs`, o arquivo que a Function Vercel emite, e o Hono escuta exatamente esse caminho interno. TDD RED comprovou o antigo `/api/mcp`; GREEN simula o destino do rewrite sem bearer e recebe `401`, preservando o handshake autenticado com Host/Origin/bearer. Node 24: 36/36 MCP (strict + compat), 121/121 raiz, build Vercel 58.9.0 limpo e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-bundle-route-report.md`.
+**Next:** com autorização, fazer deploy e repetir o smoke remoto de `/mcp`.
+**Blocked / watch out:** o manifest limpo resolve o arquivo por `check: true` e Function gerada, sem repetir a antiga regra explícita `.mjs`; nenhum deploy, segredo, pacote ou API pública foi alterado.
+
+---
+
+## 2026-08-09 10:58 BRT · E-agent (Joaquim) · handler HTTP nomeado da Function Vercel
+**Done:** removido o `default` Web handler ambíguo do bundle MCP; a Function exporta `GET`/`POST`/`DELETE` nomeados que delegam ao Hono testável. RED→GREEN no artefato comprova ausência de `default` e `POST` sem bearer = 401. Node 24: MCP 36/36 (strict/compat), raiz 121/121, typecheck, build Vercel limpo e diff check verdes. Relatório `.superpowers/sdd/2026-08-09-e-agent/task-3-named-handler-report.md`.
+**Next:** fazer deploy de produção autorizado e repetir o smoke remoto em `/mcp`.
+**Blocked / watch out:** nenhum deploy, segredo, rota pública, tool, auth ou `packages/*` foi alterado.
+
+## 2026-08-09 10:43 BRT · E-agent (Joaquim) · bundle autocontido do MCP na Vercel
+
+**Done:** corrigido o `ERR_MODULE_NOT_FOUND` de produção sem tocar em `packages/*`: a Function agora é um bundle ESM esbuild Node 24, criado por build command versionado a partir do handler testável em `src`. O Build Output limpo contém somente `api/mcp.func`, sem imports `@mazal/*` nem exports `src/index.ts`; o pacote isolado completa o handshake. Node 24: 35/35 MCP, checks estrito/compatível, build Vercel real, typecheck global e 120/120 global verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-workspace-bundle-report.md`.
+
+**Next:** fazer novo deploy de produção autorizado e repetir 401, handshake, `tools/list` e tool call remotos em `/mcp`.
+
+**Blocked / watch out:** nenhum deploy ou segredo foi alterado nesta sessão. Um build Vercel local deve começar com `.vercel/output` limpo; a CLI 58.9.0 acumulou artefatos antigos quando a pasta já existia, simulando duas Functions até o rebuild limpo.
+
+## 2026-08-09 10:26 BRT · E-agent (Joaquim) · gate estrito do build Vercel
+
+**Done:** o gate de `apps/mcp` agora executa antes dos testes tanto `tsc -p tsconfig.json --pretty false` (a prova estrita de `z.output` compatível com `Diagnosis`) quanto o check `tsconfig.vercel-compat.json` que reproduz o builder Vercel. Nenhum schema runtime nem `packages/*` foi alterado. Node 24: 33/33 MCP, checks estrito/compatível, typecheck global e 118/118 global verdes; diff check verde. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-build-gate-fix-report.md`.
+
+**Next:** com acesso autorizado, fazer deploy e executar o checklist remoto existente da Vercel/Deco.
+
+**Blocked / watch out:** `pnpm typecheck` raiz continua sem incluir `apps/mcp`; manter `pnpm --filter @mazal/mcp test` como gate focalizado, que agora contém os dois modos TypeScript.
+
+---
+
+## 2026-08-09 10:20 BRT · E-agent (Joaquim) · corretivo do typecheck Vercel/Zod 4
+
+**Done:** corrigida a falha de build da Function causada pela inferência do Zod 4 sob `strictNullChecks: false`, sem mudar o schema runtime nem `packages/*`. O bridge fica isolado na exportação de `diagnosisSchema`; o build strict normal mantém uma prova estática de compatibilidade com `Diagnosis`. Um typecheck de regressão equivalente ao builder roda antes dos testes MCP. Node 24: build Vercel real verde, 33/33 MCP, typechecks compatível/focalizado/global e 118/118 global verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-build-fix-report.md`.
+
+**Next:** com acesso autorizado, fazer deploy e executar o checklist remoto existente da Vercel/Deco.
+
+**Blocked / watch out:** o comando focalizado sem `allowImportingTsExtensions` ainda acusa somente os imports `.ts` preexistentes de `packages/contracts`; o gate versionado herda corretamente essa opção do tsconfig raiz. `apps/mcp/.gitignore` foi gerado pelo Vercel CLI e permanece fora deste commit.
+
+---
+
+## 2026-08-09 02:55 BRT · E-agent (Joaquim) · corretivo do rewrite Vercel do MCP
+
+**Done:** corrigido o HIGH do review do PRD 04: a Function Vercel agora monta o Hono autenticado em `/api/mcp`, destino interno do rewrite público `/mcp`. O teste de integração percorre a Function com Host/Origin/bearer e handshake Streamable MCP nesse caminho; RED foi `404`, GREEN é `200`. Node 24: 33/33 MCP, typechecks focalizado/global, 118/118 global, backtest e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-fix-report.md`.
+
+**Next:** com acesso autorizado, fazer deploy e executar o checklist remoto existente da Vercel/Deco.
+
+**Blocked / watch out:** não há URL de produção nem evidência remota ainda; Host e Origin devem continuar allowlists exatas e o bearer fica apenas nos secret managers.
+
+---
+
+## 2026-08-09 02:50 BRT · E-agent (Joaquim) · entrypoint Vercel e runbook da conexão Deco
+
+**Done:** parte versionável do PRD 04 implementada no commit que contém esta entrada: handler Hono importável em `api/mcp.ts`, rewrite HTTPS `/mcp` para a Vercel Function, Node `24.x` fixado e runbook sem segredos para a Custom Connection “Mazal MCP”. TDD comprovou o limite Vercel local; 33/33 MCP e 118/118 global passaram em Node 24, com typechecks focalizado/global, backtest, JSON e diff checks verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-report.md`.
+
+**Next:** com acesso autorizado às contas, configurar secrets/allowlists na Vercel, fazer o deploy e executar o checklist remoto em `docs/mazal-mcp-vercel-deco.md` antes de criar o Agent do PRD 05.
+
+**Blocked / watch out:** URL de produção, `401` remoto, handshake, `tools/list`, tool call, Custom Connection e Monitor continuam pendentes; todos exigem conta Vercel/Deco e nenhum token foi criado, solicitado ou usado nesta sessão. O typecheck raiz ainda não inclui `apps/mcp`, então manter o gate focalizado.
+
+---
+
+## 2026-08-09 02:40 BRT · E-agent (Joaquim) · corretivo HIGH/MEDIUM do MCP
+
+**Done:** removido o singleton de `InMemoryActionLog`: cada `McpServer`/request autenticada recebe log novo, comprovado por teste HTTP cruzando dois `execute_plan`. A réplica Zod 4 agora exige `price > 0` e ao menos um `paymentMethod`; 32/32 MCP e 117/117 global passaram em Node 24, com typechecks focalizado/global e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-2-fix-report.md`.
+
+**Next:** executar o PRD 04 de deploy/conexão Deco sem alterar a superfície dos quatro tools.
+
+**Blocked / watch out:** o LOW conhecido permanece: `pnpm typecheck` raiz não inclui `apps/mcp`, portanto manter também o typecheck focalizado. O log continua intencionalmente volátil por request e a execução é somente simulada.
+
+---
+
+## 2026-08-09 02:29 BRT · E-agent (Joaquim) · quatro tools MCP determinísticos
+
+**Done:** PRD 03 implementado no commit que contém esta entrada: `diagnose_campaign`, `predict_campaign`, `build_recovery_plan` e `execute_plan` são os únicos tools públicos. Benchmarks são injetados no servidor, respostas numéricas vêm diretamente do engine, e execução aceita somente ações `mazal`, grava em memória e retorna recibo SHA-256 canônico. TDD em Node 24 registrou três REDs e terminou com 29/29 no MCP e 114/114 global; typechecks focalizado/global e `git diff --check` verdes.
+
+**Next:** executar o PRD 04 de deploy/conexão Deco sem alterar a superfície de quatro tools.
+
+**Blocked / watch out:** `apps/mcp` precisa de Zod 4 para o SDK MCP 2.0 publicar JSON Schema em `tools/list`; Zod 3 executa `tools/call`, mas quebra descoberta. O log é intencionalmente volátil por processo e o typecheck raiz ainda não inclui `apps/mcp`, então o gate focalizado continua obrigatório. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-2-report.md`.
+
+## 2026-08-09 02:15 BRT · E-agent (Joaquim) · validação Node 24 do scaffold MCP
+
+**Done:** Node `v24.19.0` foi instalado localmente e validou o scaffold em `0dae69d`: `pnpm --filter @mazal/mcp test` (11/11), typecheck focalizado do MCP, `pnpm typecheck` e `pnpm test` (14 arquivos, 96/96). O teste de integração já confirma que `mazal.vercel.app`, quando incluído na allowlist exata, atravessa Host/Origin/bearer e completa o handshake MCP com 200.
+
+**Next:** confirmar o corretivo na revisão final e então iniciar o PRD 03, expondo apenas as quatro tools determinísticas.
+
+**Blocked / watch out:** o typecheck raiz não inclui `apps/mcp`; o typecheck focalizado é verde e obrigatório. Ampliar esse gate global é melhoria de configuração separada, não bloqueio funcional do scaffold.
+
+## 2026-08-09 02:11 BRT · E-agent (Joaquim) · correções do review do scaffold MCP
+
+**Done:** achados HIGH/MEDIUM do review corrigidos em `0dae69d` (`fix(mcp): secure deployment transport gates`). O endpoint aceita apenas hosts/origins exatos configurados por `MAZAL_MCP_ALLOWED_HOSTS`/`MAZAL_MCP_ALLOWED_ORIGINS`, autentica antes de parsear JSON e compara bearer tokens por digests SHA-256 fixos. Host/Origin fora da allowlist seguem em 403; JSON malformado sem bearer ou com bearer incorreto recebe 401. Testes focalizados: 11/11; suíte global: 96/96.
+
+**Next:** em Node 24, executar teste MCP, typecheck focalizado/global e smoke de handshake com Host de deploy; só então marcar o PRD 02 concluído.
+
+**Blocked / watch out:** esta máquina só tem Node `v22.22.3`; o PRD permanece pendente. `pnpm typecheck` raiz ainda não inclui `apps/mcp`; o typecheck focalizado passou, e o gate global não foi alterado porque o escopo desta correção exclui a configuração raiz.
+
+## 2026-08-09 01:56 BRT · E-agent (Joaquim) · scaffold MCP seguro
+
+**Done:** `apps/mcp` criado e commitado em `457bbd8` (`feat(mcp): scaffold secure MCP server`). O endpoint Hono `/mcp` é stateless, cria um `McpServer` por request com `@modelcontextprotocol/server@2.0.0`, exige `Authorization: Bearer <MAZAL_MCP_BEARER_TOKEN>` e devolve 401 sem expor token em token ausente/incorreto. A factory aceita `registerTools(server)` para o PRD seguinte. Teste de integração cobre handshake autorizado, duas recusas e instância nova por request; `pnpm --filter @mazal/mcp test`, typecheck focalizado, `pnpm typecheck` e `pnpm test` passaram (89 testes globais).
+
+**Next:** implementar os quatro handlers reais pelo ponto `registerTools` no próximo PRD, sem mover números para LLM.
+
+**Blocked / watch out:** a máquina local é Node 22, enquanto `apps/mcp` declara Node >=24; tudo passou com aviso de engine, mas a validação final deve ocorrer no Node 24. O adapter Hono preserva proteção contra DNS rebinding, então testes HTTP locais devem enviar `Host: localhost`. Relatório detalhado: `.superpowers/sdd/2026-08-09-e-agent/task-1-report.md`.
+
+## 2026-08-09 01:42 BRT · E-agent (Joaquim) · pacote de PRDs
+
+**Done:** plano aprovado e commitado em `3b15884`; onze PRDs autocontidos criados em `docs/prds/e-agent/`, cobrindo fixtures, MCP, Deco, narração, chat, demo, pitch, Meta read-only e writes futuros.
+
+**Next:** executar `docs/prds/e-agent/01-demo-fixtures.md` com A/B e iniciar `02-mcp-scaffold.md` na branch de E sem esperar o frontend.
+
+**Blocked / watch out:** PRD 01 permanece dependência externa; PRD 07 só começa quando D integrar `apps/web`; PRD 10 é stretch e não entra antes do caminho de demo estar congelado.
+
+## 2026-08-09 01:33 BRT · E-agent (Joaquim) · planejamento de MCP, Deco e demo
+
+**Done:** auditoria completa do brief de E, decisões de arquitetura fechadas com o responsável e plano salvo em `docs/superpowers/plans/2026-08-09-e-agent.md`. Branch `joaquim/feat/agent-mcp` criada a partir de `main`; nenhuma implementação iniciada.
+
+**Next:** obter aprovação do plano e então gerar os onze PRDs autocontidos na ordem de execução.
+
+**Blocked / watch out:** as duas fixtures de demo atuais retornam diagnóstico saudável e plano vazio; A/B precisam substituí-las. `apps/web` ainda depende de D. A branch `stage` não existe no clone/remoto e o destino de integração precisa ser decidido pelo time.
+
 ## 2026-08-08 14:12 BRT · C-agent (ingest & contracts) · SAT-A handoff
 
 **Done:** `packages/contracts` complete (metrics + frozen types + tests), `packages/ingest` complete (`parseMetaCsv`, `parseEventLog`, `productCardSchema` + tests). Monorepo scaffolded.

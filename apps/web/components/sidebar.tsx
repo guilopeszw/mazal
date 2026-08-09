@@ -220,7 +220,10 @@ export function Sidebar({ open, onToggle }: { open: boolean; onToggle: () => voi
           <span className="font-serif text-[19px] font-medium leading-none tracking-[-0.01em]">
             Mazal
           </span>
-          <span className="rounded-[5px] bg-ref-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-ref-ink">
+          {/* accent, not the old `ref` gold: that ramp was deleted with the one-accent pass,
+              and a class Tailwind no longer generates fails silently — no background, no
+              colour, no error. */}
+          <span className="rounded-[5px] bg-accent-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-accent-ink">
             beta
           </span>
         </div>

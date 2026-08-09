@@ -6,6 +6,7 @@ import type { Answer, AnswerKey } from "@/lib/answers";
 import { type Reveal, buildTimeline, fullReveal, revealAt } from "@/lib/stream";
 import { AnswerBody } from "./answer";
 import { Mark } from "./mark";
+import { PlanLoader } from "./plan-loader";
 import { MarkButton, Sidebar } from "./sidebar";
 import { Upload } from "./upload";
 
@@ -85,7 +86,15 @@ function Thinking() {
 
 type Turn = { id: number; asked: string; answer: Answer };
 
-function TurnView({ turn, active }: { turn: Turn; active: boolean }) {
+function TurnView({
+  turn,
+  active,
+  benchmarkCount,
+}: {
+  turn: Turn;
+  active: boolean;
+  benchmarkCount: number;
+}) {
   const reveal = useAnswerStream(turn.answer, active);
 
   return (
@@ -93,7 +102,18 @@ function TurnView({ turn, active }: { turn: Turn; active: boolean }) {
       <div className="rise max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
         {turn.asked}
       </div>
-      {reveal.thinking ? <Thinking /> : <AnswerBody answer={turn.answer} reveal={reveal} />}
+      {/* The loader appears only when the pending answer carries a plan of
+          action — that is the wait it narrates. Every other answer keeps the
+          breathing mark. */}
+      {reveal.thinking ? (
+        turn.answer.plan ? (
+          <PlanLoader benchmarkCount={benchmarkCount} />
+        ) : (
+          <Thinking />
+        )
+      ) : (
+        <AnswerBody answer={turn.answer} reveal={reveal} />
+      )}
     </div>
   );
 }
@@ -231,9 +251,15 @@ export function Chat({
               {/* The promise, not the name. With the wordmark moved into the sidebar this is
                   now the only place the product speaks its own case on a cold open, which is
                   the right trade: a judge reads a sentence, not a logo.
-                  `luck` is the identity's gold, the one word the sentence turns on. */}
+
+                  `luck` is the one word the sentence turns on, so it takes the accent. It was
+                  #C9963C, hardcoded: the single raw hex in the components, one value serving
+                  both themes, and 2.2:1 on the cream — the token comment said that gold
+                  "cannot carry either a thin rule or a word" and then it carried a word at
+                  46px. The accent is a token, redefines per theme, and clears the bar in both
+                  (5.3:1 light, 6.8:1 dark). */}
               <h1 className="m-0 mb-[30px] font-serif text-[38px] font-medium leading-[1.14] tracking-[-0.012em] text-balance sm:text-[46px]">
-                Campaigns shouldn&rsquo;t need <em className="text-[#C9963C]">luck</em>.
+                Campaigns shouldn&rsquo;t need <em className="text-accent">luck</em>.
               </h1>
               <div className="mb-[26px] flex max-w-lg flex-wrap justify-center gap-2">
                 {CHIPS.map((chip) => (
@@ -264,7 +290,11 @@ export function Chat({
                    */
                   className="scroll-mt-20"
                 >
-                  <TurnView turn={turn} active={i === turns.length - 1} />
+                  <TurnView
+                    turn={turn}
+                    active={i === turns.length - 1}
+                    benchmarkCount={categories.length}
+                  />
                 </div>
               ))}
             </div>

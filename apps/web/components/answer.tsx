@@ -1,5 +1,6 @@
 import type { Answer } from "@/lib/answers";
 import { type Reveal, fullReveal, tokenize } from "@/lib/stream";
+import { DailyFigure, FunnelFigure, RadarFigure, RoasFigure } from "./answer-charts";
 import { PlanPanel } from "./plan-panel";
 
 /**
@@ -11,12 +12,6 @@ import { PlanPanel } from "./plan-panel";
  * and a server render both draw the whole answer without knowing the stream exists. No timer
  * lives in this file.
  */
-
-const BAR: Record<"ok" | "broken" | "mute", string> = {
-  ok: "bg-accent",
-  broken: "bg-warn",
-  mute: "bg-line",
-};
 
 export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal }) {
   const shown = reveal ?? fullReveal(answer);
@@ -34,16 +29,18 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
   return (
     <div className="flex flex-col gap-[13px]" aria-busy={!shown.done}>
       {/* The verdict is the one sentence Mazal says rather than reports, so it is the one
-          place the serif appears in an answer. */}
+          place the serif appears in an answer.
+
+          It carries no colour. Tinting it green or red editorialises the number before the
+          seller has read it — the sentence already says whether the news is good, in words
+          they can argue with. Colour on screen stays on the funnel, where it points at the
+          one stage that leaked. */}
       <p className="m-0 font-serif text-[23px] font-medium leading-[1.3] tracking-[-0.005em]">
         {segments.map((segment, i) => {
           const take = Math.min(segment.tokens.length, Math.max(0, shown.verdictWords - segment.start));
           if (take === 0) return null;
           return (
-            <em
-              key={i}
-              className={`not-italic ${segment.tone === "good" ? "text-accent" : segment.tone === "bad" ? "text-warn" : ""}`}
-            >
+            <em key={i} className="not-italic">
               {segment.tokens.slice(0, take).join("")}
             </em>
           );
@@ -80,6 +77,14 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
           <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
             Where the funnel breaks
           </h3>
+          {/* The cascade itself — the five count stages, the leak in red. The rows
+              beneath stay as the audit trail: same order, plus the two stages a
+              count cannot draw (unassessed landing, unit economics). */}
+          {answer.charts?.funnel && (
+            <div className="border-b border-line">
+              <FunnelFigure chart={answer.charts.funnel} />
+            </div>
+          )}
           <div className="flex flex-col">
             {answer.stages.slice(0, shown.stageRows).map((s) => (
               <div
@@ -91,10 +96,6 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
                     s.state === "broken" ? "font-[540] text-warn" : "text-ink-soft"
                   }`}
                 >
-                  <span
-                    className={`h-[3px] w-[46px] flex-none rounded-[2px] ${BAR[s.state]}`}
-                    aria-hidden="true"
-                  />
                   {s.name}
                   {s.tag && (
                     <span
@@ -113,6 +114,24 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
         </section>
       )}
 
+      {answer.charts?.daily && shown.stages && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
+          <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+            {answer.charts.daily.label}, day by day
+          </h3>
+          <DailyFigure chart={answer.charts.daily} />
+        </section>
+      )}
+
+      {answer.charts?.margin && shown.stages && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
+          <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+            Return against break-even
+          </h3>
+          <RoasFigure chart={answer.charts.margin} />
+        </section>
+      )}
+
       {answer.band && shown.band && (
         <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
           <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
@@ -128,14 +147,16 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
                 className="absolute -top-1 h-3.5 w-0.5 rounded-[1px] bg-accent"
                 style={{ left: `${answer.band.mid}%` }}
               />
-              {/* Gold, not red: break-even is the threshold the band is measured against, the
-                  same job the reference column does. Red stays reserved for the broken stage,
-                  so the one red mark on screen is always the leak. */}
+              {/* Ink, not a third hue: break-even is the threshold the band is measured
+                  against, not a judgement, so it must not be the red — and it does not need
+                  a colour of its own to say so. Drawn in ink it reads as the ruler the green
+                  is measured against, and red stays reserved for the broken stage, so the
+                  one red mark on screen is always the leak. */}
               <div
-                className="absolute -top-1.5 h-[18px] w-0.5 rounded-[1px] bg-ref"
+                className="absolute -top-1.5 h-[18px] w-0.5 rounded-[1px] bg-ink"
                 style={{ left: `${answer.band.breakEven}%` }}
               >
-                <span className="absolute -top-[19px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10.5px] font-[560] text-ref-ink">
+                <span className="absolute -top-[19px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10.5px] font-[560] text-ink-soft">
                   break-even
                 </span>
               </div>
@@ -146,6 +167,15 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
               <span>{answer.band.ends[2]}</span>
             </div>
           </div>
+        </section>
+      )}
+
+      {answer.charts?.radar && shown.band && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
+          <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+            You against your market
+          </h3>
+          <RadarFigure chart={answer.charts.radar} />
         </section>
       )}
 
