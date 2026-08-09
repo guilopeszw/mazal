@@ -32,7 +32,7 @@ export function FunnelBlock({
 }) {
   return (
     <div>
-      {FUNNEL_STAGES.map(({ stage, label, metrics }) => (
+      {FUNNEL_STAGES.map(({ stage, label, metrics, unassessed }) => (
         <div key={stage}>
           {stage === MEDIA_PRODUCT_BOUNDARY && (
             <BoundaryRule above="mídia" below="produto · oferta · experiência" />
@@ -41,6 +41,7 @@ export function FunnelBlock({
             stage={stage}
             label={label}
             metrics={metrics}
+            unassessed={unassessed}
             tone={toneFor(stage, leak)}
             reading={stageValue(stage, flight)}
           />
@@ -54,12 +55,14 @@ function StageRow({
   stage,
   label,
   metrics,
+  unassessed,
   tone,
   reading,
 }: {
   stage: FunnelStage;
   label: string;
   metrics: string;
+  unassessed?: string;
   tone: "upstream" | "leak" | "downstream";
   reading: { metric: string; value: number } | null;
 }) {
@@ -104,6 +107,13 @@ function StageRow({
         >
           {metrics}
         </span>
+        {/* A skipped stage says so, and says why. An unexplained blank upstream of the leak is
+            a hole in the argument; a disclosed limitation is the argument working. */}
+        {unassessed && !reading && (
+          <span className="mt-1 block max-w-[52ch] text-[11px] leading-snug text-ink-soft">
+            {unassessed}
+          </span>
+        )}
       </span>
 
       {/* The reading. A funnel without quantities is a legend, not a diagnosis. */}
@@ -130,7 +140,7 @@ function StageRow({
               isGhost ? "text-ghost" : "text-ink-soft"
             }`}
           >
-            {isGhost ? "sintoma" : reading ? "conforme" : "sem dados"}
+            {isGhost ? "sintoma" : reading ? "conforme" : "não avaliado"}
           </span>
         )}
       </span>

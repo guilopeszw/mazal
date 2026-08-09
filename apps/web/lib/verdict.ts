@@ -1,4 +1,4 @@
-import type { Diagnosis, ReferenceMode } from "@mazal/contracts";
+import type { Diagnosis, ReferenceMode, Verdict } from "@mazal/contracts";
 
 /**
  * What gets stamped across the header.
@@ -15,6 +15,7 @@ import type { Diagnosis, ReferenceMode } from "@mazal/contracts";
 export function verdictStamp(
   diagnosis: Diagnosis,
   reference: ReferenceMode,
+  verdict?: Verdict,
 ): { text: string; note: string } {
   if (diagnosis.primary === null) {
     return {
@@ -30,8 +31,31 @@ export function verdictStamp(
     };
   }
 
-  // Pre-flight: the campaign has not run, so the decision is whether to spend at all.
+  /**
+   * Pre-flight: the campaign has not run, so the decision is whether to spend at all — and
+   * that decision belongs to `predict`, not to this file. Deriving it here from the cause
+   * layer produced a sheet that stamped "não lance" while the engine's `Verdict` said
+   * `launch_small`: the UI asserting a verdict its own engine contradicts, which is the one
+   * failure the whole "every number comes from deterministic TypeScript" rule exists to stop.
+   *
+   * Only the wording is ours. The decision is read.
+   */
   if (reference.kind === "benchmark") {
+    const decision = verdict?.decision ?? "dont_launch";
+    if (decision === "launch") {
+      return {
+        text: "pode lançar",
+        note: "A banda projetada abre acima do seu ponto de equilíbrio mesmo no pior caso.",
+      };
+    }
+    if (decision === "launch_small") {
+      return {
+        text: "lance pequeno",
+        note:
+          verdict?.killTrigger ??
+          "A banda cruza o seu ponto de equilíbrio: começa pequeno e mata cedo se não subir.",
+      };
+    }
     return {
       text: "não lance",
       note: "O vazamento está abaixo da linha. Lançar assim gasta mídia num funil que já vaza.",

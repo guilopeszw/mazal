@@ -1,4 +1,4 @@
-import type { Diagnosis, ReferenceMode } from "@mazal/contracts";
+import type { Diagnosis, ReferenceMode, Verdict } from "@mazal/contracts";
 import { Barcode } from "./barcode";
 import { Stamp } from "./stamp";
 import { formatDate } from "@/lib/format";
@@ -16,18 +16,20 @@ import { documentNumber, groupDocumentNumber, verdictStamp } from "@/lib/verdict
 export function DocumentHeader({
   diagnosis,
   reference,
+  verdict: engineVerdict,
   campaignId,
   lastDate,
   moment,
 }: {
   diagnosis: Diagnosis;
   reference: ReferenceMode;
+  verdict: Verdict;
   campaignId: string;
   lastDate: string;
   moment: string;
 }) {
   const number = documentNumber(campaignId, lastDate);
-  const verdict = verdictStamp(diagnosis, reference);
+  const verdict = verdictStamp(diagnosis, reference, engineVerdict);
 
   return (
     <header className="grid gap-6 px-5 pb-6 pt-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-8 sm:pt-8">
@@ -50,7 +52,14 @@ export function DocumentHeader({
         </p>
       </div>
 
-      <div className="relative flex flex-col items-start gap-4 sm:items-end sm:text-right">
+      {/*
+        The stamp overprints paper and the header's own rule, never a field value. Struck at
+        -7° it lifts its right end by roughly half its width times sin 7 — about sixteen pixels
+        — and at the previous clearance that end landed across "VIA cliente" and cancelled it.
+        Overprinting is true to the world; making a value unreadable is a bug wearing the
+        world's clothes.
+      */}
+      <div className="relative flex flex-col items-start gap-7 sm:items-end sm:text-right">
         <dl className="font-struck text-[11px] leading-relaxed text-ink-soft">
           <div className="flex gap-2 sm:justify-end">
             <dt className="uppercase tracking-wider">Emissão</dt>
@@ -66,7 +75,7 @@ export function DocumentHeader({
           </div>
         </dl>
 
-        <div className="flex flex-col items-start gap-2 sm:items-end">
+        <div className="flex flex-col items-start gap-2 sm:mr-1 sm:items-end">
           <Stamp tone="verdict" impression="a" strike className="text-base sm:text-xl">
             {verdict.text}
           </Stamp>

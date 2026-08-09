@@ -11,10 +11,24 @@ export const FUNNEL_STAGES: ReadonlyArray<{
   label: string;
   causeLayer: CauseLayer;
   metrics: string;
+  /**
+   * Why a stage carries no verdict, when it carries none. A row with a blank status sitting
+   * upstream of the leak, under a title claiming "first stage that deviated", is a hole in the
+   * argument exactly where it is least affordable — the reader is entitled to ask what the
+   * engine did about the stage it skipped, and the answer is printed rather than implied.
+   */
+  unassessed?: string;
 }> = [
   { stage: 0, label: "Entrega", causeLayer: "media", metrics: "impressões · CPM · frequência" },
   { stage: 1, label: "Atenção", causeLayer: "media", metrics: "CTR · CPC" },
-  { stage: 2, label: "Chegada", causeLayer: "experience", metrics: "sessões · rejeição" },
+  {
+    stage: 2,
+    label: "Chegada",
+    causeLayer: "experience",
+    metrics: "sessões · rejeição",
+    unassessed:
+      "A loja não envia sessões nem rejeição, então o estágio não foi avaliado — nem aprovado, nem acusado.",
+  },
   { stage: 3, label: "Interesse no produto", causeLayer: "product", metrics: "add-to-cart · custo por ATC" },
   { stage: 4, label: "Intenção", causeLayer: "experience", metrics: "checkouts iniciados" },
   { stage: 5, label: "Compra", causeLayer: "experience", metrics: "conversão · CPA" },

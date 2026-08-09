@@ -8,7 +8,7 @@ import type {
   ReferenceMode,
   Verdict,
 } from "@mazal/contracts";
-import { aggregate, atcRate, cvr } from "@mazal/contracts/metrics";
+import { aggregate, atcRate, cvr, icRate } from "@mazal/contracts/metrics";
 import { benchmarks } from "@mazal/data";
 import { predict } from "@mazal/engine";
 import { CHANGE_POINT, buildSeries, splitAtChangePoint } from "./series.ts";
@@ -163,7 +163,7 @@ const case1: DemoCase = {
       id: "pdp-copy",
       title: "Reescrever a descrição em torno de prazo e garantia",
       change: "Substituir o texto do fabricante por 900 caracteres que respondem às três dúvidas do checkout",
-      expectedEffect: { metric: "atcRate", from: 0.012, to: 0.034 },
+      expectedEffect: { metric: "atcRate", from: atcRate(case1Window), to: 0.034 },
       confidence: "medium",
       reversible: true,
       actor: "mazal",
@@ -172,7 +172,7 @@ const case1: DemoCase = {
       id: "offer-pix",
       title: "Publicar o desconto à vista no anúncio",
       change: "Mostrar o preço no Pix ao lado do parcelado, em vez de só no checkout",
-      expectedEffect: { metric: "cvr", from: 0.003, to: 0.011 },
+      expectedEffect: { metric: "cvr", from: cvr(case1Window), to: 0.011 },
       confidence: "low",
       reversible: true,
       actor: "mazal",
@@ -181,7 +181,7 @@ const case1: DemoCase = {
       id: "photos",
       title: "Fotografar o produto em uso",
       change: "Subir seis fotos além das duas do catálogo do fornecedor",
-      expectedEffect: { metric: "photos", from: 2, to: 8 },
+      expectedEffect: { metric: "photos", from: card.pdpImages, to: 8 },
       confidence: "high",
       reversible: false,
       actor: "seller",
@@ -236,13 +236,21 @@ const case2CvrObserved = cvr(case2Window);
  *
  * Claim 3: the leak is at stage 3, below the media line, so no action here touches the
  * campaign. "People are still clicking" is the finding; pausing the ads would contradict it.
+ *
+ * **Every `from` is read off the same window the funnel and the apuração read**, and the ETA
+ * comes off the product card. Typed literals here printed 0,4% under an arrow while the two
+ * blocks above printed 0,6% for the same metric — on the panel the seller actually signs, which
+ * is the worst place on the sheet to be caught disagreeing with yourself.
  */
+const ETA_NOW = card.deliveryEtaDays;
+const ETA_BEFORE = 9; // what the supplier held until the day the change point landed
+
 const case2Actions: Action[] = [
   {
     id: "pdp-eta",
     title: "Declarar o prazo real na página do produto",
-    change: "Exibir “chega em até 22 dias” acima do botão de compra, não no rodapé do checkout",
-    expectedEffect: { metric: "atcRate", from: 0.004, to: 0.031 },
+    change: `Exibir “chega em até ${ETA_NOW} dias” acima do botão de compra, não no rodapé do checkout`,
+    expectedEffect: { metric: "atcRate", from: atcRate(case2Window), to: 0.031 },
     confidence: "medium",
     reversible: true,
     actor: "mazal",
@@ -251,7 +259,7 @@ const case2Actions: Action[] = [
     id: "offer-freight",
     title: "Compensar a espera com frete grátis",
     change: "Frete grátis acima de R$ 150 enquanto o prazo do fornecedor estiver acima de 15 dias",
-    expectedEffect: { metric: "icRate", from: 0.27, to: 0.38 },
+    expectedEffect: { metric: "icRate", from: icRate(case2Window), to: 0.62 },
     confidence: "medium",
     reversible: true,
     actor: "mazal",
@@ -259,8 +267,8 @@ const case2Actions: Action[] = [
   {
     id: "supplier",
     title: "Renegociar o prazo com o fornecedor",
-    change: "Voltar o lead time para os 9 dias praticados até 11 de julho",
-    expectedEffect: { metric: "deliveryDays", from: 22, to: 9 },
+    change: `Voltar o lead time para os ${ETA_BEFORE} dias praticados até 11 de julho`,
+    expectedEffect: { metric: "deliveryDays", from: ETA_NOW, to: ETA_BEFORE },
     confidence: "low",
     reversible: false,
     actor: "seller",
@@ -269,7 +277,7 @@ const case2Actions: Action[] = [
     id: "stock-local",
     title: "Manter estoque local dos dois SKUs que giram",
     change: "Comprar 40 unidades para expedição própria, cortando o fornecedor do caminho",
-    expectedEffect: { metric: "deliveryDays", from: 22, to: 4 },
+    expectedEffect: { metric: "deliveryDays", from: ETA_NOW, to: 4 },
     confidence: "medium",
     reversible: false,
     actor: "seller",
@@ -301,7 +309,7 @@ const case2: DemoCase = {
       evidence: {
         date: CHANGE_POINT,
         type: "eta_change",
-        detail: "prazo do fornecedor: 9 dias → 22 dias",
+        detail: `prazo do fornecedor: ${ETA_BEFORE} dias → ${ETA_NOW} dias`,
       },
     },
     secondary: [

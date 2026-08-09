@@ -81,6 +81,39 @@ export function Despacho({
             está no ar. As notas acima são compostas do próprio parecer.
           </p>
         </form>
+
+        {/*
+          The foot of a margin is where a document declares what it is made of. This is the
+          provenance `docs/benchmark-provenance.md` says must be sayable out loud — seven of the
+          twelve reference metrics are measured from Olist and five are published estimates, and
+          the sheet quotes both. Saying it in the margin is cheaper than saying it under every
+          number, and it is the sentence slide 6 owes.
+        */}
+        <div className="mt-6 border-t border-rule pt-3">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.16em] text-ink-soft">
+            procedência
+          </h3>
+          <dl className="mt-2 space-y-1.5 text-[11px] leading-snug text-ink-soft">
+            <div>
+              <dt className="font-struck text-[10px] uppercase tracking-wider text-ghost">
+                medido
+              </dt>
+              <dd>
+                7 de 12 métricas de referência vêm do Olist — 62 categorias, 99,84% dos pedidos.
+                Cada uma imprime o seu <span className="font-struck">n</span>.
+              </dd>
+            </div>
+            <div>
+              <dt className="font-struck text-[10px] uppercase tracking-wider text-ghost">
+                estimado
+              </dt>
+              <dd>
+                As outras 5 são medianas publicadas do varejo brasileiro, sem citação por número.
+                Aparecem carimbadas como estimativa, nunca como <span className="font-struck">n = 0</span>.
+              </dd>
+            </div>
+          </dl>
+        </div>
       </div>
     </aside>
   );

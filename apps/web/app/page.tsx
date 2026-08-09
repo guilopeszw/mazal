@@ -28,6 +28,7 @@ export default function Home() {
         <DocumentHeader
           diagnosis={diagnosis}
           reference={reference}
+          verdict={verdict}
           campaignId={flight.campaignId}
           lastDate={days[days.length - 1]!.date}
           moment={demo.moment}
