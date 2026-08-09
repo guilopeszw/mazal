@@ -211,3 +211,88 @@
     transition-duration: 0.01ms !important;
   }
 }
+/**
+ * Chart tokens — the bklit components in `components/charts` read these.
+ *
+ * The installer shipped a neutral grey ramp defined only under `:root`, with a
+ * `.dark` override behind `@custom-variant dark (&:is(.dark *))` — a class this
+ * app never sets — so every chart drew its light palette in dark mode. Replaced
+ * wholesale.
+ *
+ * Every value here is a reference to an identity token above; none carries a
+ * colour of its own. The identity tokens are the ones defined in all three
+ * theme states (bare `@theme`, the `prefers-color-scheme` block, and
+ * `[data-theme="dark"]`), and a `var()` reference resolves where it is *used*,
+ * so every chart token is defined in the default un-stamped state and follows
+ * the theme by construction — there is no second ramp to keep in step.
+ *
+ * One accent, as everywhere else: green is the conclusion, red is the leak,
+ * and series otherwise separate on the ink ramp by weight, dash, and opacity.
+ * No hue lives here that the identity does not already own.
+ */
+:root {
+  --chart-1: var(--color-ink);
+  --chart-2: var(--color-ink-soft);
+  --chart-3: var(--color-ink-faint);
+  --chart-4: var(--color-line-strong);
+  --chart-5: var(--color-line);
+
+  --chart-background: var(--color-raised);
+  --chart-foreground: var(--color-ink);
+  --chart-foreground-muted: var(--color-ink-soft);
+  /* Axis dates and radar labels are 11–12px text on the raised card, so this
+     is ink-soft rather than ink-faint: ink-faint reads ~3.5:1 against raised
+     and fails the 4.5:1 text bar; ink-soft clears it in both themes. */
+  --chart-label: var(--color-ink-soft);
+  --chart-grid: var(--color-line);
+  --chart-crosshair: var(--color-ink-soft);
+  --chart-brush-border: var(--color-line-strong);
+
+  --chart-line-primary: var(--color-accent);
+  --chart-line-secondary: var(--color-ink-soft);
+  --chart-indicator-color: var(--color-accent);
+  --chart-indicator-secondary-color: var(--color-ink-soft);
+
+  --chart-tooltip-background: var(--color-ink);
+  --chart-tooltip-foreground: var(--color-ground);
+  --chart-tooltip-muted: var(--color-line-strong);
+  --chart-marker-background: var(--color-raised);
+  --chart-marker-border: var(--color-line-strong);
+  --chart-marker-foreground: var(--color-ink);
+  --chart-marker-badge-background: var(--color-accent-soft);
+  --chart-marker-badge-foreground: var(--color-accent-ink);
+  --chart-segment-background: var(--color-accent-soft);
+  --chart-segment-line: var(--color-accent);
+
+  --legend: var(--color-raised);
+  --legend-foreground: var(--color-ink);
+  --legend-muted: var(--color-sunken);
+  --legend-muted-foreground: var(--color-ink-soft);
+  --legend-track: var(--color-sunken);
+
+  /* Names the components inherited from their home design system. */
+  --foreground: var(--color-ink);
+  --background: var(--color-raised);
+  --border: var(--color-line);
+  --muted-foreground: var(--color-ink-soft);
+  --color-muted: var(--color-sunken);
+}
+
+/* The chart-token utility classes the components use (`text-chart-label`,
+   `bg-legend-track`, …). `inline` keeps each one a live reference, so the
+   utilities move with the theme like everything above. */
+@theme inline {
+  --color-chart-label: var(--chart-label);
+  --color-chart-tooltip-background: var(--chart-tooltip-background);
+  --color-chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --color-chart-tooltip-muted: var(--chart-tooltip-muted);
+  --color-legend: var(--legend);
+  --color-legend-foreground: var(--legend-foreground);
+  --color-legend-muted: var(--legend-muted);
+  --color-legend-muted-foreground: var(--legend-muted-foreground);
+  --color-legend-track: var(--legend-track);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-border: var(--border);
+  --color-muted-foreground: var(--muted-foreground);
+}

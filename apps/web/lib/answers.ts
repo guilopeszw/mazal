@@ -9,7 +9,7 @@ import type {
   SellerLeverName,
   StoreEvent,
 } from "@mazal/contracts";
-import { aggregate, atcRate } from "@mazal/contracts/metrics";
+import { aggregate, atcRate, roas } from "@mazal/contracts/metrics";
 import { benchmarks, sellerBenchmarks } from "@mazal/data";
 import {
   MEASURED_STAGES,
@@ -51,6 +51,44 @@ export type AnswerKey = "diagnose" | "atc" | "predict";
 
 export type VerdictSegment = { text: string; tone?: "good" | "bad" };
 
+/** One count stage of the funnel chart. `tone` is `toneFor`, serialised. */
+export type FunnelSlice = {
+  label: string;
+  value: number;
+  display: string;
+  tone: "ok" | "leak" | "after";
+};
+
+export type ChartPoint = { date: string; value: number };
+
+/**
+ * Chart payloads. Same rule as everything else in an `Answer`: every number was
+ * produced by the engine or read straight off the contract — a count field, a
+ * rate function from `@mazal/contracts/metrics`, a percentile from
+ * `profileCard`. The client positions them and never derives a new one.
+ */
+export type AnswerCharts = {
+  funnel?: { slices: FunnelSlice[]; summary: string };
+  daily?: {
+    label: string;
+    points: ChartPoint[];
+    /** The day the engine says the metric turned. Absent = no mark. */
+    changePoint?: string;
+    markLabel?: string;
+    summary: string;
+  };
+  /** Daily ROAS re-based against break-even: 0 on this axis *is* break-even. */
+  margin?: { points: ChartPoint[]; breakEven: string; summary: string };
+  radar?: {
+    axes: { key: string; label: string }[];
+    /** 0–100 per axis; distance from centre is standing among peers (out = better). */
+    seller: Record<string, number>;
+    /** The category median — 50 on every axis, by what a median is. */
+    peers: Record<string, number>;
+    summary: string;
+  };
+};
+
 export type Answer = {
   asked: string;
   verdict: VerdictSegment[];
@@ -73,6 +111,7 @@ export type Answer = {
    * as a sales pitch, and a p90 of 20× on a seller's screen is worse than no number.
    */
   plan?: { actions: Action[]; projected: string; assumption: string };
+  charts?: AnswerCharts;
   note: string;
 };
 
@@ -121,6 +160,86 @@ function stageRows(diagnosis: Diagnosis, window: CampaignDay) {
   });
 }
 
+/**
+ * The five stages of the funnel that are counts on the contract, in funnel
+ * order. Read straight off `CampaignDay` — no rate is computed here, which is
+ * also why stage 6 (AOV, a money rate) and the unassessed stage 2 (no data)
+ * have no segment. The rows beneath the chart still carry all seven.
+ */
+const FUNNEL_COUNTS: ReadonlyArray<{ stage: FunnelStage; of: (d: CampaignDay) => number }> = [
+  { stage: 0, of: (d) => d.impressions },
+  { stage: 1, of: (d) => d.clicks },
+  { stage: 3, of: (d) => d.addToCarts },
+  { stage: 4, of: (d) => d.checkoutsInitiated },
+  { stage: 5, of: (d) => d.purchases },
+];
+
+/** The three campaign charts of a diagnosis. Shared by the fixture case and an upload. */
+function buildDiagnoseCharts(
+  diagnosis: Diagnosis,
+  days: CampaignDay[],
+  window: CampaignDay,
+  card: ProductCard,
+): AnswerCharts {
+  const leak = diagnosis.primary?.stage ?? null;
+
+  const slices = FUNNEL_COUNTS.map(({ stage, of }) => {
+    const tone = toneFor(stage, leak);
+    return {
+      label: FUNNEL_STAGES.find((s) => s.stage === stage)?.label ?? `Stage ${stage}`,
+      value: of(window),
+      display: formatCount(of(window)),
+      tone: (tone === "upstream" ? "ok" : tone === "leak" ? "leak" : "after") as FunnelSlice["tone"],
+    };
+  });
+  const funnel = {
+    slices,
+    summary: `The funnel over the last ${WINDOW_DAYS} days: ${slices
+      .map((s) => `${s.display} ${s.label.toLowerCase()}${s.tone === "leak" ? " — the leak" : ""}`)
+      .join(", ")}.`,
+  };
+
+  const primary = diagnosis.primary;
+  const spec = primary ? MEASURED_STAGES.find((s) => s.stage === primary.stage) : undefined;
+  const daily =
+    primary && spec && days.length > 1
+      ? {
+          label: metricLabel(primary.metric),
+          // Each point is the contract's own rate function over one day's counts.
+          points: days.map((d) => ({ date: d.date, value: spec.observe(d) })),
+          ...(diagnosis.changePoint
+            ? {
+                changePoint: diagnosis.changePoint.date,
+                markLabel: `broke ${formatDate(diagnosis.changePoint.date)}`,
+              }
+            : {}),
+          summary: `${metricLabel(primary.metric)} by day over the whole flight${
+            diagnosis.changePoint
+              ? `; the engine dates the turn to ${formatDate(diagnosis.changePoint.date)}`
+              : ""
+          }. The numbers behind it are in the table.`,
+        }
+      : undefined;
+
+  /**
+   * Break-even comes from the engine's verdict, not from arithmetic here.
+   * Re-basing each day's ROAS against it is positioning, the same move as the
+   * percent mapping on the prediction band: 0 on this chart's axis *is* the
+   * break-even line, and no re-based value is ever printed.
+   */
+  const breakEven = predict({ card, table: benchmarks }).breakEvenRoas;
+  const margin =
+    days.length > 1
+      ? {
+          points: days.map((d) => ({ date: d.date, value: roas(d) - breakEven })),
+          breakEven: formatRoas(breakEven),
+          summary: `Daily ROAS measured against the break-even of ${formatRoas(breakEven)}. Days above the line paid for themselves; days below ran at a loss.`,
+        }
+      : undefined;
+
+  return { funnel, ...(daily ? { daily } : {}), ...(margin ? { margin } : {}) };
+}
+
 /** The plan payload, p50 only — see the comment on `Answer.plan`. */
 function planPayload(
   plan: RecoveryPlan,
@@ -144,14 +263,16 @@ function planPayload(
 function diagnoseAnswer(args: {
   asked: string;
   diagnosis: Diagnosis;
+  days: CampaignDay[];
   window: CampaignDay;
   card: ProductCard;
   reference: ReferenceMode;
   plan: RecoveryPlan;
   noteSuffix?: string;
 }): Answer {
-  const { asked, diagnosis, window, card, reference, plan, noteSuffix = "" } = args;
+  const { asked, diagnosis, days, window, card, reference, plan, noteSuffix = "" } = args;
   const primary = diagnosis.primary;
+  const charts = buildDiagnoseCharts(diagnosis, days, window, card);
 
   const categoryRow = benchmarks[card.category].metrics;
   const measured = Object.values(categoryRow).filter((m) => m.n > 0);
@@ -168,6 +289,7 @@ function diagnoseAnswer(args: {
       said: "Nothing deviated far enough from its reference to be flagged.",
       stages: stageRows(diagnosis, window),
       rows: [],
+      charts,
       note: benchmarkNote + noteSuffix,
     };
   }
@@ -215,6 +337,7 @@ function diagnoseAnswer(args: {
       },
     ],
     plan: planPayload(plan, diagnosis, reference),
+    charts,
     note: `Rule ${primary.rule} · reference: ${provenance.label}. ${benchmarkNote}${noteSuffix}`,
   };
 }
@@ -236,6 +359,7 @@ export function buildUploadAnswer(
   return diagnoseAnswer({
     asked,
     diagnosis,
+    days,
     window: aggregate(days.slice(-WINDOW_DAYS)),
     card,
     reference,
@@ -273,6 +397,7 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
   const diagnoseAns = diagnoseAnswer({
     asked: "My ROAS dropped this week",
     diagnosis,
+    days: case2.days,
     window,
     card: case2.card,
     reference,
@@ -397,6 +522,27 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
     p50,
   );
 
+  /**
+   * The peer radar: this card against its category across the five levers.
+   * Each axis is the percentile `profileCard` computed — engine output — drawn
+   * so that distance from the centre is standing among peers, with out = better
+   * (the percentile stores 1 as the bad end, so the flip is orientation, not a
+   * new number). The category median is 50 on every axis, by what a median is.
+   */
+  const radar =
+    profile.length >= 3
+      ? {
+          axes: profile.map((f) => ({ key: f.lever, label: LEVER[f.lever].label })),
+          seller: Object.fromEntries(
+            profile.map((f) => [f.lever, Math.round((1 - f.percentile) * 100)]),
+          ),
+          peers: Object.fromEntries(profile.map((f) => [f.lever, 50])),
+          summary: `Where this card sits among sellers in its category, across ${profile.length} levers: ${profile
+            .map((f) => `${LEVER[f.lever].label.toLowerCase()} at the ${Math.round(f.percentile * 100)}th percentile`)
+            .join(", ")} (100 is the bad end). The dashed ring is the category median.`,
+        }
+      : undefined;
+
   const predictAnswer: Answer = {
     asked: "Should I launch this campaign?",
     verdict: decisionVerdict[verdict.decision],
@@ -414,6 +560,7 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
       hit: f.percentile >= 0.75,
     })),
     plan: preflightPlan,
+    ...(radar ? { charts: { radar } } : {}),
     note: replicationNote + silentNote,
   };
 
