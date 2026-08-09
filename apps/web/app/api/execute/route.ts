@@ -1,5 +1,6 @@
+import { z } from "zod";
 import type { Action } from "@mazal/contracts";
-import { execute, metaConfigured, type ExecutionResult } from "@/lib/meta";
+import { execute, executeConfigured, type ExecutionResult } from "@/lib/meta";
 
 /**
  * The one route that writes.
@@ -18,9 +19,70 @@ import { execute, metaConfigured, type ExecutionResult } from "@/lib/meta";
  */
 const log: { at: string; receipt: string; actions: Action[]; mode: string }[] = [];
 
+/**
+ * Runtime validation, because the TypeScript types here are gone by the time a
+ * request arrives. `body.actions` was cast straight to `Action[]` and its
+ * `execution` handed to the Meta client — so a hand-written POST chose the
+ * operation, and `op` was whatever the caller said it was.
+ */
+const executableOp = z.discriminatedUnion("op", [
+  z.object({ op: z.literal("pause_campaign") }),
+  // Bounded here as well as in the client. A ceiling that exists in one layer
+  // is a ceiling that moves the first time someone calls the other one.
+  z.object({ op: z.literal("set_daily_budget"), multiplier: z.number().min(0.5).max(1.5) }),
+  z.object({ op: z.literal("set_frequency_cap"), perWeek: z.number().int().min(1).max(14) }),
+]);
+
+const actionSchema = z.object({
+  id: z.string().min(1).max(120),
+  title: z.string().max(300).optional(),
+  change: z.string().max(600).optional(),
+  actor: z.enum(["mazal", "seller"]),
+  execution: executableOp.optional(),
+});
+
+/** A plan is a handful of actions. A thousand of them is not a plan. */
+const bodySchema = z.object({ actions: z.array(actionSchema).max(20).default([]) });
+
+/**
+ * Live execution requires a shared secret; the simulated path does not.
+ *
+ * Once credentials are present this endpoint can pause a real campaign, and it
+ * had no authentication at all — anyone who could reach the deployment could
+ * stop a seller's advertising. Simulated mode touches nothing, so it stays open
+ * and the demo works with no configuration.
+ */
+function authorised(request: Request): boolean {
+  const secret = process.env["MAZAL_EXECUTE_SECRET"];
+  if (!executeConfigured()) return true;
+  if (!secret) return false;
+
+  const presented = request.headers.get("x-mazal-execute");
+  if (!presented || presented.length !== secret.length) return false;
+
+  // Constant-time-ish: compare every character regardless of the first mismatch.
+  let diff = 0;
+  for (let i = 0; i < secret.length; i++) diff |= secret.charCodeAt(i) ^ presented.charCodeAt(i);
+  return diff === 0;
+}
+
 export async function POST(request: Request) {
-  const body = (await request.json()) as { actions?: Action[] };
-  const requested = Array.isArray(body.actions) ? body.actions : [];
+  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return Response.json({ error: "Malformed plan — nothing was run." }, { status: 400 });
+  }
+
+  if (!authorised(request)) {
+    return Response.json(
+      {
+        error:
+          "This build can change a real ad account, so execution needs its shared secret. Nothing was run.",
+      },
+      { status: 401 },
+    );
+  }
+
+  const requested = parsed.data.actions;
 
   /**
    * `actor` is filtered here and not only in the panel that calls this. The
@@ -29,10 +91,10 @@ export async function POST(request: Request) {
    * never offers to execute what only the seller can do", and a receipt for an
    * action it cannot perform is a lie with a reference number on it.
    */
-  const actions = requested.filter((a) => a?.actor === "mazal");
+  const actions = requested.filter((a) => a.actor === "mazal");
   const refused = requested
-    .filter((a) => a?.actor !== "mazal")
-    .map((a) => ({ id: a?.id ?? "unknown", reason: "actor is the seller — Mazal cannot perform this" }));
+    .filter((a) => a.actor !== "mazal")
+    .map((a) => ({ id: a.id, reason: "actor is the seller — Mazal cannot perform this" }));
 
   const results: (ExecutionResult & { id: string })[] = [];
   for (const a of actions) {
@@ -51,7 +113,7 @@ export async function POST(request: Request) {
   const live = results.some((r) => r.mode === "live");
   const at = new Date().toISOString();
   const receipt = `MZL-${at.slice(0, 10).replace(/-/g, "")}-${String(log.length + 1).padStart(4, "0")}`;
-  log.push({ at, receipt, actions, mode: live ? "live" : "simulated" });
+  log.push({ at, receipt, actions: actions as Action[], mode: live ? "live" : "simulated" });
 
   return Response.json({
     receipt,
@@ -61,6 +123,6 @@ export async function POST(request: Request) {
     mode: live ? "live" : "simulated",
     /** Kept for callers written against the earlier shape. */
     simulated: !live,
-    configured: metaConfigured(),
+    configured: executeConfigured(),
   });
 }

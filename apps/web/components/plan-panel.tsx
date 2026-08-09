@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Action } from "@mazal/contracts";
+import { runPlan } from "@/app/actions";
 import { formatMetric, metricLabel } from "@/lib/format";
 
 /**
@@ -52,25 +53,18 @@ export function PlanPanel({
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch("/api/execute", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ actions: selected }),
-      });
-      if (!res.ok) throw new Error(`execute returned ${res.status}`);
-      const data = (await res.json()) as {
-        receipt: string;
-        mode: "simulated" | "live";
-        results?: { id: string; detail: string; ok: boolean }[];
-      };
+      // A server action, not a fetch to /api/execute. That route needs a shared
+      // secret before it will touch a real account, and a browser cannot keep
+      // one — shipping it to the client would be theatre.
+      const data = await runPlan(selected);
       setReceipt({
         code: data.receipt,
         count: selected.length,
-        mode: data.mode ?? "simulated",
-        results: data.results ?? [],
+        mode: data.mode,
+        results: data.results,
       });
     } catch {
-      setError("Could not reach the execution log. Nothing was run.");
+      setError("Could not run the plan. Nothing was changed.");
     } finally {
       setBusy(false);
     }

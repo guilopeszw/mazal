@@ -2,6 +2,7 @@
 
 import {
   OLIST_CATEGORIES,
+  type Action,
   type CampaignDay,
   type CardProvenance,
   type OlistCategory,
@@ -10,6 +11,7 @@ import {
 import { benchmarks } from "@mazal/data";
 import { parseMetaCsv, productCardSchema } from "@mazal/ingest";
 import { buildUploadAnswer, type Answer } from "@/lib/answers";
+import { execute } from "@/lib/meta";
 import { formatCount, formatPercent } from "@/lib/format";
 
 /**
@@ -153,5 +155,43 @@ export async function diagnoseUpload(input: {
   return {
     ok: true,
     answer: buildUploadAnswer(days, parsed.data, [], `Diagnose ${input.fileName}`, noteSuffix),
+  };
+}
+
+/**
+ * Running a plan, from the screen.
+ *
+ * A server action rather than the public `/api/execute` route, for one reason:
+ * the route now needs a shared secret before it will touch a real account, and
+ * a browser cannot hold a secret. Shipping one to the client would be theatre —
+ * anyone could read it out of the bundle.
+ *
+ * Here the secret is never needed at all. The action runs on the server, and
+ * Next only dispatches it for its own encrypted action id, so it is not an
+ * endpoint someone can discover and POST to. `/api/execute` stays for callers
+ * outside the browser, and those bring the secret.
+ */
+export async function runPlan(
+  actions: Action[],
+): Promise<{ receipt: string; mode: "simulated" | "live"; results: { id: string; detail: string; ok: boolean }[] }> {
+  // Same rule as the route, restated rather than imported: Mazal never performs
+  // what only the seller can do, and this is a second front door.
+  const mine = actions.filter((a) => a?.actor === "mazal").slice(0, 20);
+
+  const results: { id: string; detail: string; ok: boolean; mode: "simulated" | "live" }[] = [];
+  for (const a of mine) {
+    if (!a.execution) {
+      results.push({ id: a.id, mode: "simulated", ok: true, detail: "no executable operation — logged only" });
+      continue;
+    }
+    results.push({ id: a.id, ...(await execute(a.execution)) });
+  }
+
+  const live = results.some((r) => r.mode === "live");
+  const at = new Date().toISOString();
+  return {
+    receipt: `MZL-${at.slice(0, 10).replace(/-/g, "")}-${String(Date.now() % 10000).padStart(4, "0")}`,
+    mode: live ? "live" : "simulated",
+    results: results.map(({ id, detail, ok }) => ({ id, detail, ok })),
   };
 }

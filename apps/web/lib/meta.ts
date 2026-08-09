@@ -38,7 +38,7 @@ export type ExecutionResult = {
   ok: boolean;
 };
 
-export function metaConfigured(): boolean {
+export function executeConfigured(): boolean {
   return Boolean(process.env["META_ACCESS_TOKEN"] && process.env["META_CAMPAIGN_ID"]);
 }
 
@@ -48,23 +48,35 @@ export function metaConfigured(): boolean {
  * unbounded budget write is not a repair, it is a decision, and a seller makes
  * those.
  */
+/** A write that hangs is worse than one that fails: the seller is left unsure. */
+const TIMEOUT_MS = 8000;
+
 async function post(path: string, body: Record<string, string>): Promise<{ ok: boolean; detail: string }> {
   const token = process.env["META_ACCESS_TOKEN"]!;
-  const res = await fetch(`${GRAPH}/${path}`, {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ ...body, access_token: token }),
-  });
 
-  const payload = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
-  if (!res.ok || payload.error) {
-    return { ok: false, detail: payload.error?.message ?? `Meta returned ${res.status}` };
+  try {
+    const res = await fetch(`${GRAPH}/${encodeURIComponent(path)}`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ ...body, access_token: token }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+
+    const payload = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
+    if (!res.ok || payload.error) {
+      // Meta's message can echo back what was sent, so it is not passed through
+      // verbatim — a token must never reach a screen or a log.
+      return { ok: false, detail: `Meta rejected it (${res.status})` };
+    }
+    return { ok: true, detail: "accepted by Meta" };
+  } catch (e) {
+    const timedOut = e instanceof Error && e.name === "TimeoutError";
+    return { ok: false, detail: timedOut ? `no answer from Meta in ${TIMEOUT_MS / 1000}s` : "could not reach Meta" };
   }
-  return { ok: true, detail: "accepted by Meta" };
 }
 
 export async function execute(op: ExecutableOp): Promise<ExecutionResult> {
-  if (!metaConfigured()) {
+  if (!executeConfigured()) {
     return {
       mode: "simulated",
       ok: true,
@@ -81,8 +93,12 @@ export async function execute(op: ExecutableOp): Promise<ExecutionResult> {
     }
 
     case "set_daily_budget": {
-      // Bounded on both sides. A runaway multiplier is the one mistake in here
-      // that costs real money, and it is not worth the flexibility.
+      /**
+       * Clamped here *as well as* at the route boundary. The route validates
+       * what arrives over HTTP; this guards every other caller, including a
+       * future one that does not go through it. A ceiling enforced in one layer
+       * is a ceiling that moves the first time someone calls the other.
+       */
       const factor = Math.min(Math.max(op.multiplier, 0.5), 1.5);
       const current = Number(process.env["META_DAILY_BUDGET_CENTS"] ?? "0");
       if (!Number.isFinite(current) || current <= 0) {
