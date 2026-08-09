@@ -794,3 +794,11 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 **Next:** Commit + merge to `stage` when the regenerated fixtures land; re-run the build afterwards since the fixtures are baked in at build time.
 
 **Blocked / watch out:** With the current `demo-case2.json`, the engine's change point (2026-07-11) lands 2 days before the `eta_change` event (2026-07-13), so `Finding.evidence` is not attached and the evidence card does not render. The UI handles both shapes; if the demo needs the evidence sentence, the regenerated fixture's event has to land within a day of the detected change point.
+
+## 2026-08-09 · E-agent · Vercel connection and PR handoff
+
+**Done:** The Vercel project `mazal` is connected to GitHub repository `JucaGF/mazal`. The integration branch `joaquim/chore/integrate-main-mcp` was published to that repository and is ready for a pull request targeting `main` (no `stage` branch is available in the remote).
+
+**Next:** Review the PR, run the hosted Vercel preview when it appears, and merge only after the project checks are green.
+
+**Blocked / watch out:** The local `apps/web` production build still hits a restricted-process/Turbopack limitation in this environment; this is documented and should be rechecked by Vercel CI rather than treated as a source-level failure.
