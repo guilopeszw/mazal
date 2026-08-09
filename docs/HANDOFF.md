@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 10:20 BRT · E-agent (Joaquim) · corretivo do typecheck Vercel/Zod 4
+
+**Done:** corrigida a falha de build da Function causada pela inferência do Zod 4 sob `strictNullChecks: false`, sem mudar o schema runtime nem `packages/*`. O bridge fica isolado na exportação de `diagnosisSchema`; o build strict normal mantém uma prova estática de compatibilidade com `Diagnosis`. Um typecheck de regressão equivalente ao builder roda antes dos testes MCP. Node 24: build Vercel real verde, 33/33 MCP, typechecks compatível/focalizado/global e 118/118 global verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-build-fix-report.md`.
+
+**Next:** com acesso autorizado, fazer deploy e executar o checklist remoto existente da Vercel/Deco.
+
+**Blocked / watch out:** o comando focalizado sem `allowImportingTsExtensions` ainda acusa somente os imports `.ts` preexistentes de `packages/contracts`; o gate versionado herda corretamente essa opção do tsconfig raiz. `apps/mcp/.gitignore` foi gerado pelo Vercel CLI e permanece fora deste commit.
+
+---
+
 ## 2026-08-09 02:55 BRT · E-agent (Joaquim) · corretivo do rewrite Vercel do MCP
 
 **Done:** corrigido o HIGH do review do PRD 04: a Function Vercel agora monta o Hono autenticado em `/api/mcp`, destino interno do rewrite público `/mcp`. O teste de integração percorre a Function com Host/Origin/bearer e handshake Streamable MCP nesse caminho; RED foi `404`, GREEN é `200`. Node 24: 33/33 MCP, typechecks focalizado/global, 118/118 global, backtest e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-fix-report.md`.

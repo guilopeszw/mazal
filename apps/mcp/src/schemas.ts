@@ -14,6 +14,14 @@ const nonNegativeNumber = finiteNumber.nonnegative();
 const count = nonNegativeNumber.int();
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD');
 
+type Assert<T extends true> = T;
+type SchemaOutputMatches<TSchema extends z.ZodType, TContract> =
+  undefined extends null
+    ? true
+    : z.output<TSchema> extends TContract
+      ? true
+      : false;
+
 export const campaignDaySchema: z.ZodType<CampaignDay> = z.object({
   date: isoDate,
   campaignId: z.string().min(1),
@@ -68,7 +76,7 @@ const findingSchema = z.object({
   evidence: storeEventSchema.optional(),
 }).strict();
 
-export const diagnosisSchema: z.ZodType<Diagnosis> = z.object({
+const diagnosisSchemaDefinition = z.object({
   primary: findingSchema.nullable(),
   secondary: z.array(findingSchema),
   suspectedCause: z.enum([
@@ -84,6 +92,16 @@ export const diagnosisSchema: z.ZodType<Diagnosis> = z.object({
   ]),
   changePoint: z.object({ date: isoDate, metric: z.string().min(1) }).strict().optional(),
 }).strict();
+
+type _DiagnosisSchemaMatchesContract = Assert<
+  SchemaOutputMatches<typeof diagnosisSchemaDefinition, Diagnosis>
+>;
+
+// Vercel's Function builder typechecks with strictNullChecks disabled. Zod 4
+// then reports required fields inside nullable objects as optional, even though
+// the runtime schema still requires them. The strict build above keeps the
+// contract check; this assertion only bridges that compiler-mode mismatch.
+export const diagnosisSchema = diagnosisSchemaDefinition as z.ZodType<Diagnosis>;
 
 export const actionSchema: z.ZodType<Action> = z.object({
   id: z.string().min(1),

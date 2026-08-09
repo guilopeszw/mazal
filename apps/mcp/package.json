@@ -6,7 +6,8 @@
     "node": "24.x"
   },
   "scripts": {
-    "test": "vitest run --passWithNoTests"
+    "test": "pnpm run typecheck:vercel-compat && vitest run --passWithNoTests",
+    "typecheck:vercel-compat": "tsc -p tsconfig.vercel-compat.json --pretty false"
   },
   "dependencies": {
     "@mazal/contracts": "workspace:*",
