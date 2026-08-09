@@ -67,7 +67,7 @@ see yet rather than inventing one.
 | Change point named on detected breaks | 100% | same report |
 | Change point within ±1 day, **sudden** breaks | 93% | same report |
 | Change point within ±1 day, **gradual** ramps | 0% | same report |
-| Tests | 164 | `pnpm test` |
+| Tests | 206 | `pnpm test` |
 
 Report sudden and gradual separately. The 70% average lies in both directions,
 and volunteering the split is worth more than the number.
@@ -80,7 +80,7 @@ stop being able to trust it.
 ## Questions you will get
 
 **"Is this just ChatGPT with a prompt?"** No. `packages/engine` is deterministic
-TypeScript with 164 tests. The model turns a `Diagnosis` into a sentence and
+TypeScript with 206 tests. The model turns a `Diagnosis` into a sentence and
 never touches a number.
 
 **"How do I know it isn't guessing?"** Every finding carries the rule that fired,
