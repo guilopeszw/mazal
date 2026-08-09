@@ -58,3 +58,20 @@ test('does not attach an event that has nothing to do with the broken stage', ()
 
   expect(result.primary?.evidence).toBeUndefined();
 });
+
+test('a small campaign still gets a change point — the minimum scales with the window', () => {
+  // Stage 4 wants 30 add-to-carts. The flag is judged over seven days and the
+  // change point over three, so a campaign clearing the bar comfortably on the
+  // flag could never clear it on the scan, and named no date at all.
+  // Impressions and spend scale down with the clicks, so CTR and CPM stay on
+  // the category median and stage 4 is the only thing broken.
+  const days = healthyDays().map((d, i) => ({
+    ...d, spend: 121, impressions: 5500, reach: 4700, clicks: 60, addToCarts: 6,
+    ...(i < 20 ? { checkoutsInitiated: 3, purchases: 2 } : { checkoutsInitiated: 0, purchases: 0 }),
+  }));
+
+  const result = diagnose({ days, card: apparelCard, events: [], reference: benchmarkRef });
+
+  expect(result.primary?.stage).toBe(4);
+  expect(result.changePoint?.date).toMatch(/^2026-07-2[0-2]$/);
+});
