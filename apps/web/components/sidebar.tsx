@@ -193,44 +193,60 @@ function Account() {
 }
 
 /**
- * There is no scrim and no backdrop, at any width: the panel never covers the page, it moves
- * the page. `chat.tsx` carries the other half — the rail the shell is padded by.
+ * The panel is the same panel at every width; what differs is what it does to the page.
+ * Above `md` it pushes, and `chat.tsx` carries that half — the rail the shell is padded by.
+ * Below `md` the rail is nil and the panel lies over the page instead, because there is no
+ * width left to give away, and this is the scrim that dims what it covers.
  *
  * `inert` rather than an unmount: the panel has to stay in the DOM for the slide to run, and
  * off-screen focusable children are still tabbable without it. React 19 takes it as a plain
  * boolean prop.
  *
- * No focus trap, deliberately. This is a region standing beside the page, not a modal over it,
- * and holding focus captive in it would be a lie about what it is.
+ * No focus trap, deliberately. Where it pushes, this is a region standing beside the page
+ * rather than a modal over it, and holding focus captive in it would be a lie about what it
+ * is. Escape closes from either side.
  */
 export function Sidebar({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   return (
-    <aside
-      id="sidebar"
-      aria-label="Mazal"
-      inert={!open}
-      className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-line bg-ground transition-transform ${SLIDE} ${
-        open ? "translate-x-0" : "-translate-x-full"
-      }`}
-    >
-      {/* Geometrically the page header, to the pixel: same padding, same 32px row, same rule. */}
-      <div className="border-b border-line px-5 py-3.5">
-        <div className="flex h-8 items-center gap-[9px]">
-          <MarkButton open={open} onClick={onToggle} />
-          <span className="font-serif text-[19px] font-medium leading-none tracking-[-0.01em]">
-            Mazal
-          </span>
-          {/* accent, not the old `ref` gold: that ramp was deleted with the one-accent pass,
-              and a class Tailwind no longer generates fails silently — no background, no
-              colour, no error. */}
-          <span className="rounded-[5px] bg-accent-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-accent-ink">
-            beta
-          </span>
-        </div>
-      </div>
+    <>
+      {/* Tinted 30/40/30 like the composer's shadow rather than neutral black, which on warm
+          paper reads as a cold patch. `md:hidden` because above it there is nothing to dim —
+          the page has moved out from under the panel rather than beneath it. */}
+      <div
+        onClick={onToggle}
+        aria-hidden="true"
+        className={`fixed inset-0 z-30 bg-[rgb(30_40_30/0.36)] transition-opacity md:hidden ${SLIDE} ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
 
-      {/* No body. `mt-auto` on the account block is the whole layout. */}
-      <Account />
-    </aside>
+      <aside
+        id="sidebar"
+        aria-label="Mazal"
+        inert={!open}
+        className={`fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-line bg-ground transition-transform ${SLIDE} ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Geometrically the page header, to the pixel: same padding, same 32px row, same rule. */}
+        <div className="border-b border-line px-5 py-3.5">
+          <div className="flex h-8 items-center gap-[9px]">
+            <MarkButton open={open} onClick={onToggle} />
+            <span className="font-serif text-[19px] font-medium leading-none tracking-[-0.01em]">
+              Mazal
+            </span>
+            {/* accent, not the old `ref` gold: that ramp was deleted with the one-accent pass,
+                and a class Tailwind no longer generates fails silently — no background, no
+                colour, no error. */}
+            <span className="rounded-[5px] bg-accent-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-accent-ink">
+              beta
+            </span>
+          </div>
+        </div>
+
+        {/* No body. `mt-auto` on the account block is the whole layout. */}
+        <Account />
+      </aside>
+    </>
   );
 }

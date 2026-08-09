@@ -226,13 +226,15 @@ export function Chat({
        * block for that same `fixed` dock and would overflow the right edge, and neither is
        * worth the compositor on a tree this small.
        *
-       * The rail applies at every width. The panel never lies over the page — it always moves
-       * it aside, which on a narrow screen means the reading column pays for the panel while
-       * it is open.
+       * The rail is nil below `md`, where there is no width to give away. 17rem off a 768px
+       * screen is 35% of it and off a phone more than half, and the composer stops fitting
+       * outright under 428px — its two 36px buttons and their padding need 156px that the
+       * remaining column no longer has. So the panel pushes where pushing leaves a page to
+       * read, and lies over the page where it does not.
        */}
       <div
         className={`pl-[var(--rail)] transition-[padding-left] duration-[240ms] ease-[cubic-bezier(0.16,0.84,0.44,1)] ${
-          sidebar ? "[--rail:17rem]" : "[--rail:0px]"
+          sidebar ? "[--rail:0px] md:[--rail:17rem]" : "[--rail:0px]"
         }`}
       >
         <header className="sticky top-0 z-10 border-b border-line bg-ground px-5 py-3.5">
