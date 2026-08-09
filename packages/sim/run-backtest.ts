@@ -8,7 +8,7 @@
 // Deterministic end to end: fixed seeds, no clock and no unseeded randomness
 // anywhere in packages/sim. Re-running leaves git clean.
 
-import { writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { diagnose } from '@mazal/engine';
 import { runBacktestWith } from './backtest.ts';
@@ -150,3 +150,53 @@ ${formatConfusion(trainReport)}
 `;
 
 writeFileSync(OUT, md);
+
+// ─── the deck must not drift from the repo ───────────────────────────────
+
+/**
+ * docs/slide-6.md quotes these numbers by hand, because a slide cannot import a
+ * module. "The deck and the repo cannot disagree" is only true if something
+ * checks, so this is the something: change a threshold, re-run, and the slide
+ * that no longer matches fails here rather than in front of a judge.
+ */
+const SLIDE = resolve(import.meta.dirname, '../../docs/slide-6.md');
+
+if (existsSync(SLIDE)) {
+  const slide = readFileSync(SLIDE, 'utf8');
+  const heldNoneCount = String(heldHealthy);
+  const falseAlarms = Math.round(report.falseAlarmRate * heldHealthy);
+
+  /**
+   * Anchored to the labelled row, not searched for anywhere in the file.
+   * "Does 59% appear somewhere" passes while the top-1 row reads 71%, because
+   * the same figure appears three more times in the prose — a check that cannot
+   * fail is worse than no check, since it is quoted as if it had passed.
+   */
+  const rowValue = (label: string): number | null => {
+    const m = slide.match(new RegExp(`\\|\\s*${label}[^|]*\\|\\s*\\*\\*([\\d.]+)%`));
+    return m?.[1] === undefined ? null : Number(m[1]);
+  };
+
+  const required: [string, number, number | null][] = [
+    ['Names the right cause', report.top1 * 100, rowValue('Names the right cause')],
+    ['Names the right funnel stage', report.top2 * 100, rowValue('Names the right funnel stage')],
+    ['False alarms on healthy campaigns', report.falseAlarmRate * 100, rowValue('False alarms on healthy campaigns')],
+  ];
+
+  const stale = required
+    .filter(([, expected, found]) => found === null || Math.abs(found - expected) > 0.05)
+    .map(([label, expected, found]) =>
+      [label, `${expected.toFixed(1)}% (slide says ${found === null ? 'nothing' : `${found}%`})`] as [string, string]);
+
+  if (!slide.includes(`${falseAlarms} of ${heldNoneCount}`)) {
+    stale.push(['false alarm denominator', `${falseAlarms} of ${heldNoneCount}`]);
+  }
+  if (stale.length > 0) {
+    console.log('\n⚠ docs/slide-6.md is stale — it no longer quotes:');
+    for (const [label, detail] of stale) console.log(`    ${label}: ${detail}`);
+    console.log('  Update the slide before anyone presents it.');
+    process.exitCode = 1;
+  } else {
+    console.log('slide-6.md quotes the current numbers. ok');
+  }
+}
