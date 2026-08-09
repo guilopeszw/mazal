@@ -6,6 +6,7 @@
     "node": "24.x"
   },
   "scripts": {
+    "build:vercel": "node scripts/build-vercel.mjs",
     "test": "pnpm run typecheck && pnpm run typecheck:vercel-compat && vitest run --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --pretty false",
     "typecheck:vercel-compat": "tsc -p tsconfig.vercel-compat.json --pretty false"
@@ -20,6 +21,7 @@
     "zod": "^4.2.0"
   },
   "devDependencies": {
+    "esbuild": "^0.28.1",
     "vitest": "^3.2.7"
   }
 }

@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 10:43 BRT · E-agent (Joaquim) · bundle autocontido do MCP na Vercel
+
+**Done:** corrigido o `ERR_MODULE_NOT_FOUND` de produção sem tocar em `packages/*`: a Function agora é um bundle ESM esbuild Node 24, criado por build command versionado a partir do handler testável em `src`. O Build Output limpo contém somente `api/mcp.func`, sem imports `@mazal/*` nem exports `src/index.ts`; o pacote isolado completa o handshake. Node 24: 35/35 MCP, checks estrito/compatível, build Vercel real, typecheck global e 120/120 global verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-workspace-bundle-report.md`.
+
+**Next:** fazer novo deploy de produção autorizado e repetir 401, handshake, `tools/list` e tool call remotos em `/mcp`.
+
+**Blocked / watch out:** nenhum deploy ou segredo foi alterado nesta sessão. Um build Vercel local deve começar com `.vercel/output` limpo; a CLI 58.9.0 acumulou artefatos antigos quando a pasta já existia, simulando duas Functions até o rebuild limpo.
+
 ## 2026-08-09 10:26 BRT · E-agent (Joaquim) · gate estrito do build Vercel
 
 **Done:** o gate de `apps/mcp` agora executa antes dos testes tanto `tsc -p tsconfig.json --pretty false` (a prova estrita de `z.output` compatível com `Diagnosis`) quanto o check `tsconfig.vercel-compat.json` que reproduz o builder Vercel. Nenhum schema runtime nem `packages/*` foi alterado. Node 24: 33/33 MCP, checks estrito/compatível, typecheck global e 118/118 global verdes; diff check verde. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-build-gate-fix-report.md`.

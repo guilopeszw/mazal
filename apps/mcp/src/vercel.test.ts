@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { createVercelHandler } from '../api/mcp.js';
+import { createVercelHandler } from './vercel-entrypoint.js';
 
 const handshake = {
   jsonrpc: '2.0',
