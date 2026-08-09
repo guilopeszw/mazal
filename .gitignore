@@ -18,3 +18,6 @@ dist
 # Raw Kaggle datasets. Olist is CC BY-NC-SA — only aggregate statistics
 # get committed, in packages/data/benchmarks.json. See docs/plan/B-data.md.
 data/raw/
+
+# The audit trail is a runtime artefact of whichever machine ran it.
+.mazal-audit.jsonl
