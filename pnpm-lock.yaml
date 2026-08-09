@@ -69,6 +69,9 @@ importers:
       '@mazal/ingest':
         specifier: workspace:*
         version: link:../../packages/ingest
+      '@mazal/meta':
+        specifier: workspace:*
+        version: link:../../packages/meta
       '@visx/curve':
         specifier: 4.0.1-alpha.0
         version: 4.0.1-alpha.0
