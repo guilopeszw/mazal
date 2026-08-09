@@ -11,7 +11,7 @@ Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor 
 1. Criar ou selecionar um projeto Vercel para este monorepo.
 2. Definir **Root Directory** como `apps/mcp` e manter habilitada a inclusão de arquivos externos ao diretório raiz. O pacote depende de `packages/contracts`, `packages/data` e `packages/engine` pelo workspace pnpm.
 3. Confirmar **Node.js 24.x** nas configurações do projeto. `apps/mcp/package.json` também fixa `24.x`.
-4. Manter `apps/mcp/api/mcp.ts` como a função Node. `apps/mcp/vercel.json` reescreve a URL pública `/mcp` para `/api/mcp` sem migrar para Edge ou Workers.
+4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` gera a Function Node autocontida em `apps/mcp/api/mcp.mjs`; `apps/mcp/vercel.json` reescreve a URL pública `/mcp` para `/api/mcp` sem migrar para Edge ou Workers.
 5. Configurar as variáveis abaixo no secret manager da Vercel para Production. Configurar Preview somente se houver um host de preview explicitamente autorizado.
 6. Implantar e anotar a URL estável como `https://<VERCEL_PRODUCTION_HOST>/mcp` nesta seção. Não usar uma URL de preview na conexão de produção.
 
