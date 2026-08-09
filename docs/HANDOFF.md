@@ -37,6 +37,82 @@ Entry format:
 
 ---
 
+## 2026-08-08 21:42 · Bringel · apps/web exists — and both demo fixtures diagnose as healthy
+
+**Guilherme: the second half of this entry is yours, and it is more urgent than anything in `apps/web`.**
+
+**Done:** D's first commit, `ecd1785` on `feat/apps-web` off `stage`. Next.js 16.3 App Router,
+one route, the seven funnel stages rendering from a hand-written `Diagnosis`. `pnpm test` 76
+passing, root `pnpm typecheck` clean, `next build` green, and the page prints `62` from a
+runtime `OLIST_CATEGORIES.length` — the wiring is proven by a value, not by a type that erases.
+
+### The thing that needs someone else
+
+**`diagnose` returns `primary: null` for both committed demo fixtures, in both reference
+modes.** Not "wrong stage" — healthy. On today's build the demo screen has no red stage, no
+finding card, no plan and no counter, for either case.
+
+| fixture | injected | atcRate pre → post | `diagnose` |
+|---|---|---|---|
+| `demo-case1` | `thin_pdp` | 3.30% → 3.51% | `primary: null`, `suspectedCause: 'none'` |
+| `demo-case2` | `eta_shock` @ 2026-07-18 | 3.85% → **4.55%** | `primary: null`, `suspectedCause: 'none'` |
+
+Case #1 is the −1.0 threshold miss the entry below already discloses: −0.83 sigma against an
+`atcRate` prior whose IQR runs 4.5–12%.
+
+**Case #2 is a different failure and is not written down anywhere.** The `eta_shock` did not
+deform the funnel at all. Add-to-cart, conversion and ROAS all *rose* after the injection date;
+`icRate` fell on 17 add-to-carts versus 15, which is integer noise on a campaign averaging one
+add-to-cart a day. The `StoreEvent` says `supplier ETA 23d → 39d` on the 18th and nothing
+downstream of it moves. There is no change point in the series to find, so no threshold change
+rescues this one — it is the generator or the seed, not the engine.
+
+`demo-script.md` §5 sells this case as *"add-to-cart went from 6.8% to 0.4% overnight."* The
+fixture is 3.9% → 3.9%. And `plan/README.md` says Case #2 is the one to save if only one can be
+finished.
+
+Reproduce, from the repo root:
+
+```ts
+const { diagnose } = await import('./packages/engine/src/index.ts');
+const { benchmarks } = await import('./packages/data/index.ts');
+const c = JSON.parse(readFileSync('packages/sim/fixtures/demo-case2.json', 'utf8'));
+diagnose({ days: c.days, card: c.card, events: c.events,
+  reference: { kind: 'benchmark', table: benchmarks } });   // → primary: null
+```
+
+I did not touch `packages/sim` or `packages/engine`, and I am not going to. Two fixes exist and
+both are someone else's: reseed the two demo cases from a fault the engine actually catches, or
+fix whatever let a labelled `eta_shock` ship with a flat funnel. The second one is worth a look
+regardless of the demo — if a labelled campaign can carry no signal, some fraction of the 400-
+campaign cohort is unlabelled noise and the 59% is measured against it.
+
+**`buildPlan` returning `projected: {p10: 0, p50: 0, p90: 0}` is noted and the projection stays
+off screen**, per the entry below.
+
+**Next (mine):** SAT-B against my own mock — finding card, daily chart with the change point,
+plan panel with the toggles and the three controls, chat sidebar shell, then the four route
+handlers. `D-frontend.md` says never to wait on another package and I am not waiting on this
+one; the mock is written to `demo-script.md`'s numbers, which is how the screen has to look
+whoever fixes the generator.
+
+**Blocked / watch out:** three small ones, all in `apps/web`'s corner.
+
+**I edited one root file and it was not optional.** `apps/web` pulls `unrs-resolver` in through
+`eslint-config-next`, and pnpm writes the literal string `unrs-resolver: set this to true or
+false` into `pnpm-workspace.yaml` and then refuses to install until someone resolves it. Set to
+`true`, matching `esbuild`. If you pull and `pnpm install` complains, that is why.
+
+**`create-next-app` emits a nested `pnpm-workspace.yaml` inside `apps/web`.** It makes pnpm read
+the app as its own workspace root, at which point `@mazal/contracts` is not in the workspace and
+nothing resolves. Deleted in `ecd1785`; it will come back if anyone re-runs the scaffold.
+
+**The root `pnpm typecheck` does not cover `apps/web`** — the root tsconfig includes
+`packages/*` only. The app's check is `pnpm --filter web typecheck`. A green root is not a green
+frontend, and I left the root tsconfig alone rather than widen a shared config on my own.
+
+---
+
 ## 2026-08-08 21:40 · Guilherme · packages/engine exists — and the firewall did not hold
 
 **Read this before anyone puts a number on slide 6.**
