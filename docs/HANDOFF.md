@@ -37,6 +37,32 @@ Entry format:
 
 ---
 
+## 2026-08-08 22:55 · Guilherme · Verdict.limitingFactor merged without C's sign-off
+
+**Mateus: read this one.** `packages/contracts` changed and you did not approve it. That is a deliberate call, not an oversight, and it is written down here so it cannot be discovered later.
+
+```ts
+limitingFactor?: string;   // added to Verdict
+```
+
+**Why it went in anyway:** it is optional, so nothing that already builds a `Verdict` breaks; `AGENTS.md` calls adding an optional field cheap; it was announced in this log and in [#11](https://github.com/guilopeszw/mazal/pull/11) before it was pushed; and `docs/acceptance.md` claim 8 cannot be met without somewhere to put "the specific factor dragging the band down" — the only existing prose slot is `killTrigger`, which is set for one decision of three, so a `dont_launch` could name no reason at all.
+
+**It is reversible in one line.** Delete the field and `predict` stops setting it. If you want it gone, or want it shaped differently — an enum of factor names rather than a sentence would be the obvious alternative, and better for D — say so and it changes. What must not happen is the deck claiming a named factor that the type cannot carry.
+
+**Everything A and B own is now merged and green on `stage`** (`d78e8e7`): `pnpm test` 85 passing across 13 files, `pnpm typecheck` clean, `pnpm sim:eyeball` green, and `pnpm derive`, `pnpm sim:fixtures` and `pnpm sim:backtest` all byte-reproducible from a cold install.
+
+Held-out, n=100: **top-1 59.0%**, top-2 59.0%, false alarms 12.0% on 25 healthy campaigns, against an always-healthy floor of 25.0%. Change points named on 100% of detected breaks, within a day on **93% of sudden breaks and 0% of gradual ramps** — reported separately because the 70% average lies in both directions.
+
+**Next:** `apps/web` and `apps/mcp`. Neither exists. Everything they import is real, merged and measured.
+
+**Blocked / watch out:** three things, none of them code A or B can write.
+
+- **`stage` → `main`.** `main` is now 15 behind and has no engine, no simulator and no backtest. It is the build that gets cloned cold.
+- **SUN-B's second-machine check.** Clone `stage` elsewhere, `pnpm derive && pnpm sim:fixtures`, confirm `git status` is clean. Until someone has, the deck says *"reproducible from fixed seeds"*, not *"on any machine"* — [`slide-6.md`](slide-6.md) is already worded that way.
+- **A's own SUN-B item**: sit with E and check every narration line traces to a real `Finding` field. If E's script says something the engine cannot produce, one of them is wrong, and it is better to find that out tonight than at 19:00 tomorrow.
+
+---
+
 ## 2026-08-08 22:20 · Guilherme · CONTRACT CHANGE, and the last three engine gaps
 
 **Announcing a change to `packages/contracts` before it is pushed, as `AGENTS.md` requires.** It is an optional field, which the same file calls cheap — nothing that already builds a `Verdict` breaks — but Mateus owns that file and this is the announcement.
