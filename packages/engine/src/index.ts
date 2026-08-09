@@ -5,6 +5,7 @@
 //
 // Firewall: this package never reads packages/sim. See docs/plan/A-engine.md.
 
+export { measurability, type Measurability, type StageReach } from './measurability.ts';
 export { buildPlan } from './plan.ts';
 export { profileCard } from './profile.ts';
 export { predict } from './predict.ts';
@@ -29,6 +30,8 @@ type StageSpec = {
   minSample: number;
   observe: (d: CampaignDay) => number;
   sample: (d: CampaignDay) => number;
+  /** Which count the minimum is counted in. Named so `measurability` can project it forward. */
+  sampleName: 'impressions' | 'clicks' | 'addToCarts' | 'purchases';
 };
 
 /**
@@ -40,13 +43,13 @@ type StageSpec = {
  * the stage entirely rather than infer it, and inferring it is how a seller gets
  * told their landing page is broken on data nobody collected.
  */
-const STAGES: StageSpec[] = [
-  { stage: 0, metric: 'cpm', causeLayer: 'media', minSample: 1000, observe: cpm, sample: (d) => d.impressions },
-  { stage: 1, metric: 'ctr', causeLayer: 'media', minSample: 1000, observe: ctr, sample: (d) => d.impressions },
-  { stage: 3, metric: 'atcRate', causeLayer: 'product', minSample: 100, observe: atcRate, sample: (d) => d.clicks },
-  { stage: 4, metric: 'icRate', causeLayer: 'experience', minSample: 30, observe: icRate, sample: (d) => d.addToCarts },
-  { stage: 5, metric: 'cvr', causeLayer: 'experience', minSample: 100, observe: cvr, sample: (d) => d.clicks },
-  { stage: 6, metric: 'aov', causeLayer: 'offer', minSample: 5, observe: aov, sample: (d) => d.purchases },
+export const MEASURED_STAGES: StageSpec[] = [
+  { stage: 0, metric: 'cpm', causeLayer: 'media', minSample: 1000, observe: cpm, sample: (d) => d.impressions, sampleName: 'impressions' },
+  { stage: 1, metric: 'ctr', causeLayer: 'media', minSample: 1000, observe: ctr, sample: (d) => d.impressions, sampleName: 'impressions' },
+  { stage: 3, metric: 'atcRate', causeLayer: 'product', minSample: 100, observe: atcRate, sample: (d) => d.clicks, sampleName: 'clicks' },
+  { stage: 4, metric: 'icRate', causeLayer: 'experience', minSample: 30, observe: icRate, sample: (d) => d.addToCarts, sampleName: 'addToCarts' },
+  { stage: 5, metric: 'cvr', causeLayer: 'experience', minSample: 100, observe: cvr, sample: (d) => d.clicks, sampleName: 'clicks' },
+  { stage: 6, metric: 'aov', causeLayer: 'offer', minSample: 5, observe: aov, sample: (d) => d.purchases, sampleName: 'purchases' },
 ];
 
 /**
@@ -99,7 +102,7 @@ const FLAG_AT = -1.0;
  * Seven days rather than three or fourteen: it covers a full week, so weekday
  * and weekend traffic are both in the window and neither distorts the rate.
  */
-const WINDOW_DAYS = 7;
+export const WINDOW_DAYS = 7;
 
 /**
  * Self mode compares a shorter window, because it has a baseline to compare
@@ -166,7 +169,7 @@ export function diagnose(input: DiagnoseInput): Diagnosis {
     : [];
   const flagged: Finding[] = [];
 
-  for (const spec of STAGES) {
+  for (const spec of MEASURED_STAGES) {
     if (spec.sample(total) < spec.minSample) continue;
 
     const reference = self
@@ -226,7 +229,7 @@ function findChangePoint(
   baseline: CampaignDay[],
   table: ReturnType<typeof benchmarkTable>,
 ): { date: string; metric: string } | undefined {
-  const spec = STAGES.find((s) => s.metric === finding.metric);
+  const spec = MEASURED_STAGES.find((s) => s.metric === finding.metric);
   if (!spec) return undefined;
 
   const reference = self

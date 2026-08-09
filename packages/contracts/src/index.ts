@@ -197,6 +197,29 @@ export type RecoveryPlan = {
   projected: { p10: number; p50: number; p90: number };
 };
 
+// ─── where a card's numbers came from ────────────────────────────────────
+// Additive and optional, announced in docs/HANDOFF.md. Nothing that builds a
+// ProductCard today has to change.
+//
+// A seller describing their product in conversation produces the same twelve
+// fields a form does, but a model transcribed them. `productCardSchema` cannot
+// tell the difference — it checks that a price is a positive number, not that it
+// is *your* price — so the difference has to be carried alongside.
+
+export type FieldSource =
+  /** The seller said it, in words or in a form. */
+  | 'stated'
+  /** A model or a default filled it. Never render one of these as fact. */
+  | 'inferred'
+  /** The seller was shown an inferred value and accepted it. */
+  | 'confirmed';
+
+/**
+ * Absent fields are `stated` by default, so a hand-filled card needs no
+ * provenance at all and every existing caller keeps working.
+ */
+export type CardProvenance = Partial<Record<keyof ProductCard, FieldSource>>;
+
 // ─── peer comparison ─────────────────────────────────────────────────────
 // Added after SAT-A and announced in docs/HANDOFF.md. Additive: nothing that
 // already compiles against this file changes.
