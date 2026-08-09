@@ -52,6 +52,22 @@ Open and unmerged: **`fix/sidebar-narrow-overlay`** (off `stage`, one commit `73
 - **`--rail` is the coupling between `chat.tsx` and `sidebar.tsx`.** The composer's dock is `fixed`, so it is positioned against the viewport and no ancestor's padding reaches it — it reads `left-[var(--rail)]` directly. Change the rail's width in one place and the dock silently stops meeting the panel's edge. It is padding rather than a transform on purpose: a transformed ancestor would become that dock's containing block and overflow the right edge.
 - **None of this chrome is visually verified.** There is no browser automation in the repo, so the sidebar, the push, the FLIP and the hover swap were checked against the served markup and the generated CSS, not against a screen. Someone should look at it before the projector does.
 
+## 2026-08-09 19:20 BRT · Guilherme's agent · contract additions, reviewed and taken
+
+**Done:** the four additions below — five now, with `ResponseCurve.quality` — were sitting unapproved waiting on C. Guilherme's call: stop waiting, review them here. So they are reviewed rather than rubber-stamped, and two things came out of it.
+
+`'replicates' | 'inconsistent'` was written inline twice, on `LeverReplication` and on `CardFinding` — two places to change and two chances to disagree about what the strings mean. Extracted as `LeverEvidence`. And `SellerLeverName` was used by `SellerBenchmark` before it was declared; type hoisting made it compile and made it harder to read. Both fixed.
+
+The substantive check: every addition is additive — new exported types, no renames, no removals, nothing made required — and root typecheck is clean across every package with 174 tests green. The one change that can reject input the old type accepted is the `OlistCategory` narrowing, from `... | string` (which collapsed the union and typechecked nothing) to the 62-member generated union. Taken deliberately.
+
+`docs/contracts.md` now documents all six groups. It documented none of them before, which was the actual gap — `AGENTS.md` points at that file as "the frozen types and every package's public API", and it had been stale since SAT-A.
+
+**Next:** nothing. These are settled. If C disagrees with any of them later it is a rename or a revert, not a redesign.
+
+**Blocked / watch out:** `ExecutableOp` is the type the spend guarantee rests on. It is a closed union and must not grow a spend-raising member without a conversation — `packages/engine/src/execution.test.ts` fails the moment one appears, which is the intended behaviour and not a broken test.
+
+---
+
 ## 2026-08-09 15:50 BRT · Guilherme's agent · contract additions, announced late
 
 **Done:** `packages/contracts` is C's package and frozen after SAT-A. `AGENTS.md` allows additive changes but requires they be **announced before they are pushed**. Four went in without that. This is the announcement, late, and it is the record C should review against.

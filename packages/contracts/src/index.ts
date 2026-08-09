@@ -257,6 +257,20 @@ export type CardProvenance = Partial<Record<keyof ProductCard, FieldSource>>;
 // in a campaign; this asks where a seller stands among the sellers they compete
 // with, which is a fact about the store rather than about the media.
 
+/**
+ * Whether a lever separates better sellers from worse in a way that holds up
+ * across categories, or only in the one being looked at.
+ *
+ * Written out twice as `'replicates' | 'inconsistent'` before this existed —
+ * once on `LeverReplication` and once on `CardFinding` — which is two places to
+ * change and two chances to disagree about what the strings mean.
+ */
+export type LeverEvidence = 'replicates' | 'inconsistent';
+
+/** Which card fields peer comparison ranks a seller on. */
+export type SellerLeverName =
+  | 'price' | 'freightRatio' | 'deliveryDays' | 'photos' | 'descriptionLength';
+
 /** One lever's spread across sellers in a category, and where the good ones sit. */
 export type SellerLever = {
   /** Mean among the top quartile of sellers by outcome. */
@@ -280,9 +294,6 @@ export type SellerBenchmark = {
   levers: Record<SellerLeverName, SellerLever> | null;
 };
 
-export type SellerLeverName =
-  | 'price' | 'freightRatio' | 'deliveryDays' | 'photos' | 'descriptionLength';
-
 /**
  * How much a lever separates better sellers from worse, measured across every
  * category with quartile data. Derived by `pnpm derive`, never hand-written — a
@@ -292,7 +303,7 @@ export type SellerLeverName =
 export type LeverReplication = {
   categories: number;
   agreeing: number;
-  evidence: 'replicates' | 'inconsistent';
+  evidence: LeverEvidence;
   medianLift: number;
 };
 
@@ -317,7 +328,7 @@ export type CardFinding = {
    * that has the data. Attached to every finding so a percentile is never quoted
    * as if it predicted anything.
    */
-  evidence: 'replicates' | 'inconsistent';
+  evidence: LeverEvidence;
 };
 
 // ─── simulator API types ─────────────────────────────────────────────────
