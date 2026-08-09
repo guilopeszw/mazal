@@ -13,13 +13,13 @@ const handshake = {
   },
 };
 
-test('serves the authenticated MCP route through the Vercel entrypoint', async () => {
+test('serves the rewritten authenticated MCP route through the Vercel entrypoint', async () => {
   const handler = createVercelHandler({
     bearerToken: 'test-token',
     allowedHosts: ['mazal-mcp.vercel.app'],
     allowedOrigins: ['mazal-mcp.vercel.app'],
   });
-  const response = await handler(new Request('https://mazal-mcp.vercel.app/mcp', {
+  const response = await handler(new Request('https://mazal-mcp.vercel.app/api/mcp', {
     method: 'POST',
     headers: {
       Accept: 'application/json, text/event-stream',

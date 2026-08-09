@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 02:55 BRT · E-agent (Joaquim) · corretivo do rewrite Vercel do MCP
+
+**Done:** corrigido o HIGH do review do PRD 04: a Function Vercel agora monta o Hono autenticado em `/api/mcp`, destino interno do rewrite público `/mcp`. O teste de integração percorre a Function com Host/Origin/bearer e handshake Streamable MCP nesse caminho; RED foi `404`, GREEN é `200`. Node 24: 33/33 MCP, typechecks focalizado/global, 118/118 global, backtest e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-fix-report.md`.
+
+**Next:** com acesso autorizado, fazer deploy e executar o checklist remoto existente da Vercel/Deco.
+
+**Blocked / watch out:** não há URL de produção nem evidência remota ainda; Host e Origin devem continuar allowlists exatas e o bearer fica apenas nos secret managers.
+
+---
+
 ## 2026-08-09 02:50 BRT · E-agent (Joaquim) · entrypoint Vercel e runbook da conexão Deco
 
 **Done:** parte versionável do PRD 04 implementada no commit que contém esta entrada: handler Hono importável em `api/mcp.ts`, rewrite HTTPS `/mcp` para a Vercel Function, Node `24.x` fixado e runbook sem segredos para a Custom Connection “Mazal MCP”. TDD comprovou o limite Vercel local; 33/33 MCP e 118/118 global passaram em Node 24, com typechecks focalizado/global, backtest, JSON e diff checks verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-report.md`.

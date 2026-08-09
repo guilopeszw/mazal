@@ -39,7 +39,10 @@ export function createMazalMcpServer(
   return server;
 }
 
-export function createMcpHandler(options: CreateMcpHandlerOptions = {}) {
+export function createMcpHandler(
+  options: CreateMcpHandlerOptions = {},
+  routePath = '/mcp',
+) {
   const bearerToken = options.bearerToken ?? process.env.MAZAL_MCP_BEARER_TOKEN;
   const allowedHosts =
     options.allowedHosts ?? readHostnameAllowlist(process.env.MAZAL_MCP_ALLOWED_HOSTS);
@@ -53,13 +56,13 @@ export function createMcpHandler(options: CreateMcpHandlerOptions = {}) {
   );
   const app = new Hono();
 
-  app.use('/mcp', hostHeaderValidation(allowedHosts ?? localhostAllowedHostnames()));
+  app.use(routePath, hostHeaderValidation(allowedHosts ?? localhostAllowedHostnames()));
   app.use(
-    '/mcp',
+    routePath,
     originValidation(allowedOrigins ?? allowedHosts ?? localhostAllowedOrigins()),
   );
 
-  app.all('/mcp', async (c: Context) => {
+  app.all(routePath, async (c: Context) => {
     if (!hasValidBearerToken(c.req.header('Authorization'), bearerToken)) {
       return c.text('Unauthorized', 401);
     }
