@@ -23,6 +23,16 @@ const PLAYBOOK: Record<FaultKind, Template[]> = {
   eta_shock: [
     { title: 'Show the delivery estimate on the product page', change: 'Add the current ETA above the buy button, not at checkout', confidence: 'high', reversible: true, actor: 'seller' },
     { title: 'Offer a free-shipping threshold', change: 'Free shipping above the current average order value', confidence: 'medium', reversible: true, actor: 'seller' },
+    /**
+     * Last, because pausing is the blunt instrument and setting the expectation
+     * on the page is the better fix. But it belongs here for the same reason it
+     * belongs under `stockout`: an ETA shock is a softer stockout — the product
+     * still ships, just far slower than the person who clicked was willing to
+     * wait — so the seller is paying for traffic that structurally cannot
+     * convert until the promise changes. Stopping that is squarely something
+     * Mazal can do.
+     */
+    { title: 'Pause the campaign until the ETA recovers', change: 'Set the campaign to paused', confidence: 'medium', reversible: true, actor: 'mazal' },
   ],
   creative_fatigue: [
     { title: 'Refresh the creative', change: 'Rotate in a new primary image and headline', confidence: 'high', reversible: true, actor: 'seller' },

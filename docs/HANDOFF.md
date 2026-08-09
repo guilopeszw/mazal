@@ -650,3 +650,13 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 **Next:** Commit + merge to `stage` when the regenerated fixtures land; re-run the build afterwards since the fixtures are baked in at build time.
 
 **Blocked / watch out:** With the current `demo-case2.json`, the engine's change point (2026-07-11) lands 2 days before the `eta_change` event (2026-07-13), so `Finding.evidence` is not attached and the evidence card does not render. The UI handles both shapes; if the demo needs the evidence sentence, the regenerated fixture's event has to land within a day of the detected change point.
+
+---
+
+## 2026-08-09 · D-frontend session · plan panel + CSV upload
+
+**Done:** On `feat/peer-market-profile`, uncommitted, on top of `c126870`. (1) Plan panel (claim 10): `components/plan-panel.tsx` renders `RecoveryPlan` — title, change, `metric: from → to`, confidence, reversibility; `actor` drives the UI (mazal = toggle + Run, seller = advice labeled "yours to do — Mazal can't"); Run all · Edit first · I'll do it myself; Run POSTs the selected mazal actions to `/api/execute` and renders the receipt with the "writes are simulated" statement beside it; projected renders p50 only ("0.93× → 3.17× likely" on the predict answer). (2) CSV upload: paperclip in the composer opens `components/upload.tsx` — drop zone + real file input, server-side `parseMetaCsv` via server action, warnings rendered, 4 stated card fields (category select over OLIST_CATEGORIES, price, shipping, ETA), remaining fields inferred from category medians and marked "guessed" until edited (CardProvenance semantics), diagnose runs benchmark-mode server-side through the same answer builder as the fixture case. `apps/web` gained a dep on `@mazal/ingest`. All green: typecheck, web build, 96 tests.
+
+**Next:** Commit and merge to `stage`. Someone should hand-run a real Meta export through the upload path before the demo.
+
+**Blocked / watch out:** Both fixture plans (`eta_shock`, `thin_pdp`) are seller-only — no `actor: 'mazal'` action exists in either, so the Run all / Edit first buttons never appear on the two demo answers; the panel says "Mazal has nothing it can run here" instead. The full run→receipt beat is only reachable via an uploaded CSV whose fault has a mazal action (stockout, pixel_break, budget_cap, creative_fatigue). If the demo script needs Run all on a fixture, the playbook or the fixture has to change — not the UI.
