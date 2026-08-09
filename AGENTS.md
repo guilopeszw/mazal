@@ -29,8 +29,11 @@ Hackathon build. Deadline Sunday 2026-08-09 23:59, code freeze 19:00.
 | `packages/data` | B | import `benchmarks` |
 | `packages/sim` | B | call `generateCampaign`, `runBacktest`; do not read the source if you own `engine` |
 | `packages/ingest` | C | call `parseMetaCsv`, `parseEventLog`, `productCardSchema` |
+| `packages/meta` | D | call `fromMetaInsights`, `foldDaysByDate`; the fixtures are written by `pnpm meta:fixtures` and never edited by hand |
 | `apps/web` | D (C joins Sunday) | E owns `POST /api/chat` only |
 | `apps/mcp` | E | — |
+
+`packages/meta` holds the raw Meta insights payload and the adapter that turns it into `CampaignDay`. It is separate from `packages/ingest` for two reasons: that package is C's, and a package imported by both `apps/web` (zod 3) and `apps/mcp` (zod 4) cannot depend on zod at all. The integration itself is not built — the payloads are fixtures derived from `packages/sim`, and they say so in the file.
 
 ## Branches
 
