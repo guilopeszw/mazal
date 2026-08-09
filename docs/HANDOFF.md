@@ -653,6 +653,16 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 
 ---
 
+## 2026-08-09 · E-agent · MCP integration synced into main
+
+**Done:** The merged E-agent integration from `JucaGF/mazal` was brought into the current project history, including `apps/mcp`, Deco/Vercel documentation, PRDs, and the regenerated lockfile. The Vercel-connected `mazal` project still needs its web root configured before its preview is usable.
+
+**Next:** Validate the merged tree, configure Vercel `mazal` to build `apps/web`, and confirm the production page and chat route before the next demo checkpoint.
+
+**Blocked / watch out:** The remote has no `stage` branch yet. The separate MCP deployment is healthy but intentionally requires authentication on `/mcp`.
+
+---
+
 ## 2026-08-09 · D-frontend session · plan panel + CSV upload
 
 **Done:** On `feat/peer-market-profile`, uncommitted, on top of `c126870`. (1) Plan panel (claim 10): `components/plan-panel.tsx` renders `RecoveryPlan` — title, change, `metric: from → to`, confidence, reversibility; `actor` drives the UI (mazal = toggle + Run, seller = advice labeled "yours to do — Mazal can't"); Run all · Edit first · I'll do it myself; Run POSTs the selected mazal actions to `/api/execute` and renders the receipt with the "writes are simulated" statement beside it; projected renders p50 only ("0.93× → 3.17× likely" on the predict answer). (2) CSV upload: paperclip in the composer opens `components/upload.tsx` — drop zone + real file input, server-side `parseMetaCsv` via server action, warnings rendered, 4 stated card fields (category select over OLIST_CATEGORIES, price, shipping, ETA), remaining fields inferred from category medians and marked "guessed" until edited (CardProvenance semantics), diagnose runs benchmark-mode server-side through the same answer builder as the fixture case. `apps/web` gained a dep on `@mazal/ingest`. All green: typecheck, web build, 96 tests.
@@ -684,3 +694,13 @@ Also fixed: local dev tooling was missing entirely at the start of this session 
 **Next:** `gh auth login` still needs a human — the repo is private, so PR creation from `feat/fix-front` to `stage` is the only thing left blocked, and it needs an interactive browser login this session can't do. Once that's done, `gh pr create --base stage` (not `main`).
 
 **Blocked / watch out:** None of stage's other `apps/web` files (`upload.tsx`, `plan-panel.tsx`, `actions.ts`, `lib/meta.ts`, `lib/audit.ts`) were restyled to the new clover identity — they still use whatever tokens stage had at merge time. If the demo walks through CSV upload or the plan panel, someone should eyeball them against the new palette before showing them next to the rebranded chat.
+
+---
+
+## 2026-08-09 · E-agent · main sync and validation
+
+**Done:** The merged E-agent changes are now in the local `main` history. Workspace tests pass (135 tests), root typecheck passes, web typecheck and Next route type generation pass, MCP checks pass, and the web production build passes with Webpack.
+
+**Next:** Configure the connected Vercel `mazal` project to build `apps/web` as Next.js, then smoke-test `/` and `/api/chat` on the production deployment.
+
+**Blocked / watch out:** Vercel currently deploys `main` as READY but produces no output and returns 404 because its project root/framework are unset. Local Turbopack still panics on process binding; Webpack is the successful source-level build check. The checkout's `origin` still points to `guilopeszw/mazal`, while the merged PR and Vercel use `JucaGF/mazal`; do not push until that canonical remote is confirmed.

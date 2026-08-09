@@ -1,0 +1,74 @@
+import { hostHeaderValidation, originValidation } from '@modelcontextprotocol/hono';
+import {
+  createMcpHandler as createSdkMcpHandler,
+  localhostAllowedHostnames,
+  localhostAllowedOrigins,
+  McpServer,
+} from '@modelcontextprotocol/server';
+import { Hono, type Context } from 'hono';
+
+import { InMemoryActionLog, type ActionLog } from './action-log.js';
+import { hasValidBearerToken } from './auth.js';
+import { registerMazalTools } from './tools/index.js';
+
+export type RegisterTools = (server: McpServer, actionLog?: ActionLog) => void;
+
+export type CreateMcpHandlerOptions = {
+  allowedHosts?: string[];
+  allowedOrigins?: string[];
+  bearerToken?: string;
+  registerTools?: RegisterTools;
+  createActionLog?: () => ActionLog;
+};
+
+function readHostnameAllowlist(value: string | undefined): string[] | undefined {
+  const hostnames = value
+    ?.split(',')
+    .map((hostname) => hostname.trim())
+    .filter(Boolean);
+
+  return hostnames?.length ? hostnames : undefined;
+}
+
+export function createMazalMcpServer(
+  registerTools: RegisterTools = registerMazalTools,
+  actionLog: ActionLog = new InMemoryActionLog(),
+): McpServer {
+  const server = new McpServer({ name: 'Mazal MCP', version: '0.1.0' });
+  registerTools(server, actionLog);
+  return server;
+}
+
+export function createMcpHandler(
+  options: CreateMcpHandlerOptions = {},
+  routePath = '/mcp',
+) {
+  const bearerToken = options.bearerToken ?? process.env.MAZAL_MCP_BEARER_TOKEN;
+  const allowedHosts =
+    options.allowedHosts ?? readHostnameAllowlist(process.env.MAZAL_MCP_ALLOWED_HOSTS);
+  const allowedOrigins =
+    options.allowedOrigins ??
+    readHostnameAllowlist(process.env.MAZAL_MCP_ALLOWED_ORIGINS) ??
+    allowedHosts;
+  const createActionLog = options.createActionLog ?? (() => new InMemoryActionLog());
+  const handler = createSdkMcpHandler(
+    () => createMazalMcpServer(options.registerTools, createActionLog()),
+  );
+  const app = new Hono();
+
+  app.use(routePath, hostHeaderValidation(allowedHosts ?? localhostAllowedHostnames()));
+  app.use(
+    routePath,
+    originValidation(allowedOrigins ?? allowedHosts ?? localhostAllowedOrigins()),
+  );
+
+  app.all(routePath, async (c: Context) => {
+    if (!hasValidBearerToken(c.req.header('Authorization'), bearerToken)) {
+      return c.text('Unauthorized', 401);
+    }
+
+    return handler.fetch(c.req.raw);
+  });
+
+  return app;
+}
