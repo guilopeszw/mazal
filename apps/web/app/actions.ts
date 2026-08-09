@@ -188,8 +188,12 @@ export async function runPlan(
   results: { id: string; detail: string; ok: boolean }[];
   /** Opaque handle. The undo record itself never leaves the server. */
   undoToken: string | null;
+  /** True when the account is real and nobody has unlocked execution yet. */
+  locked?: true;
 }> {
-  await requireExecutionAuth();
+  if (!(await executionAuthorised())) {
+    return { receipt: "", mode: "simulated", results: [], undoToken: null, locked: true };
+  }
 
   if (idempotencyKey) {
     const already = alreadyRun.get(idempotencyKey);
@@ -254,8 +258,8 @@ const alreadyRun = new Map<string, Awaited<ReturnType<typeof runPlan>>>();
  * field/value pairs would be the unrestricted write channel this product
  * deliberately does not have.
  */
-export async function undoRun(token: string): Promise<{ ok: boolean; details: string[] }> {
-  await requireExecutionAuth();
+export async function undoRun(token: string): Promise<{ ok: boolean; details: string[]; locked?: true }> {
+  if (!(await executionAuthorised())) return { ok: false, details: [], locked: true };
 
   const entries = undoStore.get(token);
   if (!entries) return { ok: false, details: ["That run is not one this server can undo."] };
@@ -289,16 +293,22 @@ const undoStore = new Map<string, NonNullable<ExecutionResult["undo"]>[]>();
  * the same shared secret `/api/execute` does. Simulated mode is ungated,
  * because it cannot touch anything.
  */
-async function requireExecutionAuth(): Promise<void> {
-  if (!executeConfigured()) return;
+/**
+ * Returns a boolean rather than throwing.
+ *
+ * Next redacts server-action error messages in production, so the screen could
+ * never tell "you must unlock" apart from "something broke" — it showed a
+ * generic failure and the seller had no way forward. A refusal the caller can
+ * act on has to be part of the return type, not smuggled through an exception.
+ */
+async function executionAuthorised(): Promise<boolean> {
+  if (!executeConfigured()) return true;
 
   const secret = process.env["MAZAL_EXECUTE_SECRET"];
-  if (!secret) throw new Error("Execution is configured for a real account but has no secret set.");
+  if (!secret) return false;
 
   const jar = await cookies();
-  if (jar.get("mazal-exec")?.value !== secret) {
-    throw new Error("This build can change a real ad account. Unlock execution first.");
-  }
+  return jar.get("mazal-exec")?.value === secret;
 }
 
 /** Exchange the shared secret for a session cookie. The secret never reaches the client. */

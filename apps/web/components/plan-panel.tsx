@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Action } from "@mazal/contracts";
-import { runPlan, undoRun } from "@/app/actions";
+import { runPlan, undoRun, unlockExecution } from "@/app/actions";
 import { formatMetric, metricLabel } from "@/lib/format";
 
 /**
@@ -52,6 +52,13 @@ export function PlanPanel({
     undoToken: string | null;
   } | null>(null);
   const [undone, setUndone] = useState<string[] | null>(null);
+  /**
+   * Only appears when a run is actually refused. Asking every seller for a
+   * secret on load would be a lock on a door that is open in the build almost
+   * everyone runs.
+   */
+  const [needsUnlock, setNeedsUnlock] = useState(false);
+  const [secret, setSecret] = useState("");
   /** Stable for the life of this panel, so a double-click cannot run twice. */
   const [runKey] = useState(() => `${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +81,11 @@ export function PlanPanel({
       // secret before it will touch a real account, and a browser cannot keep
       // one — shipping it to the client would be theatre.
       const data = await runPlan(selected, runKey);
+      if (data.locked) {
+        setNeedsUnlock(true);
+        setError(null);
+        return;
+      }
       setReceipt({
         code: data.receipt,
         count: selected.length,
@@ -82,7 +94,7 @@ export function PlanPanel({
         undoToken: data.undoToken,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not run the plan. Nothing was changed.");
+      setError(e instanceof Error && e.message ? e.message : "Could not run the plan. Nothing was changed.");
     } finally {
       setBusy(false);
     }
@@ -181,6 +193,7 @@ export function PlanPanel({
                 type="button"
                 onClick={async () => {
                   const r = await undoRun(receipt.undoToken!);
+                  if (r.locked) return setNeedsUnlock(true);
                   setUndone(r.details);
                 }}
                 className="mt-2 rounded-full border border-line px-3.5 py-1.5 text-[13px] font-[540] transition-[background,scale] duration-150 hover:bg-sunken active:scale-[.96]"
@@ -240,6 +253,45 @@ export function PlanPanel({
                 I&rsquo;ll do it myself
               </button>
             </div>
+            {needsUnlock && (
+              <form
+                className="flex flex-col gap-2 rounded-[10px] border border-line bg-sunken px-3.5 py-3"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const r = await unlockExecution(secret);
+                  if (!r.ok) return setError("That is not the key for this deployment.");
+                  setSecret("");
+                  setNeedsUnlock(false);
+                  setError(null);
+                  await run();
+                }}
+              >
+                <p className="m-0 text-[13px] font-[540]">
+                  This build is connected to a real ad account.
+                </p>
+                <p className="m-0 text-[12.5px] text-ink-soft">
+                  Execution stays locked until someone unlocks it, and the unlock lasts fifteen
+                  minutes. Nothing has been changed.
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    value={secret}
+                    onChange={(e) => setSecret(e.target.value)}
+                    placeholder="Execution key"
+                    aria-label="Execution key"
+                    autoComplete="off"
+                    className="min-w-0 flex-1 rounded-full border border-line bg-raised px-3.5 py-2 text-[15px]"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-full bg-accent px-4 py-2 text-[13px] font-[560] text-ground transition-[scale] duration-150 active:scale-[.96]"
+                  >
+                    Unlock
+                  </button>
+                </div>
+              </form>
+            )}
             <p className="m-0 text-[12.5px] text-ink-faint">
               Every action here is reversible, and nothing runs until you press the button.
               Without ad-platform credentials this build only writes to an approval log — the
