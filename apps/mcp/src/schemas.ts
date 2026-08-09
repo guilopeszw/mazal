@@ -9,6 +9,24 @@ import {
 } from '@mazal/contracts';
 import { z } from 'zod';
 
+/**
+ * Upper bounds at the tool boundary.
+ *
+ * Every array here was unbounded and no string had a length cap, so an
+ * authenticated caller could post a million `CampaignDay`s and make the engine
+ * chew through all of them inside one request. `apps/web/app/api/execute/route.ts`
+ * has said "a thousand of them is not a plan" since the day it was written; the
+ * MCP path is the same sink reached a different way and gets the same limits.
+ *
+ * These are deliberately generous against real use — three years of daily rows,
+ * a store event every other day — so the only requests they reject are the ones
+ * nobody meant to send.
+ */
+const MAX_DAYS = 1100;
+const MAX_EVENTS = 500;
+const MAX_ACTIONS = 20;
+
+
 const finiteNumber = z.number().finite();
 const nonNegativeNumber = finiteNumber.nonnegative();
 const count = nonNegativeNumber.int();
@@ -24,7 +42,7 @@ type SchemaOutputMatches<TSchema extends z.ZodType, TContract> =
 
 export const campaignDaySchema: z.ZodType<CampaignDay> = z.object({
   date: isoDate,
-  campaignId: z.string().min(1),
+  campaignId: z.string().min(1).max(120),
   spend: nonNegativeNumber,
   impressions: count,
   reach: count,
@@ -49,14 +67,21 @@ export const productCardSchema: z.ZodType<ProductCard> = z.object({
   pdpImages: count,
   pdpDescriptionLength: count,
   returnPolicyDays: count,
-  paymentMethods: z.array(z.enum(['credit', 'debit', 'pix', 'boleto', 'installments'])).min(1),
+  // Five members in the enum, so five is the most a real card can carry. The
+  // array was the last unbounded one at the boundary: the elements were
+  // constrained and the length was not, which still lets a caller send a
+  // million of them.
+  paymentMethods: z
+    .array(z.enum(['credit', 'debit', 'pix', 'boleto', 'installments']))
+    .min(1)
+    .max(5),
   offer: z.enum(['none', 'discount', 'bundle', 'free_shipping_threshold']),
 }).strict();
 
 export const storeEventSchema: z.ZodType<StoreEvent> = z.object({
   date: isoDate,
   type: z.enum(STORE_EVENT_TYPES),
-  detail: z.string().min(1),
+  detail: z.string().min(1).max(600),
 }).strict();
 
 const findingSchema = z.object({
@@ -65,20 +90,20 @@ const findingSchema = z.object({
     z.literal(4), z.literal(5), z.literal(6),
   ]),
   severity: z.enum(['primary', 'secondary']),
-  metric: z.string().min(1),
+  metric: z.string().min(1).max(80),
   observed: finiteNumber,
   reference: finiteNumber,
   spread: finiteNumber,
   deviation: finiteNumber,
   sampleSize: count,
-  rule: z.string().min(1),
+  rule: z.string().min(1).max(200),
   causeLayer: z.enum(['media', 'product', 'offer', 'experience']),
   evidence: storeEventSchema.optional(),
 }).strict();
 
 const diagnosisSchemaDefinition = z.object({
   primary: findingSchema.nullable(),
-  secondary: z.array(findingSchema),
+  secondary: z.array(findingSchema).max(20),
   suspectedCause: z.enum([
     'none',
     'stockout',
@@ -90,7 +115,7 @@ const diagnosisSchemaDefinition = z.object({
     'budget_cap',
     'thin_pdp',
   ]),
-  changePoint: z.object({ date: isoDate, metric: z.string().min(1) }).strict().optional(),
+  changePoint: z.object({ date: isoDate, metric: z.string().min(1).max(80) }).strict().optional(),
 }).strict();
 
 type _DiagnosisSchemaMatchesContract = Assert<
@@ -104,9 +129,9 @@ type _DiagnosisSchemaMatchesContract = Assert<
 export const diagnosisSchema = diagnosisSchemaDefinition as z.ZodType<Diagnosis>;
 
 export const actionSchema: z.ZodType<Action> = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  change: z.string().min(1),
+  id: z.string().min(1).max(120),
+  title: z.string().min(1).max(300),
+  change: z.string().min(1).max(600),
   expectedEffect: z.object({
     metric: z.string().min(1),
     from: finiteNumber,
@@ -123,15 +148,15 @@ export const publicReferenceSchema = z.discriminatedUnion('kind', [
 ]);
 
 export const diagnoseCampaignInputSchema = z.object({
-  days: z.array(campaignDaySchema).min(1),
+  days: z.array(campaignDaySchema).min(1).max(MAX_DAYS),
   card: productCardSchema,
-  events: z.array(storeEventSchema),
+  events: z.array(storeEventSchema).max(MAX_EVENTS),
   reference: publicReferenceSchema,
 }).strict();
 
 export const predictCampaignInputSchema = z.object({
   card: productCardSchema,
-  history: z.array(campaignDaySchema).optional(),
+  history: z.array(campaignDaySchema).max(MAX_DAYS).optional(),
 }).strict();
 
 export const buildRecoveryPlanInputSchema = z.object({
@@ -140,7 +165,7 @@ export const buildRecoveryPlanInputSchema = z.object({
 }).strict();
 
 export const executePlanInputSchema = z.object({
-  actions: z.array(actionSchema),
+  actions: z.array(actionSchema).max(MAX_ACTIONS),
 }).strict();
 
 export type DiagnoseCampaignInput = z.infer<typeof diagnoseCampaignInputSchema>;

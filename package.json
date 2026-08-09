@@ -7,8 +7,8 @@
     "node": ">=24"
   },
   "scripts": {
-    "test": "vitest run --passWithNoTests",
-    "typecheck": "tsc --build",
+    "test": "vitest run --passWithNoTests && pnpm --filter @mazal/mcp typecheck",
+    "typecheck": "tsc --build && pnpm --filter @mazal/mcp typecheck",
     "derive": "node packages/data/derive.ts",
     "sim:eyeball": "node packages/sim/eyeball.ts",
     "sim:fixtures": "node packages/sim/write-fixtures.ts",

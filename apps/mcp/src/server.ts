@@ -50,9 +50,24 @@ export function createMcpHandler(
     options.allowedOrigins ??
     readHostnameAllowlist(process.env.MAZAL_MCP_ALLOWED_ORIGINS) ??
     allowedHosts;
-  const createActionLog = options.createActionLog ?? (() => new InMemoryActionLog());
+  /**
+   * One log for the life of the handler, not one per request.
+   *
+   * `execute_plan` appends to this and returns a receipt. Built per request, the
+   * array it appended to was discarded the moment the response ended — so every
+   * receipt pointed at a log that no longer existed, and there was no equivalent
+   * of `apps/web/lib/audit.record()` behind it. A receipt for a write you cannot
+   * show afterwards is a reference number on nothing.
+   *
+   * It is still in memory, so it dies with the process: honest about what it is
+   * on a serverless Function rather than pretending to durability this build
+   * cannot provide. Callers that need per-request isolation — the tests do —
+   * pass `createActionLog` and get it.
+   */
+  const sharedActionLog = options.createActionLog ? undefined : new InMemoryActionLog();
+  const actionLogFor = () => options.createActionLog?.() ?? sharedActionLog!;
   const handler = createSdkMcpHandler(
-    () => createMazalMcpServer(options.registerTools, createActionLog()),
+    () => createMazalMcpServer(options.registerTools, actionLogFor()),
   );
   const app = new Hono();
 
