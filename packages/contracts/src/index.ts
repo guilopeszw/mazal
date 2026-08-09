@@ -367,6 +367,14 @@ export type ResponseCurve = {
    * campaign had earned it.
    */
   source: 'prior' | 'blended' | 'fitted';
+  /**
+   * How much of the day-to-day movement this curve explains, 0 to 1.
+   *
+   * A fit whose residuals are as large as its signal has found a shape rather
+   * than a law, and nothing downstream can tell the difference from the
+   * parameters alone. Present only on a fitted curve.
+   */
+  quality?: number;
 };
 
 // ─── metrics (re-export) ─────────────────────────────────────────────────
