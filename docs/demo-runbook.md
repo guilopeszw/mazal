@@ -8,14 +8,19 @@ remembered — every one has a command beside it that reproduces it.
 ```bash
 pnpm install
 pnpm typecheck        # tsc --build, plus apps/mcp
-pnpm test             # 164 tests
+pnpm test             # 206 tests
 pnpm sim:fixtures     # asserts both demo beats still hold
+pnpm meta:fixtures    # asserts the Meta payloads still fold back to them
 pnpm --filter web build && PORT=3117 pnpm --filter web start
 ```
 
 `sim:fixtures` is the one that matters. It exits non-zero if either demo fixture
 stops doing what its beat needs — the guard exists because both fixtures once
 diagnosed healthy and nobody noticed until a commit message mentioned it.
+
+`meta:fixtures` is the same guard one layer out: the campaign numbers on screen
+arrive as a Meta insights payload now, and it fails if that payload stops
+folding back to the fixture the simulator wrote.
 
 If the port is stuck: `lsof -ti tcp:3117 | xargs kill -9`. `pkill -f "PORT=3117"`
 never matches.
@@ -88,14 +93,34 @@ to the campaign's own baseline and labels which reference it used.
 
 **"Can it spend my money?"** Covered above. Say the sentence exactly.
 
+**"Did this data come from Meta?"** No, and the file says so — every payload
+carries `__mazal_fixture`, a field the Graph API does not return, and the
+adapter warns when it reads one. It is a real insights response *shape* built
+from our deterministic fixtures. What is real is the path: `fromMetaInsights`
+in `packages/meta` is the same function `diagnose_campaign` calls on the MCP
+side, and a live response goes through it unchanged. We did not build the
+connection to Meta; we built the thing the connection would feed.
+
+**"So what does the seller have to do to get started?"** Export a CSV from Ads
+Manager and fill in twelve fields about the product. No OAuth, no app review.
+`packages/meta/fixtures/demo-case2.campaign.csv` is exactly what that export
+looks like, and it is the file to drop on the upload if someone asks to see it.
+
 ## What not to claim
 
-- **The Allocator does not render.** The maths is built and tested — response
-  curves and equal-marginal allocation, `packages/engine/src/allocate.ts` — but a
-  campaign held at a flat daily budget contains no evidence about any other
-  budget, and both demo fixtures vary spend by only 1.15× and 1.20×. The chart
-  refuses to draw rather than fit a curve it cannot identify. Say that if asked;
-  it is a better answer than a number.
+- **The Allocator renders, over a synthetic account.** The maths is the same one
+  a real seller would get — response curves and equal-marginal allocation,
+  `packages/engine/src/allocate.ts` — and the account it advises on is generated,
+  guarded by `pnpm sim:fixtures`, and delivered through the Meta payload. Say
+  both halves. The reason it needs its own account is the product's own finding:
+  a campaign held at a flat daily budget contains no evidence about any other
+  budget, and the single-campaign fixtures vary spend by only 1.15× and 1.20×,
+  so that chart still refuses to draw. The evidence lives across entities, not
+  across days.
+- **The Meta connection is not built.** The payloads are fixtures and carry
+  `__mazal_fixture`; the adapter that reads them is real and is what a live
+  response would hit. `packages/meta/README.md` has the line-by-line version of
+  what is which.
 - **Live execution reaches our account, not a seller's.** Standard Access only
   covers accounts our own developers own or administer.
 - **The audit log survives a demo, not a deployment.** Serverless has no durable
