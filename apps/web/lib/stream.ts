@@ -13,6 +13,12 @@ import type { Answer } from "./answers.ts";
 export const TIMING = {
   /** The pause after the question, before Mazal starts answering. */
   think: 700,
+  /**
+   * The pause when the answer carries a plan of action. Long enough for the plan
+   * loader to walk three of its surfaces (one cycle is 2.6s — see
+   * `components/plan-loader.tsx`); tune here, not there.
+   */
+  plan: 7000,
   /** Per word of prose. */
   word: 20,
   /** Per structured block — evidence, a panel, the provenance note. */
@@ -70,7 +76,9 @@ export type Reveal = {
  */
 export function buildTimeline(answer: Answer): Step[] {
   const steps: Step[] = [];
-  let at = TIMING.think;
+  // Drafting a plan is the one wait long enough to show its work — the loader
+  // fills it. Everything else keeps the short pause.
+  let at = answer.plan ? TIMING.plan : TIMING.think;
 
   const step = (kind: StepKind, dt: number) => {
     at += dt;
@@ -100,7 +108,8 @@ export function buildTimeline(answer: Answer): Step[] {
 
 export function revealAt(steps: Step[], elapsed: number): Reveal {
   const reveal: Reveal = {
-    thinking: elapsed < TIMING.think,
+    // Thinking until the first word lands, whichever pause this answer took.
+    thinking: steps.length > 0 && elapsed < steps[0]!.at,
     verdictWords: 0,
     saidWords: 0,
     evidence: false,

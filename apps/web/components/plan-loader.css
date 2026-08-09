@@ -1,0 +1,456 @@
+/**
+ * The plan loader's own world, scoped to `.plan-loader` and never `:root`.
+ *
+ * The rainbow lives here and nowhere else. The rest of the product is one accent
+ * plus ink plus a red warning — these tokens restyle nothing outside the card,
+ * and the moment the plan renders the card unmounts and the rainbow is gone.
+ *
+ * The card's surfaces are a neutral grey stack with no brand accent: a saturated
+ * hue would fight the rim, and the rim is the only thing here allowed to be loud.
+ */
+
+/**
+ * The pulse animates the gradient's start angle and all six stops, so each must
+ * be a registered <angle> or the browser cannot interpolate them and the wedge
+ * jumps between keyframes instead of tightening and blooming.
+ */
+@property --pl-a {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 180deg;
+}
+@property --pl-s1 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 16deg;
+}
+@property --pl-s2 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 30deg;
+}
+@property --pl-s3 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 43deg;
+}
+@property --pl-s4 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 59deg;
+}
+@property --pl-s5 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 72deg;
+}
+@property --pl-s6 {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 84deg;
+}
+
+.plan-loader {
+  /**
+   * Every colour is defined here, on the bare class, so the default un-stamped
+   * state (system light) is never left reading an undefined variable. The dark
+   * blocks below only *redefine* — the same discipline `globals.css` keeps.
+   *
+   * Face sits on the cream ground; the inverted stack is the same ramp upside
+   * down, for the one variant that flips polarity.
+   */
+  --pl-face: #f6f4ed;
+  --pl-face-2: #ebe8df;
+  --pl-edge: #d3cfc2;
+  --pl-edge-strong: #b4b0a1;
+  --pl-text: #24261f;
+  --pl-dim: #686a5e;
+  --pl-faint: #999687;
+
+  --pl-inv-face: #1d211c;
+  --pl-inv-face-2: #272c25;
+  --pl-inv-edge: #393f36;
+  --pl-inv-edge-strong: #4e5549;
+  --pl-inv-text: #ecebe2;
+  --pl-inv-dim: #a4a89a;
+  --pl-inv-faint: #767b6e;
+
+  --pl-ease-out: cubic-bezier(0.2, 0.8, 0.3, 1);
+
+  position: relative;
+  padding: 6px 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .plan-loader {
+    --pl-face: #1f241d;
+    --pl-face-2: #282d25;
+    --pl-edge: #363c32;
+    --pl-edge-strong: #4c5347;
+    --pl-text: #e9e7dd;
+    --pl-dim: #a1a596;
+    --pl-faint: #7a7f71;
+
+    --pl-inv-face: #edeae1;
+    --pl-inv-face-2: #e1ddd0;
+    --pl-inv-edge: #ccc8b8;
+    --pl-inv-edge-strong: #b1ad9c;
+    --pl-inv-text: #24261f;
+    --pl-inv-dim: #64665a;
+    --pl-inv-faint: #918e80;
+  }
+}
+
+:root[data-theme="dark"] .plan-loader {
+  --pl-face: #1f241d;
+  --pl-face-2: #282d25;
+  --pl-edge: #363c32;
+  --pl-edge-strong: #4c5347;
+  --pl-text: #e9e7dd;
+  --pl-dim: #a1a596;
+  --pl-faint: #7a7f71;
+
+  --pl-inv-face: #edeae1;
+  --pl-inv-face-2: #e1ddd0;
+  --pl-inv-edge: #ccc8b8;
+  --pl-inv-edge-strong: #b1ad9c;
+  --pl-inv-text: #24261f;
+  --pl-inv-dim: #64665a;
+  --pl-inv-faint: #918e80;
+}
+
+/**
+ * The single body. Width, height and border-radius arrive as inline styles with
+ * real px radii — the transition below is what makes one shape become another,
+ * and ease-out keeps the slowest frames at the settle, not mid-morph.
+ */
+.pl-body {
+  position: relative;
+  padding: 1px; /* the gap the carved ring lives in */
+  transition:
+    width 380ms var(--pl-ease-out),
+    height 380ms var(--pl-ease-out),
+    border-radius 380ms var(--pl-ease-out);
+}
+
+/**
+ * The glow: five masked layers, each drawn twice (the second mirrored), all
+ * under the face. Opacity and the wedge geometry are animated on this wrapper
+ * and inherited, so ten layers pulse as one light.
+ */
+.pl-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pl-glow[data-playing="true"] {
+  animation: pl-pulse 1600ms cubic-bezier(0.26, 0.94, 0.6, 1) both;
+}
+
+.pl-layer {
+  position: absolute;
+  background: conic-gradient(
+    from var(--pl-a) at 50% 50%,
+    #005bf6 0deg,
+    #b0c6e9 var(--pl-s1),
+    #feca00 var(--pl-s2),
+    #ff1c11 var(--pl-s3),
+    #ff00ea var(--pl-s4),
+    #ffa2fbcc var(--pl-s5),
+    transparent var(--pl-s6),
+    transparent 324deg,
+    #95c1ffa1 349deg,
+    #005bf6 360deg
+  );
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+}
+
+/**
+ * One shot, never a loop. As it fades, the start angle swings backwards while
+ * every stop pushes outward, so the wedge tightens at its head and blooms at
+ * its tail as it dies. Rotating it instead would read as a wheel.
+ */
+@keyframes pl-pulse {
+  0% {
+    opacity: 0;
+    --pl-a: 180deg;
+    --pl-s1: 16deg;
+    --pl-s2: 30deg;
+    --pl-s3: 43deg;
+    --pl-s4: 59deg;
+    --pl-s5: 72deg;
+    --pl-s6: 84deg;
+  }
+  10% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    --pl-a: 30deg;
+    --pl-s1: 6deg;
+    --pl-s2: 11deg;
+    --pl-s3: 17deg;
+    --pl-s4: 40deg;
+    --pl-s5: 90deg;
+    --pl-s6: 120deg;
+  }
+}
+
+/**
+ * The face, inset by the body's 1px of padding and one radius step tighter, so
+ * ring and face stay concentric. Its colour transitions on the same beat as the
+ * shape — the inverted variant flips polarity as it morphs, never on one frame.
+ */
+.pl-face {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--pl-face);
+  color: var(--pl-text);
+  font-family: var(--font-sans);
+  transition:
+    background-color 380ms var(--pl-ease-out),
+    border-radius 380ms var(--pl-ease-out);
+}
+
+.pl-face[data-invert="true"] {
+  --pl-face: var(--pl-inv-face);
+  --pl-face-2: var(--pl-inv-face-2);
+  --pl-edge: var(--pl-inv-edge);
+  --pl-edge-strong: var(--pl-inv-edge-strong);
+  --pl-text: var(--pl-inv-text);
+  --pl-dim: var(--pl-inv-dim);
+  --pl-faint: var(--pl-inv-faint);
+}
+
+/**
+ * The contents fade out while the body still holds the old shape, then sit
+ * unlaid-out through the morph — a transparent element would still be measured
+ * and still rescale its masks.
+ */
+.pl-content[data-state="fading"] {
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.pl-content[data-state="morphing"] {
+  opacity: 0;
+  content-visibility: hidden;
+}
+
+/**
+ * The off-screen probe: every variant rendered hidden at natural size, so the
+ * body always animates toward a real measured box. `visibility: hidden`, not
+ * `display: none` — a display-none element has no box to measure.
+ */
+.pl-probe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.pl-probe .pl-face {
+  width: max-content;
+}
+
+/* ── variant contents ─────────────────────────────────────────────────── */
+
+.pl-cap {
+  font-size: 11px;
+  font-weight: 580;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--pl-dim);
+  white-space: nowrap;
+}
+
+.pl-sub {
+  font-size: 10.5px;
+  color: var(--pl-faint);
+  white-space: nowrap;
+}
+
+/** Letters arrive, they do not appear. Delay per index is set inline. */
+.pl-char {
+  display: inline-block;
+  animation: pl-char-in 300ms cubic-bezier(0.66, 0, 0.34, 1) both;
+}
+
+@keyframes pl-char-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.pl-rise {
+  animation: pl-rise-in 300ms cubic-bezier(0.66, 0, 0.34, 1) both;
+}
+
+@keyframes pl-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The funnel walk. */
+.pl-funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 13px 16px 14px;
+}
+
+.pl-frow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--pl-dim);
+  white-space: nowrap;
+}
+
+.pl-fbar {
+  width: 34px;
+  height: 3px;
+  flex: none;
+  border-radius: 2px;
+  background: var(--pl-edge);
+  animation: pl-scan 2600ms linear infinite;
+  animation-delay: var(--d);
+}
+
+/** The walk itself: each stage lights briefly, in order, while it is checked. */
+@keyframes pl-scan {
+  0%,
+  22% {
+    background: var(--pl-edge);
+  }
+  8% {
+    background: var(--pl-text);
+  }
+}
+
+.pl-fdiv {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--pl-faint);
+  white-space: nowrap;
+}
+
+.pl-fdiv::before,
+.pl-fdiv::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--pl-edge);
+}
+
+/* The event log. */
+.pl-log {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 13px 16px 14px;
+}
+
+.pl-lline {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--pl-dim);
+  white-space: nowrap;
+}
+
+.pl-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 11px;
+  margin-left: 2px;
+  vertical-align: -1px;
+  background: var(--pl-dim);
+  animation: pl-blink 1000ms steps(1) infinite;
+}
+
+@keyframes pl-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The action draft. */
+.pl-draft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 13px 16px 14px;
+}
+
+.pl-drow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.pl-check {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border: 1.5px solid var(--pl-edge-strong);
+  border-radius: 3px;
+}
+
+/** Structure only: a line still being written, not a claim being hidden. */
+.pl-skel {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--pl-face-2);
+  width: var(--w);
+}
+
+.pl-actors {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--pl-faint);
+  white-space: nowrap;
+}
+
+.pl-chip {
+  padding: 1px 8px;
+  border: 1px solid var(--pl-edge);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 560;
+  color: var(--pl-dim);
+}
+
