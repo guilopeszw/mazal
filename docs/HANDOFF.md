@@ -650,3 +650,37 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 **Next:** Commit + merge to `stage` when the regenerated fixtures land; re-run the build afterwards since the fixtures are baked in at build time.
 
 **Blocked / watch out:** With the current `demo-case2.json`, the engine's change point (2026-07-11) lands 2 days before the `eta_change` event (2026-07-13), so `Finding.evidence` is not attached and the evidence card does not render. The UI handles both shapes; if the demo needs the evidence sentence, the regenerated fixture's event has to land within a day of the detected change point.
+
+---
+
+## 2026-08-09 · D-frontend session · plan panel + CSV upload
+
+**Done:** On `feat/peer-market-profile`, uncommitted, on top of `c126870`. (1) Plan panel (claim 10): `components/plan-panel.tsx` renders `RecoveryPlan` — title, change, `metric: from → to`, confidence, reversibility; `actor` drives the UI (mazal = toggle + Run, seller = advice labeled "yours to do — Mazal can't"); Run all · Edit first · I'll do it myself; Run POSTs the selected mazal actions to `/api/execute` and renders the receipt with the "writes are simulated" statement beside it; projected renders p50 only ("0.93× → 3.17× likely" on the predict answer). (2) CSV upload: paperclip in the composer opens `components/upload.tsx` — drop zone + real file input, server-side `parseMetaCsv` via server action, warnings rendered, 4 stated card fields (category select over OLIST_CATEGORIES, price, shipping, ETA), remaining fields inferred from category medians and marked "guessed" until edited (CardProvenance semantics), diagnose runs benchmark-mode server-side through the same answer builder as the fixture case. `apps/web` gained a dep on `@mazal/ingest`. All green: typecheck, web build, 96 tests.
+
+**Next:** Commit and merge to `stage`. Someone should hand-run a real Meta export through the upload path before the demo.
+
+**Blocked / watch out:** Both fixture plans (`eta_shock`, `thin_pdp`) are seller-only — no `actor: 'mazal'` action exists in either, so the Run all / Edit first buttons never appear on the two demo answers; the panel says "Mazal has nothing it can run here" instead. The full run→receipt beat is only reachable via an uploaded CSV whose fault has a mazal action (stockout, pixel_break, budget_cap, creative_fatigue). If the demo script needs Run all on a fixture, the playbook or the fixture has to change — not the UI.
+
+---
+
+## 2026-08-09 12:35 · D-frontend session · rebrand committed and pushed, PR still open
+
+**Done:** The uncommitted rebrand sitting in the tree from the previous session (four-leaf clover mark, Albert Sans + Newsreader, clover palette, word-by-word answer streaming via `apps/web/lib/stream.ts`) is now three commits on `feat/fix-front`, force-pushed to `origin/feat/fix-front`: `c95e7da` (chore: drop stale favicon/`.DS_Store`), `2eacf23` (feat: the rebrand itself), `5d97827` (feat: progressive reveal). Split by reconstructing each intermediate file from the original single commit rather than by hunk-patching, then diffed the final tree against that original commit to confirm byte-for-byte equality before pushing. Local tooling was broken and is fixed: `pnpm` wasn't on `PATH` (installed 11.5.1 globally via `npm i -g` to match `packageManager`), `gh` wasn't installed (installed via Homebrew).
+
+**Next:** `gh auth login` still needs a human — the repo is private, so PR creation is blocked until someone runs it interactively. Once authenticated, **the PR should target `stage`, not `main`** — see below. Separately, `pnpm install` is running (again) to get `apps/web/node_modules` in place for a local `next dev`; check `apps/web/node_modules` exists before trusting a "works locally" claim.
+
+**Blocked / watch out:** `feat/fix-front` branched off `main` at `afb9a90`, not off `stage`. `origin/stage` (`5e95593`) had since diverged with a lot of its own `apps/web` work (plan panel, CSV upload, Meta execution, and `style(web): a true red for warnings, not a terracotta`, which touched the same `--color-warn` token this rebrand also repaints) — merged in the next entry below, conflicts resolved in favor of this branch's visual choices. `pnpm install` failed silently mid-run three times in this session for reasons that were never diagnosed (looked like the process getting killed, not a real dependency error); if it fails again, check `ps aux | grep pnpm` and just rerun it rather than assuming the lockfile is broken.
+
+---
+
+## 2026-08-09 12:55 · D-frontend session · stage merged into feat/fix-front, verified green
+
+**Done:** `git merge origin/stage` (`f977aa4`), conflicts in `globals.css`, `answer.tsx`, `chat.tsx`, `docs/HANDOFF.md` resolved by hand, pushed. Rule applied: this branch's colour/type choices win everywhere they touched the same lines as stage's parallel "neutral, one hue" `apps/web` restyle (stage's `--color-warn: #c62222` dropped in favour of this branch's `#a63d28`/`#e08268`; `answer.tsx`'s colour-coded, streaming-aware verdict kept over stage's plain one). Stage's actual new features were not treated as conflicts and are kept in full: `PlanPanel` now renders off `answer.plan` in `answer.tsx` (gated on `shown.note`), and `chat.tsx` picked up the CSV-upload paperclip, the `categories` prop, `Turn` reshaped to carry the full `Answer` (needed because an uploaded CSV's answer has no fixed `AnswerKey`), and the `scroll-mt-20` sticky-header fix. `actions.ts`, `upload.tsx`, `plan-panel.tsx`, `lib/audit.ts`, `lib/meta.ts`, the execute route, and the `packages/engine`/`packages/contracts` changes under them merged with no conflicts and were not touched.
+
+Verified after merge, from a clean `pnpm install` (see below): `pnpm typecheck` clean, `pnpm --filter web build` clean (Turbopack, two pre-existing warnings in `lib/audit.ts` about dynamic fs tracing — stage's file, not from this merge), `pnpm test` 99/99 green. Ran `next dev` and clicked through a fixture answer in the browser: streaming reveal, funnel colours (green ok / red leak / gold break-even), and the `PlanPanel` (rendered real projected text, "likely 6.56× if the checkout is fixed") all confirmed working.
+
+Also fixed: local dev tooling was missing entirely at the start of this session — `pnpm` wasn't on `PATH` (installed 11.5.1 globally to match `packageManager`) and `gh` wasn't installed (installed via Homebrew). `pnpm install` hung or died silently four separate times before finishing (once from an accidental `rm` of its own log file mid-run, three times for an undiagnosed reason with the process idling at 0% CPU); if it happens again, `kill` the stuck process and rerun rather than trying to fix the lockfile.
+
+**Next:** `gh auth login` still needs a human — the repo is private, so PR creation from `feat/fix-front` to `stage` is the only thing left blocked, and it needs an interactive browser login this session can't do. Once that's done, `gh pr create --base stage` (not `main`).
+
+**Blocked / watch out:** None of stage's other `apps/web` files (`upload.tsx`, `plan-panel.tsx`, `actions.ts`, `lib/meta.ts`, `lib/audit.ts`) were restyled to the new clover identity — they still use whatever tokens stage had at merge time. If the demo walks through CSV upload or the plan panel, someone should eyeball them against the new palette before showing them next to the rebranded chat.

@@ -1,9 +1,20 @@
-import type { CampaignDay, Diagnosis, FunnelStage, SellerLeverName } from "@mazal/contracts";
+import type {
+  Action,
+  CampaignDay,
+  Diagnosis,
+  FunnelStage,
+  ProductCard,
+  RecoveryPlan,
+  ReferenceMode,
+  SellerLeverName,
+  StoreEvent,
+} from "@mazal/contracts";
 import { aggregate, atcRate } from "@mazal/contracts/metrics";
 import { benchmarks, sellerBenchmarks } from "@mazal/data";
 import {
   MEASURED_STAGES,
   WINDOW_DAYS,
+  buildPlan,
   diagnose,
   measurability,
   predict,
@@ -55,6 +66,13 @@ export type Answer = {
     breakEven: number;
   };
   rows: { label: string; value: string; ref: string; hit?: boolean }[];
+  /**
+   * The recovery plan, when the engine has one. `actions` are the raw contract objects —
+   * the client formats them and POSTs the approved `actor: 'mazal'` subset to /api/execute.
+   * `projected` is p50 only: the full band on a plan is honest about uncertainty but reads
+   * as a sales pitch, and a p90 of 20× on a seller's screen is worse than no number.
+   */
+  plan?: { actions: Action[]; projected: string; assumption: string };
   note: string;
 };
 
@@ -103,6 +121,129 @@ function stageRows(diagnosis: Diagnosis, window: CampaignDay) {
   });
 }
 
+/** The plan payload, p50 only — see the comment on `Answer.plan`. */
+function planPayload(
+  plan: RecoveryPlan,
+  diagnosis: Diagnosis,
+  reference: ReferenceMode,
+  currentP50?: number,
+): Answer["plan"] {
+  if (!diagnosis.primary || plan.actions.length === 0) return undefined;
+  const refWord = reference.kind === "benchmark" ? "the category median" : "its own baseline";
+  return {
+    actions: plan.actions,
+    projected:
+      currentP50 !== undefined
+        ? `${formatRoas(currentP50)} → ${formatRoas(plan.projected.p50)} likely`
+        : `likely ${formatRoas(plan.projected.p50)} if the ${STAGE_NOUN[diagnosis.primary.stage]} is fixed`,
+    assumption: `Median only. Assumes ${metricLabel(diagnosis.primary.metric)} returns to ${refWord} and every other stage holds still — a projection, not a forecast.`,
+  };
+}
+
+/** The shared diagnose answer: the fixture case and an uploaded CSV render identically. */
+function diagnoseAnswer(args: {
+  asked: string;
+  diagnosis: Diagnosis;
+  window: CampaignDay;
+  card: ProductCard;
+  reference: ReferenceMode;
+  plan: RecoveryPlan;
+  noteSuffix?: string;
+}): Answer {
+  const { asked, diagnosis, window, card, reference, plan, noteSuffix = "" } = args;
+  const primary = diagnosis.primary;
+
+  const categoryRow = benchmarks[card.category].metrics;
+  const measured = Object.values(categoryRow).filter((m) => m.n > 0);
+  const orders = Math.max(0, ...measured.map((m) => m.n));
+  const benchmarkNote = `${measured.length} of the 12 category benchmarks are measured from ${formatCount(orders)} Olist orders; the other ${12 - measured.length} are published priors, marked as estimates wherever they appear.`;
+
+  if (!primary) {
+    return {
+      asked,
+      verdict: [
+        { text: "No leak found. ", tone: "good" },
+        { text: "Every measured stage sits inside its reference." },
+      ],
+      said: "Nothing deviated far enough from its reference to be flagged.",
+      stages: stageRows(diagnosis, window),
+      rows: [],
+      note: benchmarkNote + noteSuffix,
+    };
+  }
+
+  const spec = MEASURED_STAGES.find((s) => s.stage === primary.stage);
+  const provenance = provenanceFor(primary, card.category, reference);
+  return {
+    asked,
+    verdict:
+      primary.causeLayer === "media"
+        ? [
+            { text: "This one is a media problem. " },
+            { text: `Your ${STAGE_NOUN[primary.stage]} is the first stage that broke.`, tone: "bad" },
+          ]
+        : [
+            { text: "Your ads are fine. " },
+            {
+              text: diagnosis.changePoint
+                ? `Your ${STAGE_NOUN[primary.stage]} broke on ${formatDate(diagnosis.changePoint.date)}.`
+                : `Your ${STAGE_NOUN[primary.stage]} is the leak.`,
+              tone: "bad",
+            },
+          ],
+    said: `Everything upstream held. ${metricLabel(primary.metric)} fell to ${formatMetric(primary.metric, primary.observed)} against a baseline of ${formatMetric(primary.metric, primary.reference)}, and nothing downstream of that could recover.`,
+    evidence: primary.evidence
+      ? `A ${EVENT_LABELS[primary.evidence.type] ?? primary.evidence.type} landed on ${formatDate(primary.evidence.date)} — ${primary.evidence.detail}.`
+      : undefined,
+    stages: stageRows(diagnosis, window),
+    rows: [
+      {
+        label: metricLabel(primary.metric),
+        value: formatMetric(primary.metric, primary.observed),
+        ref: `reference ${formatMetric(primary.metric, primary.reference)}`,
+        hit: true,
+      },
+      {
+        label: "Deviation from reference",
+        value: formatDeviation(primary.deviation),
+        ref: "flagged below −1σ",
+      },
+      {
+        label: `${denominatorOf(primary.metric)} behind it`,
+        value: formatCount(primary.sampleSize),
+        ref: spec ? `minimum ${formatCount(spec.minSample)}` : "",
+      },
+    ],
+    plan: planPayload(plan, diagnosis, reference),
+    note: `Rule ${primary.rule} · reference: ${provenance.label}. ${benchmarkNote}${noteSuffix}`,
+  };
+}
+
+/**
+ * Diagnose a campaign a seller just uploaded. Benchmark reference only — there is no
+ * trustworthy self-baseline for a file we just met. Called from a server action, so the
+ * benchmark table still never reaches the browser.
+ */
+export function buildUploadAnswer(
+  days: CampaignDay[],
+  card: ProductCard,
+  events: StoreEvent[],
+  asked: string,
+  noteSuffix?: string,
+): Answer {
+  const reference = { kind: "benchmark", table: benchmarks } as const;
+  const diagnosis = diagnose({ days, card, events, reference });
+  return diagnoseAnswer({
+    asked,
+    diagnosis,
+    window: aggregate(days.slice(-WINDOW_DAYS)),
+    card,
+    reference,
+    plan: buildPlan(diagnosis, card),
+    noteSuffix,
+  });
+}
+
 export function buildAnswers(): Record<AnswerKey, Answer> {
   const { case1, case2 } = demoCases;
 
@@ -129,71 +270,17 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
   const window = aggregate(case2.days.slice(-WINDOW_DAYS));
   const primary = diagnosis.primary;
 
-  const categoryRow = benchmarks[case2.card.category].metrics;
-  const measured = Object.values(categoryRow).filter((m) => m.n > 0);
-  const orders = Math.max(0, ...measured.map((m) => m.n));
-
-  let diagnoseAnswer: Answer;
-  if (!primary) {
-    diagnoseAnswer = {
-      asked: "My ROAS dropped this week",
-      verdict: [
-        { text: "No leak found. ", tone: "good" },
-        { text: "Every measured stage sits inside its reference." },
-      ],
-      said: "Nothing deviated far enough from the campaign's own baseline to be flagged.",
-      stages: stageRows(diagnosis, window),
-      rows: [],
-      note: `${measured.length} of the 12 category benchmarks are measured from ${formatCount(orders)} Olist orders; the other ${12 - measured.length} are published priors, marked as estimates wherever they appear.`,
-    };
-  } else {
-    const spec = MEASURED_STAGES.find((s) => s.stage === primary.stage);
-    const provenance = provenanceFor(primary, case2.card.category, reference);
-    diagnoseAnswer = {
-      asked: "My ROAS dropped this week",
-      verdict:
-        primary.causeLayer === "media"
-          ? [
-              { text: "This one is a media problem. " },
-              { text: `Your ${STAGE_NOUN[primary.stage]} is the first stage that broke.`, tone: "bad" },
-            ]
-          : [
-              { text: "Your ads are fine. " },
-              {
-                text: diagnosis.changePoint
-                  ? `Your ${STAGE_NOUN[primary.stage]} broke on ${formatDate(diagnosis.changePoint.date)}.`
-                  : `Your ${STAGE_NOUN[primary.stage]} is the leak.`,
-                tone: "bad",
-              },
-            ],
-      said: `Everything upstream held. ${metricLabel(primary.metric)} fell to ${formatMetric(primary.metric, primary.observed)} against a baseline of ${formatMetric(primary.metric, primary.reference)}, and nothing downstream of that could recover.`,
-      evidence: primary.evidence
-        ? `A ${EVENT_LABELS[primary.evidence.type] ?? primary.evidence.type} landed on ${formatDate(primary.evidence.date)} — ${primary.evidence.detail}.`
-        : undefined,
-      stages: stageRows(diagnosis, window),
-      rows: [
-        {
-          label: metricLabel(primary.metric),
-          value: formatMetric(primary.metric, primary.observed),
-          ref: `reference ${formatMetric(primary.metric, primary.reference)}`,
-          hit: true,
-        },
-        {
-          label: "Deviation from reference",
-          value: formatDeviation(primary.deviation),
-          ref: "flagged below −1σ",
-        },
-        {
-          label: `${denominatorOf(primary.metric)} behind it`,
-          value: formatCount(primary.sampleSize),
-          ref: spec ? `minimum ${formatCount(spec.minSample)}` : "",
-        },
-      ],
-      note: `Rule ${primary.rule} · reference: ${provenance.label}. ${measured.length} of the 12 category benchmarks are measured from ${formatCount(orders)} Olist orders; the other ${12 - measured.length} are published priors, marked as estimates wherever they appear.`,
-    };
-  }
+  const diagnoseAns = diagnoseAnswer({
+    asked: "My ROAS dropped this week",
+    diagnosis,
+    window,
+    card: case2.card,
+    reference,
+    plan: buildPlan(diagnosis, case2.card),
+  });
 
   // ── "why is my ATC low?" (case 2, stage 3 specifically) ─────────────────────────
+  const categoryRow = benchmarks[case2.card.category].metrics;
   const atcObserved = atcRate(window);
   const atcDist = categoryRow.atcRate;
   const atcIsLeak = primary?.stage === 3;
@@ -265,7 +352,12 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
     ],
     launch_small: [
       { text: "Launch small. ", tone: "good" },
-      { text: verdict.killTrigger ?? `The band crosses your break-even of ${formatRoas(breakEven)} — start small and kill early.` },
+      /**
+       * The kill number alone. `killTrigger` also carries the limiting factor,
+       * which the line beneath already says — printing the whole string here
+       * put the same sentence on screen twice, in the demo's opening beat.
+       */
+      { text: `Your break-even is ${formatRoas(breakEven)} and the likely case is ${formatRoas(p50)} — start small, and stop below ${formatRoas(breakEven)} after 100 clicks.` },
     ],
     launch: [
       { text: "Launch. ", tone: "good" },
@@ -287,6 +379,24 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
     ? ` At ${formatBRL(dailyBudget)}/day, ${silent.map(stageTitle).join(" and ")} never accumulates enough data inside the ${WINDOW_DAYS}-day window to be judged.`
     : "";
 
+  /**
+   * The pre-flight plan: campaign #1's own flight, judged against the category table,
+   * is what the plan repairs before campaign #2 spends. The projected line pairs the
+   * current predicted p50 with the plan's p50 — the two numbers the decision is between.
+   */
+  const preflightDiagnosis = diagnose({
+    days: case1.days,
+    card: case1.card,
+    events: case1.events,
+    reference: { kind: "benchmark", table: benchmarks },
+  });
+  const preflightPlan = planPayload(
+    buildPlan(preflightDiagnosis, case1.card),
+    preflightDiagnosis,
+    { kind: "benchmark", table: benchmarks },
+    p50,
+  );
+
   const predictAnswer: Answer = {
     asked: "Should I launch this campaign?",
     verdict: decisionVerdict[verdict.decision],
@@ -303,8 +413,9 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
       ref: `sellers like you: ${LEVER[f.lever].format(f.peerMedian)} · p${Math.round(f.percentile * 100)}`,
       hit: f.percentile >= 0.75,
     })),
+    plan: preflightPlan,
     note: replicationNote + silentNote,
   };
 
-  return { diagnose: diagnoseAnswer, atc: atcAnswer, predict: predictAnswer };
+  return { diagnose: diagnoseAns, atc: atcAnswer, predict: predictAnswer };
 }

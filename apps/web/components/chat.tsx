@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { OlistCategory } from "@mazal/contracts";
 import type { Answer, AnswerKey } from "@/lib/answers";
+import { type Reveal, buildTimeline, fullReveal, revealAt } from "@/lib/stream";
 import { AnswerBody } from "./answer";
+import { Upload } from "./upload";
 
 /**
  * The chat shell: landing hero, suggestion chips, composer, transcript. All three answers
@@ -22,11 +25,29 @@ function routeOf(question: string): AnswerKey {
   return "diagnose";
 }
 
-/** Mazal's spark, sized by the parent. */
+/**
+ * Mazal's clover, sized by the parent.
+ *
+ * One leaf, drawn once in the top-left quadrant and mirrored into the other three. Keeping it
+ * a single path means the four leaves cannot drift out of register at small sizes, which is
+ * the whole risk with a mark that has to survive being a 16px favicon.
+ */
+const LEAF =
+  "M3.9 0.5H7.4A3.4 3.4 0 0 1 10.8 3.9V10.8H3.9A3.4 3.4 0 0 1 0.5 7.4V3.9A3.4 3.4 0 0 1 3.9 0.5Z";
+
+const LEAF_MIRRORS = [
+  undefined,
+  "translate(24 0) scale(-1 1)",
+  "translate(0 24) scale(1 -1)",
+  "translate(24 24) scale(-1 -1)",
+];
+
 function Mark({ className }: { className: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9L12 2z" />
+      {LEAF_MIRRORS.map((transform, i) => (
+        <path key={i} d={LEAF} transform={transform} />
+      ))}
     </svg>
   );
 }
@@ -92,11 +113,88 @@ function ThemeToggle() {
   );
 }
 
-type Turn = { id: number; asked: string; key: AnswerKey };
+/**
+ * Drives one answer's reveal from a single `requestAnimationFrame` loop.
+ *
+ * The loop only advances a clock; `revealAt` does the deciding. That is what keeps this from
+ * becoming a pile of chained `setTimeout`s that drift apart and have to be torn down one by
+ * one — there is one frame handle to cancel, and a missed frame self-corrects on the next.
+ *
+ * `active` is false for every turn but the newest, so asking a second question makes the
+ * previous answer jump straight to complete instead of two timelines running at once.
+ */
+function useAnswerStream(answer: Answer, active: boolean): Reveal {
+  const steps = useMemo(() => buildTimeline(answer), [answer]);
+  const total = steps.length ? steps[steps.length - 1]!.at : 0;
 
-export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
+  // Read once, at mount. A turn only exists after a click, so this never runs during the
+  // server render and cannot desync hydration.
+  const [reduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    /**
+     * The blanket rule in `globals.css` flattens CSS animations for this reader but has no
+     * opinion about a JS clock — without this branch the prose would still type itself out
+     * word by word for someone who asked to be shown no motion at all.
+     */
+    if (!active || reduced) return;
+
+    let frame = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const at = now - start;
+      setElapsed(at);
+      if (at < total) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [active, reduced, total]);
+
+  if (!active || reduced) return fullReveal(answer);
+  return revealAt(steps, elapsed);
+}
+
+/** The pause made legible: the mark itself, breathing, and nothing moving. */
+function Thinking() {
+  return (
+    <div role="status" className="flex items-center py-1">
+      <Mark className="pulse-mark size-[18px] text-accent" />
+      <span className="sr-only">Mazal is thinking</span>
+    </div>
+  );
+}
+
+type Turn = { id: number; asked: string; answer: Answer };
+
+function TurnView({ turn, active }: { turn: Turn; active: boolean }) {
+  const reveal = useAnswerStream(turn.answer, active);
+
+  return (
+    <div className="flex flex-col gap-3.5">
+      <div className="rise max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
+        {turn.asked}
+      </div>
+      {reveal.thinking ? <Thinking /> : <AnswerBody answer={turn.answer} reveal={reveal} />}
+    </div>
+  );
+}
+
+export function Chat({
+  answers,
+  categories,
+}: {
+  answers: Record<AnswerKey, Answer>;
+  /** Passed down rather than imported, so the client never pulls in the contract runtime. */
+  categories: readonly OlistCategory[];
+}) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
+  const [uploading, setUploading] = useState(false);
   const lastTurn = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -107,14 +205,14 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
     });
   }, [turns]);
 
-  const ask = (asked: string, key: AnswerKey) =>
-    setTurns((t) => [...t, { id: t.length, asked, key }]);
+  const ask = (asked: string, answer: Answer) =>
+    setTurns((t) => [...t, { id: t.length, asked, answer }]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const asked = question.trim();
     if (!asked) return;
-    ask(asked, routeOf(asked));
+    ask(asked, answers[routeOf(asked)]);
     setQuestion("");
   };
 
@@ -122,12 +220,12 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
     <>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-ground px-5 py-3.5">
         <div className="flex items-center gap-[9px]">
-          {/* text-ground: white-ish on the accent disc in light, near-black in dark. */}
-          <span className="grid size-5 flex-none place-items-center rounded-full bg-accent text-ground">
-            <Mark className="size-[11px]" />
+          {/* The lockup mark: the four leaves in the green themselves, no disc behind them. */}
+          <Mark className="size-[17px] flex-none text-accent" />
+          <span className="font-serif text-[19px] font-medium leading-none tracking-[-0.01em]">
+            Mazal
           </span>
-          <span className="text-[15px] font-[560] tracking-[-0.022em]">Mazal</span>
-          <span className="rounded-[5px] bg-accent-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-accent-ink">
+          <span className="rounded-[5px] bg-ref-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-ref-ink">
             beta
           </span>
         </div>
@@ -137,21 +235,17 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
       <main className="mx-auto max-w-[46rem] px-5 pb-32">
         {turns.length === 0 && (
           <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
-            <div className="mb-[22px] grid size-[52px] place-items-center rounded-full bg-accent text-ground" aria-hidden="true">
-              <Mark className="size-[22px]" />
-            </div>
-            <h1 className="m-0 mb-1.5 text-[28px] font-[560] tracking-[-0.035em] sm:text-[34px]">
-              Mazal
+            {/* The promise, not the name — the name is already in the header two lines up.
+                `luck` is the identity's gold, the one word the sentence turns on. */}
+            <h1 className="m-0 mb-[30px] font-serif text-[38px] font-medium leading-[1.14] tracking-[-0.012em] text-balance sm:text-[46px]">
+              Campaigns shouldn&rsquo;t need <em className="text-[#C9963C]">luck</em>.
             </h1>
-            <p className="m-0 mb-[30px] text-[15px] text-ink-soft">
-              Campaigns shouldn&rsquo;t need luck.
-            </p>
             <div className="mb-[26px] flex max-w-lg flex-wrap justify-center gap-2">
               {CHIPS.map((chip) => (
                 <button
                   key={chip.key}
                   type="button"
-                  onClick={() => ask(chip.text, chip.key)}
+                  onClick={() => ask(chip.text, answers[chip.key])}
                   className="relative rounded-full border border-line bg-raised px-[15px] py-2 text-sm text-ink-soft transition-[border-color,color,scale] duration-150 after:absolute after:-inset-1 hover:border-line-strong hover:text-ink active:scale-[.96]"
                 >
                   {chip.text}
@@ -167,22 +261,60 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
               <div
                 key={turn.id}
                 ref={i === turns.length - 1 ? lastTurn : undefined}
-                className="rise flex flex-col gap-3.5"
+                /**
+                 * scroll-mt clears the sticky header. Without it `scrollIntoView`
+                 * puts the top of the turn exactly under the header, and the
+                 * header covers the verdict — the one line the whole answer is
+                 * built to deliver.
+                 */
+                className="scroll-mt-20"
               >
-                <div className="max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
-                  {turn.asked}
-                </div>
-                <AnswerBody answer={answers[turn.key]} />
+                <TurnView turn={turn} active={i === turns.length - 1} />
               </div>
             ))}
+          </div>
+        )}
+
+        {uploading && (
+          <div className="mt-[26px]">
+            <Upload
+              categories={categories}
+              onAnswer={(answer) => {
+                ask(answer.asked, answer);
+                setUploading(false);
+              }}
+              onClose={() => setUploading(false)}
+            />
           </div>
         )}
 
         {/* Concentric: composer radius 26, inner button 18 with 8px inset. */}
         <form
           onSubmit={submit}
-          className="mx-auto mt-[26px] flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_8px_24px_-12px_rgb(0_0_0/0.2)] transition-[border-color] duration-150 focus-within:border-line-strong"
+          // The shadow is the identity's, tinted 30/40/30 rather than neutral black: a grey
+          // shadow on warm paper reads as a cold patch sitting on top of the sheet.
+          className="mx-auto mt-[26px] flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
         >
+          <button
+            type="button"
+            onClick={() => setUploading((v) => !v)}
+            aria-label="Upload a Meta Ads CSV export"
+            aria-expanded={uploading}
+            className="relative -ml-2.5 grid size-9 flex-none place-items-center rounded-[18px] text-ink-soft transition-[background-color,color,scale] duration-150 after:absolute after:-inset-1 hover:bg-sunken hover:text-ink active:scale-[.96]"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-4"
+              aria-hidden="true"
+            >
+              <path d="M21.4 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.2-9.19a4 4 0 015.65 5.66l-9.2 9.19a2 2 0 01-2.82-2.83l8.49-8.48" />
+            </svg>
+          </button>
           <input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
