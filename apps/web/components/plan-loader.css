@@ -150,20 +150,38 @@
   animation: pl-pulse 1600ms cubic-bezier(0.26, 0.94, 0.6, 1) both;
 }
 
+/**
+ * The travelling arc, in Mazal's green rather than a rainbow.
+ *
+ * The reference effect ran a full spectrum around the rim. That reads as an AI
+ * product's house style rather than as ours, and this product's whole legend is
+ * three things — green is the verdict, red is the leak, everything else is ink.
+ * A rim that introduces five hues spends the discipline that makes the red mean
+ * something the moment it appears.
+ *
+ * So the wedge moves through VALUE, not hue: a deep pine at the head, the
+ * identity green, then a pale mint highlight at the crest before the long
+ * transparent tail. Light travelling an edge is a brightness gradient anyway —
+ * the rainbow was doing the same job with more colours than it needed.
+ *
+ * Written as literals rather than `var(--color-accent)` because these are the
+ * hue's own ramp, not the token: the accent is tuned to sit as text on a
+ * surface, and the crest of a glow has to run brighter than any text ever does.
+ */
 .pl-layer {
   position: absolute;
   background: conic-gradient(
     from var(--pl-a) at 50% 50%,
-    #005bf6 0deg,
-    #b0c6e9 var(--pl-s1),
-    #feca00 var(--pl-s2),
-    #ff1c11 var(--pl-s3),
-    #ff00ea var(--pl-s4),
-    #ffa2fbcc var(--pl-s5),
+    #0b5c3a 0deg,
+    #128554 var(--pl-s1),
+    #17a86a var(--pl-s2),
+    #2bbd80 var(--pl-s3),
+    #6fdcaa var(--pl-s4),
+    #b6f0d5cc var(--pl-s5),
     transparent var(--pl-s6),
     transparent 324deg,
-    #95c1ffa1 349deg,
-    #005bf6 360deg
+    #1a7a51a1 349deg,
+    #0b5c3a 360deg
   );
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
@@ -382,9 +400,23 @@
   padding: 13px 16px 14px;
 }
 
+/**
+ * The log lines are set in the interface face, not a monospace.
+ *
+ * A terminal wants a typewriter, and this panel is quoting the names of store
+ * events — so the pull toward `ui-monospace` was a real one. But the identity
+ * owns two families and no more: Albert Sans carries the interface, Newsreader
+ * carries the wordmark, the headline and the verdict. A system monospace stack
+ * is a third family, chosen by whichever machine the seller happens to be on,
+ * and on stage that is a font nobody picked.
+ *
+ * The log still reads as a log: lowercase, tight, one line each, and the
+ * letter-spacing does the work the monospace was doing.
+ */
 .pl-lline {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-sans);
   font-size: 11.5px;
+  letter-spacing: 0.02em;
   line-height: 1.35;
   color: var(--pl-dim);
   white-space: nowrap;
