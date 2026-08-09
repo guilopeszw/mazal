@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { OlistCategory } from "@mazal/contracts";
 import type { Answer, AnswerKey } from "@/lib/answers";
 import { type Reveal, buildTimeline, fullReveal, revealAt } from "@/lib/stream";
@@ -196,6 +196,9 @@ export function Chat({
   const [question, setQuestion] = useState("");
   const [uploading, setUploading] = useState(false);
   const lastTurn = useRef<HTMLDivElement>(null);
+  const composer = useRef<HTMLFormElement>(null);
+  /** Where the composer sat before the first turn moved it — the F of the FLIP below. */
+  const cameFrom = useRef<number | null>(null);
 
   /** The conversation has begun: the hero is gone and the composer docks to the bottom. */
   const started = turns.length > 0;
@@ -208,8 +211,42 @@ export function Chat({
     });
   }, [turns]);
 
-  const ask = (asked: string, answer: Answer) =>
+  /**
+   * The composer goes from in-flow to fixed the instant the first turn lands, and no CSS
+   * transition can cross that — `position` is not an interpolable property. So play the
+   * difference back by hand: `ask` records where the bar was standing, this reads where it
+   * ended up before the browser has painted either, and the gap becomes a transform that
+   * unwinds to zero. The bar is docked the whole time; only its painted position is a lie,
+   * and only for as long as the slide.
+   *
+   * Layout effect, not effect: after paint the bar would already be at the bottom for a
+   * frame, and the animation would start by throwing it back up the screen.
+   */
+  useLayoutEffect(() => {
+    const from = cameFrom.current;
+    cameFrom.current = null;
+    const bar = composer.current;
+    if (from === null || !bar) return;
+    // The blanket rule in globals.css flattens CSS animations, not this one.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const delta = from - bar.getBoundingClientRect().top;
+    if (delta === 0) return;
+
+    bar.animate([{ transform: `translateY(${delta}px)` }, { transform: "translateY(0)" }], {
+      // Longer than `rise`'s 320ms because this travels half a screen rather than 6px, and
+      // the same curve over that distance reads as a cut rather than a move. The easing is
+      // `rise`'s: nearly all the distance is covered early, then it settles.
+      duration: 380,
+      easing: "cubic-bezier(0.16, 0.84, 0.44, 1)",
+    });
+  }, [started]);
+
+  const ask = (asked: string, answer: Answer) => {
+    // Read here, in the handler: once React has re-rendered, the landing position is gone.
+    if (!started) cameFrom.current = composer.current?.getBoundingClientRect().top ?? null;
     setTurns((t) => [...t, { id: t.length, asked, answer }]);
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -310,6 +347,7 @@ export function Chat({
         >
           {/* Concentric: composer radius 26, inner button 18 with 8px inset. */}
           <form
+            ref={composer}
             onSubmit={submit}
             // The shadow is the identity's, tinted 30/40/30 rather than neutral black: a grey
             // shadow on warm paper reads as a cold patch sitting on top of the sheet.
