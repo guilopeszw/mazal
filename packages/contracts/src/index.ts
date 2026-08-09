@@ -197,6 +197,61 @@ export type RecoveryPlan = {
   projected: { p10: number; p50: number; p90: number };
 };
 
+// ─── peer comparison ─────────────────────────────────────────────────────
+// Added after SAT-A and announced in docs/HANDOFF.md. Additive: nothing that
+// already compiles against this file changes.
+//
+// This answers a different question from the funnel. `diagnose` asks what broke
+// in a campaign; this asks where a seller stands among the sellers they compete
+// with, which is a fact about the store rather than about the media.
+
+/** One lever's spread across sellers in a category, and where the good ones sit. */
+export type SellerLever = {
+  /** Mean among the top quartile of sellers by outcome. */
+  top: number;
+  /** Mean among the bottom quartile. */
+  bottom: number;
+  /** (top - bottom) / |bottom|. Negative means the better sellers do less of it. */
+  lift: number;
+};
+
+export type SellerBenchmark = {
+  category: OlistCategory;
+  /** Qualifying sellers behind every number here. */
+  sellers: number;
+  /** What "better" was ranked on. Review score is a proxy — see docs/peer-comparison.md. */
+  outcome: 'reviewAvg';
+  outcomeTop: number;
+  outcomeBottom: number;
+  percentiles: Record<SellerLeverName, Distribution>;
+  /** Null when the category has too few sellers for a quartile to mean anything. */
+  levers: Record<SellerLeverName, SellerLever> | null;
+};
+
+export type SellerLeverName =
+  | 'price' | 'freightRatio' | 'deliveryDays' | 'photos' | 'descriptionLength';
+
+/** Partial: only 22 of the 62 categories have enough sellers. */
+export type SellerBenchmarkTable = Partial<Record<OlistCategory, SellerBenchmark>>;
+
+/** Where one card field sits among the sellers it competes with. */
+export type CardFinding = {
+  lever: SellerLeverName;
+  observed: number;
+  /** Median across qualifying sellers in the category. */
+  peerMedian: number;
+  /** 0-1. Where the seller sits in the distribution. */
+  percentile: number;
+  /** What the top quartile does, when the category has enough sellers to say. */
+  betterSellers: SellerLever | null;
+  /**
+   * How much this lever separates good sellers from bad, across every category
+   * that has the data. Attached to every finding so a percentile is never quoted
+   * as if it predicted anything.
+   */
+  evidence: 'replicates' | 'inconsistent';
+};
+
 // ─── simulator API types ─────────────────────────────────────────────────
 // docs/contracts.md § packages/sim. They live here for the same reason the engine's
 // do: B injects the fault and A predicts it, and the backtest only means anything if
