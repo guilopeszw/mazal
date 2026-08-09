@@ -11,7 +11,7 @@
     "typecheck": "tsc --build && pnpm --filter @mazal/mcp typecheck",
     "derive": "node packages/data/derive.ts",
     "sim:eyeball": "node packages/sim/eyeball.ts",
-    "sim:fixtures": "node packages/sim/write-fixtures.ts",
+    "sim:fixtures": "node packages/sim/write-fixtures.ts && node packages/sim/write-account-fixture.ts",
     "sim:backtest": "node packages/sim/run-backtest.ts",
     "sim:allocator": "node packages/sim/run-allocator.ts"
   },
