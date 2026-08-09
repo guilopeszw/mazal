@@ -22,7 +22,7 @@ import type { Quantiles } from './index.ts';
  * A seller who re-runs a verdict and sees a different band stops trusting the
  * band, and a judge who re-runs the demo sees the number from the slide.
  */
-const at = (d: Quantiles, q: 'p25' | 'median' | 'p75'): number => (q === 'median' ? d.median : d[q]);
+type Quantile = 'p25' | 'median' | 'p75';
 
 /** The five factors ROAS decomposes into. */
 const FACTORS = ['ctr', 'atcRate', 'icRate', 'cvr', 'aov'] as const;
@@ -83,15 +83,13 @@ export function predict(input: PredictInput): Verdict {
     FACTORS.map((f) => [f, total ? shrink(m[f], OBSERVE[f](total), days) : m[f]]),
   ) as Record<Factor, Quantiles>;
 
-  // cpm is not shrunk: it is priced by the auction, not by this seller's page.
-  const cpmAt = (q: 'p25' | 'median' | 'p75') => at(m.cpm, q);
-
-  const roasAt = (q: 'p25' | 'median' | 'p75'): number => {
+  const roasAt = (q: Quantile): number => {
     // cpc is not a benchmark column; it is cpm / (1000 × ctr) by definition, so
     // the pessimistic case pairs an expensive thousand impressions with a poor CTR.
     const worse = q === 'p25' ? 'p75' : q === 'p75' ? 'p25' : 'median';
-    const clickRate = at(factors.ctr, q);
-    const cpc = clickRate <= 0 ? Infinity : cpmAt(worse) / (1000 * clickRate);
+    const clickRate = factors.ctr[q];
+    // cpm is not shrunk: it is priced by the auction, not by this seller's page.
+    const cpc = clickRate <= 0 ? Infinity : m.cpm[worse] / (1000 * clickRate);
     if (!Number.isFinite(cpc) || cpc === 0) return 0;
 
     // A-engine.md writes ROAS = (ctr x atcRate x icRate x cvr x aov) / cpc, but
@@ -100,7 +98,7 @@ export function predict(input: PredictInput): Verdict {
     // drives the band to roughly a thousandth of the truth. Revenue per click is
     // cvr x aov, and cpc already carries ctr. The other two stay as named
     // factors below, because they are still things a seller can move.
-    return Math.max((at(factors.cvr, q) * at(factors.aov, q)) / cpc, 0);
+    return Math.max((factors.cvr[q] * factors.aov[q]) / cpc, 0);
   };
 
   const predictedRoas = { p10: roasAt('p25'), p50: roasAt('median'), p90: roasAt('p75') };

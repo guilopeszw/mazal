@@ -33,3 +33,18 @@ test('a healthy campaign projects nothing, because there is nothing to fix', () 
   expect(plan.actions).toEqual([]);
   expect(plan.projected).toEqual({ p10: 0, p50: 0, p90: 0 });
 });
+
+test('a cost metric projects an improvement too — it gets better by falling', () => {
+  // CPM well above the category median. Both branches of the ratio once read
+  // reference/observed, so a cost fault projected a gain below 1, was clamped to
+  // 1, and showed the seller nothing to gain from fixing it.
+  const expensive = diagnose({
+    days: healthyDays().map((d) => ({ ...d, spend: d.spend * 3 })),
+    card: apparelCard, events: [], reference: benchmarkRef,
+  });
+  const plan = buildPlan(expensive, apparelCard);
+  const today = predict({ card: apparelCard, table: benchmarks });
+
+  expect(expensive.primary?.metric).toBe('cpm');
+  expect(plan.projected.p50).toBeGreaterThan(today.predictedRoas.p50);
+});

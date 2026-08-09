@@ -70,11 +70,20 @@ const MEDIA_ACTIONS = new Set(['creative_fatigue', 'budget_cap']);
 function projectFixing(finding: Finding, card: ProductCard): RecoveryPlan['projected'] {
   const today = predict({ card, table: benchmarks }).predictedRoas;
 
-  // Costs improve by falling, rates by rising.
-  const costMetric = finding.metric === 'cpm' || finding.metric.startsWith('cost') || finding.metric === 'cpa';
-  const ratio = costMetric
-    ? finding.observed <= 0 ? 1 : finding.reference / finding.observed
-    : finding.reference <= 0 ? 1 : finding.observed <= 0 ? 1 : finding.reference / finding.observed;
+  /**
+   * How much better the metric gets. A rate improves by rising, so the gain is
+   * reference/observed; a cost improves by falling, so it is the other way up.
+   *
+   * Both branches used to read `reference / observed`, which meant every cost
+   * fault produced a ratio below one, was clamped to one by the floor below, and
+   * projected no improvement at all — a CPM of 41.8 against a reference of 22
+   * showed a seller nothing to gain from fixing it.
+   */
+  const costMetric = finding.metric === 'cpm' || finding.metric === 'cpa' || finding.metric.startsWith('cost');
+  const [gain, base] = costMetric
+    ? [finding.observed, finding.reference]
+    : [finding.reference, finding.observed];
+  const ratio = base <= 0 || gain <= 0 ? 1 : gain / base;
 
   // A stage at zero would project an infinite recovery. Four times is already a
   // bigger claim than a seller should be shown on one fix.
