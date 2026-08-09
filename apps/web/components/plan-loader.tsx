@@ -1,14 +1,17 @@
 "use client";
 
+import { STORE_EVENT_TYPES } from "@mazal/contracts";
+
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { RIM_LAYERS, RIM_STOPS, buildMask, padOf } from "@/lib/ai-lights/mask";
 import { FUNNEL_STAGES, MEDIA_PRODUCT_BOUNDARY } from "@/lib/funnel";
+import { PLAN_LOADER_CYCLE_MS } from "@/lib/stream";
 import "./plan-loader.css";
 
 /**
  * The plan loader: one body that becomes several of Mazal's own working surfaces,
- * lit by a pulse of rainbow light running its rim. Shown only while a plan of
- * action is being drafted — the one moment this product is allowed a rainbow.
+ * lit by a pulse of green light running its rim. Shown only while a plan of
+ * action is being drafted — the one moment this product lights its own edge.
  *
  * There is a single element for the life of the card. It animates width, height
  * and corner radius from one surface's shape to the next; the variants are only
@@ -36,6 +39,14 @@ const SETTLED_MS = 260;
  */
 const GAP_MS = HANDOVER_AT - PULSE_MS + FADE_OUT_MS + MORPH_MS + 80 + SETTLED_MS;
 const CYCLE_MS = PULSE_MS + GAP_MS;
+
+// `lib/stream.ts` sizes the plan pause to exactly one of these. If this stops
+// matching `PLAN_LOADER_CYCLE_MS`, the pause stops being one clean beat.
+if (CYCLE_MS !== PLAN_LOADER_CYCLE_MS) {
+  console.warn(
+    `plan-loader: cycle is ${CYCLE_MS}ms but stream.ts sizes the pause to ${PLAN_LOADER_CYCLE_MS}ms`,
+  );
+}
 /** Lets the first surface's letters land before the first pulse. */
 const LEAD_IN_MS = 400;
 
@@ -93,10 +104,23 @@ function FunnelWalk({ count }: { count: number }) {
 
 /**
  * Surface 2 — the store's event log, and the polarity flip of the rotation. The
- * engine only names a cause when an event lines up with the change point; the
- * six names are the real `StoreEvent` types it listens for, shown as what is
- * being *looked for*, never as something found.
+ * engine only names a cause when an event lines up with the change point, and
+ * these are the real `StoreEvent` types it listens for, shown as what is being
+ * *looked for*, never as something found.
+ *
+ * Read from `STORE_EVENT_TYPES` rather than typed out. The contract warns that
+ * this enum has already been duplicated once and is "one place for them to
+ * drift" — and the hand-written copy this replaces had already lost
+ * `policy_flag`, so the card was quietly claiming to listen for six things when
+ * the engine listens for seven.
  */
+const EVENT_ROWS = (() => {
+  const names = [...STORE_EVENT_TYPES];
+  const rows: string[] = [];
+  for (let i = 0; i < names.length; i += 2) rows.push(names.slice(i, i + 2).join(" · "));
+  return rows;
+})();
+
 function EventLog() {
   return (
     <div className="pl-log">
@@ -104,16 +128,12 @@ function EventLog() {
       <div className="pl-lline pl-rise" style={delay(600)}>
         matching events to the change point
       </div>
-      <div className="pl-lline pl-rise" style={delay(660)}>
-        listening: eta_change · stockout
-      </div>
-      <div className="pl-lline pl-rise" style={delay(720)}>
-        price_change · pixel_error
-      </div>
-      <div className="pl-lline pl-rise" style={delay(780)}>
-        creative_refresh · budget_change
-        <span className="pl-cursor" />
-      </div>
+      {EVENT_ROWS.map((row, i) => (
+        <div key={row} className="pl-lline pl-rise" style={delay(660 + i * 60)}>
+          {i === 0 ? `listening: ${row}` : row}
+          {i === EVENT_ROWS.length - 1 ? <span className="pl-cursor" /> : null}
+        </div>
+      ))}
     </div>
   );
 }
