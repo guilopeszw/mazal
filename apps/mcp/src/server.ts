@@ -8,6 +8,7 @@ import {
 import { Hono, type Context } from 'hono';
 
 import { hasValidBearerToken } from './auth.js';
+import { registerMazalTools } from './tools/index.js';
 
 export type RegisterTools = (server: McpServer) => void;
 
@@ -27,7 +28,7 @@ function readHostnameAllowlist(value: string | undefined): string[] | undefined 
   return hostnames?.length ? hostnames : undefined;
 }
 
-export function createMazalMcpServer(registerTools: RegisterTools = () => undefined): McpServer {
+export function createMazalMcpServer(registerTools: RegisterTools = registerMazalTools): McpServer {
   const server = new McpServer({ name: 'Mazal MCP', version: '0.1.0' });
   registerTools(server);
   return server;

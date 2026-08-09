@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 02:29 BRT · E-agent (Joaquim) · quatro tools MCP determinísticos
+
+**Done:** PRD 03 implementado no commit que contém esta entrada: `diagnose_campaign`, `predict_campaign`, `build_recovery_plan` e `execute_plan` são os únicos tools públicos. Benchmarks são injetados no servidor, respostas numéricas vêm diretamente do engine, e execução aceita somente ações `mazal`, grava em memória e retorna recibo SHA-256 canônico. TDD em Node 24 registrou três REDs e terminou com 29/29 no MCP e 114/114 global; typechecks focalizado/global e `git diff --check` verdes.
+
+**Next:** executar o PRD 04 de deploy/conexão Deco sem alterar a superfície de quatro tools.
+
+**Blocked / watch out:** `apps/mcp` precisa de Zod 4 para o SDK MCP 2.0 publicar JSON Schema em `tools/list`; Zod 3 executa `tools/call`, mas quebra descoberta. O log é intencionalmente volátil por processo e o typecheck raiz ainda não inclui `apps/mcp`, então o gate focalizado continua obrigatório. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-2-report.md`.
+
 ## 2026-08-09 02:15 BRT · E-agent (Joaquim) · validação Node 24 do scaffold MCP
 
 **Done:** Node `v24.19.0` foi instalado localmente e validou o scaffold em `0dae69d`: `pnpm --filter @mazal/mcp test` (11/11), typecheck focalizado do MCP, `pnpm typecheck` e `pnpm test` (14 arquivos, 96/96). O teste de integração já confirma que `mazal.vercel.app`, quando incluído na allowlist exata, atravessa Host/Origin/bearer e completa o handshake MCP com 200.

@@ -9,10 +9,13 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@mazal/contracts": "workspace:*",
+    "@mazal/data": "workspace:*",
+    "@mazal/engine": "workspace:*",
     "@modelcontextprotocol/hono": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
     "hono": "^4.13.1",
-    "zod": "^3.25.76"
+    "zod": "^4.2.0"
   },
   "devDependencies": {
     "vitest": "^3.2.7"
