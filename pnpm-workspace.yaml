@@ -3,3 +3,6 @@ packages:
   - apps/*
 allowBuilds:
   esbuild: true
+  # Native resolver behind eslint-config-next's import plugin. Arrived with apps/web;
+  # without its build step `next lint` cannot resolve a single import.
+  unrs-resolver: true
