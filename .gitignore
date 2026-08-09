@@ -21,3 +21,13 @@ data/raw/
 
 # The audit trail is a runtime artefact of whichever machine ran it.
 .mazal-audit.jsonl
+
+# Deployment state and secrets. `.env.example` is the exception — it carries no
+# values, and it is the one env file a cold clone needs to know what to set.
+.vercel
+.env*
+!.env.example
+
+# macOS writes these into every directory it opens. Three reached the repo once
+# already.
+.DS_Store

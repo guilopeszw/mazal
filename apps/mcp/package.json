@@ -1,0 +1,27 @@
+{
+  "name": "@mazal/mcp",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build:vercel": "node scripts/build-vercel.mjs",
+    "test": "pnpm run typecheck && pnpm run typecheck:vercel-compat && vitest run --passWithNoTests",
+    "typecheck": "tsc -p tsconfig.json --pretty false",
+    "typecheck:vercel-compat": "tsc -p tsconfig.vercel-compat.json --pretty false"
+  },
+  "dependencies": {
+    "@mazal/contracts": "workspace:*",
+    "@mazal/data": "workspace:*",
+    "@mazal/engine": "workspace:*",
+    "@modelcontextprotocol/hono": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "hono": "^4.13.1",
+    "zod": "^4.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "vitest": "^3.2.7"
+  }
+}
