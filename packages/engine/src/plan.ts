@@ -1,7 +1,9 @@
 // ─── packages/engine/src/plan.ts ─────────────────────────────────────────
 // Findings become actions the seller approves before anything runs.
 
-import type { Action, Diagnosis, FaultKind, ProductCard, RecoveryPlan } from '@mazal/contracts';
+import type { Action, Diagnosis, Finding, FaultKind, ProductCard, RecoveryPlan } from '@mazal/contracts';
+import { benchmarks } from '@mazal/data';
+import { predict } from './predict.ts';
 
 type Template = Omit<Action, 'id' | 'expectedEffect'>;
 
@@ -50,6 +52,38 @@ const PLAYBOOK: Record<FaultKind, Template[]> = {
 /** Everything that touches the ad account rather than the store. */
 const MEDIA_ACTIONS = new Set(['creative_fatigue', 'budget_cap']);
 
+/**
+ * What the band becomes if the named stage is restored to its reference.
+ *
+ * ROAS is a product of its factors, so lifting one factor from `observed` to
+ * `reference` scales the whole band by that ratio. This is the same
+ * decomposability that lets `predict` name a limiting factor, used in the other
+ * direction — and it is the only projection available here, because
+ * `buildPlan(diagnosis, card)` is frozen and receives neither the daily series
+ * nor a benchmark table.
+ *
+ * The assumption is stated rather than hidden: it projects the named stage back
+ * to the category median and holds every other stage where it is. A plan that
+ * fixes two stages at once is worth more than this says, and one whose fix only
+ * half lands is worth less.
+ */
+function projectFixing(finding: Finding, card: ProductCard): RecoveryPlan['projected'] {
+  const today = predict({ card, table: benchmarks }).predictedRoas;
+
+  // Costs improve by falling, rates by rising.
+  const costMetric = finding.metric === 'cpm' || finding.metric.startsWith('cost') || finding.metric === 'cpa';
+  const ratio = costMetric
+    ? finding.observed <= 0 ? 1 : finding.reference / finding.observed
+    : finding.reference <= 0 ? 1 : finding.observed <= 0 ? 1 : finding.reference / finding.observed;
+
+  // A stage at zero would project an infinite recovery. Four times is already a
+  // bigger claim than a seller should be shown on one fix.
+  const capped = Math.min(Math.max(ratio, 1), 4);
+  const round = (x: number) => Math.round(x * 100) / 100;
+
+  return { p10: round(today.p10 * capped), p50: round(today.p50 * capped), p90: round(today.p90 * capped) };
+}
+
 export function buildPlan(diagnosis: Diagnosis, card: ProductCard): RecoveryPlan {
   const { primary } = diagnosis;
   if (!primary) return { actions: [], projected: { p10: 0, p50: 0, p90: 0 } };
@@ -75,6 +109,5 @@ export function buildPlan(diagnosis: Diagnosis, card: ProductCard): RecoveryPlan
     expectedEffect: { metric: primary.metric, from: primary.observed, to: primary.reference },
   }));
 
-  void card;
-  return { actions, projected: { p10: 0, p50: 0, p90: 0 } };
+  return { actions, projected: projectFixing(primary, card) };
 }
