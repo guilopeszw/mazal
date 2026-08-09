@@ -8,8 +8,13 @@ import { PlanPanel } from "./plan-panel";
  */
 
 const BAR: Record<"ok" | "broken" | "mute", string> = {
+  /**
+   * One hue. A healthy stage is green; a broken one is the absence of green,
+   * not a second colour — and it always carries the word "leak" beside it, so
+   * the distinction never rests on colour at all.
+   */
   ok: "bg-accent",
-  broken: "bg-warn",
+  broken: "bg-ink",
   mute: "bg-line",
 };
 
@@ -20,7 +25,13 @@ export function AnswerBody({ answer }: { answer: Answer }) {
         {answer.verdict.map((seg, i) => (
           <em
             key={i}
-            className={`not-italic ${seg.tone === "good" ? "text-accent" : seg.tone === "bad" ? "text-warn" : ""}`}
+            /**
+             * The verdict carries no colour. A sentence a seller is being asked
+             * to trust should read as a statement, not as a status light —
+             * colouring it green or red editorialises the number before they
+             * have read it. Emphasis comes from weight and position instead.
+             */
+            className="not-italic"
           >
             {seg.text}
           </em>
@@ -30,7 +41,7 @@ export function AnswerBody({ answer }: { answer: Answer }) {
       <p className="m-0 max-w-[60ch] text-[15px] text-ink-soft">{answer.said}</p>
 
       {answer.evidence && (
-        <div className="flex items-start gap-2.5 rounded-xl bg-accent-soft px-3.5 py-3 text-sm">
+        <div className="flex items-start gap-2.5 rounded-xl border border-line bg-sunken px-3.5 py-3 text-sm">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -38,7 +49,7 @@ export function AnswerBody({ answer }: { answer: Answer }) {
             strokeWidth="1.6"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="mt-[3px] size-[15px] flex-none text-accent-ink"
+            className="mt-[3px] size-[15px] flex-none text-ink-soft"
             aria-hidden="true"
           >
             <path d="M12 8v5M12 16.5v.5" />
@@ -61,7 +72,7 @@ export function AnswerBody({ answer }: { answer: Answer }) {
               >
                 <span
                   className={`flex items-center gap-[9px] text-sm ${
-                    s.state === "broken" ? "font-[540] text-warn" : "text-ink-soft"
+                    s.state === "broken" ? "font-[560] text-ink" : "text-ink-soft"
                   }`}
                 >
                   <span
@@ -72,7 +83,7 @@ export function AnswerBody({ answer }: { answer: Answer }) {
                   {s.tag && (
                     <span
                       className={`rounded px-1.5 py-px text-[10.5px] font-[580] uppercase tracking-[0.05em] ${
-                        s.state === "broken" ? "bg-warn-soft text-warn" : "bg-sunken text-ink-faint"
+                        s.state === "broken" ? "bg-ink text-ground" : "bg-sunken text-ink-faint"
                       }`}
                     >
                       {s.tag}
@@ -102,10 +113,10 @@ export function AnswerBody({ answer }: { answer: Answer }) {
                 style={{ left: `${answer.band.mid}%` }}
               />
               <div
-                className="absolute -top-1.5 h-[18px] w-0.5 rounded-[1px] bg-warn"
+                className="absolute -top-1.5 h-[18px] w-0.5 rounded-[1px] bg-ink"
                 style={{ left: `${answer.band.breakEven}%` }}
               >
-                <span className="absolute -top-[19px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10.5px] font-[560] text-warn">
+                <span className="absolute -top-[19px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10.5px] font-[560] text-ink-soft">
                   break-even
                 </span>
               </div>
@@ -126,11 +137,11 @@ export function AnswerBody({ answer }: { answer: Answer }) {
               <div
                 key={r.label}
                 className={`grid grid-cols-[1fr_auto] items-baseline gap-3.5 border-b border-line px-4 py-2.5 text-sm last:border-b-0 sm:grid-cols-[1fr_auto_auto] ${
-                  r.hit ? "bg-warn-soft" : ""
+                  r.hit ? "bg-sunken" : ""
                 }`}
               >
-                <span className={r.hit ? "text-warn" : "text-ink-soft"}>{r.label}</span>
-                <span className={`tnum font-[540] ${r.hit ? "text-warn" : ""}`}>{r.value}</span>
+                <span className={r.hit ? "font-[540] text-ink" : "text-ink-soft"}>{r.label}</span>
+                <span className={`tnum ${r.hit ? "font-[600]" : "font-[540]"}`}>{r.value}</span>
                 <span className="tnum hidden text-[13px] text-ink-faint sm:block">{r.ref}</span>
               </div>
             ))}

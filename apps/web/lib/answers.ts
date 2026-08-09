@@ -352,7 +352,12 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
     ],
     launch_small: [
       { text: "Launch small. ", tone: "good" },
-      { text: verdict.killTrigger ?? `The band crosses your break-even of ${formatRoas(breakEven)} — start small and kill early.` },
+      /**
+       * The kill number alone. `killTrigger` also carries the limiting factor,
+       * which the line beneath already says — printing the whole string here
+       * put the same sentence on screen twice, in the demo's opening beat.
+       */
+      { text: `Your break-even is ${formatRoas(breakEven)} and the likely case is ${formatRoas(p50)} — start small, and stop below ${formatRoas(breakEven)} after 100 clicks.` },
     ],
     launch: [
       { text: "Launch. ", tone: "good" },

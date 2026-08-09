@@ -69,7 +69,7 @@ export function PlanPanel({
     <section className="overflow-hidden rounded-[14px] border border-line bg-raised">
       <h3 className="m-0 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
         The plan
-        <span className="tnum normal-case tracking-normal text-accent-ink">{projected}</span>
+        <span className="tnum normal-case tracking-normal text-ink-soft">{projected}</span>
       </h3>
 
       <div className="flex flex-col">
@@ -124,8 +124,8 @@ export function PlanPanel({
         <p className="m-0 text-[12.5px] text-ink-faint">{assumption}</p>
 
         {receipt ? (
-          <div className="rounded-[10px] bg-accent-soft px-3.5 py-3 text-sm">
-            <p className="tnum m-0 font-[560] text-accent-ink">
+          <div className="rounded-[10px] border border-line bg-sunken px-3.5 py-3 text-sm">
+            <p className="tnum m-0 font-[560] text-ink">
               Receipt {receipt.code} — {receipt.count} action{receipt.count === 1 ? "" : "s"} logged.
             </p>
             <p className="m-0 mt-1 text-[13px] text-ink-soft">
@@ -174,7 +174,7 @@ export function PlanPanel({
               Writes are simulated — this build has no ad-platform client. Running appends to
               an approval log and returns a receipt.
             </p>
-            {error && <p className="m-0 text-[13px] text-warn">{error}</p>}
+            {error && <p className="m-0 text-[13px] font-[540] text-ink">{error}</p>}
           </>
         )}
       </div>
