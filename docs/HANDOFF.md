@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 10:26 BRT · E-agent (Joaquim) · gate estrito do build Vercel
+
+**Done:** o gate de `apps/mcp` agora executa antes dos testes tanto `tsc -p tsconfig.json --pretty false` (a prova estrita de `z.output` compatível com `Diagnosis`) quanto o check `tsconfig.vercel-compat.json` que reproduz o builder Vercel. Nenhum schema runtime nem `packages/*` foi alterado. Node 24: 33/33 MCP, checks estrito/compatível, typecheck global e 118/118 global verdes; diff check verde. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-build-gate-fix-report.md`.
+
+**Next:** com acesso autorizado, fazer deploy e executar o checklist remoto existente da Vercel/Deco.
+
+**Blocked / watch out:** `pnpm typecheck` raiz continua sem incluir `apps/mcp`; manter `pnpm --filter @mazal/mcp test` como gate focalizado, que agora contém os dois modos TypeScript.
+
+---
+
 ## 2026-08-09 10:20 BRT · E-agent (Joaquim) · corretivo do typecheck Vercel/Zod 4
 
 **Done:** corrigida a falha de build da Function causada pela inferência do Zod 4 sob `strictNullChecks: false`, sem mudar o schema runtime nem `packages/*`. O bridge fica isolado na exportação de `diagnosisSchema`; o build strict normal mantém uma prova estática de compatibilidade com `Diagnosis`. Um typecheck de regressão equivalente ao builder roda antes dos testes MCP. Node 24: build Vercel real verde, 33/33 MCP, typechecks compatível/focalizado/global e 118/118 global verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-build-fix-report.md`.
