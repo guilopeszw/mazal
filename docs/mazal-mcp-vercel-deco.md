@@ -2,7 +2,7 @@
 
 ## Estado
 
-A parte versionável está pronta para implantação como Vercel Function no runtime Node 24. A implantação, a URL de produção, a Custom Connection e a evidência do Monitor continuam pendentes porque exigem acesso autorizado às contas Vercel e Deco.
+A operação está ativa em produção: a Vercel serve o MCP em Node 24, a Custom Connection `Mazal MCP` guarda o bearer secret e o agente `Mazal` usa somente essa conexão. Um diagnóstico real foi executado pelo Studio e registrado no Monitoramento.
 
 Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor de token.
 
@@ -11,11 +11,11 @@ Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor 
 1. Criar ou selecionar um projeto Vercel para este monorepo.
 2. Definir **Root Directory** como `apps/mcp` e manter habilitada a inclusão de arquivos externos ao diretório raiz. O pacote depende de `packages/contracts`, `packages/data` e `packages/engine` pelo workspace pnpm.
 3. Confirmar **Node.js 24.x** nas configurações do projeto. `apps/mcp/package.json` também fixa `24.x`.
-4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` gera a Function Node autocontida em `apps/mcp/api/mcp.mjs`; `apps/mcp/vercel.json` reescreve a URL pública `/mcp` para `/api/mcp` sem migrar para Edge ou Workers.
+4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` gera a Function Node autocontida em `apps/mcp/api/mcp.mjs`; `apps/mcp/vercel.json` encaminha a URL pública `/mcp` para esse artefato antes do filesystem, sem migrar para Edge ou Workers.
 5. Configurar as variáveis abaixo no secret manager da Vercel para Production. Configurar Preview somente se houver um host de preview explicitamente autorizado.
 6. Implantar e anotar a URL estável como `https://<VERCEL_PRODUCTION_HOST>/mcp` nesta seção. Não usar uma URL de preview na conexão de produção.
 
-**URL HTTPS de produção:** pendente de deploy autorizado.
+**URL HTTPS de produção:** `https://mcp-cyan-gamma.vercel.app/mcp`
 
 ### Variáveis de ambiente, sem valores
 
@@ -65,25 +65,25 @@ Criar o Agent “Mazal”, conectar Meta Ads ou habilitar qualquer quinto tool p
 
 ### Endpoint e protocolo
 
-- [ ] `POST https://<VERCEL_PRODUCTION_HOST>/mcp` sem `Authorization` retorna `401`.
-- [ ] O mesmo endpoint com a credencial da conexão conclui o handshake `initialize` em Streamable HTTP.
-- [ ] A resposta do handshake identifica o servidor como `Mazal MCP`.
-- [ ] `tools/list` retorna exatamente os quatro nomes listados acima, sem tools adicionais.
-- [ ] Uma chamada real de `diagnose_campaign` com payload válido retorna sucesso MCP.
+- [x] `POST https://mcp-cyan-gamma.vercel.app/mcp` sem `Authorization` retorna `401`.
+- [x] O mesmo endpoint com a credencial da conexão conclui o handshake `initialize` em Streamable HTTP.
+- [x] A resposta do handshake identifica o servidor como `Mazal MCP`.
+- [x] `tools/list` retorna exatamente os quatro nomes listados acima, sem tools adicionais.
+- [x] Uma chamada real de `diagnose_campaign` com payload válido retorna sucesso MCP.
 - [ ] Uma chamada inválida continua sendo recusada pelo schema; autenticação, Host e Origin permanecem ativos.
 
 ### Deco e Monitor
 
-- [ ] A Custom Connection se chama exatamente **Mazal MCP** e usa a URL HTTPS de produção.
-- [ ] A credencial bearer está no campo secreto da conexão e não em instruções.
-- [ ] Em **Settings → Monitor**, a chamada real mostra status de sucesso, duração e o nome `diagnose_campaign`.
-- [ ] Registrar a URL de produção neste documento e a evidência sem token no handoff após a validação.
+- [x] A Custom Connection se chama exatamente **Mazal MCP** e usa a URL HTTPS de produção.
+- [x] A credencial bearer está no campo secreto da conexão e não em instruções.
+- [x] Em **Settings → Monitor**, a chamada real mostra status de sucesso, duração e o nome `diagnose_campaign`.
+- [x] Registrar a URL de produção neste documento e a evidência sem token no handoff após a validação.
 
 ## Pendências que exigem conta externa
 
-- [ ] Criar/configurar o projeto Vercel, os três secrets e o deploy de produção.
-- [ ] Preencher a URL HTTPS real neste documento.
-- [ ] Criar a Custom Connection Deco “Mazal MCP” e seu secret bearer.
-- [ ] Executar handshake, `tools/list`, tool call e validação no Monitor.
+- [x] Criar/configurar o projeto Vercel, os secrets necessários e o deploy de produção.
+- [x] Preencher a URL HTTPS real neste documento.
+- [x] Criar a Custom Connection Deco “Mazal MCP” e seu secret bearer.
+- [x] Executar handshake, `tools/list`, tool call e validação no Monitor.
 
 Referências oficiais: [Node.js na Vercel](https://vercel.com/docs/functions/runtimes/node-js), [versões Node.js](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions), [monorepos](https://vercel.com/docs/monorepos) e [rewrites](https://vercel.com/docs/routing/rewrites).

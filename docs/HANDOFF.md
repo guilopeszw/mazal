@@ -15,6 +15,13 @@ Entry format:
 
 ---
 
+## 2026-08-09 11:34 BRT · E-agent (Joaquim) · produção Vercel e agente Deco
+**Done:** MCP publicado em `https://mcp-cyan-gamma.vercel.app/mcp`, com Host allowlist e bearer somente nos secret managers. A Custom Connection `Mazal MCP` foi criada no Deco e vinculada exclusivamente ao agente `Mazal`; as instruções versionadas estão em `docs/deco-agent-instructions.md`. Smoke real no Studio concluiu `Enable Tool → Diagnose Campaign` em 113 ms, retornou `primary: null`, `secondary: []` e `suspectedCause: "none"`, e está registrado em Settings → Monitor → Chats como `Diagnóstico de campanha de anúncios` (Done, 11:34). O runbook foi atualizado sem segredos.
+**Next:** iniciar o PRD do chat web somente quando D disponibilizar `apps/web`; antes disso, definir o secret manager e escopo de uma API key do agente para a integração servidor-a-servidor.
+**Blocked / watch out:** não criar nem expor uma API key do agente no browser, Git ou documentação sem o destino servidor-a-servidor do `apps/web`; o bearer da conexão atual é separado e não deve ser reutilizado.
+
+---
+
 ## 2026-08-09 11:18 BRT · E-agent (Joaquim) · corretivo final da rota pública MCP na Vercel
 **Done:** substituído o `rewrites` por `routes` explícitas: `/mcp` encaminha para `/api/mcp.mjs` antes de `handle: filesystem`, sem `check`. O teste RED→GREEN fixa a ordem e percorre o destino público local até a recusa `401` do handler autenticado. Build limpo Vercel CLI 58.9.0 em Node 24.19.0 gera `api/mcp.func` e manifesta primeiro `^/mcp$ → /api/mcp.mjs`, sem `check`. Node 24: 36/36 MCP, 121/121 raiz, typecheck e diff check verdes.
 **Next:** com autorização, fazer deploy e repetir o smoke remoto de `/mcp` sem bearer (401) e handshake autenticado.
