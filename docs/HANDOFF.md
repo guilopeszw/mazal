@@ -37,6 +37,40 @@ Entry format:
 
 ---
 
+## 2026-08-08 22:20 · Guilherme · CONTRACT CHANGE, and the last three engine gaps
+
+**Announcing a change to `packages/contracts` before it is pushed, as `AGENTS.md` requires.** It is an optional field, which the same file calls cheap — nothing that already builds a `Verdict` breaks — but Mateus owns that file and this is the announcement.
+
+```ts
+export type Verdict = {
+  decision: 'launch' | 'launch_small' | 'dont_launch';
+  predictedRoas: { p10: number; p50: number; p90: number };
+  breakEvenRoas: number;
+  killTrigger?: string;
+  limitingFactor?: string;   // NEW
+};
+```
+
+`docs/acceptance.md` claim 8 asks every verdict to carry *"the specific factor dragging the band down"*, and the only prose slot was `killTrigger`, which is set for one decision of three. **A `dont_launch` could name no reason — the verdict that most needs one.**
+
+**Done:** the three gaps between `packages/engine` and the ten claims, all found by reading `acceptance.md` against the code rather than by a failing test.
+
+**Claim 9 was failing outright.** `PredictInput.history` was never read, so *"`predict` without `history` returns a strictly wider band than the same input with history"* was simply false — and its demo beat, the band visibly narrowing once there is history, would have shown D two identical bands. History now shrinks the category prior toward what the account actually did: the centre moves by the weight of the evidence, the spread contracts by its square root. Under seven days nothing moves at all, because a band that narrows on two days is the false precision claim 9 exists to rule out. Concretely: **width 4.04 with no history, 2.40 with thirty days.**
+
+**Claim 10 had nothing to update.** `RecoveryPlan.projected` was three zeros. ROAS is a product of its factors, so restoring the named stage from `observed` to `reference` scales the band by that ratio — the decomposability `predict` uses to name a factor, run backwards. Capped at 4x, because a stage at zero would otherwise project an infinite recovery. **D can render the plan panel now.**
+
+**A bug in the brief, worth knowing about.** `A-engine.md` writes `ROAS = (ctr x atcRate x icRate x cvr x aov) / cpc`, but the contract defines `cvr` as purchases/clicks — which already contains `atcRate` and `icRate`. Multiplying all three double-counts the funnel and puts the band about three orders of magnitude low. It is `(cvr x aov) / cpc`, with `cpc` carrying the `ctr`. The other two remain as named factors, because a seller can still move them.
+
+`limitingFactor` also declines to name a culprit when there is not one: an account at 99% of the median on its worst factor has nothing dragging it down, and saying otherwise puts a false claim on a seller's screen.
+
+**Next:** nothing in `packages/engine` that the ten claims ask for. Stage 2 stays unimplemented on purpose — it needs analytics most sellers do not have.
+
+**Blocked / watch out:** `pnpm test` 83 passing, `pnpm typecheck` clean, backtest unchanged at 59% top-1 — none of this touches `diagnose`.
+
+**Mateus: the `Verdict` change is yours to accept or reject.** If it is rejected, claim 8 cannot be met as written, and the deck should drop the "named factor" half of that beat rather than fake it.
+
+---
+
 ## 2026-08-08 21:40 · Guilherme · packages/engine exists — and the firewall did not hold
 
 **Read this before anyone puts a number on slide 6.**
