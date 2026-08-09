@@ -18,15 +18,29 @@ const handshake = {
   },
 };
 
-test('rewrites the public MCP route to the Vercel artifact before authentication', async () => {
+test('routes the public MCP URL to the Vercel artifact before authentication', async () => {
   const config = JSON.parse(
     await readFile(resolve(appRoot, 'vercel.json'), 'utf8'),
-  ) as { rewrites: Array<{ source: string; destination: string }> };
-  const rewrite = config.rewrites.find(({ source }) => source === '/mcp');
+  ) as {
+    routes?: Array<{
+      src?: string;
+      dest?: string;
+      handle?: string;
+      check?: boolean;
+    }>;
+  };
+  const routes = config.routes ?? [];
+  const routeIndex = routes.findIndex(({ src }) => src === '/mcp');
+  const filesystemIndex = routes.findIndex(
+    ({ handle }) => handle === 'filesystem',
+  );
+  const route = routes[routeIndex];
 
-  expect(rewrite).toEqual({ source: '/mcp', destination: '/api/mcp.mjs' });
-  if (!rewrite) {
-    throw new Error('Missing /mcp Vercel rewrite');
+  expect(routeIndex).toBeGreaterThanOrEqual(0);
+  expect(filesystemIndex).toBeGreaterThan(routeIndex);
+  expect(route).toEqual({ src: '/mcp', dest: '/api/mcp.mjs' });
+  if (!route?.dest) {
+    throw new Error('Missing explicit /mcp Vercel route');
   }
 
   const handler = createVercelHandler({
@@ -34,7 +48,7 @@ test('rewrites the public MCP route to the Vercel artifact before authentication
     allowedHosts: ['mazal-mcp.vercel.app'],
     allowedOrigins: ['mazal-mcp.vercel.app'],
   });
-  const response = await handler(new Request(`https://mazal-mcp.vercel.app${rewrite.destination}`, {
+  const response = await handler(new Request(`https://mazal-mcp.vercel.app${route.dest}`, {
     method: 'POST',
     headers: {
       Host: 'mazal-mcp.vercel.app',

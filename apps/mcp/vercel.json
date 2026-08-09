@@ -3,10 +3,13 @@
   "framework": null,
   "buildCommand": "pnpm run build:vercel",
   "outputDirectory": "public",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/mcp",
-      "destination": "/api/mcp.mjs"
+      "src": "/mcp",
+      "dest": "/api/mcp.mjs"
+    },
+    {
+      "handle": "filesystem"
     }
   ]
 }

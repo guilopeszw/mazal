@@ -15,6 +15,11 @@ Entry format:
 
 ---
 
+## 2026-08-09 11:18 BRT · E-agent (Joaquim) · corretivo final da rota pública MCP na Vercel
+**Done:** substituído o `rewrites` por `routes` explícitas: `/mcp` encaminha para `/api/mcp.mjs` antes de `handle: filesystem`, sem `check`. O teste RED→GREEN fixa a ordem e percorre o destino público local até a recusa `401` do handler autenticado. Build limpo Vercel CLI 58.9.0 em Node 24.19.0 gera `api/mcp.func` e manifesta primeiro `^/mcp$ → /api/mcp.mjs`, sem `check`. Node 24: 36/36 MCP, 121/121 raiz, typecheck e diff check verdes.
+**Next:** com autorização, fazer deploy e repetir o smoke remoto de `/mcp` sem bearer (401) e handshake autenticado.
+**Blocked / watch out:** nenhum deploy foi feito. O `task-3-bundle-route-review.md` não rastreado já existia e não faz parte desta correção.
+
 ## 2026-08-09 11:08 BRT · E-agent (Joaquim) · corretivo de rota do bundle MCP Vercel
 **Done:** `/mcp` agora reescreve para `/api/mcp.mjs`, o arquivo que a Function Vercel emite, e o Hono escuta exatamente esse caminho interno. TDD RED comprovou o antigo `/api/mcp`; GREEN simula o destino do rewrite sem bearer e recebe `401`, preservando o handshake autenticado com Host/Origin/bearer. Node 24: 36/36 MCP (strict + compat), 121/121 raiz, build Vercel 58.9.0 limpo e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-bundle-route-report.md`.
 **Next:** com autorização, fazer deploy e repetir o smoke remoto de `/mcp`.
