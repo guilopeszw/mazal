@@ -7,6 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "build": "pnpm --filter web build",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --build",
     "derive": "node packages/data/derive.ts",
