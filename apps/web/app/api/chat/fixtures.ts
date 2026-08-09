@@ -1,5 +1,6 @@
 import type { ResolvedContext } from "./context.ts";
 import { renderNarration, type StructuredNarration } from "./narration.ts";
+import { templateFor } from "./template.ts";
 
 const fixtures: Record<"case1" | "case2", StructuredNarration> = {
   case1: {
@@ -15,5 +16,8 @@ const fixtures: Record<"case1" | "case2", StructuredNarration> = {
 };
 
 export function fixtureFor(scenarioKey: "case1" | "case2", context: ResolvedContext): string {
+  if (!context.diagnosis.primary || !context.plan.actions[0]) {
+    return templateFor(context);
+  }
   return renderNarration(fixtures[scenarioKey], context);
 }

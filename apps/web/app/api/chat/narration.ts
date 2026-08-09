@@ -53,9 +53,7 @@ function assertSourceText(value: string): void {
 
 function addText(values: Record<Path, ValueSpec>, path: Path, value: string | undefined): void {
   if (value === undefined) return;
-  if (ASCII_DIGIT.test(value)) {
-    throw new Error(`Text value for ${path} contains an ASCII digit`);
-  }
+  if (ASCII_DIGIT.test(value)) return;
   values[path] = { value, formatter: "text" };
 }
 

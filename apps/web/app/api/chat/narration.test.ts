@@ -1,6 +1,7 @@
-import type { ResolvedContext } from "./context.ts";
+import { resolveContext, type ResolvedContext } from "./context.ts";
 import { fixtureFor } from "./fixtures.ts";
 import { parseStructuredNarration, renderNarration } from "./narration.ts";
+import { parseChatRequest } from "./schema.ts";
 import { templateFor } from "./template.ts";
 import { expect, test } from "vitest";
 
@@ -63,6 +64,31 @@ test("renders a valid known fixture through the deterministic renderer", () => {
   expect(narration).toContain("4,5%");
   expect(narration).toContain("Melhore a página do produto");
   expect(narration).not.toMatch(/{{|}}/);
+});
+
+test.each(["case1", "case2"] as const)("renders the %s fixture from engine-resolved context", (scenarioKey) => {
+  const resolved = resolveContext(parseChatRequest({ scenarioKey, userMessage: "Diagnostique" }));
+
+  expect(fixtureFor(scenarioKey, resolved)).toBe(templateFor(resolved));
+});
+
+test("falls back to the template for a healthy fixture context", () => {
+  const healthyContext: ResolvedContext = {
+    ...context,
+    diagnosis: { ...context.diagnosis, primary: null, suspectedCause: "none" },
+    plan: { ...context.plan, actions: [] },
+  };
+
+  expect(fixtureFor("case1", healthyContext)).toBe(templateFor(healthyContext));
+});
+
+test("falls back to the template for a fixture context without an action", () => {
+  const actionlessContext: ResolvedContext = {
+    ...context,
+    plan: { ...context.plan, actions: [] },
+  };
+
+  expect(fixtureFor("case2", actionlessContext)).toBe(templateFor(actionlessContext));
 });
 
 test("rejects prototype paths from a provider", () => {

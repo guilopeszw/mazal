@@ -15,6 +15,15 @@ Entry format:
 
 ---
 
+## 2026-08-09 17:00 BRT · Codex · web chat API Task 2 fix round 1
+
+**Done:** `fixtureFor` now falls back to `templateFor` when a known scenario resolves healthy or without a recovery action; it no longer attempts placeholders absent from that context. The narration registry omits text values with digits unless a safe template needs them, preserving rejection when a provider tries to interpolate them. Tests now exercise both engine-resolved demo scenarios plus healthy/actionless fallback paths; 14 narration tests, the web typecheck, and diff check are green.
+
+**Next:** route integration can call `fixtureFor` for either known key without duplicating finding/action guards, then use `templateFor` for raw contexts.
+
+**Blocked / watch out:** a provider reference to any text source containing ASCII digits is deliberately rejected as missing; numeric facts must keep using their typed deterministic formatter.
+
+
 ## 2026-08-09 16:56 BRT · Codex · web chat API Task 2
 
 **Done:** deterministic chat narration guard, templates, and known-case fixtures are implemented in `apps/web/app/api/chat/` and will be committed as `feat(web): validate deterministic chat narration`. The guard rejects literal provider digits, unknown/prototype/missing paths, incompatible formatters, unresolved braces, control characters, and digits introduced through text substitutions. Focal narration tests (10) and the web typecheck are green.
