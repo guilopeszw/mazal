@@ -21,3 +21,7 @@ data/raw/
 
 # The audit trail is a runtime artefact of whichever machine ran it.
 .mazal-audit.jsonl
+
+# Local Vercel configuration and environment files.
+.vercel
+.env*
