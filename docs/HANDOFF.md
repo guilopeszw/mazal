@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 02:11 BRT · E-agent (Joaquim) · correções do review do scaffold MCP
+
+**Done:** achados HIGH/MEDIUM do review corrigidos em `0dae69d` (`fix(mcp): secure deployment transport gates`). O endpoint aceita apenas hosts/origins exatos configurados por `MAZAL_MCP_ALLOWED_HOSTS`/`MAZAL_MCP_ALLOWED_ORIGINS`, autentica antes de parsear JSON e compara bearer tokens por digests SHA-256 fixos. Host/Origin fora da allowlist seguem em 403; JSON malformado sem bearer ou com bearer incorreto recebe 401. Testes focalizados: 11/11; suíte global: 96/96.
+
+**Next:** em Node 24, executar teste MCP, typecheck focalizado/global e smoke de handshake com Host de deploy; só então marcar o PRD 02 concluído.
+
+**Blocked / watch out:** esta máquina só tem Node `v22.22.3`; o PRD permanece pendente. `pnpm typecheck` raiz ainda não inclui `apps/mcp`; o typecheck focalizado passou, e o gate global não foi alterado porque o escopo desta correção exclui a configuração raiz.
+
 ## 2026-08-09 01:56 BRT · E-agent (Joaquim) · scaffold MCP seguro
 
 **Done:** `apps/mcp` criado e commitado em `457bbd8` (`feat(mcp): scaffold secure MCP server`). O endpoint Hono `/mcp` é stateless, cria um `McpServer` por request com `@modelcontextprotocol/server@2.0.0`, exige `Authorization: Bearer <MAZAL_MCP_BEARER_TOKEN>` e devolve 401 sem expor token em token ausente/incorreto. A factory aceita `registerTools(server)` para o PRD seguinte. Teste de integração cobre handshake autorizado, duas recusas e instância nova por request; `pnpm --filter @mazal/mcp test`, typecheck focalizado, `pnpm typecheck` e `pnpm test` passaram (89 testes globais).
