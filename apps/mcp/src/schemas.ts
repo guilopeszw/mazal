@@ -67,7 +67,14 @@ export const productCardSchema: z.ZodType<ProductCard> = z.object({
   pdpImages: count,
   pdpDescriptionLength: count,
   returnPolicyDays: count,
-  paymentMethods: z.array(z.enum(['credit', 'debit', 'pix', 'boleto', 'installments'])).min(1),
+  // Five members in the enum, so five is the most a real card can carry. The
+  // array was the last unbounded one at the boundary: the elements were
+  // constrained and the length was not, which still lets a caller send a
+  // million of them.
+  paymentMethods: z
+    .array(z.enum(['credit', 'debit', 'pix', 'boleto', 'installments']))
+    .min(1)
+    .max(5),
   offer: z.enum(['none', 'discount', 'bundle', 'free_shipping_threshold']),
 }).strict();
 
