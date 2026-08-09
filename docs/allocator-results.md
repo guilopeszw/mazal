@@ -10,12 +10,12 @@ declined to advise         0   (no identifiable curve)
 no profitable spend        0   (nothing to allocate)
 scored                   200
 
-profit captured — Mazal        37.7%
+profit captured — Mazal        69.0%
 profit captured — status quo    2.0%
 profit captured — even split   25.3%
 profit captured — greedy      -75.4%
 
-median error in the marginal   31.2%   (at the spend the money is at)
+median error in the marginal   14.1%   (at the spend the money is at)
 ```
 
 "Profit captured" is profit at Mazal's split over profit at the true optimum, both evaluated on the true curves. The gap is what `optimization.md` §5 calls **regret**.
@@ -26,7 +26,19 @@ median error in the marginal   31.2%   (at the spend the money is at)
 
 **Greedy loses money.** Putting the whole wallet on the product with the best historical ROAS returns **−75.4%** of the achievable profit — worse than doing nothing. That is the headline result and it is the one sellers need, because greedy is what they actually do. It fails for one reason a seller can hold: *the best product fills up.*
 
-**37.7% is not 94%.** `optimization.md` §5 imagines "94% of achievable profit". We do not get there, and the reason is visible in the last line: the marginal return is estimated with a **31% median error** at the spend the money is actually sitting at. With that much error, products near the break-even margin get zeroed when they should be funded, and each of those is a large slice of the achievable profit.
+**69% is not 94%.** `optimization.md` §5 imagines "94% of achievable profit". We do not get there, and the reason is visible in the last line: the marginal return still carries a **14% median error** at the spend the money is actually sitting at. Products close to the break-even margin get zeroed when they should be funded, and each of those is a large slice of what was available.
+
+It was 37.7% until the fit stopped reading the wrong column — see below. Both numbers are in this file on purpose: the first was honest and the second is better, and the difference was a choice about which count to fit, not a change to the method.
+
+## Fit the bend where the bend is visible
+
+The first version fitted the whole curve to `purchases`. On these accounts that is **0 to 3 a day**, where one day's noise is larger than the bend itself — the fit was reading noise, and it measured a 64% error in the marginal on data whose answer was known.
+
+Saturation is a media fact: the auction gets dearer as daily spend rises, so the same real buys fewer impressions and fewer clicks. Clicks come in **hundreds** a day and carry the same bend with a fraction of the relative noise.
+
+So the two questions are answered by two columns. `k` — where it bends — is read off clicks. `vMax` — how high it reaches — is then solved on purchases with that bend held, because the ceiling must stay a conversions quantity. Clicks are only used when there are meaningfully more of them than purchases, so a CSV without a click column falls back to the single-signal fit.
+
+That one change took the marginal error from 31.2% to **14.1%** and the profit captured from 37.7% to **69.0%**, with every baseline untouched.
 
 ## Why `k` is not the metric
 
