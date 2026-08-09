@@ -1,9 +1,9 @@
 /**
  * The plan loader's own world, scoped to `.plan-loader` and never `:root`.
  *
- * The rainbow lives here and nowhere else. The rest of the product is one accent
+ * This light lives here and nowhere else. The rest of the product is one accent
  * plus ink plus a red warning — these tokens restyle nothing outside the card,
- * and the moment the plan renders the card unmounts and the rainbow is gone.
+ * and the moment the plan renders the card unmounts and the light is gone.
  *
  * The card's surfaces are a neutral grey stack with no brand accent: a saturated
  * hue would fight the rim, and the rim is the only thing here allowed to be loud.
@@ -167,21 +167,28 @@
  * Written as literals rather than `var(--color-accent)` because these are the
  * hue's own ramp, not the token: the accent is tuned to sit as text on a
  * surface, and the crest of a glow has to run brighter than any text ever does.
+ *
+ * Every stop sits on hue 144, which is the identity's own — #2e6b47 is 144.6
+ * and #5fb37f is 142.9. The first pass at this ramp was built around #2bbd80,
+ * the accent from before the rebrand, and measured 152-155 across all six
+ * stops: a consistent drift toward spring green that read as a second green
+ * beside the button rather than the same one lit. Only lightness and chroma
+ * vary now.
  */
 .pl-layer {
   position: absolute;
   background: conic-gradient(
     from var(--pl-a) at 50% 50%,
-    #0b5c3a 0deg,
-    #128554 var(--pl-s1),
-    #17a86a var(--pl-s2),
-    #2bbd80 var(--pl-s3),
-    #6fdcaa var(--pl-s4),
-    #b6f0d5cc var(--pl-s5),
+    #0b5c2b 0deg,
+    #128540 var(--pl-s1),
+    #17a851 var(--pl-s2),
+    #2bbd65 var(--pl-s3),
+    #6fdc9b var(--pl-s4),
+    #b6f0cdcc var(--pl-s5),
     transparent var(--pl-s6),
     transparent 324deg,
-    #1a7a51a1 349deg,
-    #0b5c3a 360deg
+    #1a7a44a1 349deg,
+    #0b5c2b 360deg
   );
   mask-repeat: no-repeat;
   mask-size: 100% 100%;

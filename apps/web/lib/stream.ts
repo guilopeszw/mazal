@@ -10,15 +10,34 @@ import type { Answer } from "./answers.ts";
  */
 
 /** Every duration in one place, so the pace can be tuned without reading the logic. */
+/**
+ * One full pulse-and-handover of the plan loader: its pulse plus the gap the
+ * loader derives from its own beats. Mirrored here because `TIMING` is the only
+ * thing that decides how long the pause lasts, and a magic number in this file
+ * would silently stop matching the component the first time either moved.
+ */
+export const PLAN_LOADER_CYCLE_MS = 2600;
+
 export const TIMING = {
   /** The pause after the question, before Mazal starts answering. */
   think: 700,
   /**
-   * The pause when the answer carries a plan of action. Long enough for the plan
-   * loader to walk three of its surfaces (one cycle is 2.6s — see
-   * `components/plan-loader.tsx`); tune here, not there.
+   * The pause when the answer carries a plan of action — one full beat of the
+   * plan loader, and no more.
+   *
+   * This was 7000, chosen to walk three of the loader's surfaces. It did not
+   * even do that: the loader's cycle is 2600ms, so the third beat was clipped
+   * partway into its fade, and nothing in the code related the two numbers.
+   *
+   * The deeper problem was the number itself. Mazal's whole claim is that the
+   * answer is deterministic and already computed; seven seconds of animation in
+   * front of it spends that property to buy a light show. One beat says "it is
+   * working" and gets out of the way, which is what a loading state is for.
+   *
+   * Derived from the loader's own cycle rather than typed, so the two cannot
+   * drift apart again.
    */
-  plan: 7000,
+  plan: PLAN_LOADER_CYCLE_MS,
   /** Per word of prose. */
   word: 20,
   /** Per structured block — evidence, a panel, the provenance note. */
