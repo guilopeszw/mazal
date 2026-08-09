@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 01:56 BRT · E-agent (Joaquim) · scaffold MCP seguro
+
+**Done:** `apps/mcp` criado e commitado em `457bbd8` (`feat(mcp): scaffold secure MCP server`). O endpoint Hono `/mcp` é stateless, cria um `McpServer` por request com `@modelcontextprotocol/server@2.0.0`, exige `Authorization: Bearer <MAZAL_MCP_BEARER_TOKEN>` e devolve 401 sem expor token em token ausente/incorreto. A factory aceita `registerTools(server)` para o PRD seguinte. Teste de integração cobre handshake autorizado, duas recusas e instância nova por request; `pnpm --filter @mazal/mcp test`, typecheck focalizado, `pnpm typecheck` e `pnpm test` passaram (89 testes globais).
+
+**Next:** implementar os quatro handlers reais pelo ponto `registerTools` no próximo PRD, sem mover números para LLM.
+
+**Blocked / watch out:** a máquina local é Node 22, enquanto `apps/mcp` declara Node >=24; tudo passou com aviso de engine, mas a validação final deve ocorrer no Node 24. O adapter Hono preserva proteção contra DNS rebinding, então testes HTTP locais devem enviar `Host: localhost`. Relatório detalhado: `.superpowers/sdd/2026-08-09-e-agent/task-1-report.md`.
+
 ## 2026-08-09 01:42 BRT · E-agent (Joaquim) · pacote de PRDs
 
 **Done:** plano aprovado e commitado em `3b15884`; onze PRDs autocontidos criados em `docs/prds/e-agent/`, cobrindo fixtures, MCP, Deco, narração, chat, demo, pitch, Meta read-only e writes futuros.
