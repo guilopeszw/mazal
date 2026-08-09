@@ -11,7 +11,9 @@ Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor 
 1. Criar ou selecionar um projeto Vercel para este monorepo.
 2. Definir **Root Directory** como `apps/mcp` e manter habilitada a inclusão de arquivos externos ao diretório raiz. O pacote depende de `packages/contracts`, `packages/data` e `packages/engine` pelo workspace pnpm.
 3. Confirmar **Node.js 24.x** nas configurações do projeto. `apps/mcp/package.json` também fixa `24.x`.
-4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` gera a Function Node autocontida em `apps/mcp/api/mcp.mjs`; `apps/mcp/vercel.json` encaminha a URL pública `/mcp` para esse artefato antes do filesystem, sem migrar para Edge ou Workers.
+4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` grava a árvore da Build Output API em `apps/mcp/.vercel/output`: a Function fica em `functions/mcp.func/` e é servida em `/mcp` sem nenhuma rota declarada.
+
+   **Não voltar a gerar `api/mcp.mjs`.** Aquela versão dependia da detecção zero-config da Vercel, que varre a ÁRVORE DE FONTES atrás de `api/*.mjs` — e o arquivo é gerado durante o build e está no gitignore, então na hora da varredura ele não existe. Nenhuma Function era criada, a rota apontava para o nada, e toda URL respondia 404 enquanto o build reportava sucesso. `apps/mcp/src/vercel.test.ts` trava isso.
 5. Configurar as variáveis abaixo no secret manager da Vercel para Production. Configurar Preview somente se houver um host de preview explicitamente autorizado.
 6. Implantar e anotar a URL estável como `https://<VERCEL_PRODUCTION_HOST>/mcp` nesta seção. Não usar uma URL de preview na conexão de produção.
 
