@@ -36,7 +36,8 @@ export function PlanPanel({
     count: number;
     mode: "simulated" | "live";
     results: { id: string; detail: string; ok: boolean }[];
-    undo: { target: string; field: string; previous: string; label: string }[];
+    /** Opaque handle — the panel never learns what the undo is. */
+    undoToken: string | null;
   } | null>(null);
   const [undone, setUndone] = useState<string[] | null>(null);
   /** Stable for the life of this panel, so a double-click cannot run twice. */
@@ -66,10 +67,10 @@ export function PlanPanel({
         count: selected.length,
         mode: data.mode,
         results: data.results,
-        undo: data.undo,
+        undoToken: data.undoToken,
       });
-    } catch {
-      setError("Could not run the plan. Nothing was changed.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not run the plan. Nothing was changed.");
     } finally {
       setBusy(false);
     }
@@ -152,11 +153,11 @@ export function PlanPanel({
                 ? "Sent to Meta. Every action here is reversible, and Mazal will not raise a budget beyond the ceiling you set."
                 : "Simulated. This build has no ad-platform credentials — the write went to an approval log and nothing touched your account. The absence is the guarantee."}
             </p>
-            {receipt.undo.length > 0 && !undone && (
+            {receipt.undoToken && !undone && (
               <button
                 type="button"
                 onClick={async () => {
-                  const r = await undoRun(receipt.undo);
+                  const r = await undoRun(receipt.undoToken!);
                   setUndone(r.details);
                 }}
                 className="mt-2 rounded-full border border-line px-3.5 py-1.5 text-[13px] font-[540] transition-[background,scale] duration-150 hover:bg-sunken active:scale-[.96]"

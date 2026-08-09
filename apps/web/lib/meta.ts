@@ -67,9 +67,18 @@ async function readField(objectId: string, field: string): Promise<string | null
 /**
  * Put back exactly what was there.
  *
- * Refuses anything it did not itself record, so this cannot be used as a
- * general write channel — an undo that accepts arbitrary field/value pairs is
- * the unrestricted API we spent the last hour removing.
+ * **The record must come from the server's own store, never from a caller.**
+ * The first version returned the undo record to the browser and accepted it
+ * back, which meant a crafted call could name any Meta object and any value —
+ * `{ target: <someone else's campaign>, field: "daily_budget", previous:
+ * "999999999" }` would have raised spend on an account we were never asked to
+ * touch, defeating the whole point of having no spend-increasing operation.
+ * The field allowlist only ever restricted *which* field, not the value or the
+ * target.
+ *
+ * Two belts kept anyway, because a store can be got wrong too: the field must
+ * be one of the three, and the target must be an object this deployment is
+ * configured for.
  */
 export async function undo(u: NonNullable<ExecutionResult["undo"]>): Promise<ExecutionResult> {
   if (!executeConfigured()) {
@@ -78,9 +87,17 @@ export async function undo(u: NonNullable<ExecutionResult["undo"]>): Promise<Exe
   if (!ALLOWED_UNDO_FIELDS.has(u.field)) {
     return { mode: "live", ok: false, detail: `refused: ${u.field} is not a field Mazal restores` };
   }
+  if (!configuredTargets().has(u.target)) {
+    return { mode: "live", ok: false, detail: "refused: that is not an object this deployment manages" };
+  }
 
   const r = await post(u.target, { [u.field]: u.previous });
   return { mode: "live", target: u.target, ok: r.ok, detail: `${u.label} — ${r.detail}` };
+}
+
+/** The only Meta objects this deployment may write to, from its own env. */
+function configuredTargets(): Set<string> {
+  return new Set([process.env["META_CAMPAIGN_ID"], process.env["META_ADSET_ID"]].filter(Boolean) as string[]);
 }
 
 /** Only the three fields the three operations touch. Nothing else is restorable. */

@@ -11,7 +11,9 @@ import {
 import { benchmarks } from "@mazal/data";
 import { parseMetaCsv, productCardSchema } from "@mazal/ingest";
 import { buildUploadAnswer, type Answer } from "@/lib/answers";
-import { execute, undo, type ExecutionResult } from "@/lib/meta";
+import { randomUUID } from "node:crypto";
+import { cookies } from "next/headers";
+import { execute, executeConfigured, undo, type ExecutionResult } from "@/lib/meta";
 import { formatCount, formatPercent } from "@/lib/format";
 
 /**
@@ -183,8 +185,11 @@ export async function runPlan(
   receipt: string;
   mode: "simulated" | "live";
   results: { id: string; detail: string; ok: boolean }[];
-  undo: NonNullable<ExecutionResult["undo"]>[];
+  /** Opaque handle. The undo record itself never leaves the server. */
+  undoToken: string | null;
 }> {
+  await requireExecutionAuth();
+
   if (idempotencyKey) {
     const already = alreadyRun.get(idempotencyKey);
     if (already) return already;
@@ -208,8 +213,17 @@ export async function runPlan(
     receipt: `MZL-${at.slice(0, 10).replace(/-/g, "")}-${String(Date.now() % 10000).padStart(4, "0")}`,
     mode: (live ? "live" : "simulated") as "simulated" | "live",
     results: results.map(({ id, detail, ok }) => ({ id, detail, ok })),
-    undo: results.flatMap((r) => (r.undo ? [r.undo] : [])),
+    undoToken: null as string | null,
   };
+
+  const undoable = results.flatMap((r) => (r.undo ? [r.undo] : []));
+  if (undoable.length > 0) {
+    // Handed out as an unguessable id. The client can ask for the undo to
+    // happen; it cannot say what the undo is.
+    const token = randomUUID();
+    undoStore.set(token, undoable);
+    answer.undoToken = token;
+  }
 
   if (idempotencyKey) alreadyRun.set(idempotencyKey, answer);
   return answer;
@@ -226,9 +240,15 @@ const alreadyRun = new Map<string, Awaited<ReturnType<typeof runPlan>>>();
  * field/value pairs would be the unrestricted write channel this product
  * deliberately does not have.
  */
-export async function undoRun(
-  entries: NonNullable<ExecutionResult["undo"]>[],
-): Promise<{ ok: boolean; details: string[] }> {
+export async function undoRun(token: string): Promise<{ ok: boolean; details: string[] }> {
+  await requireExecutionAuth();
+
+  const entries = undoStore.get(token);
+  if (!entries) return { ok: false, details: ["That run is not one this server can undo."] };
+
+  // Single use. A replayed token is a second write nobody asked for.
+  undoStore.delete(token);
+
   const out: string[] = [];
   let ok = true;
   for (const e of entries.slice(0, 20)) {
@@ -237,4 +257,46 @@ export async function undoRun(
     if (!r.ok) ok = false;
   }
   return { ok, details: out };
+}
+
+/** Undo records, server-side only, keyed by a handle the client cannot forge. */
+const undoStore = new Map<string, NonNullable<ExecutionResult["undo"]>[]>();
+
+/**
+ * Both of the actions above change a real account when credentials are present,
+ * and a server action is a POST endpoint like any other — its id is in the
+ * client bundle, so "hard to discover" is not a control. Without this, anyone
+ * who found the deployment could pause the campaign, or undo a pause.
+ *
+ * Live mode requires a cookie that only `unlockExecution` sets, and that needs
+ * the same shared secret `/api/execute` does. Simulated mode is ungated,
+ * because it cannot touch anything.
+ */
+async function requireExecutionAuth(): Promise<void> {
+  if (!executeConfigured()) return;
+
+  const secret = process.env["MAZAL_EXECUTE_SECRET"];
+  if (!secret) throw new Error("Execution is configured for a real account but has no secret set.");
+
+  const jar = await cookies();
+  if (jar.get("mazal-exec")?.value !== secret) {
+    throw new Error("This build can change a real ad account. Unlock execution first.");
+  }
+}
+
+/** Exchange the shared secret for a session cookie. The secret never reaches the client. */
+export async function unlockExecution(secret: string): Promise<{ ok: boolean }> {
+  const expected = process.env["MAZAL_EXECUTE_SECRET"];
+  if (!expected || secret !== expected) return { ok: false };
+
+  const jar = await cookies();
+  jar.set("mazal-exec", expected, { httpOnly: true, sameSite: "strict", secure: true, path: "/" });
+  return { ok: true };
+}
+
+/** Whether the screen should ask for the unlock before offering to run anything. */
+export async function executionNeedsUnlock(): Promise<boolean> {
+  if (!executeConfigured()) return false;
+  const jar = await cookies();
+  return jar.get("mazal-exec")?.value !== process.env["MAZAL_EXECUTE_SECRET"];
 }
