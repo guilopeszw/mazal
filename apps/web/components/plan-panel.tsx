@@ -174,7 +174,7 @@ export function PlanPanel({
               Writes are simulated — this build has no ad-platform client. Running appends to
               an approval log and returns a receipt.
             </p>
-            {error && <p className="m-0 text-[13px] font-[540] text-ink">{error}</p>}
+            {error && <p className="m-0 text-[13px] font-[540] text-warn">{error}</p>}
           </>
         )}
       </div>

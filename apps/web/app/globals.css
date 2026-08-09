@@ -34,9 +34,14 @@
   --color-accent-soft: #e6f5ee;
   --color-accent-ink: #0a6b44;
 
-  /** A judgement against the seller's interest gets its own colour, used once. */
-  --color-warn: #b4472c;
-  --color-warn-soft: #fbeae5;
+  /**
+   * A true red, not the terracotta this used to be — an orange-leaning warning
+   * reads as a brand accent rather than a caution. Reserved for things the
+   * seller should actually check: parser warnings and errors. Never the
+   * verdict, and never a funnel stage; those carry meaning in words.
+   */
+  --color-warn: #c62222;
+  --color-warn-soft: #fdecec;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   /** Numbers only. Tabular figures stop a changing value from shifting its neighbours. */
@@ -71,8 +76,8 @@
       --color-accent-soft: #10261e;
       --color-accent-ink: #6fdcaa;
 
-      --color-warn: #e0755a;
-      --color-warn-soft: #2a1712;
+      --color-warn: #ff7d70;
+      --color-warn-soft: #2c1413;
     }
   }
 
@@ -92,8 +97,8 @@
     --color-accent-soft: #10261e;
     --color-accent-ink: #6fdcaa;
 
-    --color-warn: #e0755a;
-    --color-warn-soft: #2a1712;
+    --color-warn: #ff7d70;
+    --color-warn-soft: #2c1413;
   }
 
   html {
