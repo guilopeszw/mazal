@@ -29,6 +29,9 @@ importers:
       '@mazal/engine':
         specifier: workspace:*
         version: link:../../packages/engine
+      '@mazal/meta':
+        specifier: workspace:*
+        version: link:../../packages/meta
       '@modelcontextprotocol/hono':
         specifier: ^2.0.0
         version: 2.0.0(@modelcontextprotocol/server@2.0.0)(hono@4.13.1)

@@ -25,6 +25,10 @@ import { z } from 'zod';
 const MAX_DAYS = 1100;
 const MAX_EVENTS = 500;
 const MAX_ACTIONS = 20;
+/** A raw insights response is one row per entity per day, so it needs headroom. */
+const MAX_INSIGHT_ROWS = 5000;
+/** Meta returns a couple of dozen action types on a busy account; this product reads three. */
+const MAX_ACTION_TYPES = 60;
 
 
 const finiteNumber = z.number().finite();
@@ -147,12 +151,77 @@ export const publicReferenceSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('self'), baselineDays: z.number().int().positive() }).strict(),
 ]);
 
+/**
+ * A raw Meta insights response, as `GET /act_<id>/insights` returns it.
+ *
+ * Every number is a string here because that is what the Graph API sends; the
+ * parsing lives in `@mazal/meta`, which is the only thing in the product
+ * allowed to turn Meta's vocabulary into the contract's. `ctr`, `cpc`, `cpm`
+ * and `frequency` are fields Meta really returns and are deliberately absent —
+ * `.strict()` rejects them, which is the boundary refusing to carry a stored
+ * rate rather than trusting everyone downstream to ignore it.
+ */
+const metaActionSchema = z.object({
+  action_type: z.string().min(1).max(120),
+  value: z.string().max(40),
+}).strict();
+
+const metaInsightsRowSchema = z.object({
+  date_start: isoDate,
+  date_stop: isoDate,
+  campaign_id: z.string().min(1).max(120),
+  campaign_name: z.string().min(1).max(200),
+  adset_id: z.string().min(1).max(120).optional(),
+  adset_name: z.string().min(1).max(200).optional(),
+  account_id: z.string().max(120).optional(),
+  account_currency: z.string().max(8).optional(),
+  spend: z.string().max(24),
+  impressions: z.string().max(24),
+  reach: z.string().max(24),
+  inline_link_clicks: z.string().max(24),
+  actions: z.array(metaActionSchema).max(MAX_ACTION_TYPES).optional(),
+  action_values: z.array(metaActionSchema).max(MAX_ACTION_TYPES).optional(),
+}).strict();
+
+export const metaInsightsPayloadSchema = z.object({
+  data: z.array(metaInsightsRowSchema).min(1).max(MAX_INSIGHT_ROWS),
+  paging: z.object({
+    cursors: z.object({
+      before: z.string().max(2000).optional(),
+      after: z.string().max(2000).optional(),
+    }).strict().optional(),
+    next: z.string().max(4000).optional(),
+  }).strict().optional(),
+  __mazal_fixture: z.object({
+    kind: z.literal('fixture'),
+    generator: z.string().max(200),
+    derivedFrom: z.string().max(200),
+    note: z.string().max(600),
+  }).strict().optional(),
+}).strict();
+
+/**
+ * `days` or `metaInsights`, exactly one.
+ *
+ * An object with a refinement rather than a union, on purpose: a union publishes
+ * a JSON Schema whose root is `anyOf` in `tools/list`, and a client that expects
+ * an object at the root stops being able to call the tool at all. This keeps the
+ * root an object, keeps `.strict()`, and still refuses both-or-neither.
+ *
+ * The agent never converts a payload into days itself. If it did, the numbers
+ * would come from an arithmetic no test in this repo covers — the same reason
+ * the LLM is not allowed to compute anything else here.
+ */
 export const diagnoseCampaignInputSchema = z.object({
-  days: z.array(campaignDaySchema).min(1).max(MAX_DAYS),
+  days: z.array(campaignDaySchema).min(1).max(MAX_DAYS).optional(),
+  metaInsights: metaInsightsPayloadSchema.optional(),
   card: productCardSchema,
   events: z.array(storeEventSchema).max(MAX_EVENTS),
   reference: publicReferenceSchema,
-}).strict();
+}).strict().refine(
+  (input) => (input.days === undefined) !== (input.metaInsights === undefined),
+  { message: 'Send `days` or `metaInsights`, exactly one of the two.' },
+);
 
 export const predictCampaignInputSchema = z.object({
   card: productCardSchema,
