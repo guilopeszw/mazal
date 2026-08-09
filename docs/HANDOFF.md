@@ -797,7 +797,7 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 
 ## 2026-08-09 · E-agent · Vercel connection and PR handoff
 
-**Done:** The Vercel project `mazal` is connected to GitHub repository `JucaGF/mazal`. The integration branch `joaquim/chore/integrate-main-mcp` was published to that repository and is ready for a pull request targeting `main` (no `stage` branch is available in the remote).
+**Done:** The Vercel project `mazal` is connected to GitHub repository `JucaGF/mazal`. The integration branch `joaquim/chore/integrate-main-mcp` was published, and draft PR [#1](https://github.com/JucaGF/mazal/pull/1) targets `main` (no `stage` branch is available in the remote).
 
 **Next:** Review the PR, run the hosted Vercel preview when it appears, and merge only after the project checks are green.
 
