@@ -1,5 +1,6 @@
 import type { Answer } from "@/lib/answers";
 import { type Reveal, fullReveal, tokenize } from "@/lib/stream";
+import { PlanPanel } from "./plan-panel";
 
 /**
  * One answer turn, rendered exactly as the approved prototype draws it: verdict sentence
@@ -166,6 +167,8 @@ export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal
           </div>
         </section>
       )}
+
+      {answer.plan && shown.note && <PlanPanel {...answer.plan} />}
 
       {shown.note && (
         <p className="rise m-0 max-w-[62ch] text-[13px] text-ink-faint">{answer.note}</p>

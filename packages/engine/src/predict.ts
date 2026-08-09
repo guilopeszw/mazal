@@ -185,6 +185,11 @@ export function predict(input: PredictInput): Verdict {
     predictedRoas,
     breakEvenRoas,
     limitingFactor,
-    killTrigger: `Stop if ROAS is below ${breakEvenRoas.toFixed(2)} after 100 clicks. ${limitingFactor}.`,
+    // `limitingFactor` is written to sit mid-sentence, so it starts lowercase.
+    // Appending it after a full stop gave "…after 100 clicks. no campaign
+    // history yet…" — on the first line of the demo.
+    killTrigger:
+      `Stop if ROAS is below ${breakEvenRoas.toFixed(2)} after 100 clicks. ` +
+      `${limitingFactor.charAt(0).toUpperCase()}${limitingFactor.slice(1)}.`,
   };
 }

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { OlistCategory } from "@mazal/contracts";
 import type { Answer, AnswerKey } from "@/lib/answers";
 import { type Reveal, buildTimeline, fullReveal, revealAt } from "@/lib/stream";
 import { AnswerBody } from "./answer";
+import { Upload } from "./upload";
 
 /**
  * The chat shell: landing hero, suggestion chips, composer, transcript. All three answers
@@ -167,32 +169,32 @@ function Thinking() {
   );
 }
 
-type Turn = { id: number; asked: string; key: AnswerKey };
+type Turn = { id: number; asked: string; answer: Answer };
 
-function TurnView({
-  turn,
-  answer,
-  active,
-}: {
-  turn: Turn;
-  answer: Answer;
-  active: boolean;
-}) {
-  const reveal = useAnswerStream(answer, active);
+function TurnView({ turn, active }: { turn: Turn; active: boolean }) {
+  const reveal = useAnswerStream(turn.answer, active);
 
   return (
     <div className="flex flex-col gap-3.5">
       <div className="rise max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
         {turn.asked}
       </div>
-      {reveal.thinking ? <Thinking /> : <AnswerBody answer={answer} reveal={reveal} />}
+      {reveal.thinking ? <Thinking /> : <AnswerBody answer={turn.answer} reveal={reveal} />}
     </div>
   );
 }
 
-export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
+export function Chat({
+  answers,
+  categories,
+}: {
+  answers: Record<AnswerKey, Answer>;
+  /** Passed down rather than imported, so the client never pulls in the contract runtime. */
+  categories: readonly OlistCategory[];
+}) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
+  const [uploading, setUploading] = useState(false);
   const lastTurn = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -203,14 +205,14 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
     });
   }, [turns]);
 
-  const ask = (asked: string, key: AnswerKey) =>
-    setTurns((t) => [...t, { id: t.length, asked, key }]);
+  const ask = (asked: string, answer: Answer) =>
+    setTurns((t) => [...t, { id: t.length, asked, answer }]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const asked = question.trim();
     if (!asked) return;
-    ask(asked, routeOf(asked));
+    ask(asked, answers[routeOf(asked)]);
     setQuestion("");
   };
 
@@ -243,7 +245,7 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
                 <button
                   key={chip.key}
                   type="button"
-                  onClick={() => ask(chip.text, chip.key)}
+                  onClick={() => ask(chip.text, answers[chip.key])}
                   className="relative rounded-full border border-line bg-raised px-[15px] py-2 text-sm text-ink-soft transition-[border-color,color,scale] duration-150 after:absolute after:-inset-1 hover:border-line-strong hover:text-ink active:scale-[.96]"
                 >
                   {chip.text}
@@ -256,14 +258,33 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
         {turns.length > 0 && (
           <div className="flex flex-col gap-[26px] pt-[34px]">
             {turns.map((turn, i) => (
-              <div key={turn.id} ref={i === turns.length - 1 ? lastTurn : undefined}>
-                <TurnView
-                  turn={turn}
-                  answer={answers[turn.key]}
-                  active={i === turns.length - 1}
-                />
+              <div
+                key={turn.id}
+                ref={i === turns.length - 1 ? lastTurn : undefined}
+                /**
+                 * scroll-mt clears the sticky header. Without it `scrollIntoView`
+                 * puts the top of the turn exactly under the header, and the
+                 * header covers the verdict — the one line the whole answer is
+                 * built to deliver.
+                 */
+                className="scroll-mt-20"
+              >
+                <TurnView turn={turn} active={i === turns.length - 1} />
               </div>
             ))}
+          </div>
+        )}
+
+        {uploading && (
+          <div className="mt-[26px]">
+            <Upload
+              categories={categories}
+              onAnswer={(answer) => {
+                ask(answer.asked, answer);
+                setUploading(false);
+              }}
+              onClose={() => setUploading(false)}
+            />
           </div>
         )}
 
@@ -274,6 +295,26 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
           // shadow on warm paper reads as a cold patch sitting on top of the sheet.
           className="mx-auto mt-[26px] flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
         >
+          <button
+            type="button"
+            onClick={() => setUploading((v) => !v)}
+            aria-label="Upload a Meta Ads CSV export"
+            aria-expanded={uploading}
+            className="relative -ml-2.5 grid size-9 flex-none place-items-center rounded-[18px] text-ink-soft transition-[background-color,color,scale] duration-150 after:absolute after:-inset-1 hover:bg-sunken hover:text-ink active:scale-[.96]"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-4"
+              aria-hidden="true"
+            >
+              <path d="M21.4 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.2-9.19a4 4 0 015.65 5.66l-9.2 9.19a2 2 0 01-2.82-2.83l8.49-8.48" />
+            </svg>
+          </button>
           <input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}

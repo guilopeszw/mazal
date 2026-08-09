@@ -13,9 +13,11 @@
     "@mazal/contracts": "workspace:*",
     "@mazal/data": "workspace:*",
     "@mazal/engine": "workspace:*",
+    "@mazal/ingest": "workspace:*",
     "next": "16.3.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

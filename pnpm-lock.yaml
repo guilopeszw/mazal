@@ -29,6 +29,9 @@ importers:
       '@mazal/engine':
         specifier: workspace:*
         version: link:../../packages/engine
+      '@mazal/ingest':
+        specifier: workspace:*
+        version: link:../../packages/ingest
       next:
         specifier: 16.3.0
         version: 16.3.0(@babel/core@7.29.7)(@types/node@20.19.43)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -38,6 +41,9 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4
@@ -80,6 +86,10 @@ importers:
       '@mazal/data':
         specifier: workspace:*
         version: link:../data
+    devDependencies:
+      '@mazal/sim':
+        specifier: workspace:*
+        version: link:../sim
 
   packages/ingest:
     dependencies:

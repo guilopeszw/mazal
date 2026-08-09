@@ -12,5 +12,8 @@
   "dependencies": {
     "@mazal/contracts": "workspace:*",
     "@mazal/data": "workspace:*"
+  },
+  "devDependencies": {
+    "@mazal/sim": "workspace:*"
   }
 }

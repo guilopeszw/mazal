@@ -1,3 +1,4 @@
+import { OLIST_CATEGORIES } from "@mazal/contracts";
 import { Chat } from "@/components/chat";
 import { buildAnswers } from "@/lib/answers";
 
@@ -7,5 +8,5 @@ import { buildAnswers } from "@/lib/answers";
  * of formatted strings and never downloads the benchmark JSON.
  */
 export default function Home() {
-  return <Chat answers={buildAnswers()} />;
+  return <Chat answers={buildAnswers()} categories={OLIST_CATEGORIES} />;
 }

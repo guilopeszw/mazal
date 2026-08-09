@@ -96,7 +96,36 @@ export type Action = {
   confidence: 'low' | 'medium' | 'high';
   reversible: boolean;
   actor: 'mazal' | 'seller';
+  /**
+   * What to actually do, when something can. `change` is a sentence for a
+   * seller to read; this is the same instruction in a form an ad platform can
+   * execute, and it is present only on `actor: 'mazal'` actions.
+   *
+   * Added after SAT-A and announced in docs/HANDOFF.md. Optional, so every
+   * existing Action still type-checks and a consumer that ignores it keeps
+   * working exactly as before.
+   */
+  execution?: ExecutableOp;
 };
+
+/**
+ * The operations Mazal is willing to perform, and deliberately no more.
+ *
+ * **Every one of these can only ever reduce spend.** Pausing stops it, a
+ * frequency cap slows delivery, and a budget change is decrease-only — the
+ * multiplier is at most 1. That is the guarantee, and it is structural rather
+ * than procedural: there is no operation in this union that could spend a
+ * seller's money, so no bug, no crafted request and no confused agent can.
+ *
+ * Raising a budget is not a repair, it is a decision to spend more, and the
+ * seller makes those. It stays in the plan as advice with `actor: 'seller'`.
+ * There is no create-campaign and no creative edit for the same reason.
+ */
+export type ExecutableOp =
+  | { op: 'pause_campaign' }
+  /** `multiplier` is in (0, 1]. Values above 1 are rejected, not clamped. */
+  | { op: 'reduce_daily_budget'; multiplier: number }
+  | { op: 'set_frequency_cap'; perWeek: number };
 
 /** The pre-flight answer. */
 export type Verdict = {
