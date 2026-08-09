@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 17:12 BRT · Codex · web chat API Task 3 fix round 1
+
+**Done:** `readLimitedJson` now catches a rejected `reader.cancel()` after the byte cap is exceeded, then reliably throws `PayloadTooLarge` for the route's 413 response. Added `limits.test.ts` with a controlled `ReadableStream` that proves cancellation was called even when its cleanup rejects. All 30 Task 3 tests, web typecheck, and diff check are green. Commit follows this handoff entry.
+
+**Next:** Task 4 replaces the provisional conversation issuer with signed-cookie identity, expiry, verification, and continuation tests.
+
+**Blocked / watch out:** Nothing. The Task 3 report contains the RED→GREEN evidence in its Fix round 1 section.
+
 ## 2026-08-09 17:08 BRT · Codex · web chat API Task 3
 
 **Done:** Implemented `POST /api/chat` on `feat/web-chat-api` with bounded streaming JSON input, exact host/origin validation, fixture/template selection, generic errors, `no-store`, and a provisional opaque server-issued `conversationId`. Added 10 route tests; all 29 chat API tests, Next type generation, web typecheck, diff check, and a local fixture smoke are green. Commit follows this handoff entry.

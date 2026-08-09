@@ -28,7 +28,7 @@ export async function readLimitedJson(request: Request, maximumBytes: number): P
 
       totalBytes += value.byteLength;
       if (totalBytes > maximumBytes) {
-        await reader.cancel();
+        await reader.cancel().catch(() => undefined);
         throw new PayloadTooLarge();
       }
       chunks.push(value);
