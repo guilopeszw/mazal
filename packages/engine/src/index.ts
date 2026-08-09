@@ -9,6 +9,20 @@ export { measurability, type Measurability, type StageReach } from './measurabil
 export { buildPlan } from './plan.ts';
 export { profileCard } from './profile.ts';
 export { predict } from './predict.ts';
+export {
+  allocate,
+  fitCurve,
+  marginalRevenue,
+  priorCurve,
+  reallocate,
+  valueAt,
+  type Adset,
+  type AllocateOptions,
+  type Allocation,
+  type FundedAdset,
+  type Move,
+  type Reallocation,
+} from './allocate.ts';
 
 import type {
   CampaignDay, CauseLayer, Diagnosis, DiagnoseInput, Distribution,
