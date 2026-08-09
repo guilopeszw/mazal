@@ -124,6 +124,30 @@ export function fitCurve(days: CampaignDay[], prior: ResponseCurve): ResponseCur
   const spends = usable.map((d) => d.spend);
   const values = usable.map((d) => d.purchases);
   const maxSpend = Math.max(...spends);
+
+  /**
+   * Where the curve bends and how high it reaches are two different questions,
+   * and they are best answered by two different columns.
+   *
+   * The bend is a media fact: the auction gets dearer as daily spend rises, so
+   * the same real buys fewer impressions and fewer clicks. Clicks come in
+   * hundreds a day, and the bend is plainly visible in them. Purchases come in
+   * ones and twos, where a day's noise is larger than the bend itself — fitting
+   * the shape there is fitting noise, and it measured a 64% error in the
+   * marginal return on data where the answer was known.
+   *
+   * So `k` is read off the largest count that still carries the saturation, and
+   * `vMax` is then solved on purchases with that `k` held. The ceiling stays a
+   * conversions quantity, which is what every caller expects it to be.
+   *
+   * Clicks are used only when there are meaningfully more of them than
+   * purchases; a CSV without a click column, or a campaign whose clicks and
+   * purchases are the same order, falls back to the single-signal fit.
+   */
+  const clicks = usable.map((d) => d.clicks);
+  const totalClicks = clicks.reduce((a, b) => a + b, 0);
+  const totalPurchases = values.reduce((a, b) => a + b, 0);
+  const shape = totalClicks > Math.max(10, totalPurchases * 10) ? clicks : values;
   const minSpend = Math.min(...spends);
 
   /**
@@ -147,14 +171,14 @@ export function fitCurve(days: CampaignDay[], prior: ResponseCurve): ResponseCur
     return { ...prior, n, source: n > 0 ? 'blended' : 'prior' };
   }
 
-  /** Best `vMax` for this `k`, and the error it leaves behind. */
-  const evaluate = (k: number): { vMax: number; sse: number } => {
+  /** Best ceiling for this `k` against a signal, and the error it leaves behind. */
+  const evaluate = (k: number, signal: number[] = shape): { vMax: number; sse: number } => {
     let num = 0;
     let den = 0;
     for (let i = 0; i < n; i++) {
       const s = Math.pow(spends[i]!, ALPHA);
       const h = s / (Math.pow(k, ALPHA) + s);
-      num += values[i]! * h;
+      num += signal[i]! * h;
       den += h * h;
     }
     const vMax = den > 0 ? num / den : 0;
@@ -162,7 +186,7 @@ export function fitCurve(days: CampaignDay[], prior: ResponseCurve): ResponseCur
     for (let i = 0; i < n; i++) {
       const s = Math.pow(spends[i]!, ALPHA);
       const h = s / (Math.pow(k, ALPHA) + s);
-      const r = values[i]! - vMax * h;
+      const r = signal[i]! - vMax * h;
       sse += r * r;
     }
     return { vMax, sse };
@@ -193,8 +217,12 @@ export function fitCurve(days: CampaignDay[], prior: ResponseCurve): ResponseCur
     hi = bestK * span * span;
   }
 
+  // `bestVMax` is in the shape signal's units. The ceiling has to be in
+  // conversions, so it is re-solved on purchases with the recovered bend held.
+  const ceiling = shape === values ? bestVMax : evaluate(bestK, values).vMax;
+
   const fitted: ResponseCurve = {
-    vMax: bestVMax,
+    vMax: ceiling,
     k: bestK,
     alpha: ALPHA,
     n,

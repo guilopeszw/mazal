@@ -482,3 +482,71 @@ describe('value per conversion is a property of the thing sold', () => {
     expect(by['broom']).toBeLessThan(0);
   });
 });
+
+describe('the fit reads the signal that carries the shape', () => {
+  /**
+   * Where the curve bends is a media fact — the auction gets dearer as spend
+   * rises — and it is visible in clicks, which come in hundreds a day. It is
+   * *also* in purchases, which come in ones and twos, and at that size the day
+   * noise is bigger than the bend. Fitting the shape to purchases fits noise.
+   *
+   * So: `k` from the high-count signal, `vMax` from the low-count one. The
+   * ceiling is a conversions quantity and must stay measured in conversions.
+   */
+  const truth: ResponseCurve = { vMax: 3, k: 150, alpha: 1, n: 0, source: 'prior' };
+  const prior = priorCurve({ cpc: 1.2, cvr: 0.02, typicalSpend: 100 });
+
+  /** Days on the true curve, with realistic per-day noise on the counts. */
+  const noisyDays = (seed: number) => {
+    let s = seed;
+    const rand = () => ((s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+    const levels = [40, 70, 100, 150, 220];
+    return Array.from({ length: 30 }, (_, i) => {
+      const spend = levels[i % levels.length]!;
+      // Purchases follow the true curve; clicks are the same shape, 200x larger.
+      const exact = valueAt(truth, spend);
+      const jitter = 0.75 + rand() * 0.5;
+      const purchases = Math.max(0, Math.round(exact * jitter));
+      const clicks = Math.max(0, Math.round(exact * 200 * (0.95 + rand() * 0.1)));
+      return {
+        date: `2026-06-${String(i + 1).padStart(2, '0')}`,
+        campaignId: 'c1',
+        spend,
+        impressions: clicks * 90,
+        reach: clicks * 60,
+        clicks,
+        addToCarts: Math.round(clicks * 0.08),
+        checkoutsInitiated: Math.round(clicks * 0.04),
+        purchases,
+        revenue: purchases * 120,
+      };
+    });
+  };
+
+  it('recovers the bend far better than fitting purchases alone', () => {
+    const days = noisyDays(7);
+    const got = fitCurve(days, prior);
+
+    // The marginal at the operating spend is the only quantity allocation
+    // depends on, so that is what has to be close.
+    const want = marginalRevenue(truth, 100, 50);
+    const mine = marginalRevenue(got, 100, 50);
+    expect(Math.abs(mine - want) / want).toBeLessThan(0.15);
+  });
+
+  it('keeps the ceiling in conversions, not clicks', () => {
+    const days = noisyDays(11);
+    const got = fitCurve(days, prior);
+    // vMax is a purchases-per-day quantity: ~3 here, not ~600.
+    expect(got.vMax).toBeGreaterThan(1);
+    expect(got.vMax).toBeLessThan(10);
+  });
+
+  it('still works when clicks are absent', () => {
+    // An upload with no click column must not lose the fit entirely.
+    const days = noisyDays(13).map((d) => ({ ...d, clicks: 0, impressions: 0 }));
+    const got = fitCurve(days, prior);
+    expect(got.source).toBe('fitted');
+    expect(got.vMax).toBeGreaterThan(0);
+  });
+});
