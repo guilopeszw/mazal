@@ -1,3 +1,4 @@
+import { DailyChart } from "@/components/daily-chart";
 import { FindingCard } from "@/components/finding-card";
 import { DEMO_CASES } from "@/lib/fixtures";
 import { FUNNEL_STAGES, MEDIA_PRODUCT_BOUNDARY, toneFor } from "@/lib/funnel";
@@ -10,7 +11,7 @@ const TONE = {
 
 export default function Home() {
   const demo = DEMO_CASES.case2;
-  const { diagnosis, category, reference } = demo;
+  const { diagnosis, category, reference, days } = demo;
   const leak = diagnosis.primary?.stage ?? null;
 
   return (
@@ -49,6 +50,14 @@ export default function Home() {
           reference={reference}
         />
       )}
+      {diagnosis.primary && (
+        <DailyChart
+          days={days}
+          metric={diagnosis.changePoint?.metric ?? diagnosis.primary.metric}
+          changePoint={diagnosis.changePoint?.date}
+        />
+      )}
+
       {diagnosis.secondary.map((finding) => (
         <FindingCard
           key={finding.rule}

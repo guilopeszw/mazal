@@ -4,6 +4,7 @@ import {
   denominatorOf,
   formatCount,
   formatDate,
+  formatDeviation,
   formatMetric,
   metricLabel,
 } from "@/lib/format";
@@ -59,7 +60,7 @@ export function FindingCard({
         <div>
           <dt className="text-[11px] uppercase tracking-wider text-neutral-500">desvio</dt>
           <dd className="text-2xl font-semibold tabular-nums text-neutral-300">
-            {finding.deviation.toFixed(1)}σ
+            {formatDeviation(finding.deviation)}
           </dd>
         </div>
       </dl>

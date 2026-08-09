@@ -59,13 +59,33 @@ export function formatMetric(metric: string, value: number): string {
 
 export const formatCount = (value: number) => int.format(value);
 
-/** "12 de julho" — the change point and the evidence both need a date a seller reads. */
+/**
+ * "−8,3σ". `toFixed` would print `-8.3` with a full stop next to values Intl has already
+ * rendered as `0,3%` — two decimal separators in one card, four centimetres apart.
+ */
+export const formatDeviation = (value: number) =>
+  `${new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value)}σ`;
+
+/**
+ * "12 de julho" — the change point and the evidence both need a date a seller reads.
+ *
+ * `timeZone: 'UTC'` is load-bearing, not tidiness. The contract stores dates as bare
+ * `YYYY-MM-DD` with no zone; parsed as UTC midnight and then formatted in America/Sao_Paulo
+ * they land at 21:00 the previous day, and the chart announces the campaign broke on the
+ * 11th while every number under it is the 12th's. Off by one, in the one sentence the demo
+ * is built around.
+ */
 export function formatDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
-  return new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long" }).format(
-    new Date(Date.UTC(y, m - 1, d)),
-  );
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(y, m - 1, d)));
 }
 
 /** Store events are typed in the contract; the seller should not read `eta_change`. */
