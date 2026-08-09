@@ -5,6 +5,29 @@ export class PayloadTooLarge extends Error {
   }
 }
 
+const LIVE_REQUEST_LIMIT = 10;
+const LIVE_WINDOW_MS = 60_000;
+const MAX_TRACKED_LIVE_SESSIONS = 1_000;
+const liveRequestsBySession = new Map<string, number[]>();
+
+/**
+ * Process-local, best-effort live-provider abuse control. The browser cannot choose this key:
+ * callers pass only a verified server session id.
+ */
+export function allowLiveRequest(sessionId: string, now: number): boolean {
+  const windowStart = now - LIVE_WINDOW_MS;
+  const previous = (liveRequestsBySession.get(sessionId) ?? []).filter((at) => at > windowStart);
+  if (previous.length >= LIVE_REQUEST_LIMIT) return false;
+
+  if (!liveRequestsBySession.has(sessionId) && liveRequestsBySession.size >= MAX_TRACKED_LIVE_SESSIONS) {
+    const oldestSessionId = liveRequestsBySession.keys().next().value;
+    if (oldestSessionId !== undefined) liveRequestsBySession.delete(oldestSessionId);
+  }
+  previous.push(now);
+  liveRequestsBySession.set(sessionId, previous);
+  return true;
+}
+
 function declaredLengthExceeds(request: Request, maximumBytes: number): boolean {
   const contentLength = request.headers.get("content-length");
   if (!contentLength || !/^\d+$/.test(contentLength)) return false;

@@ -1,6 +1,8 @@
-export type NarrationMode = "fixture" | "template";
+export type NarrationMode = "fixture" | "template" | "live";
 
-/** Offline narration is the default; live provider calls are deliberately out of this task. */
+/** Offline narration is the default; live stays unavailable until a server-only provider is added. */
 export function narrationMode(): NarrationMode {
-  return process.env["NARRATION_MODE"] === "template" ? "template" : "fixture";
+  const configured = process.env["NARRATION_MODE"];
+  if (configured === "template" || configured === "live") return configured;
+  return "fixture";
 }

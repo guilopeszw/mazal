@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 17:22 BRT · Codex · web chat API Task 4
+
+**Done:** Replaced the provisional opaque chat id with HMAC-signed session cookies and signed, expiring conversation envelopes bound to the cookie session. The route rejects external, altered, expired, and cross-session handles; provider thread ids can only emerge after server-side verification. Added a 100-entry canonical rendered-content cache (fixture/template only), with response handles reconstructed per caller, plus a bounded rolling live limiter that returns the exact `429 { error: "RATE_LIMITED" }` and never falls back. The focused chat API suite is 25/25; web typecheck and diff check are green. Commit follows this handoff entry.
+
+**Next:** Add the server-only Deco provider in its own task; pass any provider-created thread id only into `issueConversationId`, never into browser input.
+
+**Blocked / watch out:** `MAZAL_CHAT_SESSION_SECRET` must be a high-entropy server-only secret of at least 32 bytes in every deployed environment. Cache and rate limiting are process-local, bounded best-effort controls by design.
+
+---
+
 ## 2026-08-09 17:12 BRT · Codex · web chat API Task 3 fix round 1
 
 **Done:** `readLimitedJson` now catches a rejected `reader.cancel()` after the byte cap is exceeded, then reliably throws `PayloadTooLarge` for the route's 413 response. Added `limits.test.ts` with a controlled `ReadableStream` that proves cancellation was called even when its cleanup rejects. All 30 Task 3 tests, web typecheck, and diff check are green. Commit follows this handoff entry.

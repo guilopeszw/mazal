@@ -1,18 +1,30 @@
-import { issueConversationId } from "./conversation.ts";
+import {
+  createChatSession,
+  issueConversationId,
+  sessionIdFromCookieHeader,
+  verifyConversationId,
+} from "./conversation.ts";
+import {
+  cacheKeyFor,
+  RenderedContentCache,
+  type CachedContent,
+  type ChatResponse,
+  type ChatSource,
+} from "./cache.ts";
 import { resolveContext } from "./context.ts";
 import { fixtureFor } from "./fixtures.ts";
-import { PayloadTooLarge, readLimitedJson } from "./limits.ts";
+import { PayloadTooLarge, allowLiveRequest, readLimitedJson } from "./limits.ts";
 import { narrationMode } from "./mode.ts";
 import { parseChatRequest } from "./schema.ts";
 import { templateFor } from "./template.ts";
 
 const MAX_BODY_BYTES = 1_000_000;
 const NO_STORE = { "Cache-Control": "no-store" };
+const PROMPT_VERSION = "2026-08-09";
+const renderedContentCache = new RenderedContentCache();
 
-type ChatSource = "fixture" | "template";
-
-function json(body: Record<string, unknown>, status = 200): Response {
-  return Response.json(body, { status, headers: NO_STORE });
+function json(body: Record<string, unknown>, status = 200, headers: HeadersInit = {}): Response {
+  return Response.json(body, { status, headers: { ...NO_STORE, ...headers } });
 }
 
 function allowedHosts(): Set<string> {
@@ -39,13 +51,9 @@ function requestIsAllowed(request: Request): boolean {
   return origin === permittedOrigin;
 }
 
-function renderResponse(source: ChatSource, message: string, scenarioKey?: "case1" | "case2"): Response {
-  return json({
-    message,
-    conversationId: issueConversationId(),
-    source,
-    ...(scenarioKey ? { scenarioKey } : {}),
-  });
+function renderResponse(content: CachedContent, conversationId: string, setCookie?: string): Response {
+  const response: ChatResponse = { ...content, conversationId };
+  return json(response, 200, setCookie ? { "Set-Cookie": setCookie } : {});
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -59,18 +67,64 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: "Invalid request body" }, 400);
   }
 
+  let chatRequest;
   try {
-    const chatRequest = parseChatRequest(payload);
-    // Task 4 will verify and resume signed handles. Until then, input identifiers are ignored.
+    chatRequest = parseChatRequest(payload);
+  } catch {
+    return json({ error: "Invalid request body" }, 400);
+  }
+
+  let sessionId = sessionIdFromCookieHeader(request.headers.get("cookie"));
+  let setCookie: string | undefined;
+  if (!sessionId) {
+    try {
+      const session = createChatSession();
+      sessionId = session.id;
+      setCookie = session.setCookie;
+    } catch {
+      return json({ error: "Service unavailable" }, 503);
+    }
+  }
+
+  const continuation = chatRequest.conversationId
+    ? verifyConversationId(chatRequest.conversationId, sessionId)
+    : {};
+  if (!continuation) return json({ error: "Invalid request body" }, 400);
+
+  const mode = narrationMode();
+  if (mode === "live") {
+    if (!allowLiveRequest(sessionId, Date.now())) return json({ error: "RATE_LIMITED" }, 429);
+    return json({ error: "Live chat unavailable" }, 503, setCookie ? { "Set-Cookie": setCookie } : {});
+  }
+
+  try {
     const context = resolveContext(chatRequest);
-    const source: ChatSource = narrationMode() === "fixture" && context.scenarioKey
+    const source: Extract<ChatSource, "fixture" | "template"> = mode === "fixture" && context.scenarioKey
       ? "fixture"
       : "template";
-    const message = source === "fixture"
-      ? fixtureFor(context.scenarioKey!, context)
-      : templateFor(context);
+    const key = cacheKeyFor({
+      promptVersion: `${PROMPT_VERSION}:${mode}`,
+      scenarioKey: context.scenarioKey,
+      userMessage: chatRequest.userMessage,
+      resolvedInput: context.input,
+    });
+    let content = renderedContentCache.get(key);
+    if (!content) {
+      content = {
+        message: source === "fixture"
+          ? fixtureFor(context.scenarioKey!, context)
+          : templateFor(context),
+        source,
+        ...(context.scenarioKey ? { scenarioKey: context.scenarioKey } : {}),
+      };
+      renderedContentCache.set(key, content);
+    }
 
-    return renderResponse(source, message, context.scenarioKey);
+    return renderResponse(
+      content,
+      issueConversationId(sessionId, { providerThreadId: continuation.providerThreadId }),
+      setCookie,
+    );
   } catch {
     return json({ error: "Invalid request body" }, 400);
   }
