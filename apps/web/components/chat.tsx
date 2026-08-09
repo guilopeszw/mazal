@@ -6,6 +6,7 @@ import type { Answer, AnswerKey } from "@/lib/answers";
 import { type Reveal, buildTimeline, fullReveal, revealAt } from "@/lib/stream";
 import { AnswerBody } from "./answer";
 import { Mark } from "./mark";
+import { MarkButton, Sidebar } from "./sidebar";
 import { Upload } from "./upload";
 
 /**
@@ -24,67 +25,6 @@ function routeOf(question: string): AnswerKey {
   if (/launch|should i|predict/i.test(question)) return "predict";
   if (/atc|add.?to.?cart/i.test(question)) return "atc";
   return "diagnose";
-}
-
-function ThemeToggle() {
-  // Resolved after mount: the server cannot know the stored theme, and guessing
-  // here would be a hydration mismatch on exactly the attribute the blocking
-  // script in the layout just set.
-  const [dark, setDark] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const attr = document.documentElement.getAttribute("data-theme");
-    setDark(attr ? attr === "dark" : matchMedia("(prefers-color-scheme: dark)").matches);
-  }, []);
-
-  const flip = () => {
-    const next = dark ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    try {
-      localStorage.setItem("mazal-theme", next);
-    } catch {
-      // Private mode: the toggle still works for the session.
-    }
-    setDark(!dark);
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={flip}
-      aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
-      className="relative grid size-8 place-items-center rounded-lg bg-sunken text-ink-soft transition-[background-color,color,scale] duration-150 after:absolute after:-inset-1.5 hover:bg-line hover:text-ink active:scale-[.96]"
-    >
-      {dark ? (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="size-[15px]"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-        </svg>
-      ) : (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="size-[15px]"
-          aria-hidden="true"
-        >
-          <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" />
-        </svg>
-      )}
-    </button>
-  );
 }
 
 /**
@@ -169,10 +109,12 @@ export function Chat({
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [sidebar, setSidebar] = useState(false);
   const lastTurn = useRef<HTMLDivElement>(null);
   const composer = useRef<HTMLFormElement>(null);
   /** Where the composer sat before the first turn moved it — the F of the FLIP below. */
   const cameFrom = useRef<number | null>(null);
+  const headerMark = useRef<HTMLButtonElement>(null);
 
   /** The conversation has begun: the hero is gone and the composer docks to the bottom. */
   const started = turns.length > 0;
@@ -184,6 +126,26 @@ export function Chat({
       block: "start",
     });
   }, [turns]);
+
+  /**
+   * Closing removes whichever mark was clicked — the panel's twin, or the header's if the key
+   * came from elsewhere — so focus has to be handed to the one that survives, or it falls to
+   * the body and a keyboard loses its place. The frame is the wait: the header button does not
+   * exist in the DOM until React has re-rendered, and `.focus()` on nothing does nothing.
+   */
+  const closeSidebar = () => {
+    setSidebar(false);
+    requestAnimationFrame(() => headerMark.current?.focus());
+  };
+
+  useEffect(() => {
+    if (!sidebar) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeSidebar();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sidebar]);
 
   /**
    * The composer goes from in-flow to fixed the instant the first turn lands, and no CSS
@@ -232,151 +194,175 @@ export function Chat({
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-ground px-5 py-3.5">
-        <div className="flex items-center gap-[9px]">
-          {/* The lockup mark: the four leaves in the green themselves, no disc behind them. */}
-          <Mark className="size-[17px] flex-none text-accent" />
-          <span className="font-serif text-[19px] font-medium leading-none tracking-[-0.01em]">
-            Mazal
-          </span>
-          <span className="rounded-[5px] bg-ref-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-ref-ink">
-            beta
-          </span>
-        </div>
-        <ThemeToggle />
-      </header>
+      <Sidebar open={sidebar} onToggle={sidebar ? closeSidebar : () => setSidebar(true)} />
 
-      <main className="mx-auto max-w-[46rem] px-5 pb-32">
-        {!started && (
-          <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
-            {/* The promise, not the name — the name is already in the header two lines up.
-                `luck` is the identity's gold, the one word the sentence turns on. */}
-            <h1 className="m-0 mb-[30px] font-serif text-[38px] font-medium leading-[1.14] tracking-[-0.012em] text-balance sm:text-[46px]">
-              Campaigns shouldn&rsquo;t need <em className="text-[#C9963C]">luck</em>.
-            </h1>
-            <div className="mb-[26px] flex max-w-lg flex-wrap justify-center gap-2">
-              {CHIPS.map((chip) => (
-                <button
-                  key={chip.key}
-                  type="button"
-                  onClick={() => ask(chip.text, answers[chip.key])}
-                  className="relative rounded-full border border-line bg-raised px-[15px] py-2 text-sm text-ink-soft transition-[border-color,color,scale] duration-150 after:absolute after:-inset-1 hover:border-line-strong hover:text-ink active:scale-[.96]"
+      {/**
+       * The shell the sidebar pushes. One custom property drives the whole displacement, and
+       * it is declared here so everything below inherits it — including the composer's dock,
+       * which is `fixed` and therefore positioned against the viewport rather than against
+       * this padding, so it has to read the rail itself.
+       *
+       * Padding rather than a transform: a transformed ancestor would become the containing
+       * block for that same `fixed` dock and would overflow the right edge, and neither is
+       * worth the compositor on a tree this small.
+       *
+       * The rail applies at every width. The panel never lies over the page — it always moves
+       * it aside, which on a narrow screen means the reading column pays for the panel while
+       * it is open.
+       */}
+      <div
+        className={`pl-[var(--rail)] transition-[padding-left] duration-[240ms] ease-[cubic-bezier(0.16,0.84,0.44,1)] ${
+          sidebar ? "[--rail:17rem]" : "[--rail:0px]"
+        }`}
+      >
+        <header className="sticky top-0 z-10 border-b border-line bg-ground px-5 py-3.5">
+          {/* h-8 holds the 60px the theme toggle used to hold, now that it lives in the panel.
+              The row is duplicated verbatim in the sidebar so the mark lands on the same pixel. */}
+          <div className="flex h-8 items-center">
+            {!sidebar && (
+              <MarkButton open={false} onClick={() => setSidebar(true)} ref={headerMark} />
+            )}
+          </div>
+        </header>
+
+        <main className="mx-auto max-w-[46rem] px-5 pb-32">
+          {!started && (
+            <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
+              {/* The promise, not the name. With the wordmark moved into the sidebar this is
+                  now the only place the product speaks its own case on a cold open, which is
+                  the right trade: a judge reads a sentence, not a logo.
+                  `luck` is the identity's gold, the one word the sentence turns on. */}
+              <h1 className="m-0 mb-[30px] font-serif text-[38px] font-medium leading-[1.14] tracking-[-0.012em] text-balance sm:text-[46px]">
+                Campaigns shouldn&rsquo;t need <em className="text-[#C9963C]">luck</em>.
+              </h1>
+              <div className="mb-[26px] flex max-w-lg flex-wrap justify-center gap-2">
+                {CHIPS.map((chip) => (
+                  <button
+                    key={chip.key}
+                    type="button"
+                    onClick={() => ask(chip.text, answers[chip.key])}
+                    className="relative rounded-full border border-line bg-raised px-[15px] py-2 text-sm text-ink-soft transition-[border-color,color,scale] duration-150 after:absolute after:-inset-1 hover:border-line-strong hover:text-ink active:scale-[.96]"
+                  >
+                    {chip.text}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {started && (
+            <div className="flex flex-col gap-[26px] pt-[34px]">
+              {turns.map((turn, i) => (
+                <div
+                  key={turn.id}
+                  ref={i === turns.length - 1 ? lastTurn : undefined}
+                  /**
+                   * scroll-mt clears the sticky header. Without it `scrollIntoView`
+                   * puts the top of the turn exactly under the header, and the
+                   * header covers the verdict — the one line the whole answer is
+                   * built to deliver.
+                   */
+                  className="scroll-mt-20"
                 >
-                  {chip.text}
-                </button>
+                  <TurnView turn={turn} active={i === turns.length - 1} />
+                </div>
               ))}
             </div>
-          </section>
-        )}
+          )}
 
-        {started && (
-          <div className="flex flex-col gap-[26px] pt-[34px]">
-            {turns.map((turn, i) => (
-              <div
-                key={turn.id}
-                ref={i === turns.length - 1 ? lastTurn : undefined}
-                /**
-                 * scroll-mt clears the sticky header. Without it `scrollIntoView`
-                 * puts the top of the turn exactly under the header, and the
-                 * header covers the verdict — the one line the whole answer is
-                 * built to deliver.
-                 */
-                className="scroll-mt-20"
-              >
-                <TurnView turn={turn} active={i === turns.length - 1} />
-              </div>
-            ))}
-          </div>
-        )}
+          {uploading && (
+            <div className="mt-[26px]">
+              <Upload
+                categories={categories}
+                onAnswer={(answer) => {
+                  ask(answer.asked, answer);
+                  setUploading(false);
+                }}
+                onClose={() => setUploading(false)}
+              />
+            </div>
+          )}
 
-        {uploading && (
-          <div className="mt-[26px]">
-            <Upload
-              categories={categories}
-              onAnswer={(answer) => {
-                ask(answer.asked, answer);
-                setUploading(false);
-              }}
-              onClose={() => setUploading(false)}
-            />
-          </div>
-        )}
-
-        {/**
-         * On the landing the composer sits in the flow, directly under the promise and the
-         * chips — it is the one thing to do on that screen. The moment there is a transcript
-         * it leaves the flow and docks to the bottom of the viewport, because from then on
-         * the answer is what moves and the place you type into should not.
-         *
-         * The dock fades rather than sits on a bar: `from-ground` solid behind the composer,
-         * transparent above it, so a turn scrolling past dissolves into the paper instead of
-         * being cut by an edge. `main`'s pb-32 is the room this takes up.
-         */}
-        <div
-          className={
-            started
-              ? "fixed inset-x-0 bottom-0 z-20 bg-linear-to-t from-ground from-60% to-transparent px-5 pt-6 pb-[max(1.125rem,env(safe-area-inset-bottom))]"
-              : "mt-[26px]"
-          }
-        >
-          {/* Concentric: composer radius 26, inner button 18 with 8px inset. */}
-          <form
-            ref={composer}
-            onSubmit={submit}
-            // The shadow is the identity's, tinted 30/40/30 rather than neutral black: a grey
-            // shadow on warm paper reads as a cold patch sitting on top of the sheet.
-            className="mx-auto flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
+          {/**
+           * On the landing the composer sits in the flow, directly under the promise and the
+           * chips — it is the one thing to do on that screen. The moment there is a transcript
+           * it leaves the flow and docks to the bottom of the viewport, because from then on
+           * the answer is what moves and the place you type into should not.
+           *
+           * The dock fades rather than sits on a bar: `from-ground` solid behind the composer,
+           * transparent above it, so a turn scrolling past dissolves into the paper instead of
+           * being cut by an edge. `main`'s pb-32 is the room this takes up.
+           *
+           * `left-[var(--rail)]` rather than `inset-x-0`: being fixed, the dock is positioned
+           * against the viewport and the shell's padding cannot reach it, so it reads the rail
+           * itself and stops at the sidebar's edge instead of running under it.
+           */}
+          <div
+            className={
+              started
+                ? "fixed right-0 bottom-0 left-[var(--rail)] z-20 bg-linear-to-t from-ground from-60% to-transparent px-5 pt-6 pb-[max(1.125rem,env(safe-area-inset-bottom))] transition-[left] duration-[240ms] ease-[cubic-bezier(0.16,0.84,0.44,1)]"
+                : "mt-[26px]"
+            }
           >
-            <button
-              type="button"
-              onClick={() => setUploading((v) => !v)}
-              aria-label="Upload a Meta Ads CSV export"
-              aria-expanded={uploading}
-              className="relative -ml-2.5 grid size-9 flex-none place-items-center rounded-[18px] text-ink-soft transition-[background-color,color,scale] duration-150 after:absolute after:-inset-1 hover:bg-sunken hover:text-ink active:scale-[.96]"
+            {/* Concentric: composer radius 26, inner button 18 with 8px inset. */}
+            <form
+              ref={composer}
+              onSubmit={submit}
+              // The shadow is the identity's, tinted 30/40/30 rather than neutral black: a grey
+              // shadow on warm paper reads as a cold patch sitting on top of the sheet.
+              className="mx-auto flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4"
-                aria-hidden="true"
+              <button
+                type="button"
+                onClick={() => setUploading((v) => !v)}
+                aria-label="Upload a Meta Ads CSV export"
+                aria-expanded={uploading}
+                className="relative -ml-2.5 grid size-9 flex-none place-items-center rounded-[18px] text-ink-soft transition-[background-color,color,scale] duration-150 after:absolute after:-inset-1 hover:bg-sunken hover:text-ink active:scale-[.96]"
               >
-                <path d="M21.4 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.2-9.19a4 4 0 015.65 5.66l-9.2 9.19a2 2 0 01-2.82-2.83l8.49-8.48" />
-              </svg>
-            </button>
-            <input
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="What's happening with your campaign?"
-              autoComplete="off"
-              aria-label="Ask Mazal about your campaign"
-              className="min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-ink outline-none placeholder:text-ink-faint"
-            />
-            <button
-              type="submit"
-              aria-label="Send"
-              disabled={question.trim() === ""}
-              className="relative grid size-9 flex-none place-items-center rounded-[18px] bg-accent text-ground transition-[opacity,scale] duration-150 after:absolute after:-inset-1 active:scale-[.96] disabled:cursor-default disabled:opacity-35"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-[15px]"
-                aria-hidden="true"
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-4"
+                  aria-hidden="true"
+                >
+                  <path d="M21.4 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.2-9.19a4 4 0 015.65 5.66l-9.2 9.19a2 2 0 01-2.82-2.83l8.49-8.48" />
+                </svg>
+              </button>
+              <input
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="What's happening with your campaign?"
+                autoComplete="off"
+                aria-label="Ask Mazal about your campaign"
+                className="min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-ink outline-none placeholder:text-ink-faint"
+              />
+              <button
+                type="submit"
+                aria-label="Send"
+                disabled={question.trim() === ""}
+                className="relative grid size-9 flex-none place-items-center rounded-[18px] bg-accent text-ground transition-[opacity,scale] duration-150 after:absolute after:-inset-1 active:scale-[.96] disabled:cursor-default disabled:opacity-35"
               >
-                <path d="M5 12h13M13 6l6 6-6 6" />
-              </svg>
-            </button>
-          </form>
-        </div>
-      </main>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-[15px]"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h13M13 6l6 6-6 6" />
+                </svg>
+              </button>
+            </form>
+          </div>
+        </main>
+      </div>
     </>
   );
 }
