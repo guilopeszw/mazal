@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 02:50 BRT · E-agent (Joaquim) · entrypoint Vercel e runbook da conexão Deco
+
+**Done:** parte versionável do PRD 04 implementada no commit que contém esta entrada: handler Hono importável em `api/mcp.ts`, rewrite HTTPS `/mcp` para a Vercel Function, Node `24.x` fixado e runbook sem segredos para a Custom Connection “Mazal MCP”. TDD comprovou o limite Vercel local; 33/33 MCP e 118/118 global passaram em Node 24, com typechecks focalizado/global, backtest, JSON e diff checks verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-report.md`.
+
+**Next:** com acesso autorizado às contas, configurar secrets/allowlists na Vercel, fazer o deploy e executar o checklist remoto em `docs/mazal-mcp-vercel-deco.md` antes de criar o Agent do PRD 05.
+
+**Blocked / watch out:** URL de produção, `401` remoto, handshake, `tools/list`, tool call, Custom Connection e Monitor continuam pendentes; todos exigem conta Vercel/Deco e nenhum token foi criado, solicitado ou usado nesta sessão. O typecheck raiz ainda não inclui `apps/mcp`, então manter o gate focalizado.
+
+---
+
 ## 2026-08-09 02:40 BRT · E-agent (Joaquim) · corretivo HIGH/MEDIUM do MCP
 
 **Done:** removido o singleton de `InMemoryActionLog`: cada `McpServer`/request autenticada recebe log novo, comprovado por teste HTTP cruzando dois `execute_plan`. A réplica Zod 4 agora exige `price > 0` e ao menos um `paymentMethod`; 32/32 MCP e 117/117 global passaram em Node 24, com typechecks focalizado/global e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-2-fix-report.md`.
