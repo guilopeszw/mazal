@@ -6,7 +6,7 @@ import {
 } from './server.js';
 
 export function createVercelHandler(options: CreateMcpHandlerOptions = {}) {
-  return handle(createMcpHandler(options, '/api/mcp'));
+  return handle(createMcpHandler(options, '/api/mcp.mjs'));
 }
 
 const deployedHandler = createVercelHandler();

@@ -15,6 +15,13 @@ Entry format:
 
 ---
 
+## 2026-08-09 11:08 BRT · E-agent (Joaquim) · corretivo de rota do bundle MCP Vercel
+**Done:** `/mcp` agora reescreve para `/api/mcp.mjs`, o arquivo que a Function Vercel emite, e o Hono escuta exatamente esse caminho interno. TDD RED comprovou o antigo `/api/mcp`; GREEN simula o destino do rewrite sem bearer e recebe `401`, preservando o handshake autenticado com Host/Origin/bearer. Node 24: 36/36 MCP (strict + compat), 121/121 raiz, build Vercel 58.9.0 limpo e diff check verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-bundle-route-report.md`.
+**Next:** com autorização, fazer deploy e repetir o smoke remoto de `/mcp`.
+**Blocked / watch out:** o manifest limpo resolve o arquivo por `check: true` e Function gerada, sem repetir a antiga regra explícita `.mjs`; nenhum deploy, segredo, pacote ou API pública foi alterado.
+
+---
+
 ## 2026-08-09 10:58 BRT · E-agent (Joaquim) · handler HTTP nomeado da Function Vercel
 **Done:** removido o `default` Web handler ambíguo do bundle MCP; a Function exporta `GET`/`POST`/`DELETE` nomeados que delegam ao Hono testável. RED→GREEN no artefato comprova ausência de `default` e `POST` sem bearer = 401. Node 24: MCP 36/36 (strict/compat), raiz 121/121, typecheck, build Vercel limpo e diff check verdes. Relatório `.superpowers/sdd/2026-08-09-e-agent/task-3-named-handler-report.md`.
 **Next:** fazer deploy de produção autorizado e repetir o smoke remoto em `/mcp`.

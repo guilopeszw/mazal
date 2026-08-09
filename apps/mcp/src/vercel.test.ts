@@ -1,6 +1,11 @@
+import { readFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from 'vitest';
 
 import { createVercelHandler } from './vercel-entrypoint.js';
+
+const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const handshake = {
   jsonrpc: '2.0',
@@ -13,24 +18,29 @@ const handshake = {
   },
 };
 
-test('serves the rewritten authenticated MCP route through the Vercel entrypoint', async () => {
+test('rewrites the public MCP route to the Vercel artifact before authentication', async () => {
+  const config = JSON.parse(
+    await readFile(resolve(appRoot, 'vercel.json'), 'utf8'),
+  ) as { rewrites: Array<{ source: string; destination: string }> };
+  const rewrite = config.rewrites.find(({ source }) => source === '/mcp');
+
+  expect(rewrite).toEqual({ source: '/mcp', destination: '/api/mcp.mjs' });
+  if (!rewrite) {
+    throw new Error('Missing /mcp Vercel rewrite');
+  }
+
   const handler = createVercelHandler({
     bearerToken: 'test-token',
     allowedHosts: ['mazal-mcp.vercel.app'],
     allowedOrigins: ['mazal-mcp.vercel.app'],
   });
-  const response = await handler(new Request('https://mazal-mcp.vercel.app/api/mcp', {
+  const response = await handler(new Request(`https://mazal-mcp.vercel.app${rewrite.destination}`, {
     method: 'POST',
     headers: {
-      Accept: 'application/json, text/event-stream',
-      Authorization: 'Bearer test-token',
-      'Content-Type': 'application/json',
       Host: 'mazal-mcp.vercel.app',
-      Origin: 'https://mazal-mcp.vercel.app',
     },
-    body: JSON.stringify(handshake),
   }));
 
-  expect(response.status).toBe(200);
-  expect(await response.text()).toContain('Mazal MCP');
+  expect(response.status).toBe(401);
+  expect(await response.text()).toBe('Unauthorized');
 });

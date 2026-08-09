@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/mcp",
-      "destination": "/api/mcp"
+      "destination": "/api/mcp.mjs"
     }
   ]
 }
