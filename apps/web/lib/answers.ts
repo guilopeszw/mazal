@@ -124,6 +124,21 @@ export type AnswerCharts = {
     }[];
     summary: string;
   };
+  /**
+   * Each product's daily spend across the flight, on one time axis.
+   *
+   * This is the evidence for the advice above it rather than decoration. A
+   * response curve is a claim about what a different budget would do, and the
+   * only reason Mazal can make one here is that these budgets moved — the
+   * fit refuses when they have not. Showing the walk is showing why it is
+   * allowed to speak.
+   */
+  budgetWalk?: {
+    /** One row per date, one key per product, plus the date itself. */
+    points: Record<string, string | number>[];
+    series: { key: string; label: string }[];
+    summary: string;
+  };
   money?: {
     /** Sampled along the fitted curve. Profit in BRL per day. */
     points: { spend: number; profit: number }[];
@@ -592,6 +607,22 @@ function allocateAnswer(): Answer {
     .filter((m) => m.delta < 0)
     .reduce((sum, m) => sum - m.delta, 0);
 
+  /**
+   * The spend walk. Read straight off the fixture's days — no rate is computed
+   * here, and the series keys are the product ids so nothing has to be matched
+   * back up by label.
+   */
+  const dates = funded[0]!.card ? demoAccount.products[0]!.days.map((d) => d.date) : [];
+  const budgetWalk = {
+    points: dates.map((date, i) => {
+      const row: Record<string, string | number> = { date };
+      for (const p of demoAccount.products) row[p.id] = p.days[i]?.spend ?? 0;
+      return row;
+    }),
+    series: demoAccount.products.map((p) => ({ key: p.id, label: nameOf(p.id) })),
+    summary: `Each product's daily budget over the flight. Mazal can only draw a curve for a product whose budget actually moved — these span more than 2× from their lowest day to their highest, which is what makes the advice above possible at all. A budget held flat carries no evidence about any other budget, and Mazal says so rather than guessing.`,
+  };
+
   const moves = {
     budget: formatMoney(advice.budget),
     gain: formatMoney(advice.gain),
@@ -669,7 +700,7 @@ function allocateAnswer(): Answer {
       projected: `${formatMoney(advice.currentProfit)} → ${formatMoney(advice.bestProfit)} a day, at the same spend`,
       assumption: `Every figure comes from each product's own curve, fitted to ${funded[0]!.curve.n} days. Mazal can make the reductions; raising a budget is a decision to spend more and stays yours. The two halves are the same size, so approving only the cuts lowers your spend rather than moving it.`,
     },
-    charts: { moves },
+    charts: { moves, budgetWalk },
     note: `Curves fitted from each product's own ${funded[0]!.curve.n} days of spending, which varied by more than 2× — a budget that never moved carries no evidence about any other budget, and Mazal declines rather than guessing. Measured against known curves on 200 simulated accounts this captures 71% of the achievable profit, against 25% for an even split; docs/allocator-results.md has the rest, including what it does not do.`,
   };
 }
