@@ -1,15 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "pnpm run build:vercel",
-  "outputDirectory": "public",
-  "routes": [
-    {
-      "src": "/mcp",
-      "dest": "/api/mcp.mjs"
-    },
-    {
-      "handle": "filesystem"
-    }
-  ]
+  "buildCommand": "pnpm run build:vercel"
 }
