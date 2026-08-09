@@ -694,3 +694,13 @@ Also fixed: local dev tooling was missing entirely at the start of this session 
 **Next:** `gh auth login` still needs a human — the repo is private, so PR creation from `feat/fix-front` to `stage` is the only thing left blocked, and it needs an interactive browser login this session can't do. Once that's done, `gh pr create --base stage` (not `main`).
 
 **Blocked / watch out:** None of stage's other `apps/web` files (`upload.tsx`, `plan-panel.tsx`, `actions.ts`, `lib/meta.ts`, `lib/audit.ts`) were restyled to the new clover identity — they still use whatever tokens stage had at merge time. If the demo walks through CSV upload or the plan panel, someone should eyeball them against the new palette before showing them next to the rebranded chat.
+
+---
+
+## 2026-08-09 · E-agent · main sync and validation
+
+**Done:** The merged E-agent changes are now in the local `main` history. Workspace tests pass (135 tests), root typecheck passes, web typecheck and Next route type generation pass, MCP checks pass, and the web production build passes with Webpack.
+
+**Next:** Configure the connected Vercel `mazal` project to build `apps/web` as Next.js, then smoke-test `/` and `/api/chat` on the production deployment.
+
+**Blocked / watch out:** Vercel currently deploys `main` as READY but produces no output and returns 404 because its project root/framework are unset. Local Turbopack still panics on process binding; Webpack is the successful source-level build check. The checkout's `origin` still points to `guilopeszw/mazal`, while the merged PR and Vercel use `JucaGF/mazal`; do not push until that canonical remote is confirmed.
