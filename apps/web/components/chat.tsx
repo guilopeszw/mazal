@@ -169,7 +169,13 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
               <div
                 key={turn.id}
                 ref={i === turns.length - 1 ? lastTurn : undefined}
-                className="rise flex flex-col gap-3.5"
+                /**
+                 * scroll-mt clears the sticky header. Without it `scrollIntoView`
+                 * puts the top of the turn exactly under the header, and the
+                 * header covers the verdict — the one line the whole answer is
+                 * built to deliver.
+                 */
+                className="rise flex scroll-mt-20 flex-col gap-3.5"
               >
                 <div className="max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
                   {turn.asked}
