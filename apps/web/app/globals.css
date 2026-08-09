@@ -55,26 +55,26 @@
   --color-accent-ink: #265a3b;
 
   /**
-   * The identity's gold, at the weight the palette gives it — half the green's.
-   * It marks a reference value: the benchmark, the break-even threshold. Not a
-   * judgement, which is why it is not the red.
+   * There is no third hue.
    *
-   * #C9963C itself appears only in the dark theme. It is a mid-tone — 2.2:1 on
-   * the cream — so on paper it cannot carry either a thin rule or a word. Both
-   * light values are that gold walked down its own hue until it clears the bar
-   * for the job: #99722E as a mark (3.3:1, the 1.4.11 threshold for a non-text
-   * UI element), #795A24 as text (5.3:1 on the ground, 4.7:1 on the sunken).
+   * A gold ramp lived here to mark reference values — the benchmark column, the
+   * break-even threshold. It read well, and the reasoning was sound: a threshold
+   * is not a judgement, so it should not be the red. But the product owner's rule
+   * is one accent, and the reference marks already have a colour that carries the
+   * same meaning without adding a hue: none. They are drawn in ink, and the only
+   * two coloured things on screen stay the verdict's green and the leak's red.
+   *
+   * The green/ink/red split is the whole legend, and a seller can hold it.
    */
-  --color-ref: #99722e;
-  --color-ref-soft: #f4e9d3;
-  --color-ref-ink: #795a24;
 
   /**
    * A judgement against the seller's interest gets its own colour, used once.
-   * Aniline stamp red rather than a signal red — it belongs to the warm paper.
+   * A true red, not a terracotta — an orange-leaning warning reads as a brand
+   * accent rather than a caution, and this is the one mark on screen that has to
+   * read as "check this".
    */
-  --color-warn: #a63d28;
-  --color-warn-soft: #f5e3dc;
+  --color-warn: #c62222;
+  --color-warn-soft: #fdecec;
 
   /** Newsreader for the wordmark, the headline, and the verdict. Nothing else. */
   --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
@@ -115,12 +115,8 @@
       --color-accent-soft: #17301f;
       --color-accent-ink: #8ed0a5;
 
-      --color-ref: #d9ae5c;
-      --color-ref-soft: #2c2415;
-      --color-ref-ink: #e6c688;
-
-      --color-warn: #e08268;
-      --color-warn-soft: #2e1a14;
+      --color-warn: #ff7d70;
+      --color-warn-soft: #2c1413;
     }
   }
 
@@ -140,12 +136,8 @@
     --color-accent-soft: #17301f;
     --color-accent-ink: #8ed0a5;
 
-    --color-ref: #d9ae5c;
-    --color-ref-soft: #2c2415;
-    --color-ref-ink: #e6c688;
-
-    --color-warn: #e08268;
-    --color-warn-soft: #2e1a14;
+    --color-warn: #ff7d70;
+    --color-warn-soft: #2c1413;
   }
 
   html {

@@ -225,7 +225,7 @@ export function Chat({
           <span className="font-serif text-[19px] font-medium leading-none tracking-[-0.01em]">
             Mazal
           </span>
-          <span className="rounded-[5px] bg-ref-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-ref-ink">
+          <span className="rounded-[5px] bg-accent-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-accent-ink">
             beta
           </span>
         </div>
@@ -236,9 +236,15 @@ export function Chat({
         {turns.length === 0 && (
           <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
             {/* The promise, not the name — the name is already in the header two lines up.
-                `luck` is the identity's gold, the one word the sentence turns on. */}
+                `luck` is the one word the sentence turns on, so it takes the accent.
+
+                It was #C9963C, hardcoded: the single raw hex in the components, one value
+                serving both themes, and 2.2:1 on the cream — the token comment said that
+                gold "cannot carry either a thin rule or a word" and then it carried a word
+                at 46px. The accent is a token, redefines per theme, and clears the bar in
+                both (5.3:1 light, 6.8:1 dark). */}
             <h1 className="m-0 mb-[30px] font-serif text-[38px] font-medium leading-[1.14] tracking-[-0.012em] text-balance sm:text-[46px]">
-              Campaigns shouldn&rsquo;t need <em className="text-[#C9963C]">luck</em>.
+              Campaigns shouldn&rsquo;t need <em className="text-accent">luck</em>.
             </h1>
             <div className="mb-[26px] flex max-w-lg flex-wrap justify-center gap-2">
               {CHIPS.map((chip) => (
