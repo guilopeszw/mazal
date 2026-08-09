@@ -39,6 +39,33 @@ test('emits a self-contained ESM Vercel function', async () => {
   expect(bundle).not.toContain('src/index.ts');
 });
 
+test('the isolated bundle exposes named MCP HTTP methods and rejects an unauthenticated POST', async () => {
+  const isolatedDirectory = await mkdtemp(join(tmpdir(), 'mazal-mcp-bundle-'));
+  const isolatedBundle = join(isolatedDirectory, 'mcp.mjs');
+
+  try {
+    await copyFile(bundlePath, isolatedBundle);
+    const entrypoint = await import(pathToFileURL(isolatedBundle).href);
+
+    expect(entrypoint.default).toBeUndefined();
+    expect(entrypoint.GET).toEqual(expect.any(Function));
+    expect(entrypoint.POST).toEqual(expect.any(Function));
+    expect(entrypoint.DELETE).toEqual(expect.any(Function));
+
+    const response = await entrypoint.POST(
+      new Request('https://localhost/api/mcp', {
+        method: 'POST',
+        headers: { Host: 'localhost' },
+      }),
+    );
+
+    expect(response.status).toBe(401);
+    expect(await response.text()).toBe('Unauthorized');
+  } finally {
+    await rm(isolatedDirectory, { recursive: true, force: true });
+  }
+});
+
 test('the isolated bundle completes an authenticated MCP handshake', async () => {
   const isolatedDirectory = await mkdtemp(join(tmpdir(), 'mazal-mcp-bundle-'));
   const isolatedBundle = join(isolatedDirectory, 'mcp.mjs');

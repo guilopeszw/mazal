@@ -15,6 +15,11 @@ Entry format:
 
 ---
 
+## 2026-08-09 10:58 BRT · E-agent (Joaquim) · handler HTTP nomeado da Function Vercel
+**Done:** removido o `default` Web handler ambíguo do bundle MCP; a Function exporta `GET`/`POST`/`DELETE` nomeados que delegam ao Hono testável. RED→GREEN no artefato comprova ausência de `default` e `POST` sem bearer = 401. Node 24: MCP 36/36 (strict/compat), raiz 121/121, typecheck, build Vercel limpo e diff check verdes. Relatório `.superpowers/sdd/2026-08-09-e-agent/task-3-named-handler-report.md`.
+**Next:** fazer deploy de produção autorizado e repetir o smoke remoto em `/mcp`.
+**Blocked / watch out:** nenhum deploy, segredo, rota pública, tool, auth ou `packages/*` foi alterado.
+
 ## 2026-08-09 10:43 BRT · E-agent (Joaquim) · bundle autocontido do MCP na Vercel
 
 **Done:** corrigido o `ERR_MODULE_NOT_FOUND` de produção sem tocar em `packages/*`: a Function agora é um bundle ESM esbuild Node 24, criado por build command versionado a partir do handler testável em `src`. O Build Output limpo contém somente `api/mcp.func`, sem imports `@mazal/*` nem exports `src/index.ts`; o pacote isolado completa o handshake. Node 24: 35/35 MCP, checks estrito/compatível, build Vercel real, typecheck global e 120/120 global verdes. Relatório: `.superpowers/sdd/2026-08-09-e-agent/task-3-workspace-bundle-report.md`.
