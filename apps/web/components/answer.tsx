@@ -15,7 +15,9 @@ const BAR: Record<"ok" | "broken" | "mute", string> = {
 export function AnswerBody({ answer }: { answer: Answer }) {
   return (
     <div className="flex flex-col gap-[13px]">
-      <p className="m-0 text-xl font-[550] leading-[1.35] tracking-[-0.02em]">
+      {/* The verdict is the one sentence Mazal says rather than reports, so it is the one
+          place the serif appears in an answer. */}
+      <p className="m-0 font-serif text-[23px] font-medium leading-[1.3] tracking-[-0.005em]">
         {answer.verdict.map((seg, i) => (
           <em
             key={i}
@@ -100,11 +102,14 @@ export function AnswerBody({ answer }: { answer: Answer }) {
                 className="absolute -top-1 h-3.5 w-0.5 rounded-[1px] bg-accent"
                 style={{ left: `${answer.band.mid}%` }}
               />
+              {/* Gold, not red: break-even is the threshold the band is measured against, the
+                  same job the reference column does. Red stays reserved for the broken stage,
+                  so the one red mark on screen is always the leak. */}
               <div
-                className="absolute -top-1.5 h-[18px] w-0.5 rounded-[1px] bg-warn"
+                className="absolute -top-1.5 h-[18px] w-0.5 rounded-[1px] bg-ref"
                 style={{ left: `${answer.band.breakEven}%` }}
               >
-                <span className="absolute -top-[19px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10.5px] font-[560] text-warn">
+                <span className="absolute -top-[19px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10.5px] font-[560] text-ref-ink">
                   break-even
                 </span>
               </div>

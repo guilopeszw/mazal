@@ -1,53 +1,97 @@
 @import "tailwindcss";
 
 /**
- * Mazal — functionalist.
+ * Mazal — the clover identity.
  *
  * A seller is being told what to do with their money by software they met two
  * minutes ago. Everything here is in service of that number looking *measured*
- * rather than *sold*: one accent, one type family, a strict scale, and no
- * decoration that could be mistaken for confidence.
+ * rather than *sold*: a strict scale, and no decoration that could be mistaken
+ * for confidence.
  *
- * The ground is off-white rather than white. Pure white on a projector clips to
- * a glare and every hairline on it disappears; a warm paper tone keeps the rules
- * visible in a room nobody controls the lighting of.
+ * The ground is warm paper rather than white. Pure white on a projector clips to
+ * a glare and every hairline on it disappears; the identity's #EDEAE1 keeps the
+ * rules visible in a room nobody controls the lighting of.
+ *
+ * Three marks carry meaning and nothing else does:
+ *   green  — what Mazal concluded
+ *   gold   — the market reference it measured against
+ *   red    — the one stage that is broken
  */
 @theme {
-  /* surfaces */
-  --color-ground: #fafaf8;
-  --color-raised: #ffffff;
-  --color-sunken: #f2f2ee;
-  --color-line: #e6e6e0;
-  --color-line-strong: #d3d3ca;
-
-  /* ink */
-  --color-ink: #16181c;
-  --color-ink-soft: #5c6169;
-  --color-ink-faint: #8a9099;
+  /**
+   * Surfaces are the identity's two papers: #EDEAE1 for the page, #F7F3E8 for
+   * anything raised off it. Every card in the identity sheet is the lighter
+   * stock on the darker one, so a card needs no shadow to separate.
+   */
+  --color-ground: #edeae1;
+  --color-raised: #f7f3e8;
+  --color-sunken: #e3decd;
+  --color-line: #ddd7c4;
+  --color-line-strong: #c7c0a8;
 
   /**
-   * One accent, and it is functional: it marks what Mazal is confident about and
-   * nothing else. Green because the verdict is the product, and 0.62 lightness
-   * clears 4.5:1 on the ground while staying legible inverted on dark.
+   * Ink is the identity's #1E241C — a green-black, not a neutral one, so body
+   * text sits in the same world as the mark instead of on top of it.
+   *
+   * ink-faint darkens the identity's #8B8676 to #7D7868. #8B8676 is a label
+   * colour on a card at 11px; here the same token also carries funnel values a
+   * judge reads from the back of a room, and 3.0:1 does not survive a projector.
+   * 3.7:1 does.
    */
-  --color-accent: #0f9d63;
-  --color-accent-soft: #e6f5ee;
-  --color-accent-ink: #0a6b44;
+  --color-ink: #1e241c;
+  --color-ink-soft: #5c6154;
+  --color-ink-faint: #7d7868;
 
-  /** A judgement against the seller's interest gets its own colour, used once. */
-  --color-warn: #b4472c;
-  --color-warn-soft: #fbeae5;
+  /**
+   * The identity green, unmodified. #2E6B47 is the rare accent that works both
+   * ways without a second value: 5.3:1 as text on the ground, and 5.7:1 the
+   * other way round with the cream on top of it, so the filled button and the
+   * verdict word are literally the same colour.
+   */
+  --color-accent: #2e6b47;
+  /* The green let down into the cream rather than into white — a tint mixed toward
+     white turns mint, and mint is the one hue on screen the identity does not own. */
+  --color-accent-soft: #e1ebdd;
+  --color-accent-ink: #265a3b;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /**
+   * The identity's gold, at the weight the palette gives it — half the green's.
+   * It marks a reference value: the benchmark, the break-even threshold. Not a
+   * judgement, which is why it is not the red.
+   *
+   * #C9963C itself appears only in the dark theme. It is a mid-tone — 2.2:1 on
+   * the cream — so on paper it cannot carry either a thin rule or a word. Both
+   * light values are that gold walked down its own hue until it clears the bar
+   * for the job: #99722E as a mark (3.3:1, the 1.4.11 threshold for a non-text
+   * UI element), #795A24 as text (5.3:1 on the ground, 4.7:1 on the sunken).
+   */
+  --color-ref: #99722e;
+  --color-ref-soft: #f4e9d3;
+  --color-ref-ink: #795a24;
+
+  /**
+   * A judgement against the seller's interest gets its own colour, used once.
+   * Aniline stamp red rather than a signal red — it belongs to the warm paper.
+   */
+  --color-warn: #a63d28;
+  --color-warn-soft: #f5e3dc;
+
+  /** Newsreader for the wordmark, the headline, and the verdict. Nothing else. */
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-sans: var(--font-albert-sans), ui-sans-serif, system-ui, sans-serif;
   /** Numbers only. Tabular figures stop a changing value from shifting its neighbours. */
-  --font-num: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-num: var(--font-albert-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 /**
- * Dark is not the light palette inverted. The ground lifts off pure black —
- * #0d0f12 rather than #000 — because a true black behind a bright card reads as
- * a hole, and the ink drops to an off-white for the same reason white-on-black
- * body text is tiring to read.
+ * Dark is not the light palette inverted, it is the identity's other end. The
+ * ground lifts off pure black to #171C15 — a true black behind a bright card
+ * reads as a hole — and the ink becomes the identity's own paper, #EDEAE1, so
+ * the dark theme is still made of the four colours on the sheet.
+ *
+ * The green is the one value that cannot survive the move. #2E6B47 on a dark
+ * ground is 1.6:1; the identity's lighter sibling #3F8A5B is still short of it.
+ * #5FB37F is the same hue opened up until it clears 6.8:1.
  */
 @layer base {
   :root {
@@ -57,43 +101,51 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --color-ground: #0d0f12;
-      --color-raised: #16191e;
-      --color-sunken: #1b1f25;
-      --color-line: #262b33;
-      --color-line-strong: #363d47;
+      --color-ground: #171c15;
+      --color-raised: #1e241c;
+      --color-sunken: #262d23;
+      --color-line: #2e362b;
+      --color-line-strong: #414a3d;
 
-      --color-ink: #e8eaed;
-      --color-ink-soft: #9aa1ab;
-      --color-ink-faint: #6b727c;
+      --color-ink: #edeae1;
+      --color-ink-soft: #a8ac9e;
+      --color-ink-faint: #7c8175;
 
-      --color-accent: #2bbd80;
-      --color-accent-soft: #10261e;
-      --color-accent-ink: #6fdcaa;
+      --color-accent: #5fb37f;
+      --color-accent-soft: #17301f;
+      --color-accent-ink: #8ed0a5;
 
-      --color-warn: #e0755a;
-      --color-warn-soft: #2a1712;
+      --color-ref: #d9ae5c;
+      --color-ref-soft: #2c2415;
+      --color-ref-ink: #e6c688;
+
+      --color-warn: #e08268;
+      --color-warn-soft: #2e1a14;
     }
   }
 
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --color-ground: #0d0f12;
-    --color-raised: #16191e;
-    --color-sunken: #1b1f25;
-    --color-line: #262b33;
-    --color-line-strong: #363d47;
+    --color-ground: #171c15;
+    --color-raised: #1e241c;
+    --color-sunken: #262d23;
+    --color-line: #2e362b;
+    --color-line-strong: #414a3d;
 
-    --color-ink: #e8eaed;
-    --color-ink-soft: #9aa1ab;
-    --color-ink-faint: #6b727c;
+    --color-ink: #edeae1;
+    --color-ink-soft: #a8ac9e;
+    --color-ink-faint: #7c8175;
 
-    --color-accent: #2bbd80;
-    --color-accent-soft: #10261e;
-    --color-accent-ink: #6fdcaa;
+    --color-accent: #5fb37f;
+    --color-accent-soft: #17301f;
+    --color-accent-ink: #8ed0a5;
 
-    --color-warn: #e0755a;
-    --color-warn-soft: #2a1712;
+    --color-ref: #d9ae5c;
+    --color-ref-soft: #2c2415;
+    --color-ref-ink: #e6c688;
+
+    --color-warn: #e08268;
+    --color-warn-soft: #2e1a14;
   }
 
   html {
@@ -119,7 +171,6 @@
   }
 }
 
-/**
  * Motion earns its place only on state change: a message arriving, a panel
  * opening. Nothing loops, nothing draws attention to itself, and all of it stops
  * for anyone who has asked it to.

@@ -22,11 +22,29 @@ function routeOf(question: string): AnswerKey {
   return "diagnose";
 }
 
-/** Mazal's spark, sized by the parent. */
+/**
+ * Mazal's clover, sized by the parent.
+ *
+ * One leaf, drawn once in the top-left quadrant and mirrored into the other three. Keeping it
+ * a single path means the four leaves cannot drift out of register at small sizes, which is
+ * the whole risk with a mark that has to survive being a 16px favicon.
+ */
+const LEAF =
+  "M3.9 0.5H7.4A3.4 3.4 0 0 1 10.8 3.9V10.8H3.9A3.4 3.4 0 0 1 0.5 7.4V3.9A3.4 3.4 0 0 1 3.9 0.5Z";
+
+const LEAF_MIRRORS = [
+  undefined,
+  "translate(24 0) scale(-1 1)",
+  "translate(0 24) scale(1 -1)",
+  "translate(24 24) scale(-1 -1)",
+];
+
 function Mark({ className }: { className: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9L12 2z" />
+      {LEAF_MIRRORS.map((transform, i) => (
+        <path key={i} d={LEAF} transform={transform} />
+      ))}
     </svg>
   );
 }
@@ -122,12 +140,12 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
     <>
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-ground px-5 py-3.5">
         <div className="flex items-center gap-[9px]">
-          {/* text-ground: white-ish on the accent disc in light, near-black in dark. */}
-          <span className="grid size-5 flex-none place-items-center rounded-full bg-accent text-ground">
-            <Mark className="size-[11px]" />
+          {/* The lockup mark: the four leaves in the green themselves, no disc behind them. */}
+          <Mark className="size-[17px] flex-none text-accent" />
+          <span className="font-serif text-[19px] font-medium leading-none tracking-[-0.01em]">
+            Mazal
           </span>
-          <span className="text-[15px] font-[560] tracking-[-0.022em]">Mazal</span>
-          <span className="rounded-[5px] bg-accent-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-accent-ink">
+          <span className="rounded-[5px] bg-ref-soft px-[7px] py-[2.5px] text-[10.5px] font-[550] lowercase tracking-[0.04em] text-ref-ink">
             beta
           </span>
         </div>
@@ -137,15 +155,11 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
       <main className="mx-auto max-w-[46rem] px-5 pb-32">
         {turns.length === 0 && (
           <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
-            <div className="mb-[22px] grid size-[52px] place-items-center rounded-full bg-accent text-ground" aria-hidden="true">
-              <Mark className="size-[22px]" />
-            </div>
-            <h1 className="m-0 mb-1.5 text-[28px] font-[560] tracking-[-0.035em] sm:text-[34px]">
-              Mazal
+            {/* The promise, not the name — the name is already in the header two lines up.
+                `luck` is the identity's gold, the one word the sentence turns on. */}
+            <h1 className="m-0 mb-[30px] font-serif text-[38px] font-medium leading-[1.14] tracking-[-0.012em] text-balance sm:text-[46px]">
+              Campaigns shouldn&rsquo;t need <em className="text-[#C9963C]">luck</em>.
             </h1>
-            <p className="m-0 mb-[30px] text-[15px] text-ink-soft">
-              Campaigns shouldn&rsquo;t need luck.
-            </p>
             <div className="mb-[26px] flex max-w-lg flex-wrap justify-center gap-2">
               {CHIPS.map((chip) => (
                 <button
@@ -181,7 +195,9 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
         {/* Concentric: composer radius 26, inner button 18 with 8px inset. */}
         <form
           onSubmit={submit}
-          className="mx-auto mt-[26px] flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_8px_24px_-12px_rgb(0_0_0/0.2)] transition-[border-color] duration-150 focus-within:border-line-strong"
+          // The shadow is the identity's, tinted 30/40/30 rather than neutral black: a grey
+          // shadow on warm paper reads as a cold patch sitting on top of the sheet.
+          className="mx-auto mt-[26px] flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
         >
           <input
             value={question}
