@@ -1,4 +1,5 @@
 import type { Answer } from "@/lib/answers";
+import { PlanPanel } from "./plan-panel";
 
 /**
  * One answer turn, rendered exactly as the approved prototype draws it: verdict sentence
@@ -136,6 +137,8 @@ export function AnswerBody({ answer }: { answer: Answer }) {
           </div>
         </section>
       )}
+
+      {answer.plan && <PlanPanel {...answer.plan} />}
 
       <p className="m-0 max-w-[62ch] text-[13px] text-ink-faint">{answer.note}</p>
     </div>
