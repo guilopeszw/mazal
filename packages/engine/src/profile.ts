@@ -14,26 +14,6 @@
 
 import type { CardFinding, ProductCard, SellerBenchmarkTable, SellerLeverName } from '@mazal/contracts';
 
-/**
- * Which levers actually separate better-reviewed sellers from worse ones, across
- * every category with the data to say.
- *
- * Only delivery replicates — 16 of 18 categories agree on its direction, with
- * better sellers promising about 7% shorter. Price agrees in 11, and freight
- * ratio, photos and description length agree in 9 of 18, which is a coin flip.
- *
- * This ships attached to every finding because a percentile is interesting on
- * its own and misleading without it. A seller told their photo count is p20
- * will go and add photos; the data does not support that changing anything.
- */
-const EVIDENCE: Record<SellerLeverName, CardFinding['evidence']> = {
-  deliveryDays: 'replicates',
-  price: 'inconsistent',
-  freightRatio: 'inconsistent',
-  photos: 'inconsistent',
-  descriptionLength: 'inconsistent',
-};
-
 /** Higher is worse for these, so the percentile is read from the top down. */
 const LOWER_IS_BETTER = new Set<SellerLeverName>(['price', 'freightRatio', 'deliveryDays']);
 
@@ -71,7 +51,7 @@ function percentileOf(value: number, q: { p25: number; median: number; p75: numb
  * arithmetic on too few shops, and saying nothing beats saying something thin.
  */
 export function profileCard(card: ProductCard, table: SellerBenchmarkTable): CardFinding[] {
-  const row = table[card.category];
+  const row = table.categories[card.category];
   if (!row) return [];
 
   const findings: CardFinding[] = [];
@@ -91,7 +71,13 @@ export function profileCard(card: ProductCard, table: SellerBenchmarkTable): Car
       // Reported so that 1 is always the bad end, whichever direction the lever runs.
       percentile: Math.round((LOWER_IS_BETTER.has(lever) ? raw : 1 - raw) * 1000) / 1000,
       betterSellers: row.levers?.[lever] ?? null,
-      evidence: EVIDENCE[lever],
+      // Read from the data, not from a constant here. Only delivery replicates:
+      // better-reviewed sellers promise shorter ETAs in 16 of 18 categories,
+      // while freight ratio, photos and description length agree in 9 of 18,
+      // which is a coin flip. A percentile without that attached is misleading —
+      // a seller told their photo count is p20 will go and add photos, and
+      // nothing in this data says that changes anything.
+      evidence: table.replication[lever].evidence,
     });
   }
 

@@ -231,8 +231,24 @@ export type SellerBenchmark = {
 export type SellerLeverName =
   | 'price' | 'freightRatio' | 'deliveryDays' | 'photos' | 'descriptionLength';
 
-/** Partial: only 22 of the 62 categories have enough sellers. */
-export type SellerBenchmarkTable = Partial<Record<OlistCategory, SellerBenchmark>>;
+/**
+ * How much a lever separates better sellers from worse, measured across every
+ * category with quartile data. Derived by `pnpm derive`, never hand-written — a
+ * kept-by-hand table of facts about the data becomes a lie the first time the
+ * data is re-derived.
+ */
+export type LeverReplication = {
+  categories: number;
+  agreeing: number;
+  evidence: 'replicates' | 'inconsistent';
+  medianLift: number;
+};
+
+export type SellerBenchmarkTable = {
+  replication: Record<SellerLeverName, LeverReplication>;
+  /** Only 22 of the 62 categories have enough sellers. */
+  categories: Partial<Record<OlistCategory, SellerBenchmark>>;
+};
 
 /** Where one card field sits among the sellers it competes with. */
 export type CardFinding = {

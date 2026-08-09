@@ -132,7 +132,15 @@ for (const entry of existsSync(RAW) ? readdirSync(RAW, { withFileTypes: true }) 
   }
 }
 
+const csvCache = new Map<string, Record<string, string>[]>();
+
 function readCsv(name: string): Record<string, string>[] {
+  // Memoised: the seller pass needs products and the translation table that the
+  // category pass already parsed, and re-reading 33,000 rows to get them back is
+  // pure waste in a script that is slow enough by hand.
+  const cached = csvCache.get(name);
+  if (cached) return cached;
+
   const path = rawFiles.get(name);
   if (!path) {
     throw new Error(
@@ -143,6 +151,7 @@ function readCsv(name: string): Record<string, string>[] {
   }
   const rows = parseCsv(readFileSync(path, 'utf8'));
   console.log(`  ${name.padEnd(44)} ${rows.length.toLocaleString('en-US').padStart(9)} rows`);
+  csvCache.set(name, rows);
   return rows;
 }
 
@@ -294,14 +303,15 @@ function deriveSellers(): void {
       }];
     }));
 
-    // Quartiles by outcome, best first. Only where there are enough sellers for
-    // a quartile to be more than four shops.
+    // Quartiles by outcome, best first. Sorted once and read three times.
+    const ranked = [...rows].sort((a, b) => b.outcome - a.outcome);
+    const q = Math.max(Math.floor(ranked.length / 4), 1);
+    const top = ranked.slice(0, q);
+    const bottom = ranked.slice(-q);
+
+    // Levers only where a quartile is more than four shops.
     let levers = null;
     if (rows.length >= MIN_SELLERS_FOR_LEVERS) {
-      const ranked = [...rows].sort((a, b) => b.outcome - a.outcome);
-      const q = Math.floor(ranked.length / 4);
-      const top = ranked.slice(0, q);
-      const bottom = ranked.slice(-q);
       levers = Object.fromEntries(LEVERS.map((l) => {
         const t = mean(top.map((r) => r.levers[l]!).filter(Number.isFinite));
         const b = mean(bottom.map((r) => r.levers[l]!).filter(Number.isFinite));
@@ -313,14 +323,41 @@ function deriveSellers(): void {
       category,
       sellers: rows.length,
       outcome: 'reviewAvg',
-      outcomeTop: round(mean([...rows].sort((a, b) => b.outcome - a.outcome).slice(0, Math.floor(rows.length / 4)).map((r) => r.outcome))),
-      outcomeBottom: round(mean([...rows].sort((a, b) => b.outcome - a.outcome).slice(-Math.floor(rows.length / 4)).map((r) => r.outcome))),
+      outcomeTop: round(mean(top.map((r) => r.outcome))),
+      outcomeBottom: round(mean(bottom.map((r) => r.outcome))),
       percentiles,
       levers,
     };
   }
 
-  writeFileSync(OUT_SELLERS, `${JSON.stringify(table, null, 2)}\n`);
+  /**
+   * How often each lever points the same way across every category that has
+   * quartile data — computed here rather than written into the engine by hand.
+   *
+   * A hand-kept table of facts about the data becomes a lie the first time the
+   * data is re-derived, and nothing would catch it. This is the same reason the
+   * slide-6 numbers are checked against the file that produced them.
+   */
+  const withLeverData = Object.values(table)
+    .map((c) => (c as { levers: Record<string, { lift: number }> | null }).levers)
+    .filter((l): l is Record<string, { lift: number }> => l !== null);
+
+  const replication = Object.fromEntries(LEVERS.map((l) => {
+    const lifts = withLeverData.map((x) => x[l]!.lift).filter(Number.isFinite);
+    const negative = lifts.filter((x) => x < 0).length;
+    const agreeing = Math.max(negative, lifts.length - negative);
+    const rate = lifts.length === 0 ? 0 : agreeing / lifts.length;
+    return [l, {
+      categories: lifts.length,
+      agreeing,
+      // Two thirds is the line: below it the lever is closer to a coin flip than
+      // to a finding, and a percentile on it must not be quoted as predictive.
+      evidence: rate >= 0.667 ? 'replicates' : 'inconsistent',
+      medianLift: round(median(lifts)),
+    }];
+  }));
+
+  writeFileSync(OUT_SELLERS, `${JSON.stringify({ replication, categories: table }, null, 2)}\n`);
 
   const withLevers = Object.values(table).filter((c) => (c as { levers: unknown }).levers !== null).length;
   console.log(

@@ -49,7 +49,7 @@ Across all 18 categories with quartile data, comparing the top quartile of selle
 
 An earlier read of three categories suggested freight ratio was the lever. It was not; it was an artifact of the sample. The number above is every category with the data.
 
-**Every `CardFinding` carries an `evidence` field** — `'replicates'` or `'inconsistent'` — for exactly this reason. A percentile is interesting on its own and misleading without it: a seller told their photo count is p20 will go and add photos, and nothing in this data says that changes anything.
+**Every `CardFinding` carries an `evidence` field** — `'replicates'` or `'inconsistent'` — for exactly this reason. It is **computed by `pnpm derive` and shipped in `seller-benchmarks.json`**, not written into the engine by hand: a kept-by-hand table of facts about the data becomes a lie the first time the data is re-derived, and nothing would catch it. The threshold is two thirds of categories agreeing on direction. A percentile is interesting on its own and misleading without it: a seller told their photo count is p20 will go and add photos, and nothing in this data says that changes anything.
 
 Findings sort worst-placed first, with a replicating lever outranking an inconsistent one at the same percentile, so the first line a seller reads is the one worth acting on.
 
