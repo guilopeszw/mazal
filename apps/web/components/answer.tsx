@@ -1,9 +1,14 @@
 import type { Answer } from "@/lib/answers";
+import { type Reveal, fullReveal, tokenize } from "@/lib/stream";
 
 /**
  * One answer turn, rendered exactly as the approved prototype draws it: verdict sentence
  * (the only large type), plain-language line, evidence, funnel, band, metrics table,
  * provenance note. Pure presentation — every string arrives pre-formatted from the server.
+ *
+ * `reveal` says how much of it is on screen. Omitting it means all of it, so a finished turn
+ * and a server render both draw the whole answer without knowing the stream exists. No timer
+ * lives in this file.
  */
 
 const BAR: Record<"ok" | "broken" | "mute", string> = {
@@ -12,26 +17,46 @@ const BAR: Record<"ok" | "broken" | "mute", string> = {
   mute: "bg-line",
 };
 
-export function AnswerBody({ answer }: { answer: Answer }) {
+export function AnswerBody({ answer, reveal }: { answer: Answer; reveal?: Reveal }) {
+  const shown = reveal ?? fullReveal(answer);
+
+  // The word count is global across the verdict, but each segment keeps its own tone, so each
+  // one is cut against its own offset. The <em> runs stay exactly as they were.
+  let offset = 0;
+  const segments = answer.verdict.map((segment) => {
+    const tokens = tokenize(segment.text);
+    const start = offset;
+    offset += tokens.length;
+    return { tone: segment.tone, tokens, start };
+  });
+
   return (
-    <div className="flex flex-col gap-[13px]">
+    <div className="flex flex-col gap-[13px]" aria-busy={!shown.done}>
       {/* The verdict is the one sentence Mazal says rather than reports, so it is the one
           place the serif appears in an answer. */}
       <p className="m-0 font-serif text-[23px] font-medium leading-[1.3] tracking-[-0.005em]">
-        {answer.verdict.map((seg, i) => (
-          <em
-            key={i}
-            className={`not-italic ${seg.tone === "good" ? "text-accent" : seg.tone === "bad" ? "text-warn" : ""}`}
-          >
-            {seg.text}
-          </em>
-        ))}
+        {segments.map((segment, i) => {
+          const take = Math.min(segment.tokens.length, Math.max(0, shown.verdictWords - segment.start));
+          if (take === 0) return null;
+          return (
+            <em
+              key={i}
+              className={`not-italic ${segment.tone === "good" ? "text-accent" : segment.tone === "bad" ? "text-warn" : ""}`}
+            >
+              {segment.tokens.slice(0, take).join("")}
+            </em>
+          );
+        })}
       </p>
 
-      <p className="m-0 max-w-[60ch] text-[15px] text-ink-soft">{answer.said}</p>
+      {shown.saidWords > 0 && (
+        <p className="m-0 max-w-[60ch] text-[15px] text-ink-soft">
+          {tokenize(answer.said).slice(0, shown.saidWords).join("")}
+        </p>
+      )}
 
-      {answer.evidence && (
-        <div className="flex items-start gap-2.5 rounded-xl bg-accent-soft px-3.5 py-3 text-sm">
+      {answer.evidence && shown.evidence && (
+        <div className="rise flex items-start gap-2.5 rounded-xl bg-accent-soft px-3.5 py-3 text-sm">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -49,16 +74,16 @@ export function AnswerBody({ answer }: { answer: Answer }) {
         </div>
       )}
 
-      {answer.stages && (
-        <section className="overflow-hidden rounded-[14px] border border-line bg-raised">
+      {answer.stages && shown.stages && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
           <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
             Where the funnel breaks
           </h3>
           <div className="flex flex-col">
-            {answer.stages.map((s) => (
+            {answer.stages.slice(0, shown.stageRows).map((s) => (
               <div
                 key={s.name}
-                className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-line px-4 py-[9px] last:border-b-0"
+                className="rise grid grid-cols-[1fr_auto] items-center gap-3 border-b border-line px-4 py-[9px] last:border-b-0"
               >
                 <span
                   className={`flex items-center gap-[9px] text-sm ${
@@ -87,8 +112,8 @@ export function AnswerBody({ answer }: { answer: Answer }) {
         </section>
       )}
 
-      {answer.band && (
-        <section className="overflow-hidden rounded-[14px] border border-line bg-raised">
+      {answer.band && shown.band && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
           <h3 className="m-0 border-b border-line bg-sunken px-4 py-[11px] text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
             Predicted return on ad spend
           </h3>
@@ -123,13 +148,13 @@ export function AnswerBody({ answer }: { answer: Answer }) {
         </section>
       )}
 
-      {answer.rows.length > 0 && (
-        <section className="overflow-hidden rounded-[14px] border border-line bg-raised">
+      {answer.rows.length > 0 && shown.tableRows > 0 && (
+        <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
           <div className="flex flex-col">
-            {answer.rows.map((r) => (
+            {answer.rows.slice(0, shown.tableRows).map((r) => (
               <div
                 key={r.label}
-                className={`grid grid-cols-[1fr_auto] items-baseline gap-3.5 border-b border-line px-4 py-2.5 text-sm last:border-b-0 sm:grid-cols-[1fr_auto_auto] ${
+                className={`rise grid grid-cols-[1fr_auto] items-baseline gap-3.5 border-b border-line px-4 py-2.5 text-sm last:border-b-0 sm:grid-cols-[1fr_auto_auto] ${
                   r.hit ? "bg-warn-soft" : ""
                 }`}
               >
@@ -142,7 +167,9 @@ export function AnswerBody({ answer }: { answer: Answer }) {
         </section>
       )}
 
-      <p className="m-0 max-w-[62ch] text-[13px] text-ink-faint">{answer.note}</p>
+      {shown.note && (
+        <p className="rise m-0 max-w-[62ch] text-[13px] text-ink-faint">{answer.note}</p>
+      )}
     </div>
   );
 }

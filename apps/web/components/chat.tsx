@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Answer, AnswerKey } from "@/lib/answers";
+import { type Reveal, buildTimeline, fullReveal, revealAt } from "@/lib/stream";
 import { AnswerBody } from "./answer";
 
 /**
@@ -110,7 +111,84 @@ function ThemeToggle() {
   );
 }
 
+/**
+ * Drives one answer's reveal from a single `requestAnimationFrame` loop.
+ *
+ * The loop only advances a clock; `revealAt` does the deciding. That is what keeps this from
+ * becoming a pile of chained `setTimeout`s that drift apart and have to be torn down one by
+ * one — there is one frame handle to cancel, and a missed frame self-corrects on the next.
+ *
+ * `active` is false for every turn but the newest, so asking a second question makes the
+ * previous answer jump straight to complete instead of two timelines running at once.
+ */
+function useAnswerStream(answer: Answer, active: boolean): Reveal {
+  const steps = useMemo(() => buildTimeline(answer), [answer]);
+  const total = steps.length ? steps[steps.length - 1]!.at : 0;
+
+  // Read once, at mount. A turn only exists after a click, so this never runs during the
+  // server render and cannot desync hydration.
+  const [reduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    /**
+     * The blanket rule in `globals.css` flattens CSS animations for this reader but has no
+     * opinion about a JS clock — without this branch the prose would still type itself out
+     * word by word for someone who asked to be shown no motion at all.
+     */
+    if (!active || reduced) return;
+
+    let frame = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const at = now - start;
+      setElapsed(at);
+      if (at < total) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [active, reduced, total]);
+
+  if (!active || reduced) return fullReveal(answer);
+  return revealAt(steps, elapsed);
+}
+
+/** The pause made legible: the mark itself, breathing, and nothing moving. */
+function Thinking() {
+  return (
+    <div role="status" className="flex items-center py-1">
+      <Mark className="pulse-mark size-[18px] text-accent" />
+      <span className="sr-only">Mazal is thinking</span>
+    </div>
+  );
+}
+
 type Turn = { id: number; asked: string; key: AnswerKey };
+
+function TurnView({
+  turn,
+  answer,
+  active,
+}: {
+  turn: Turn;
+  answer: Answer;
+  active: boolean;
+}) {
+  const reveal = useAnswerStream(answer, active);
+
+  return (
+    <div className="flex flex-col gap-3.5">
+      <div className="rise max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
+        {turn.asked}
+      </div>
+      {reveal.thinking ? <Thinking /> : <AnswerBody answer={answer} reveal={reveal} />}
+    </div>
+  );
+}
 
 export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -178,15 +256,12 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
         {turns.length > 0 && (
           <div className="flex flex-col gap-[26px] pt-[34px]">
             {turns.map((turn, i) => (
-              <div
-                key={turn.id}
-                ref={i === turns.length - 1 ? lastTurn : undefined}
-                className="rise flex flex-col gap-3.5"
-              >
-                <div className="max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
-                  {turn.asked}
-                </div>
-                <AnswerBody answer={answers[turn.key]} />
+              <div key={turn.id} ref={i === turns.length - 1 ? lastTurn : undefined}>
+                <TurnView
+                  turn={turn}
+                  answer={answers[turn.key]}
+                  active={i === turns.length - 1}
+                />
               </div>
             ))}
           </div>

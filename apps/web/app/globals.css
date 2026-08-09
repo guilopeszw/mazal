@@ -171,9 +171,14 @@
   }
 }
 
+/**
  * Motion earns its place only on state change: a message arriving, a panel
- * opening. Nothing loops, nothing draws attention to itself, and all of it stops
- * for anyone who has asked it to.
+ * opening. Nothing draws attention to itself, and all of it stops for anyone who
+ * has asked it to.
+ *
+ * One thing loops, and only one: the mark while Mazal is composing an answer. A
+ * loop is the right shape for exactly this — it says *still working*, and it ends
+ * when the waiting does. Everything else here plays once and settles.
  */
 @utility rise {
   animation: rise 320ms cubic-bezier(0.16, 0.84, 0.44, 1) both;
@@ -187,6 +192,21 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/** Opacity only. A mark that also moved would be a spinner, and this is not a wait. */
+@utility pulse-mark {
+  animation: pulse-mark 1400ms ease-in-out infinite;
+}
+
+@keyframes pulse-mark {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
