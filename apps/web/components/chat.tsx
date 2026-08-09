@@ -197,6 +197,9 @@ export function Chat({
   const [uploading, setUploading] = useState(false);
   const lastTurn = useRef<HTMLDivElement>(null);
 
+  /** The conversation has begun: the hero is gone and the composer docks to the bottom. */
+  const started = turns.length > 0;
+
   useEffect(() => {
     if (turns.length === 0) return;
     lastTurn.current?.scrollIntoView({
@@ -233,7 +236,7 @@ export function Chat({
       </header>
 
       <main className="mx-auto max-w-[46rem] px-5 pb-32">
-        {turns.length === 0 && (
+        {!started && (
           <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
             {/* The promise, not the name — the name is already in the header two lines up.
                 `luck` is the identity's gold, the one word the sentence turns on. */}
@@ -255,7 +258,7 @@ export function Chat({
           </section>
         )}
 
-        {turns.length > 0 && (
+        {started && (
           <div className="flex flex-col gap-[26px] pt-[34px]">
             {turns.map((turn, i) => (
               <div
@@ -288,61 +291,79 @@ export function Chat({
           </div>
         )}
 
-        {/* Concentric: composer radius 26, inner button 18 with 8px inset. */}
-        <form
-          onSubmit={submit}
-          // The shadow is the identity's, tinted 30/40/30 rather than neutral black: a grey
-          // shadow on warm paper reads as a cold patch sitting on top of the sheet.
-          className="mx-auto mt-[26px] flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
+        {/**
+         * On the landing the composer sits in the flow, directly under the promise and the
+         * chips — it is the one thing to do on that screen. The moment there is a transcript
+         * it leaves the flow and docks to the bottom of the viewport, because from then on
+         * the answer is what moves and the place you type into should not.
+         *
+         * The dock fades rather than sits on a bar: `from-ground` solid behind the composer,
+         * transparent above it, so a turn scrolling past dissolves into the paper instead of
+         * being cut by an edge. `main`'s pb-32 is the room this takes up.
+         */}
+        <div
+          className={
+            started
+              ? "fixed inset-x-0 bottom-0 z-20 bg-linear-to-t from-ground from-60% to-transparent px-5 pt-6 pb-[max(1.125rem,env(safe-area-inset-bottom))]"
+              : "mt-[26px]"
+          }
         >
-          <button
-            type="button"
-            onClick={() => setUploading((v) => !v)}
-            aria-label="Upload a Meta Ads CSV export"
-            aria-expanded={uploading}
-            className="relative -ml-2.5 grid size-9 flex-none place-items-center rounded-[18px] text-ink-soft transition-[background-color,color,scale] duration-150 after:absolute after:-inset-1 hover:bg-sunken hover:text-ink active:scale-[.96]"
+          {/* Concentric: composer radius 26, inner button 18 with 8px inset. */}
+          <form
+            onSubmit={submit}
+            // The shadow is the identity's, tinted 30/40/30 rather than neutral black: a grey
+            // shadow on warm paper reads as a cold patch sitting on top of the sheet.
+            className="mx-auto flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="size-4"
-              aria-hidden="true"
+            <button
+              type="button"
+              onClick={() => setUploading((v) => !v)}
+              aria-label="Upload a Meta Ads CSV export"
+              aria-expanded={uploading}
+              className="relative -ml-2.5 grid size-9 flex-none place-items-center rounded-[18px] text-ink-soft transition-[background-color,color,scale] duration-150 after:absolute after:-inset-1 hover:bg-sunken hover:text-ink active:scale-[.96]"
             >
-              <path d="M21.4 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.2-9.19a4 4 0 015.65 5.66l-9.2 9.19a2 2 0 01-2.82-2.83l8.49-8.48" />
-            </svg>
-          </button>
-          <input
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="What's happening with your campaign?"
-            autoComplete="off"
-            aria-label="Ask Mazal about your campaign"
-            className="min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-ink outline-none placeholder:text-ink-faint"
-          />
-          <button
-            type="submit"
-            aria-label="Send"
-            disabled={question.trim() === ""}
-            className="relative grid size-9 flex-none place-items-center rounded-[18px] bg-accent text-ground transition-[opacity,scale] duration-150 after:absolute after:-inset-1 active:scale-[.96] disabled:cursor-default disabled:opacity-35"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="size-[15px]"
-              aria-hidden="true"
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-4"
+                aria-hidden="true"
+              >
+                <path d="M21.4 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.2-9.19a4 4 0 015.65 5.66l-9.2 9.19a2 2 0 01-2.82-2.83l8.49-8.48" />
+              </svg>
+            </button>
+            <input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="What's happening with your campaign?"
+              autoComplete="off"
+              aria-label="Ask Mazal about your campaign"
+              className="min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-ink outline-none placeholder:text-ink-faint"
+            />
+            <button
+              type="submit"
+              aria-label="Send"
+              disabled={question.trim() === ""}
+              className="relative grid size-9 flex-none place-items-center rounded-[18px] bg-accent text-ground transition-[opacity,scale] duration-150 after:absolute after:-inset-1 active:scale-[.96] disabled:cursor-default disabled:opacity-35"
             >
-              <path d="M5 12h13M13 6l6 6-6 6" />
-            </svg>
-          </button>
-        </form>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-[15px]"
+                aria-hidden="true"
+              >
+                <path d="M5 12h13M13 6l6 6-6 6" />
+              </svg>
+            </button>
+          </form>
+        </div>
       </main>
     </>
   );
