@@ -640,3 +640,13 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 **Next:** `packages/contracts` — the six types from `docs/contracts.md` plus `metrics.ts` with its three assertions. This is C's package, but it is the only hard blocker for the other four people and B is the only one online, so B ships it and hands guardianship to C on arrival. Twenty minutes. Then `packages/data` (Olist derivation), then the simulator.
 
 **Blocked / watch out:** Nobody else is online yet. A arrives Saturday night and takes `packages/engine`; tell them about the A/B firewall the moment they start, because it is the one rule that cannot be fixed retroactively — once B's fault-injection logic has been read by A, the backtest number is worthless for the rest of the weekend.
+
+---
+
+## 2026-08-09 · D-frontend session · chat-first UI ported into apps/web
+
+**Done:** Replaced the carbonless-paper sheet in `apps/web` with the approved chat-first interface, on `feat/peer-market-profile`, uncommitted. Old presentation deleted (`components/despacho|funnel-block|finding-entry|plan-panel|daily-chart`, `components/document/*`, `lib/series.ts`, `lib/verdict.ts`); new `components/chat.tsx` + `components/answer.tsx`, `lib/answers.ts` runs `diagnose`/`predict`/`profileCard`/`measurability` in the server component so the benchmark JSON never ships to the client (verified: 596K of client chunks, no benchmark strings). `lib/fixtures.ts` now imports `packages/sim/fixtures/demo-case*.json` at build time — regenerating the fixtures re-derives every number on screen at the next build. UI copy and number formatting switched to English (`en` locale, BRL kept) to match the prototype. `pnpm typecheck`, `pnpm --filter web build`, `pnpm test` (96) all green.
+
+**Next:** Commit + merge to `stage` when the regenerated fixtures land; re-run the build afterwards since the fixtures are baked in at build time.
+
+**Blocked / watch out:** With the current `demo-case2.json`, the engine's change point (2026-07-11) lands 2 days before the `eta_change` event (2026-07-13), so `Finding.evidence` is not attached and the evidence card does not render. The UI handles both shapes; if the demo needs the evidence sentence, the regenerated fixture's event has to land within a day of the detected change point.

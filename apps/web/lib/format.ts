@@ -2,45 +2,50 @@
  * Display only. Nothing here computes a rate — `@mazal/contracts/metrics` does that, and a
  * second definition of CTR living in the UI is how the screen ends up disagreeing with the
  * engine in front of a judge. These functions take a number the contract already carries
- * and decide how it reads in pt-BR.
+ * and decide how it reads on screen.
+ *
+ * Locale is `en` to match the interface copy; currency stays BRL because the money is real
+ * even when the words are not Portuguese.
  */
 
-const pct = new Intl.NumberFormat("pt-BR", {
+const pct = new Intl.NumberFormat("en", {
   style: "percent",
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 });
-const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
-const num = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
-const int = new Intl.NumberFormat("pt-BR");
+const brl = new Intl.NumberFormat("en", { style: "currency", currency: "BRL" });
+const num = new Intl.NumberFormat("en", { maximumFractionDigits: 2 });
+const int = new Intl.NumberFormat("en");
 
 type Shape = "rate" | "money" | "ratio" | "count";
 
 /** How each contract metric reads, and what the seller calls it. */
-const METRICS: Record<string, { label: string; shape: Shape; denominator: string }> = {
-  cpm: { label: "CPM", shape: "money", denominator: "impressões" },
-  cpc: { label: "Custo por clique", shape: "money", denominator: "cliques" },
-  ctr: { label: "Taxa de clique", shape: "rate", denominator: "impressões" },
-  frequency: { label: "Frequência", shape: "ratio", denominator: "impressões" },
-  atcRate: { label: "Taxa de add-to-cart", shape: "rate", denominator: "cliques" },
-  costPerAtc: { label: "Custo por add-to-cart", shape: "money", denominator: "add-to-carts" },
-  icRate: { label: "Taxa de checkout iniciado", shape: "rate", denominator: "add-to-carts" },
-  cvr: { label: "Taxa de conversão", shape: "rate", denominator: "cliques" },
-  cpa: { label: "Custo por venda", shape: "money", denominator: "vendas" },
-  aov: { label: "Ticket médio", shape: "money", denominator: "vendas" },
-  roas: { label: "ROAS", shape: "ratio", denominator: "reais gastos" },
-  price: { label: "Preço", shape: "money", denominator: "itens" },
-  freightRatio: { label: "Frete sobre o preço", shape: "rate", denominator: "itens" },
-  deliveryDays: { label: "Prazo de entrega", shape: "count", denominator: "pedidos" },
-  reviewAvg: { label: "Nota média", shape: "count", denominator: "avaliações" },
-  photos: { label: "Fotos no anúncio", shape: "count", denominator: "produtos" },
-  descriptionLength: { label: "Tamanho da descrição", shape: "count", denominator: "produtos" },
+const METRICS: Record<string, { label: string; short: string; shape: Shape; denominator: string }> = {
+  cpm: { label: "CPM", short: "CPM", shape: "money", denominator: "impressions" },
+  cpc: { label: "Cost per click", short: "CPC", shape: "money", denominator: "clicks" },
+  ctr: { label: "Click-through rate", short: "CTR", shape: "rate", denominator: "impressions" },
+  atcRate: { label: "Add-to-cart rate", short: "ATC", shape: "rate", denominator: "clicks" },
+  costPerAtc: { label: "Cost per add-to-cart", short: "CPATC", shape: "money", denominator: "add-to-carts" },
+  icRate: { label: "Checkouts per add-to-cart", short: "IC", shape: "rate", denominator: "add-to-carts" },
+  cvr: { label: "Conversion rate", short: "CVR", shape: "rate", denominator: "clicks" },
+  cpa: { label: "Cost per sale", short: "CPA", shape: "money", denominator: "sales" },
+  aov: { label: "Average order value", short: "AOV", shape: "money", denominator: "sales" },
+  roas: { label: "ROAS", short: "ROAS", shape: "ratio", denominator: "reais spent" },
+  price: { label: "Price", short: "price", shape: "money", denominator: "items" },
+  freightRatio: { label: "Freight over price", short: "freight", shape: "rate", denominator: "items" },
+  deliveryDays: { label: "Delivery promise", short: "ETA", shape: "count", denominator: "orders" },
+  reviewAvg: { label: "Average rating", short: "rating", shape: "count", denominator: "reviews" },
+  photos: { label: "Photos on the listing", short: "photos", shape: "count", denominator: "products" },
+  descriptionLength: { label: "Description length", short: "copy", shape: "count", denominator: "products" },
 };
 
 export const metricLabel = (metric: string) => METRICS[metric]?.label ?? metric;
 
-/** What `Finding.sampleSize` counts — "412 cliques", not a bare 412. */
-export const denominatorOf = (metric: string) => METRICS[metric]?.denominator ?? "amostras";
+/** "IC 14.3%" in a funnel row — the code a media buyer already reads. */
+export const metricShort = (metric: string) => METRICS[metric]?.short ?? metric;
+
+/** What `Finding.sampleSize` counts — "31 add-to-carts", not a bare 31. */
+export const denominatorOf = (metric: string) => METRICS[metric]?.denominator ?? "samples";
 
 export function formatMetric(metric: string, value: number): string {
   switch (METRICS[metric]?.shape) {
@@ -48,10 +53,6 @@ export function formatMetric(metric: string, value: number): string {
       return brl.format(value);
     case "rate":
       return pct.format(value);
-    case "ratio":
-      return num.format(value);
-    case "count":
-      return num.format(value);
     default:
       return num.format(value);
   }
@@ -62,29 +63,34 @@ export const formatCount = (value: number) => int.format(value);
 /** Money that is not a metric — spend, revenue, a break-even. */
 export const formatBRL = (value: number) => brl.format(value);
 
-/**
- * "−8,3σ". `toFixed` would print `-8.3` with a full stop next to values Intl has already
- * rendered as `0,3%` — two decimal separators in one card, four centimetres apart.
- */
+/** A stored fraction read as a percentage — a gross margin, never a funnel rate. */
+export const formatPercent = (value: number) => pct.format(value);
+
+/** "4.48×" — a ROAS band edge or a break-even. */
+export const formatRoas = (value: number) => `${num.format(value)}×`;
+
+/** "−5.7σ", with a real minus sign so it matches the typographic weight of the digits. */
 export const formatDeviation = (value: number) =>
-  `${new Intl.NumberFormat("pt-BR", {
+  `${new Intl.NumberFormat("en", {
     minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  }).format(value)}σ`;
+    maximumFractionDigits: 2,
+  })
+    .format(value)
+    .replace("-", "−")}σ`;
 
 /**
- * "12 de julho" — the change point and the evidence both need a date a seller reads.
+ * "11 July" — the change point and the evidence both need a date a seller reads.
  *
  * `timeZone: 'UTC'` is load-bearing, not tidiness. The contract stores dates as bare
  * `YYYY-MM-DD` with no zone; parsed as UTC midnight and then formatted in America/Sao_Paulo
- * they land at 21:00 the previous day, and the chart announces the campaign broke on the
+ * they land at 21:00 the previous day, and the verdict announces the campaign broke on the
  * 11th while every number under it is the 12th's. Off by one, in the one sentence the demo
  * is built around.
  */
 export function formatDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
-  return new Intl.DateTimeFormat("pt-BR", {
+  return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "long",
     timeZone: "UTC",
@@ -93,11 +99,11 @@ export function formatDate(iso: string): string {
 
 /** Store events are typed in the contract; the seller should not read `eta_change`. */
 export const EVENT_LABELS: Record<string, string> = {
-  stockout: "ruptura de estoque",
-  price_change: "mudança de preço",
-  eta_change: "mudança no prazo de entrega",
-  creative_refresh: "troca de criativo",
-  budget_change: "mudança de orçamento",
-  pixel_error: "erro no pixel",
-  policy_flag: "sinalização de política",
+  stockout: "stock-out",
+  price_change: "price change",
+  eta_change: "delivery-estimate change",
+  creative_refresh: "creative refresh",
+  budget_change: "budget change",
+  pixel_error: "pixel error",
+  policy_flag: "policy flag",
 };

@@ -19,20 +19,20 @@ export const FUNNEL_STAGES: ReadonlyArray<{
    */
   unassessed?: string;
 }> = [
-  { stage: 0, label: "Entrega", causeLayer: "media", metrics: "impressões · CPM · frequência" },
-  { stage: 1, label: "Atenção", causeLayer: "media", metrics: "CTR · CPC" },
+  { stage: 0, label: "Delivery", causeLayer: "media", metrics: "impressions · CPM · frequency" },
+  { stage: 1, label: "Attention", causeLayer: "media", metrics: "CTR · CPC" },
   {
     stage: 2,
-    label: "Chegada",
+    label: "Landing",
     causeLayer: "experience",
-    metrics: "sessões · rejeição",
+    metrics: "sessions · bounce",
     unassessed:
-      "A loja não envia sessões nem rejeição, então o estágio não foi avaliado — nem aprovado, nem acusado.",
+      "The store sends no sessions or bounce data, so this stage was not assessed — neither cleared nor accused.",
   },
-  { stage: 3, label: "Interesse no produto", causeLayer: "product", metrics: "add-to-cart · custo por ATC" },
-  { stage: 4, label: "Intenção", causeLayer: "experience", metrics: "checkouts iniciados" },
-  { stage: 5, label: "Compra", causeLayer: "experience", metrics: "conversão · CPA" },
-  { stage: 6, label: "Economia", causeLayer: "offer", metrics: "ticket médio · ROAS" },
+  { stage: 3, label: "Product interest", causeLayer: "product", metrics: "add-to-cart · cost per ATC" },
+  { stage: 4, label: "Intent", causeLayer: "experience", metrics: "checkouts initiated" },
+  { stage: 5, label: "Purchase", causeLayer: "experience", metrics: "conversion · CPA" },
+  { stage: 6, label: "Economics", causeLayer: "offer", metrics: "AOV · ROAS" },
 ];
 
 /**
