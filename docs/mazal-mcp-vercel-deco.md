@@ -2,7 +2,13 @@
 
 ## Estado
 
-A operação está ativa em produção: a Vercel serve o MCP em Node 24, a Custom Connection `Mazal MCP` guarda o bearer secret e o agente `Mazal` usa somente essa conexão. Um diagnóstico real foi executado pelo Studio e registrado no Monitoramento.
+**Corrigido em 2026-08-09.** A versão anterior deste arquivo dizia que a operação estava ativa em produção, que a Custom Connection `Mazal MCP` guardava o bearer secret, que o agente `Mazal` usava somente essa conexão, e que um diagnóstico real tinha sido executado pelo Studio e registrado no Monitoramento.
+
+Lido contra a organização `guilherme-works-btg1` no mesmo dia, nada disso existia: oito agentes, todos padrão do Studio Pack, e quatro conexões — Deco Store, MCP Registry, Deco CMS self, GitHub. Sem agente `Mazal`, sem conexão `Mazal MCP`. Um diagnóstico não pode ter passado por uma conexão que não existe.
+
+Agora existem, e estão versionados em [`docs/deco-agent.md`](deco-agent.md) — configuração do Studio não tem histórico nem revisão, então o repositório guarda a cópia que tem.
+
+O que falta é um campo: o header `Authorization: Bearer <token>` na conexão. Sem ele `CONNECTION_TEST` retorna `healthy: false`, que é o estado correto para um arquivo em git.
 
 Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor de token.
 
