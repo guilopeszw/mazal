@@ -1,40 +1,51 @@
-import type { FunnelStage } from "@mazal/contracts";
+import type { CampaignDay, FunnelStage } from "@mazal/contracts";
 import { BoundaryRule } from "./document/sheet";
 import { Stamp } from "./document/stamp";
-import { FUNNEL_STAGES, MEDIA_PRODUCT_BOUNDARY, toneFor } from "@/lib/funnel";
+import { FUNNEL_STAGES, MEDIA_PRODUCT_BOUNDARY, stageValue, toneFor } from "@/lib/funnel";
+import { formatMetric } from "@/lib/format";
 
 /**
  * The funnel as a tracking block — seven numbered rows on ruled paper, one of them stamped.
+ * This is the object the product is recognised by, so it is the largest thing on the sheet and
+ * it carries a number on every row.
  *
  * A Correios tracking slip is already this shape: an ordered sequence of stages where exactly
- * one line says the thing went wrong, and the reader's whole job is to find that line. Borrowing
- * it costs nothing and buys the one property the product needs most, which is that the answer
- * is a *row*, not a colour.
+ * one line says the thing went wrong, and the reader's whole job is to find that line.
+ * Borrowing it buys the property the product needs most — the answer is a *row*, not a colour.
  *
- * Three states, and they are three different printing operations rather than three hues, so the
- * distinction survives being projected, photographed, or read by someone who cannot separate red
- * from green:
+ * Three states, and they are three printing operations rather than three hues, so the
+ * distinction survives being projected, photographed, or read by someone who cannot separate
+ * red from green:
  *
  * - upstream — struck cleanly in impact black, CONFORME.
  * - the leak — stamped in aniline red, heavier and off-square, the only saturated mark.
- * - downstream — the carbon ghost: lighter, offset a hair, and labelled SINTOMA rather than
- *   judged, because a stage below the leak was never independently assessed and printing a
- *   verdict there is the exact misdiagnosis this product exists to prevent.
+ * - downstream — the carbon ghost: lighter, and labelled SINTOMA rather than judged, because a
+ *   stage below the leak was never independently assessed and printing a verdict there is the
+ *   exact misdiagnosis this product exists to prevent.
  */
-export function FunnelBlock({ leak }: { leak: FunnelStage | null }) {
+export function FunnelBlock({
+  leak,
+  flight,
+}: {
+  leak: FunnelStage | null;
+  flight: CampaignDay;
+}) {
   return (
     <div>
-      {FUNNEL_STAGES.map(({ stage, label, metrics }) => {
-        const tone = toneFor(stage, leak);
-        return (
-          <div key={stage}>
-            {stage === MEDIA_PRODUCT_BOUNDARY && (
-              <BoundaryRule above="mídia" below="produto · oferta · experiência" />
-            )}
-            <StageRow stage={stage} label={label} metrics={metrics} tone={tone} leak={leak} />
-          </div>
-        );
-      })}
+      {FUNNEL_STAGES.map(({ stage, label, metrics }) => (
+        <div key={stage}>
+          {stage === MEDIA_PRODUCT_BOUNDARY && (
+            <BoundaryRule above="mídia" below="produto · oferta · experiência" />
+          )}
+          <StageRow
+            stage={stage}
+            label={label}
+            metrics={metrics}
+            tone={toneFor(stage, leak)}
+            reading={stageValue(stage, flight)}
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -44,25 +55,25 @@ function StageRow({
   label,
   metrics,
   tone,
-  leak,
+  reading,
 }: {
   stage: FunnelStage;
   label: string;
   metrics: string;
   tone: "upstream" | "leak" | "downstream";
-  leak: FunnelStage | null;
+  reading: { metric: string; value: number } | null;
 }) {
   const isLeak = tone === "leak";
   const isGhost = tone === "downstream";
 
   return (
     <div
-      className={`grid grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-rule py-2.5 sm:gap-x-5 ${
+      className={`grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-rule py-3 sm:grid-cols-[2.5rem_minmax(0,1fr)_7rem_auto] sm:gap-x-5 ${
         isLeak ? "bg-paper-band" : ""
       }`}
     >
       <span
-        className={`font-struck text-lg tabular-nums ${
+        className={`self-start font-struck text-lg tabular-nums sm:self-center sm:text-xl ${
           isLeak ? "font-bold text-stamp" : isGhost ? "text-ghost" : "text-ink-soft"
         }`}
       >
@@ -70,24 +81,24 @@ function StageRow({
       </span>
 
       {/*
-        Never truncated. On a narrow screen the stamp and the label compete for the same row,
-        and the obvious fix — `truncate` — renders the leak as "Interesse no pr…". The name of
-        the stage that broke is the answer the whole product exists to produce; it wraps.
+        Never truncated. On a narrow screen the stamp and the label compete for the same row and
+        the obvious fix renders the leak as "Interesse no pr…" — the name of the stage that broke
+        is the answer the whole product exists to produce.
       */}
       <span className="min-w-0">
         <span
-          className={`block font-form text-[1.05rem] leading-tight text-balance sm:text-xl ${
+          className={`block font-form leading-tight text-balance ${
             isLeak
-              ? "font-extrabold tracking-[-0.01em] text-ink"
+              ? "text-xl font-extrabold tracking-[-0.015em] text-ink sm:text-[1.75rem]"
               : isGhost
-                ? "text-ghost"
-                : "font-semibold text-ink"
+                ? "text-lg text-ghost sm:text-xl"
+                : "text-lg font-semibold text-ink sm:text-xl"
           }`}
         >
           {label}
         </span>
         <span
-          className={`block text-[11px] uppercase tracking-[0.1em] ${
+          className={`block text-[10px] uppercase tracking-[0.1em] sm:text-[11px] ${
             isGhost ? "text-ghost" : "text-ink-soft"
           }`}
         >
@@ -95,18 +106,31 @@ function StageRow({
         </span>
       </span>
 
-      <span className="justify-self-end">
+      {/* The reading. A funnel without quantities is a legend, not a diagnosis. */}
+      <span
+        className={`col-start-2 row-start-2 font-struck tabular-nums sm:col-start-3 sm:row-start-1 sm:text-right ${
+          isLeak
+            ? "text-2xl font-bold text-stamp sm:text-[1.75rem]"
+            : isGhost
+              ? "text-base text-ghost"
+              : "text-lg text-ink"
+        }`}
+      >
+        {reading ? formatMetric(reading.metric, reading.value) : <span className="text-ghost">—</span>}
+      </span>
+
+      <span className="col-start-3 row-start-1 justify-self-end sm:col-start-4">
         {isLeak ? (
-          <Stamp tone="verdict" className="text-[11px] sm:text-xs">
+          <Stamp tone="verdict" impression="b" className="text-[11px] sm:text-sm">
             vazamento
           </Stamp>
         ) : (
           <span
-            className={`font-struck text-[11px] uppercase tracking-[0.14em] ${
+            className={`font-struck text-[10px] uppercase tracking-[0.14em] sm:text-[11px] ${
               isGhost ? "text-ghost" : "text-ink-soft"
             }`}
           >
-            {isGhost ? "sintoma" : leak === null ? "conforme" : "conforme"}
+            {isGhost ? "sintoma" : reading ? "conforme" : "sem dados"}
           </span>
         )}
       </span>

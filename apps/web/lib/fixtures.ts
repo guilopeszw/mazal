@@ -6,9 +6,11 @@ import type {
   OlistCategory,
   ProductCard,
   ReferenceMode,
+  Verdict,
 } from "@mazal/contracts";
 import { aggregate, atcRate, cvr } from "@mazal/contracts/metrics";
 import { benchmarks } from "@mazal/data";
+import { predict } from "@mazal/engine";
 import { CHANGE_POINT, buildSeries, splitAtChangePoint } from "./series.ts";
 
 /**
@@ -28,7 +30,7 @@ import { CHANGE_POINT, buildSeries, splitAtChangePoint } from "./series.ts";
 export const DEMO_CATEGORY: OlistCategory = "furniture_decor";
 
 /** The engine reads a seven-day trailing window rather than the whole flight. */
-const TRAILING_DAYS = 7;
+export const TRAILING_DAYS = 7;
 
 /**
  * `spread` is the robust sigma, floored at a tenth of the median. In self mode a baseline
@@ -52,6 +54,23 @@ export type DemoCase = {
   days: CampaignDay[];
   reference: ReferenceMode;
   diagnosis: Diagnosis;
+  /**
+   * From the engine, not from a component. `1 / card.grossMargin` written inline in a page was
+   * a rate computed in the UI — the exact thing the rules forbid, and it happened to be the
+   * number the whole "don't launch" verdict is measured against. `predict` already owns this
+   * definition, so the sheet reads `breakEvenRoas` off a real `Verdict`.
+   *
+   * Only that field is surfaced. `predictedRoas` from a card with no history comes back with a
+   * p90 near 19, which is honest about the band's width and useless on screen; putting it up
+   * would be quoting a number nobody should act on.
+   */
+  verdict: Verdict;
+  /**
+   * The window the engine judged — the trailing seven days, not the whole flight. The funnel
+   * reads its per-stage figures off this, because a row showing the 30-day average beside an
+   * `observed` computed over seven prints two different numbers for one metric on one sheet.
+   */
+  window: CampaignDay;
   actions: Action[];
   /** Prevented waste, or revenue recovered. Derived from the series, never typed in. */
   counter: { label: string; amount: number; basis: string };
@@ -110,6 +129,8 @@ const case1: DemoCase = {
   card,
   days: case1Days,
   reference: { kind: "benchmark", table: benchmarks },
+  verdict: predict({ card, table: benchmarks }),
+  window: case1Window,
   diagnosis: {
     primary: case1Primary,
     secondary: [
@@ -263,6 +284,8 @@ const case2: DemoCase = {
   card,
   days: case2Days,
   reference: { kind: "self", baselineDays: baseline.length },
+  verdict: predict({ card, table: benchmarks, history: case2Days }),
+  window: case2Window,
   diagnosis: {
     primary: {
       stage: 3,

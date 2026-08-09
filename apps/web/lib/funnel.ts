@@ -1,4 +1,5 @@
-import type { CauseLayer, FunnelStage } from "@mazal/contracts";
+import type { CampaignDay, CauseLayer, FunnelStage } from "@mazal/contracts";
+import { atcRate, cpm, ctr, cvr, icRate, roas } from "@mazal/contracts/metrics";
 
 /**
  * The seven stages, ordered. Names and cause layers come from the table in
@@ -41,4 +42,38 @@ export function toneFor(stage: FunnelStage, leak: FunnelStage | null): StageTone
   if (leak === null || stage < leak) return "upstream";
   if (stage === leak) return "leak";
   return "downstream";
+}
+
+/**
+ * The one headline number per stage, so the funnel reads as a cascade rather than as a list of
+ * metric names. A row that names `add-to-cart · custo por ATC` and shows nothing makes the
+ * product's identity object the only block on the sheet with nothing auditable in it.
+ *
+ * One rate per stage, in the funnel's own order, so the drop between a healthy 2,1% and a
+ * broken 0,6% is a quantity the room can see from the back — not a colour it has to decode.
+ *
+ * Every one of these is a function imported from the contract. Frequency belongs to stage 0 and
+ * is deliberately absent: the contract stores `reach` so frequency is *derivable*, but it
+ * exports no function for it, and deriving it here would be the `clicks / impressions` the
+ * rules exist to prevent. CPM carries the stage instead.
+ */
+const STAGE_METRIC: Partial<Record<FunnelStage, { metric: string; of: (d: CampaignDay) => number }>> =
+  {
+    0: { metric: "cpm", of: cpm },
+    1: { metric: "ctr", of: ctr },
+    // Stage 2 needs `sessions` and `bounceRate`, which are optional in the contract and absent
+    // for a seller without analytics. The engine skips the stage; so does the sheet.
+    3: { metric: "atcRate", of: atcRate },
+    4: { metric: "icRate", of: icRate },
+    5: { metric: "cvr", of: cvr },
+    6: { metric: "roas", of: roas },
+  };
+
+export function stageValue(
+  stage: FunnelStage,
+  flight: CampaignDay,
+): { metric: string; value: number } | null {
+  const entry = STAGE_METRIC[stage];
+  if (!entry) return null;
+  return { metric: entry.metric, value: entry.of(flight) };
 }

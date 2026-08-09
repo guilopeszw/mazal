@@ -11,11 +11,54 @@ import type { ReactNode } from "react";
  * sentence that keeps the borrowed form honest.
  */
 
-/** The sheet. Fixed measure, real edges, sitting on a desk. */
-export function Sheet({ children }: { children: ReactNode }) {
+/**
+ * The sheet. Full measure, real edges, real stock, sitting on a desk.
+ *
+ * `margin` is the second via — the carbon copy, bound to the same sheet down its right edge
+ * rather than floating beside it as a separate card. A document's marginal notes are part of
+ * the document; the previous build set them adrift and left a third of the desk bare for the
+ * whole scroll.
+ */
+export function Sheet({ children, margin }: { children: ReactNode; margin?: ReactNode }) {
   return (
-    <div className="mx-auto w-full max-w-5xl bg-paper text-ink ring-1 ring-paper-edge sheet-shadow">
-      {children}
+    <div className="stock mx-auto w-full text-ink ring-1 ring-paper-edge sheet-shadow lg:grid lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="min-w-0">{children}</div>
+      {margin && (
+        <div className="border-t border-rule lg:border-l lg:border-t-0 lg:border-dashed">
+          {margin}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * A total. On a printed document the sum is not a hero metric with a label above it — it is
+ * the last field of the last box, ruled off heavier than the rows it closes and set in the
+ * same struck column everything else lands in. That is the device; the label-over-big-number
+ * arrangement is the dashboard's.
+ */
+export function Total({
+  label,
+  value,
+  note,
+}: {
+  label: string;
+  value: string;
+  note?: string;
+}) {
+  return (
+    <div className="border-y-2 border-rule-strong py-2.5">
+      <div className="flex items-baseline gap-3">
+        <span className="shrink-0 text-[12px] font-bold uppercase tracking-[0.16em] text-ink">
+          {label}
+        </span>
+        <span className="leader h-[0.7em] min-w-4 flex-1" aria-hidden />
+        <span className="shrink-0 font-struck text-xl font-bold tabular-nums text-ink sm:text-2xl">
+          {value}
+        </span>
+      </div>
+      {note && <p className="mt-1 text-[11px] leading-snug text-ink-soft">{note}</p>}
     </div>
   );
 }

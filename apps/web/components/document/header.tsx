@@ -31,15 +31,21 @@ export function DocumentHeader({
 
   return (
     <header className="grid gap-6 px-5 pb-6 pt-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-8 sm:pt-8">
+      {/*
+        The emitter block, and it is deliberately not the largest thing here. The funnel is the
+        object this product is recognised by; a masthead that outweighs it turns the first
+        viewport into a brand slide. The wordmark identifies the issuer, which is all a document
+        header is for.
+      */}
       <div>
-        <p className="font-form text-[2.75rem] font-extrabold leading-[0.85] tracking-[-0.045em] sm:text-6xl">
+        <p className="font-form text-2xl font-extrabold leading-none tracking-[-0.03em] sm:text-[1.75rem]">
           Mazal
         </p>
-        <p className="mt-2 max-w-[34ch] text-sm leading-snug text-ink-soft">
+        <p className="mt-1.5 max-w-[38ch] text-[13px] leading-snug text-ink-soft">
           Parecer de subscrição de campanha. Campanhas não deveriam depender de sorte.
         </p>
-        <Barcode payload={number} className="mt-5 block text-ink" height={32} />
-        <p className="mt-1 font-struck text-[11px] tracking-[0.22em] text-ink-soft">
+        <Barcode payload={number} className="mt-3.5 block text-ink" height={26} />
+        <p className="mt-1 font-struck text-[10px] tracking-[0.22em] text-ink-soft">
           {groupDocumentNumber(number)}
         </p>
       </div>
@@ -61,16 +67,13 @@ export function DocumentHeader({
         </dl>
 
         <div className="flex flex-col items-start gap-2 sm:items-end">
-          <Stamp tone="verdict" className="text-base sm:text-xl">
+          <Stamp tone="verdict" impression="a" strike className="text-base sm:text-xl">
             {verdict.text}
-          </Stamp>
-          <Stamp tone="seal" className="text-[10px]">
-            sem valor fiscal
           </Stamp>
         </div>
       </div>
 
-      <p className="max-w-[62ch] border-l-0 text-[0.95rem] leading-relaxed text-ink sm:col-span-2">
+      <p className="max-w-[62ch] text-[0.95rem] leading-relaxed text-ink sm:col-span-2">
         <span className="text-ghost">{moment}</span> {verdict.note}
       </p>
     </header>

@@ -6,18 +6,25 @@ import { Field, Quadro, Sheet } from "@/components/document/sheet";
 import { FindingEntry } from "@/components/finding-entry";
 import { FunnelBlock } from "@/components/funnel-block";
 import { PlanPanel } from "@/components/plan-panel";
-import { DEMO_CASES } from "@/lib/fixtures";
+import { DEMO_CASES, TRAILING_DAYS } from "@/lib/fixtures";
 import { formatBRL, formatCount, formatMetric } from "@/lib/format";
 
 export default function Home() {
   const demo = DEMO_CASES.case2;
-  const { diagnosis, category, reference, days, card, actions, counter } = demo;
+  const { diagnosis, category, reference, days, actions, counter, verdict, window } = demo;
   const flight = aggregate(days);
 
   return (
-    <main className="mx-auto flex max-w-[84rem] flex-col gap-6 px-3 py-6 sm:px-6 sm:py-10 lg:flex-row lg:items-start lg:gap-8">
-      <div className="min-w-0 flex-1">
-      <Sheet>
+    <main className="mx-auto w-full max-w-[92rem] px-3 py-6 sm:px-6 sm:py-10">
+      <Sheet
+        margin={
+          <Despacho
+            diagnosis={diagnosis}
+            reference={reference}
+            actionCount={actions.length}
+          />
+        }
+      >
         <DocumentHeader
           diagnosis={diagnosis}
           reference={reference}
@@ -26,8 +33,12 @@ export default function Home() {
           moment={demo.moment}
         />
 
-        <Quadro title="localização do vazamento" aside="primeiro estágio que desviou">
-          <FunnelBlock leak={diagnosis.primary?.stage ?? null} />
+        {/* The identity object, and the largest block on the sheet. */}
+        <Quadro
+          title="localização do vazamento"
+          aside={`janela de ${TRAILING_DAYS} dias · primeiro estágio que desviou`}
+        >
+          <FunnelBlock leak={diagnosis.primary?.stage ?? null} flight={window} />
         </Quadro>
 
         {diagnosis.primary && (
@@ -70,17 +81,15 @@ export default function Home() {
             <Field label="cliques">{formatCount(flight.clicks)}</Field>
             <Field label="vendas">{formatCount(flight.purchases)}</Field>
             <Field label="roas">{formatMetric("roas", roas(flight))}</Field>
+            {/* From the engine's `Verdict`, not from `1 / grossMargin` in this file. */}
             <Field label="roas de equilíbrio">
-              {formatMetric("roas", 1 / card.grossMargin)}
+              {formatMetric("roas", verdict.breakEvenRoas)}
             </Field>
           </div>
         </Quadro>
 
         <PlanPanel actions={actions} counter={counter} />
       </Sheet>
-      </div>
-
-      <Despacho diagnosis={diagnosis} reference={reference} actionCount={actions.length} />
     </main>
   );
 }

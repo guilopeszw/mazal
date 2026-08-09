@@ -1,19 +1,25 @@
 /**
- * The carimbo. One saturated mark on an otherwise black-on-green sheet, and the thing the
- * room reads first from the back row.
+ * The carimbo. One saturated mark on an otherwise black-on-green sheet, and the thing the room
+ * reads first from the back row.
  *
- * A rubber stamp is not a badge: it is struck by hand, so it sits off-square, its double rule
- * is uneven, and the ink neither fills solidly nor lands entirely inside the frame. Those are
- * the three properties that separate it from a rounded pill with a red background, and all
- * three are cheap — a rotation, a doubled border, and a mask that eats the fill.
+ * A rubber stamp is not a badge. It sits off-square, its ink neither fills solidly nor lands
+ * entirely inside the frame, and no two strikes are the same impression — so the irregularity
+ * comes from an SVG displacement filter (`components/document/ink.tsx`) that actually breaks
+ * the letterforms, and the two filters alternate so the verdict and the row stamp are two
+ * strikes of a die rather than one sticker used twice.
  */
 export function Stamp({
   children,
   tone = "verdict",
+  impression = "a",
+  strike = false,
   className = "",
 }: {
   children: React.ReactNode;
   tone?: "verdict" | "notice" | "seal";
+  impression?: "a" | "b";
+  /** The one authored motion on the sheet. Reserved for the verdict. */
+  strike?: boolean;
   className?: string;
 }) {
   const tones = {
@@ -24,7 +30,9 @@ export function Stamp({
 
   return (
     <span
-      className={`inline-flex select-none items-center border-[3px] px-3 py-1.5 text-center font-form text-sm font-extrabold uppercase leading-none tracking-[0.14em] shadow-[inset_0_0_0_1px_currentColor] ink-bleed ${tones[tone]} ${className}`}
+      className={`inline-flex select-none items-center border-[3px] px-3 py-1.5 text-center font-form text-sm font-extrabold uppercase leading-none tracking-[0.14em] shadow-[inset_0_0_0_1px_currentColor] ${
+        impression === "a" ? "struck-a" : "struck-b"
+      } ${strike ? "strike-down" : ""} ${tones[tone]} ${className}`}
     >
       {children}
     </span>

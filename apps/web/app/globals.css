@@ -77,20 +77,52 @@
 }
 
 /**
- * Ink bleed. Aniline stamp ink soaks unevenly into fibre: the impression is never solid and
- * never perfectly aligned. Two overlaid noise gradients at low alpha eat into the fill, and
- * the whole mark sits slightly off-square. This is the world's one texture and it is a
- * specific effect, not decoration — a flat red rectangle reads as a UI badge.
+ * The stock itself. `public/stock.svg` carries two octaves of fractal mottle and a stretched
+ * fibre pass; painting a flat hex here is what made the last build's paper read as a colour
+ * rather than a material. Tiled, because a sheet is cut from a roll.
  */
-@utility ink-bleed {
-  mask-image:
-    radial-gradient(ellipse 120% 80% at 30% 40%, #000 62%, rgb(0 0 0 / 0.72) 100%),
-    repeating-linear-gradient(
-      74deg,
-      #000 0 3px,
-      rgb(0 0 0 / 0.86) 3px 4px
-    );
-  mask-composite: intersect;
+@utility stock {
+  background-color: var(--color-paper);
+  background-image: url("/stock.svg");
+  background-size: 420px 420px;
+  background-repeat: repeat;
+}
+
+/**
+ * A struck impression. The irregularity lives in `components/document/ink.tsx` as an SVG
+ * filter, because breaking a letterform edge needs displacement and a CSS mask cannot do it —
+ * the periodic gradient this replaces dipped 14% every 4px and never touched a glyph.
+ */
+@utility struck-a {
+  filter: url(#ink-a);
+}
+
+@utility struck-b {
+  filter: url(#ink-b);
+}
+
+/**
+ * The one authored moment: the die coming down. It plays once, on load, on the verdict only —
+ * the mark the room reads first arrives by being struck rather than by fading in. Everything
+ * else on the sheet is already printed when you get there.
+ */
+@keyframes strike {
+  0% {
+    opacity: 0;
+    transform: rotate(-7deg) scale(1.5);
+  }
+  55% {
+    opacity: 1;
+    transform: rotate(-7deg) scale(0.965);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-7deg) scale(1);
+  }
+}
+
+@utility strike-down {
+  animation: strike 420ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {

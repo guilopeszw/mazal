@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Action } from "@mazal/contracts";
-import { Perforation, Quadro } from "./document/sheet";
+import { Perforation, Quadro, Total } from "./document/sheet";
 import { Stamp } from "./document/stamp";
 import { formatBRL, formatMetric, metricLabel } from "@/lib/format";
 
@@ -104,25 +104,40 @@ export function PlanPanel({
           </>
         )}
 
-        <div className="mt-6 flex flex-col gap-4 border-t-2 border-rule-strong pt-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="font-struck text-[11px] uppercase tracking-[0.16em] text-ink-soft">
-              {counter.label}
-            </p>
-            <p className="font-form text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
-              {formatBRL(counter.amount)}
-            </p>
-            <p className="mt-0.5 max-w-[40ch] text-[11px] leading-snug text-ink-soft">
-              {counter.basis}
+        {/* The sum, in the sheet's own device: the last field of the last box, ruled off
+            heavier than the rows it closes and landing in the same struck column as every
+            other value. Label over big number is the dashboard's arrangement, not this one's. */}
+        <div className="mt-6">
+          <Total label={counter.label} value={formatBRL(counter.amount)} note={counter.basis} />
+        </div>
+
+        {/*
+          The signature line, and it is the THESIS's verb: an opinion you sign or refuse. It is
+          also where the disclosure has to live — at rest, beside the primary action, not
+          revealed after the fact by a receipt nobody has generated yet.
+        */}
+        <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-[46ch]">
+            <div className="flex items-end gap-3">
+              <span className="h-8 flex-1 border-b border-ink" aria-hidden />
+              <Stamp tone="seal" impression="b" className="mb-1 text-[9px]">
+                sem valor fiscal
+              </Stamp>
+            </div>
+            <p className="mt-1.5 text-[11px] leading-snug text-ink-soft">
+              Assinatura do responsável. <strong className="font-semibold text-ink">As
+              escritas são simuladas nesta build</strong> — executar anexa o plano a um log e
+              devolve um protocolo; nada chega ao Meta nem à loja.
             </p>
           </div>
 
           {/*
-            Three controls, in the order and the wording `D-frontend.md` fixes. They are
-            English inside a pt-BR sheet because the brief pins them, and they are the line the
-            demo pauses on: it proposes, you decide.
+            Three controls, in the order and the wording `D-frontend.md` fixes. English inside a
+            pt-BR sheet because the brief pins them, and they are the line the demo pauses on:
+            it proposes, you decide. All three are real controls — the third one refuses the
+            plan, which is a decision the seller is entitled to make with a keystroke.
           */}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <button
               type="button"
               onClick={run}
@@ -139,7 +154,14 @@ export function PlanPanel({
             >
               Edit first
             </button>
-            <span className="font-form text-sm text-ink-soft">I&rsquo;ll do it myself</span>
+            <button
+              type="button"
+              onClick={() => setChecked(new Set())}
+              disabled={selected.length === 0}
+              className="border-b border-transparent pb-0.5 font-form text-sm text-ink-soft transition-colors hover:border-ink-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stamp disabled:cursor-not-allowed disabled:text-ghost"
+            >
+              I&rsquo;ll do it myself
+            </button>
           </div>
         </div>
 
@@ -277,12 +299,11 @@ function Protocolo({ receipt, count }: { receipt: string; count: number }) {
           </p>
         </div>
         <div className="max-w-[36ch]">
-          <Stamp tone="seal" className="text-[10px]">
+          <Stamp tone="seal" impression="a" className="text-[10px]">
             nada foi escrito na conta
           </Stamp>
           <p className="mt-2 text-[12px] leading-snug text-ink-soft">
-            As escritas são simuladas nesta build. O plano foi anexado ao log e nenhuma
-            alteração chegou ao Meta ou à loja.
+            O plano foi anexado ao log. Nenhuma alteração chegou ao Meta ou à loja.
           </p>
         </div>
       </div>

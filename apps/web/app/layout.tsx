@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo, Martian_Mono } from "next/font/google";
 import "./globals.css";
+import { InkFilters } from "@/components/document/ink";
 
 /**
  * Two faces, and the split is semantic rather than decorative: a Brazilian fiscal document
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="pt-BR" className={`${archivo.variable} ${martian.variable} h-full`}>
       <body className="min-h-full bg-desk font-form text-ink antialiased">
         <div hidden dangerouslySetInnerHTML={{ __html: CONTRACT }} />
+        <InkFilters />
         {children}
       </body>
     </html>

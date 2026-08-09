@@ -30,11 +30,22 @@ export function Despacho({
   const notes = composeNotes(diagnosis, reference, actionCount);
 
   return (
-    <aside className="w-full lg:sticky lg:top-10 lg:w-[19rem] lg:shrink-0">
-      <div className="border-t-2 border-rule-strong bg-paper/60 px-4 py-4">
-        <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-soft">
-          despacho
-        </h2>
+    <aside className="h-full px-5 py-6 lg:sticky lg:top-0">
+      {/*
+        The second via. Bound to the same sheet rather than floating beside it, and printed as
+        what a second via actually is: a carbon impression, struck a hair off register and
+        lighter than the original. That is this world's own answer to "what is a side panel",
+        and it is why the desk no longer shows through a third of the page.
+      */}
+      <div className="translate-x-[0.5px]">
+        <div className="flex items-baseline justify-between gap-2 border-b border-rule pb-1.5">
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-soft">
+            despacho
+          </h2>
+          <span className="font-struck text-[9px] uppercase tracking-[0.16em] text-ghost">
+            2ª via
+          </span>
+        </div>
 
         <ol className="mt-3 space-y-3">
           {notes.map((note, i) => (
@@ -42,7 +53,7 @@ export function Despacho({
               <span className="font-struck text-[10px] leading-5 text-ghost tabular-nums">
                 {String(9 + i).padStart(2, "0")}:4{i}
               </span>
-              <p className="text-[13px] leading-snug text-ink">{note}</p>
+              <p className="text-[13px] leading-snug text-ink-soft">{note}</p>
             </li>
           ))}
         </ol>
