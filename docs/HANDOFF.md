@@ -23,6 +23,8 @@ Entry format:
 
 **Blocked / watch out:** `apps/web` belongs to D and was not changed. The Vercel project `mazal` has **no production deployment**, no preview deployments, and no Git repository connected; its dashboard says production requires pushing `main`. This integration branch requires Node 24 for its declared engine, while this local verification ran on Node 22 and emitted only engine warnings. The branch must not merge directly to `main`; review/integrate through the project's branch flow.
 
+**Reproducibility follow-up:** the isolated checkout ran `pnpm install --frozen-lockfile` and `pnpm sim:fixtures` without changing the committed fixtures. The required `pnpm derive` second-machine check remains blocked because `data/raw/` is intentionally gitignored and was absent from the clean checkout; repeat it on Node 24 with the approved raw Olist data available locally.
+
 ## 2026-08-09 11:34 BRT · E-agent (Joaquim) · produção Vercel e agente Deco
 **Done:** MCP publicado em `https://mcp-cyan-gamma.vercel.app/mcp`, com Host allowlist e bearer somente nos secret managers. A Custom Connection `Mazal MCP` foi criada no Deco e vinculada exclusivamente ao agente `Mazal`; as instruções versionadas estão em `docs/deco-agent-instructions.md`. Smoke real no Studio concluiu `Enable Tool → Diagnose Campaign` em 113 ms, retornou `primary: null`, `secondary: []` e `suspectedCause: "none"`, e está registrado em Settings → Monitor → Chats como `Diagnóstico de campanha de anúncios` (Done, 11:34). O runbook foi atualizado sem segredos.
 **Next:** iniciar o PRD do chat web somente quando D disponibilizar `apps/web`; antes disso, definir o secret manager e escopo de uma API key do agente para a integração servidor-a-servidor.
