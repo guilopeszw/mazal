@@ -1,0 +1,1384 @@
+{
+  "replication": {
+    "price": {
+      "categories": 18,
+      "agreeing": 11,
+      "evidence": "inconsistent",
+      "medianLift": 0.0975
+    },
+    "freightRatio": {
+      "categories": 18,
+      "agreeing": 9,
+      "evidence": "inconsistent",
+      "medianLift": -0.0476
+    },
+    "deliveryDays": {
+      "categories": 18,
+      "agreeing": 16,
+      "evidence": "replicates",
+      "medianLift": -0.0709
+    },
+    "photos": {
+      "categories": 18,
+      "agreeing": 9,
+      "evidence": "inconsistent",
+      "medianLift": -0.016
+    },
+    "descriptionLength": {
+      "categories": 18,
+      "agreeing": 9,
+      "evidence": "inconsistent",
+      "medianLift": 0.0065
+    }
+  },
+  "categories": {
+    "auto": {
+      "category": "auto",
+      "sellers": 100,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6323,
+      "outcomeBottom": 3.2843,
+      "percentiles": {
+        "price": {
+          "p25": 38.475,
+          "median": 65.845,
+          "p75": 140.9425,
+          "n": 100
+        },
+        "freightRatio": {
+          "p25": 0.189,
+          "median": 0.2956,
+          "p75": 0.4708,
+          "n": 100
+        },
+        "deliveryDays": {
+          "p25": 20.7419,
+          "median": 23.504,
+          "p75": 26.2235,
+          "n": 100
+        },
+        "photos": {
+          "p25": 1.281,
+          "median": 2.5294,
+          "p75": 3.5653,
+          "n": 100
+        },
+        "descriptionLength": {
+          "p25": 512.965,
+          "median": 779.5882,
+          "p75": 1186.8842,
+          "n": 100
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 104.9566,
+          "bottom": 261.877,
+          "lift": -0.5992
+        },
+        "freightRatio": {
+          "top": 0.4049,
+          "bottom": 0.3043,
+          "lift": 0.3308
+        },
+        "deliveryDays": {
+          "top": 22.6989,
+          "bottom": 26.6471,
+          "lift": -0.1482
+        },
+        "photos": {
+          "top": 2.6479,
+          "bottom": 2.9662,
+          "lift": -0.1073
+        },
+        "descriptionLength": {
+          "top": 1040.6017,
+          "bottom": 1145.4045,
+          "lift": -0.0915
+        }
+      }
+    },
+    "baby": {
+      "category": "baby",
+      "sellers": 64,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6347,
+      "outcomeBottom": 3.4833,
+      "percentiles": {
+        "price": {
+          "p25": 49.7175,
+          "median": 75.72,
+          "p75": 129.9925,
+          "n": 64
+        },
+        "freightRatio": {
+          "p25": 0.1782,
+          "median": 0.2614,
+          "p75": 0.3476,
+          "n": 64
+        },
+        "deliveryDays": {
+          "p25": 20.4497,
+          "median": 23.6123,
+          "p75": 26.6981,
+          "n": 64
+        },
+        "photos": {
+          "p25": 1.6141,
+          "median": 2.0871,
+          "p75": 3.4279,
+          "n": 64
+        },
+        "descriptionLength": {
+          "p25": 546.9553,
+          "median": 765.2917,
+          "p75": 1043.1154,
+          "n": 64
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 114.2147,
+          "bottom": 181.345,
+          "lift": -0.3702
+        },
+        "freightRatio": {
+          "top": 0.3108,
+          "bottom": 0.2693,
+          "lift": 0.1538
+        },
+        "deliveryDays": {
+          "top": 25.0182,
+          "bottom": 23.9013,
+          "lift": 0.0467
+        },
+        "photos": {
+          "top": 2.3419,
+          "bottom": 2.9376,
+          "lift": -0.2028
+        },
+        "descriptionLength": {
+          "top": 879.9269,
+          "bottom": 802.7179,
+          "lift": 0.0962
+        }
+      }
+    },
+    "bed_bath_table": {
+      "category": "bed_bath_table",
+      "sellers": 84,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.4797,
+      "outcomeBottom": 3.3881,
+      "percentiles": {
+        "price": {
+          "p25": 53.025,
+          "median": 69.9,
+          "p75": 104.475,
+          "n": 84
+        },
+        "freightRatio": {
+          "p25": 0.1994,
+          "median": 0.2617,
+          "p75": 0.3417,
+          "n": 84
+        },
+        "deliveryDays": {
+          "p25": 20.9853,
+          "median": 22.9332,
+          "p75": 25.3764,
+          "n": 84
+        },
+        "photos": {
+          "p25": 1.0041,
+          "median": 1.1534,
+          "p75": 1.7195,
+          "n": 84
+        },
+        "descriptionLength": {
+          "p25": 320.5055,
+          "median": 477.8154,
+          "p75": 701.2223,
+          "n": 84
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 131.9438,
+          "bottom": 109.8798,
+          "lift": 0.2008
+        },
+        "freightRatio": {
+          "top": 0.2999,
+          "bottom": 0.285,
+          "lift": 0.0523
+        },
+        "deliveryDays": {
+          "top": 21.9886,
+          "bottom": 25.3568,
+          "lift": -0.1328
+        },
+        "photos": {
+          "top": 2.0498,
+          "bottom": 1.2836,
+          "lift": 0.5969
+        },
+        "descriptionLength": {
+          "top": 677.9464,
+          "bottom": 524.5861,
+          "lift": 0.2923
+        }
+      }
+    },
+    "computers_accessories": {
+      "category": "computers_accessories",
+      "sellers": 98,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.5423,
+      "outcomeBottom": 3.3138,
+      "percentiles": {
+        "price": {
+          "p25": 46.1725,
+          "median": 81.395,
+          "p75": 139.9975,
+          "n": 98
+        },
+        "freightRatio": {
+          "p25": 0.1536,
+          "median": 0.2336,
+          "p75": 0.4029,
+          "n": 98
+        },
+        "deliveryDays": {
+          "p25": 21.77,
+          "median": 23.9073,
+          "p75": 26.3879,
+          "n": 98
+        },
+        "photos": {
+          "p25": 1,
+          "median": 1.8366,
+          "p75": 2.7033,
+          "n": 98
+        },
+        "descriptionLength": {
+          "p25": 475.4467,
+          "median": 719.7444,
+          "p75": 1142.5196,
+          "n": 98
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 123.9977,
+          "bottom": 87.9463,
+          "lift": 0.4099
+        },
+        "freightRatio": {
+          "top": 0.3102,
+          "bottom": 0.2853,
+          "lift": 0.087
+        },
+        "deliveryDays": {
+          "top": 23.1489,
+          "bottom": 25.5929,
+          "lift": -0.0955
+        },
+        "photos": {
+          "top": 2.401,
+          "bottom": 1.4385,
+          "lift": 0.6692
+        },
+        "descriptionLength": {
+          "top": 1055.0678,
+          "bottom": 646.2979,
+          "lift": 0.6325
+        }
+      }
+    },
+    "consoles_games": {
+      "category": "consoles_games",
+      "sellers": 21,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6131,
+      "outcomeBottom": 3.4772,
+      "percentiles": {
+        "price": {
+          "p25": 39,
+          "median": 69,
+          "p75": 90,
+          "n": 21
+        },
+        "freightRatio": {
+          "p25": 0.1501,
+          "median": 0.2367,
+          "p75": 0.4834,
+          "n": 21
+        },
+        "deliveryDays": {
+          "p25": 19.6722,
+          "median": 23.7216,
+          "p75": 26.2008,
+          "n": 21
+        },
+        "photos": {
+          "p25": 1.7391,
+          "median": 2.6061,
+          "p75": 2.9074,
+          "n": 21
+        },
+        "descriptionLength": {
+          "p25": 434,
+          "median": 716.2,
+          "p75": 915.75,
+          "n": 21
+        }
+      },
+      "levers": null
+    },
+    "construction_tools_construction": {
+      "category": "construction_tools_construction",
+      "sellers": 22,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6747,
+      "outcomeBottom": 3.4172,
+      "percentiles": {
+        "price": {
+          "p25": 45.2675,
+          "median": 94.825,
+          "p75": 123.8125,
+          "n": 22
+        },
+        "freightRatio": {
+          "p25": 0.1623,
+          "median": 0.2921,
+          "p75": 0.4057,
+          "n": 22
+        },
+        "deliveryDays": {
+          "p25": 17.1052,
+          "median": 20.8546,
+          "p75": 24.7869,
+          "n": 22
+        },
+        "photos": {
+          "p25": 1,
+          "median": 1.2318,
+          "p75": 2.6697,
+          "n": 22
+        },
+        "descriptionLength": {
+          "p25": 446.7693,
+          "median": 1003.8745,
+          "p75": 1308.1477,
+          "n": 22
+        }
+      },
+      "levers": null
+    },
+    "cool_stuff": {
+      "category": "cool_stuff",
+      "sellers": 65,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.5516,
+      "outcomeBottom": 3.4973,
+      "percentiles": {
+        "price": {
+          "p25": 49.9,
+          "median": 99.9,
+          "p75": 189.9,
+          "n": 65
+        },
+        "freightRatio": {
+          "p25": 0.1348,
+          "median": 0.2238,
+          "p75": 0.3067,
+          "n": 65
+        },
+        "deliveryDays": {
+          "p25": 20.2531,
+          "median": 23.5138,
+          "p75": 27.2067,
+          "n": 65
+        },
+        "photos": {
+          "p25": 1.4118,
+          "median": 2.1786,
+          "p75": 3.1176,
+          "n": 65
+        },
+        "descriptionLength": {
+          "p25": 554.8136,
+          "median": 783.9565,
+          "p75": 1038.2857,
+          "n": 65
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 151.9894,
+          "bottom": 131.0059,
+          "lift": 0.1602
+        },
+        "freightRatio": {
+          "top": 0.2864,
+          "bottom": 0.2838,
+          "lift": 0.0092
+        },
+        "deliveryDays": {
+          "top": 23.3128,
+          "bottom": 25.27,
+          "lift": -0.0775
+        },
+        "photos": {
+          "top": 2.0497,
+          "bottom": 3.1387,
+          "lift": -0.3469
+        },
+        "descriptionLength": {
+          "top": 762.8257,
+          "bottom": 1129.2271,
+          "lift": -0.3245
+        }
+      }
+    },
+    "electronics": {
+      "category": "electronics",
+      "sellers": 38,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.5907,
+      "outcomeBottom": 3.5454,
+      "percentiles": {
+        "price": {
+          "p25": 26.1,
+          "median": 50.5,
+          "p75": 114.4675,
+          "n": 38
+        },
+        "freightRatio": {
+          "p25": 0.2229,
+          "median": 0.3431,
+          "p75": 0.6279,
+          "n": 38
+        },
+        "deliveryDays": {
+          "p25": 21.6265,
+          "median": 23.595,
+          "p75": 25.2374,
+          "n": 38
+        },
+        "photos": {
+          "p25": 1.0875,
+          "median": 2,
+          "p75": 3.0188,
+          "n": 38
+        },
+        "descriptionLength": {
+          "p25": 501.1147,
+          "median": 692.8422,
+          "p75": 973.9313,
+          "n": 38
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 93.0433,
+          "bottom": 99.0233,
+          "lift": -0.0604
+        },
+        "freightRatio": {
+          "top": 0.3583,
+          "bottom": 0.3095,
+          "lift": 0.1577
+        },
+        "deliveryDays": {
+          "top": 22.5866,
+          "bottom": 24.2569,
+          "lift": -0.0689
+        },
+        "photos": {
+          "top": 2.1247,
+          "bottom": 2.4464,
+          "lift": -0.1315
+        },
+        "descriptionLength": {
+          "top": 854.8717,
+          "bottom": 924.5971,
+          "lift": -0.0754
+        }
+      }
+    },
+    "fashion_bags_accessories": {
+      "category": "fashion_bags_accessories",
+      "sellers": 33,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.617,
+      "outcomeBottom": 3.7189,
+      "percentiles": {
+        "price": {
+          "p25": 29.99,
+          "median": 49.9,
+          "p75": 96.8,
+          "n": 33
+        },
+        "freightRatio": {
+          "p25": 0.2099,
+          "median": 0.2636,
+          "p75": 0.4103,
+          "n": 33
+        },
+        "deliveryDays": {
+          "p25": 20.8845,
+          "median": 24.5512,
+          "p75": 27.427,
+          "n": 33
+        },
+        "photos": {
+          "p25": 1.5185,
+          "median": 3.2955,
+          "p75": 4.5263,
+          "n": 33
+        },
+        "descriptionLength": {
+          "p25": 234.8,
+          "median": 335.2143,
+          "p75": 591.2857,
+          "n": 33
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 56.1463,
+          "bottom": 102.6225,
+          "lift": -0.4529
+        },
+        "freightRatio": {
+          "top": 0.3896,
+          "bottom": 0.2896,
+          "lift": 0.3453
+        },
+        "deliveryDays": {
+          "top": 23.6748,
+          "bottom": 25.9975,
+          "lift": -0.0893
+        },
+        "photos": {
+          "top": 2.4876,
+          "bottom": 4.7646,
+          "lift": -0.4779
+        },
+        "descriptionLength": {
+          "top": 508.1739,
+          "bottom": 664.0109,
+          "lift": -0.2347
+        }
+      }
+    },
+    "furniture_decor": {
+      "category": "furniture_decor",
+      "sellers": 115,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.4945,
+      "outcomeBottom": 3.2904,
+      "percentiles": {
+        "price": {
+          "p25": 44.945,
+          "median": 63.5,
+          "p75": 100.95,
+          "n": 115
+        },
+        "freightRatio": {
+          "p25": 0.2347,
+          "median": 0.3097,
+          "p75": 0.4563,
+          "n": 115
+        },
+        "deliveryDays": {
+          "p25": 22.1221,
+          "median": 24.1809,
+          "p75": 26.9867,
+          "n": 115
+        },
+        "photos": {
+          "p25": 1.1438,
+          "median": 2.034,
+          "p75": 3.0663,
+          "n": 115
+        },
+        "descriptionLength": {
+          "p25": 399.9775,
+          "median": 651.2143,
+          "p75": 862.8101,
+          "n": 115
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 92.1786,
+          "bottom": 81.5409,
+          "lift": 0.1305
+        },
+        "freightRatio": {
+          "top": 0.3398,
+          "bottom": 0.476,
+          "lift": -0.2862
+        },
+        "deliveryDays": {
+          "top": 23.5742,
+          "bottom": 26.6109,
+          "lift": -0.1141
+        },
+        "photos": {
+          "top": 2.5744,
+          "bottom": 1.9156,
+          "lift": 0.3439
+        },
+        "descriptionLength": {
+          "top": 728.8414,
+          "bottom": 784.0372,
+          "lift": -0.0704
+        }
+      }
+    },
+    "garden_tools": {
+      "category": "garden_tools",
+      "sellers": 44,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6372,
+      "outcomeBottom": 3.2457,
+      "percentiles": {
+        "price": {
+          "p25": 50.6762,
+          "median": 82.7,
+          "p75": 150.75,
+          "n": 44
+        },
+        "freightRatio": {
+          "p25": 0.1872,
+          "median": 0.2506,
+          "p75": 0.4092,
+          "n": 44
+        },
+        "deliveryDays": {
+          "p25": 21.8631,
+          "median": 24.007,
+          "p75": 25.9908,
+          "n": 44
+        },
+        "photos": {
+          "p25": 1.3355,
+          "median": 2,
+          "p75": 3.1618,
+          "n": 44
+        },
+        "descriptionLength": {
+          "p25": 440.3995,
+          "median": 688.2868,
+          "p75": 986.0192,
+          "n": 44
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 130.7941,
+          "bottom": 118.9805,
+          "lift": 0.0993
+        },
+        "freightRatio": {
+          "top": 0.2835,
+          "bottom": 0.4394,
+          "lift": -0.3549
+        },
+        "deliveryDays": {
+          "top": 24.5814,
+          "bottom": 26.515,
+          "lift": -0.0729
+        },
+        "photos": {
+          "top": 2.6093,
+          "bottom": 1.9704,
+          "lift": 0.3243
+        },
+        "descriptionLength": {
+          "top": 699.2391,
+          "bottom": 1131.7992,
+          "lift": -0.3822
+        }
+      }
+    },
+    "health_beauty": {
+      "category": "health_beauty",
+      "sellers": 160,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6491,
+      "outcomeBottom": 3.6282,
+      "percentiles": {
+        "price": {
+          "p25": 45.03,
+          "median": 76.97,
+          "p75": 130.225,
+          "n": 160
+        },
+        "freightRatio": {
+          "p25": 0.159,
+          "median": 0.2442,
+          "p75": 0.3888,
+          "n": 160
+        },
+        "deliveryDays": {
+          "p25": 19.8486,
+          "median": 23.189,
+          "p75": 25.6475,
+          "n": 160
+        },
+        "photos": {
+          "p25": 1,
+          "median": 1.3657,
+          "p75": 2.1818,
+          "n": 160
+        },
+        "descriptionLength": {
+          "p25": 704.3238,
+          "median": 1037.5704,
+          "p75": 1446.7039,
+          "n": 160
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 99.9598,
+          "bottom": 109.4745,
+          "lift": -0.0869
+        },
+        "freightRatio": {
+          "top": 0.328,
+          "bottom": 0.3858,
+          "lift": -0.15
+        },
+        "deliveryDays": {
+          "top": 21.368,
+          "bottom": 25.0404,
+          "lift": -0.1467
+        },
+        "photos": {
+          "top": 1.7944,
+          "bottom": 1.9278,
+          "lift": -0.0692
+        },
+        "descriptionLength": {
+          "top": 1199.1258,
+          "bottom": 1215.2998,
+          "lift": -0.0133
+        }
+      }
+    },
+    "housewares": {
+      "category": "housewares",
+      "sellers": 143,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.596,
+      "outcomeBottom": 3.3959,
+      "percentiles": {
+        "price": {
+          "p25": 35.495,
+          "median": 58.99,
+          "p75": 117.73,
+          "n": 143
+        },
+        "freightRatio": {
+          "p25": 0.231,
+          "median": 0.3498,
+          "p75": 0.4792,
+          "n": 143
+        },
+        "deliveryDays": {
+          "p25": 19.8251,
+          "median": 22.2981,
+          "p75": 25.2495,
+          "n": 143
+        },
+        "photos": {
+          "p25": 1.2137,
+          "median": 2,
+          "p75": 2.9815,
+          "n": 143
+        },
+        "descriptionLength": {
+          "p25": 383.8091,
+          "median": 572.1818,
+          "p75": 880.4641,
+          "n": 143
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 91.7893,
+          "bottom": 68.3136,
+          "lift": 0.3436
+        },
+        "freightRatio": {
+          "top": 0.3615,
+          "bottom": 0.4463,
+          "lift": -0.1901
+        },
+        "deliveryDays": {
+          "top": 22.5885,
+          "bottom": 22.6311,
+          "lift": -0.0019
+        },
+        "photos": {
+          "top": 2.1775,
+          "bottom": 2.0993,
+          "lift": 0.0372
+        },
+        "descriptionLength": {
+          "top": 653.7413,
+          "bottom": 692.3615,
+          "lift": -0.0558
+        }
+      }
+    },
+    "luggage_accessories": {
+      "category": "luggage_accessories",
+      "sellers": 20,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6692,
+      "outcomeBottom": 3.8138,
+      "percentiles": {
+        "price": {
+          "p25": 77.2425,
+          "median": 129.945,
+          "p75": 203.925,
+          "n": 20
+        },
+        "freightRatio": {
+          "p25": 0.1593,
+          "median": 0.2425,
+          "p75": 0.3063,
+          "n": 20
+        },
+        "deliveryDays": {
+          "p25": 20.3519,
+          "median": 22.4703,
+          "p75": 24.5497,
+          "n": 20
+        },
+        "photos": {
+          "p25": 2.033,
+          "median": 2.6538,
+          "p75": 3.4491,
+          "n": 20
+        },
+        "descriptionLength": {
+          "p25": 431.9724,
+          "median": 604.2848,
+          "p75": 751.7841,
+          "n": 20
+        }
+      },
+      "levers": null
+    },
+    "perfumery": {
+      "category": "perfumery",
+      "sellers": 51,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6827,
+      "outcomeBottom": 3.2368,
+      "percentiles": {
+        "price": {
+          "p25": 37.4,
+          "median": 69,
+          "p75": 136.45,
+          "n": 51
+        },
+        "freightRatio": {
+          "p25": 0.1388,
+          "median": 0.2616,
+          "p75": 0.472,
+          "n": 51
+        },
+        "deliveryDays": {
+          "p25": 20.3537,
+          "median": 23.5413,
+          "p75": 27.2503,
+          "n": 51
+        },
+        "photos": {
+          "p25": 1.0232,
+          "median": 1.3889,
+          "p75": 2,
+          "n": 51
+        },
+        "descriptionLength": {
+          "p25": 437.6818,
+          "median": 609,
+          "p75": 830.525,
+          "n": 51
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 86.9017,
+          "bottom": 86.115,
+          "lift": 0.0091
+        },
+        "freightRatio": {
+          "top": 0.2914,
+          "bottom": 0.4839,
+          "lift": -0.3979
+        },
+        "deliveryDays": {
+          "top": 20.2637,
+          "bottom": 25.87,
+          "lift": -0.2167
+        },
+        "photos": {
+          "top": 1.6426,
+          "bottom": 1.8479,
+          "lift": -0.1111
+        },
+        "descriptionLength": {
+          "top": 905.2803,
+          "bottom": 548.7909,
+          "lift": 0.6496
+        }
+      }
+    },
+    "pet_shop": {
+      "category": "pet_shop",
+      "sellers": 46,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6909,
+      "outcomeBottom": 3.7005,
+      "percentiles": {
+        "price": {
+          "p25": 59.225,
+          "median": 95.09,
+          "p75": 126,
+          "n": 46
+        },
+        "freightRatio": {
+          "p25": 0.1422,
+          "median": 0.2436,
+          "p75": 0.3663,
+          "n": 46
+        },
+        "deliveryDays": {
+          "p25": 20.6952,
+          "median": 22.4109,
+          "p75": 26.9334,
+          "n": 46
+        },
+        "photos": {
+          "p25": 1.1681,
+          "median": 1.9688,
+          "p75": 2.8104,
+          "n": 46
+        },
+        "descriptionLength": {
+          "p25": 630.9215,
+          "median": 765.8494,
+          "p75": 1263.1375,
+          "n": 46
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 146.1605,
+          "bottom": 133.4091,
+          "lift": 0.0956
+        },
+        "freightRatio": {
+          "top": 0.2013,
+          "bottom": 0.2451,
+          "lift": -0.1787
+        },
+        "deliveryDays": {
+          "top": 22.201,
+          "bottom": 23.2118,
+          "lift": -0.0435
+        },
+        "photos": {
+          "top": 2.6898,
+          "bottom": 3.5709,
+          "lift": -0.2467
+        },
+        "descriptionLength": {
+          "top": 1322.7125,
+          "bottom": 945.0574,
+          "lift": 0.3996
+        }
+      }
+    },
+    "small_appliances": {
+      "category": "small_appliances",
+      "sellers": 24,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6913,
+      "outcomeBottom": 3.7623,
+      "percentiles": {
+        "price": {
+          "p25": 38.2775,
+          "median": 70.8975,
+          "p75": 329.25,
+          "n": 24
+        },
+        "freightRatio": {
+          "p25": 0.0897,
+          "median": 0.2266,
+          "p75": 0.3948,
+          "n": 24
+        },
+        "deliveryDays": {
+          "p25": 19.7395,
+          "median": 22.6733,
+          "p75": 25.196,
+          "n": 24
+        },
+        "photos": {
+          "p25": 1.3207,
+          "median": 2.2817,
+          "p75": 3.3438,
+          "n": 24
+        },
+        "descriptionLength": {
+          "p25": 626.75,
+          "median": 862.6429,
+          "p75": 1492.3056,
+          "n": 24
+        }
+      },
+      "levers": null
+    },
+    "sports_leisure": {
+      "category": "sports_leisure",
+      "sellers": 158,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.5604,
+      "outcomeBottom": 3.53,
+      "percentiles": {
+        "price": {
+          "p25": 43.05,
+          "median": 76.4075,
+          "p75": 119.975,
+          "n": 158
+        },
+        "freightRatio": {
+          "p25": 0.1727,
+          "median": 0.2637,
+          "p75": 0.3943,
+          "n": 158
+        },
+        "deliveryDays": {
+          "p25": 20.7919,
+          "median": 23.6579,
+          "p75": 26.235,
+          "n": 158
+        },
+        "photos": {
+          "p25": 1.0696,
+          "median": 1.8167,
+          "p75": 3.1223,
+          "n": 158
+        },
+        "descriptionLength": {
+          "p25": 530.7582,
+          "median": 795.0793,
+          "p75": 1141.1571,
+          "n": 158
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 91.5559,
+          "bottom": 112.2827,
+          "lift": -0.1846
+        },
+        "freightRatio": {
+          "top": 0.314,
+          "bottom": 0.3506,
+          "lift": -0.1044
+        },
+        "deliveryDays": {
+          "top": 23.4164,
+          "bottom": 24.886,
+          "lift": -0.0591
+        },
+        "photos": {
+          "top": 2.4375,
+          "bottom": 2.0949,
+          "lift": 0.1635
+        },
+        "descriptionLength": {
+          "top": 860.1465,
+          "bottom": 981.6791,
+          "lift": -0.1238
+        }
+      }
+    },
+    "stationery": {
+      "category": "stationery",
+      "sellers": 38,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.7633,
+      "outcomeBottom": 3.6471,
+      "percentiles": {
+        "price": {
+          "p25": 33.9675,
+          "median": 68.2,
+          "p75": 109.975,
+          "n": 38
+        },
+        "freightRatio": {
+          "p25": 0.174,
+          "median": 0.2766,
+          "p75": 0.4301,
+          "n": 38
+        },
+        "deliveryDays": {
+          "p25": 20.1485,
+          "median": 21.9984,
+          "p75": 25.1302,
+          "n": 38
+        },
+        "photos": {
+          "p25": 1.5462,
+          "median": 2.5407,
+          "p75": 3.9925,
+          "n": 38
+        },
+        "descriptionLength": {
+          "p25": 306.1623,
+          "median": 388.1469,
+          "p75": 563.4078,
+          "n": 38
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 130.9222,
+          "bottom": 109.5528,
+          "lift": 0.1951
+        },
+        "freightRatio": {
+          "top": 0.1758,
+          "bottom": 0.4029,
+          "lift": -0.5637
+        },
+        "deliveryDays": {
+          "top": 24.9325,
+          "bottom": 21.6401,
+          "lift": 0.1521
+        },
+        "photos": {
+          "top": 3.6438,
+          "bottom": 2.4767,
+          "lift": 0.4712
+        },
+        "descriptionLength": {
+          "top": 678.9086,
+          "bottom": 455.1724,
+          "lift": 0.4915
+        }
+      }
+    },
+    "telephony": {
+      "category": "telephony",
+      "sellers": 46,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.3338,
+      "outcomeBottom": 3.2008,
+      "percentiles": {
+        "price": {
+          "p25": 28.775,
+          "median": 40.995,
+          "p75": 106.975,
+          "n": 46
+        },
+        "freightRatio": {
+          "p25": 0.1461,
+          "median": 0.3706,
+          "p75": 0.5731,
+          "n": 46
+        },
+        "deliveryDays": {
+          "p25": 22.4566,
+          "median": 23.5534,
+          "p75": 26.4529,
+          "n": 46
+        },
+        "photos": {
+          "p25": 1.6052,
+          "median": 2.0781,
+          "p75": 2.6051,
+          "n": 46
+        },
+        "descriptionLength": {
+          "p25": 525.6336,
+          "median": 779.187,
+          "p75": 1195.55,
+          "n": 46
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 150.3336,
+          "bottom": 125.9891,
+          "lift": 0.1932
+        },
+        "freightRatio": {
+          "top": 0.3261,
+          "bottom": 0.3858,
+          "lift": -0.1548
+        },
+        "deliveryDays": {
+          "top": 23.783,
+          "bottom": 24.7149,
+          "lift": -0.0377
+        },
+        "photos": {
+          "top": 2.59,
+          "bottom": 2.4545,
+          "lift": 0.0552
+        },
+        "descriptionLength": {
+          "top": 949.9577,
+          "bottom": 678.5585,
+          "lift": 0.4
+        }
+      }
+    },
+    "toys": {
+      "category": "toys",
+      "sellers": 82,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.6176,
+      "outcomeBottom": 3.4248,
+      "percentiles": {
+        "price": {
+          "p25": 55.1725,
+          "median": 89.9,
+          "p75": 119.99,
+          "n": 82
+        },
+        "freightRatio": {
+          "p25": 0.1748,
+          "median": 0.237,
+          "p75": 0.3173,
+          "n": 82
+        },
+        "deliveryDays": {
+          "p25": 20.0755,
+          "median": 22.6454,
+          "p75": 25.0755,
+          "n": 82
+        },
+        "photos": {
+          "p25": 1.5705,
+          "median": 2.4055,
+          "p75": 3.3729,
+          "n": 82
+        },
+        "descriptionLength": {
+          "p25": 471.886,
+          "median": 624.4436,
+          "p75": 856.1386,
+          "n": 82
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 145.6145,
+          "bottom": 119.045,
+          "lift": 0.2232
+        },
+        "freightRatio": {
+          "top": 0.2935,
+          "bottom": 0.2623,
+          "lift": 0.1188
+        },
+        "deliveryDays": {
+          "top": 21.7714,
+          "bottom": 22.5977,
+          "lift": -0.0366
+        },
+        "photos": {
+          "top": 2.825,
+          "bottom": 2.539,
+          "lift": 0.1126
+        },
+        "descriptionLength": {
+          "top": 759.1274,
+          "bottom": 636.5926,
+          "lift": 0.1925
+        }
+      }
+    },
+    "watches_gifts": {
+      "category": "watches_gifts",
+      "sellers": 37,
+      "outcome": "reviewAvg",
+      "outcomeTop": 4.4633,
+      "outcomeBottom": 3.2282,
+      "percentiles": {
+        "price": {
+          "p25": 79,
+          "median": 155.97,
+          "p75": 219.54,
+          "n": 37
+        },
+        "freightRatio": {
+          "p25": 0.0773,
+          "median": 0.1111,
+          "p75": 0.2277,
+          "n": 37
+        },
+        "deliveryDays": {
+          "p25": 23.4252,
+          "median": 25.351,
+          "p75": 27.0734,
+          "n": 37
+        },
+        "photos": {
+          "p25": 1.5238,
+          "median": 1.8,
+          "p75": 2.8933,
+          "n": 37
+        },
+        "descriptionLength": {
+          "p25": 472.7,
+          "median": 551.0952,
+          "p75": 719.8333,
+          "n": 37
+        }
+      },
+      "levers": {
+        "price": {
+          "top": 140.9822,
+          "bottom": 252.7711,
+          "lift": -0.4423
+        },
+        "freightRatio": {
+          "top": 0.1876,
+          "bottom": 0.1587,
+          "lift": 0.1825
+        },
+        "deliveryDays": {
+          "top": 26.2125,
+          "bottom": 27.2375,
+          "lift": -0.0376
+        },
+        "photos": {
+          "top": 2.2203,
+          "bottom": 2.7144,
+          "lift": -0.182
+        },
+        "descriptionLength": {
+          "top": 671.7046,
+          "bottom": 654.5739,
+          "lift": 0.0262
+        }
+      }
+    }
+  }
+}

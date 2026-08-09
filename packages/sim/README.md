@@ -22,12 +22,20 @@ Same seed, same output, on any machine. `Math.random()`, `Date.now()` and argles
 
 **Two committed fixtures** for building against fixed data — the exact campaigns the demo runs on:
 
-| File | Fault | Shape |
-|---|---|---|
-| `fixtures/demo-case1.json` | `thin_pdp` | a **condition** — present from day one, only a benchmark catches it |
-| `fixtures/demo-case2.json` | `eta_shock` | a **break** — starts mid-flight, the campaign's own history catches it |
+| File | Seed | Fault | Shape |
+|---|---|---|---|
+| `fixtures/demo-case1.json` | 830176 | `thin_pdp` | **pre-flight** — a condition present from day one, in `housewares` |
+| `fixtures/demo-case2.json` | 820001 | `eta_shock` | **in-flight** — a sudden break in `watches_gifts`, detected under *both* reference arms |
 
-One of each, because they exercise the two `ReferenceMode` arms.
+`pnpm sim:fixtures` asserts what each one has to do and exits non-zero otherwise —
+the exact expected values are in [`docs/demo-contract.md`](../../docs/demo-contract.md).
+The previous pair both diagnosed as healthy and a frontend was built against them
+for hours before anyone noticed, which is why the assertions exist.
+
+**`thin_pdp` is marginal at −1.02σ against a −1.0σ threshold, and `price_too_high`
+is not supportable at all** — zero seeds in 900 meet the pre-flight contract. Those
+are the only two day-one conditions, so Case 1 is `thin_pdp` or there is none. The
+threshold was not lowered to accommodate either.
 
 ## Scripts
 

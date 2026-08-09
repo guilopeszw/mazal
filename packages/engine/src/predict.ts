@@ -83,25 +83,57 @@ export function predict(input: PredictInput): Verdict {
     FACTORS.map((f) => [f, total ? shrink(m[f], OBSERVE[f](total), days) : m[f]]),
   ) as Record<Factor, Quantiles>;
 
-  const roasAt = (q: Quantile): number => {
-    // cpc is not a benchmark column; it is cpm / (1000 × ctr) by definition, so
-    // the pessimistic case pairs an expensive thousand impressions with a poor CTR.
-    const worse = q === 'p25' ? 'p75' : q === 'p75' ? 'p25' : 'median';
-    const clickRate = factors.ctr[q];
-    // cpm is not shrunk: it is priced by the auction, not by this seller's page.
-    const cpc = clickRate <= 0 ? Infinity : m.cpm[worse] / (1000 * clickRate);
-    if (!Number.isFinite(cpc) || cpc === 0) return 0;
+  /**
+   * ROAS at the median of every factor. The centre is unambiguous — a product of
+   * medians is the median of the product for factors this well behaved.
+   */
+  const centre = (() => {
+    const clickRate = factors.ctr.median;
+    if (clickRate <= 0) return 0;
+    const cpc = m.cpm.median / (1000 * clickRate);
+    return cpc === 0 ? 0 : Math.max((factors.cvr.median * factors.aov.median) / cpc, 0);
+  })();
 
-    // A-engine.md writes ROAS = (ctr x atcRate x icRate x cvr x aov) / cpc, but
-    // the contract defines cvr as purchases/clicks, which already contains
-    // atcRate and icRate — multiplying all three double-counts the funnel and
-    // drives the band to roughly a thousandth of the truth. Revenue per click is
-    // cvr x aov, and cpc already carries ctr. The other two stay as named
-    // factors below, because they are still things a seller can move.
-    return Math.max((factors.cvr[q] * factors.aov[q]) / cpc, 0);
+  /**
+   * The band is built in log space, and this is a correction rather than a
+   * refinement.
+   *
+   * Evaluating every factor at p75 at once and calling the result p90 is what
+   * the three-point method literally says, and it is wrong: the quantile of a
+   * product is not the product of the quantiles. Five factors each at their own
+   * p75 is a joint event of roughly one in a thousand, not one in ten. It put a
+   * p90 of 23x ROAS on the screen, which is the kind of number that loses a room
+   * — and the frontend was right to refuse to render it.
+   *
+   * Independent factors add in log-variance, not in log-spread, so the honest
+   * width is the root of the sum of squares of each factor's own log spread.
+   */
+  const logSpread = (q: Quantiles): number => {
+    if (q.median <= 0 || q.p75 <= 0 || q.p25 <= 0) return 0;
+    // 1.349, the same constant `spread()` uses on the funnel side: p25 and p75
+    // sit 1.349 sigma apart, not 2. Halving the interquartile range gives
+    // 0.6745 sigma, and treating that as sigma made a band labelled p10-p90
+    // about a p19-p81 — narrower than it claims, which is the same kind of
+    // error as the p99 it replaced, in the other direction.
+    return (Math.log(q.p75) - Math.log(q.p25)) / 1.349;
   };
 
-  const predictedRoas = { p10: roasAt('p25'), p50: roasAt('median'), p90: roasAt('p75') };
+  const spreads = [
+    logSpread(factors.cvr),
+    logSpread(factors.aov),
+    logSpread(factors.ctr),   // enters through cpc
+    logSpread(m.cpm),         // enters through cpc
+  ];
+  const width = Math.sqrt(spreads.reduce((sum, x) => sum + x * x, 0));
+
+  // 1.2816 sigma is the 90th percentile of a standard normal.
+  const Z = 1.2816;
+  const predictedRoas = {
+    p10: Math.max(centre * Math.exp(-Z * width), 0),
+    p50: centre,
+    p90: centre * Math.exp(Z * width),
+  };
+
 
   /**
    * The factor dragging the band down — claim 8 wants it named on every verdict,

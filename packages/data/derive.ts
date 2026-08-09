@@ -15,9 +15,25 @@ const OUT_JSON = join(import.meta.dirname, 'benchmarks.json');
 // The union is generated into `packages/contracts`, not here: every package imports the
 // contract, so the contract has to stay the leaf. Generated file, never hand-edited.
 const OUT_CATEGORIES = resolve(import.meta.dirname, '../contracts/src/categories.ts');
+const OUT_SELLERS = join(import.meta.dirname, 'seller-benchmarks.json');
 
 /** Categories below this many orders have quartiles too noisy to show a seller. */
 const MIN_ORDERS = 30;
+
+/**
+ * Peer gates. A "seller" here is a seller within one category, because the same
+ * shop sells brooms and headphones and is a different competitor in each.
+ *
+ * Two gates because there are two questions. Placing a card against the
+ * distribution needs enough sellers to have percentiles; saying what the top
+ * quartile does differently needs enough to have quartiles. A category short of
+ * either gets nothing for that question and says so — the same discipline as
+ * `n: 0` on the media priors.
+ */
+const MIN_SELLER_SALES = 10;
+const MIN_SELLER_REVIEWS = 5;
+const MIN_SELLERS_FOR_PERCENTILES = 20;
+const MIN_SELLERS_FOR_LEVERS = 30;
 
 type Distribution = {
   median: number;
@@ -116,7 +132,15 @@ for (const entry of existsSync(RAW) ? readdirSync(RAW, { withFileTypes: true }) 
   }
 }
 
+const csvCache = new Map<string, Record<string, string>[]>();
+
 function readCsv(name: string): Record<string, string>[] {
+  // Memoised: the seller pass needs products and the translation table that the
+  // category pass already parsed, and re-reading 33,000 rows to get them back is
+  // pure waste in a script that is slow enough by hand.
+  const cached = csvCache.get(name);
+  if (cached) return cached;
+
   const path = rawFiles.get(name);
   if (!path) {
     throw new Error(
@@ -127,6 +151,7 @@ function readCsv(name: string): Record<string, string>[] {
   }
   const rows = parseCsv(readFileSync(path, 'utf8'));
   console.log(`  ${name.padEnd(44)} ${rows.length.toLocaleString('en-US').padStart(9)} rows`);
+  csvCache.set(name, rows);
   return rows;
 }
 
@@ -140,6 +165,11 @@ function quantile(sorted: number[], q: number): number {
   const a = sorted[lo] ?? 0;
   const b = sorted[hi] ?? a;
   return a + (b - a) * (pos - lo);
+}
+
+/** Median of an unsorted array. */
+function median(values: number[]): number {
+  return quantile([...values].filter(Number.isFinite).sort((a, b) => a - b), 0.5);
 }
 
 export function distribution(values: number[], source: Distribution['source']): Distribution {
@@ -167,6 +197,175 @@ function push(map: Map<string, number[]>, key: string, value: number): void {
 }
 
 // ---------------------------------------------------------------- derive
+
+/**
+ * Per-seller statistics, so a card can be placed against the sellers it competes
+ * with rather than against the average order.
+ *
+ * The outcome is mean review score. It is the only quality signal Olist carries
+ * per seller, and it is a proxy — nobody has competitors' campaign numbers, and
+ * no product that claims to is telling the truth. Order volume was considered
+ * and rejected: top-reviewed sellers have *fewer* orders in every category
+ * measured, so ranking on volume would invert the question.
+ *
+ * A seller is scoped to one category. The same shop sells brooms and headphones
+ * and is a different competitor in each.
+ */
+function deriveSellers(): void {
+  const product = new Map<string, { category: string; photos: number; description: number }>();
+  const translation = new Map(
+    readCsv('product_category_name_translation.csv').map((r) => [
+      r['product_category_name'] ?? '',
+      r['product_category_name_english'] ?? '',
+    ]),
+  );
+  for (const p of readCsv('olist_products_dataset.csv')) {
+    const category = translation.get(p['product_category_name'] ?? '');
+    const id = p['product_id'];
+    if (!category || !id) continue;
+    product.set(id, {
+      category,
+      photos: num(p['product_photos_qty']),
+      description: num(p['product_description_lenght']),
+    });
+  }
+
+  const reviewOf = new Map<string, number>();
+  for (const r of readCsv('olist_order_reviews_dataset.csv')) {
+    const score = num(r['review_score']);
+    if (r['order_id'] && Number.isFinite(score)) reviewOf.set(r['order_id'], score);
+  }
+
+  const etaOf = new Map<string, number>();
+  for (const o of readCsv('olist_orders_dataset.csv')) {
+    const purchased = Date.parse(o['order_purchase_timestamp'] ?? '');
+    const estimated = Date.parse(o['order_estimated_delivery_date'] ?? '');
+    if (o['order_id'] && Number.isFinite(purchased) && Number.isFinite(estimated)) {
+      etaOf.set(o['order_id'], (estimated - purchased) / 86_400_000);
+    }
+  }
+
+  type Acc = Record<'price' | 'freightRatio' | 'deliveryDays' | 'photos' | 'descriptionLength' | 'reviewAvg', number[]>;
+  const empty = (): Acc =>
+    ({ price: [], freightRatio: [], deliveryDays: [], photos: [], descriptionLength: [], reviewAvg: [] });
+  const sellers = new Map<string, Acc>();
+
+  for (const item of readCsv('olist_order_items_dataset.csv')) {
+    const p = product.get(item['product_id'] ?? '');
+    const sellerId = item['seller_id'];
+    const orderId = item['order_id'] ?? '';
+    const price = num(item['price']);
+    if (!p || !sellerId || !Number.isFinite(price)) continue;
+
+    const key = `${p.category}|${sellerId}`;
+    let acc = sellers.get(key);
+    if (!acc) { acc = empty(); sellers.set(key, acc); }
+
+    acc.price.push(price);
+    if (price > 0) acc.freightRatio.push(num(item['freight_value']) / price);
+    if (Number.isFinite(p.photos)) acc.photos.push(p.photos);
+    if (Number.isFinite(p.description)) acc.descriptionLength.push(p.description);
+    const eta = etaOf.get(orderId);
+    if (eta !== undefined) acc.deliveryDays.push(eta);
+    const review = reviewOf.get(orderId);
+    if (review !== undefined) acc.reviewAvg.push(review);
+  }
+
+  const LEVERS = ['price', 'freightRatio', 'deliveryDays', 'photos', 'descriptionLength'] as const;
+  const mean = (xs: number[]) => (xs.length === 0 ? NaN : xs.reduce((a, b) => a + b, 0) / xs.length);
+  const round = (x: number) => Math.round(x * 1e4) / 1e4;
+
+  /** One row per qualifying seller: their levers, and the outcome they achieved. */
+  const byCategory = new Map<string, { levers: Record<string, number>; outcome: number }[]>();
+  for (const [key, acc] of sellers) {
+    if (acc.price.length < MIN_SELLER_SALES || acc.reviewAvg.length < MIN_SELLER_REVIEWS) continue;
+    const category = key.slice(0, key.indexOf('|'));
+    const row = {
+      levers: Object.fromEntries(LEVERS.map((l) => [l, l === 'price' ? median(acc[l]) : mean(acc[l])])),
+      outcome: mean(acc.reviewAvg),
+    };
+    const list = byCategory.get(category);
+    if (list) list.push(row);
+    else byCategory.set(category, [row]);
+  }
+
+  const table: Record<string, unknown> = {};
+  for (const [category, rows] of [...byCategory.entries()].sort()) {
+    if (rows.length < MIN_SELLERS_FOR_PERCENTILES) continue;
+
+    const percentiles = Object.fromEntries(LEVERS.map((l) => {
+      const values = rows.map((r) => r.levers[l]!).filter(Number.isFinite).sort((a, b) => a - b);
+      return [l, {
+        p25: round(quantile(values, 0.25)),
+        median: round(quantile(values, 0.5)),
+        p75: round(quantile(values, 0.75)),
+        n: values.length,
+      }];
+    }));
+
+    // Quartiles by outcome, best first. Sorted once and read three times.
+    const ranked = [...rows].sort((a, b) => b.outcome - a.outcome);
+    const q = Math.max(Math.floor(ranked.length / 4), 1);
+    const top = ranked.slice(0, q);
+    const bottom = ranked.slice(-q);
+
+    // Levers only where a quartile is more than four shops.
+    let levers = null;
+    if (rows.length >= MIN_SELLERS_FOR_LEVERS) {
+      levers = Object.fromEntries(LEVERS.map((l) => {
+        const t = mean(top.map((r) => r.levers[l]!).filter(Number.isFinite));
+        const b = mean(bottom.map((r) => r.levers[l]!).filter(Number.isFinite));
+        return [l, { top: round(t), bottom: round(b), lift: b === 0 ? 0 : round((t - b) / Math.abs(b)) }];
+      }));
+    }
+
+    table[category] = {
+      category,
+      sellers: rows.length,
+      outcome: 'reviewAvg',
+      outcomeTop: round(mean(top.map((r) => r.outcome))),
+      outcomeBottom: round(mean(bottom.map((r) => r.outcome))),
+      percentiles,
+      levers,
+    };
+  }
+
+  /**
+   * How often each lever points the same way across every category that has
+   * quartile data — computed here rather than written into the engine by hand.
+   *
+   * A hand-kept table of facts about the data becomes a lie the first time the
+   * data is re-derived, and nothing would catch it. This is the same reason the
+   * slide-6 numbers are checked against the file that produced them.
+   */
+  const withLeverData = Object.values(table)
+    .map((c) => (c as { levers: Record<string, { lift: number }> | null }).levers)
+    .filter((l): l is Record<string, { lift: number }> => l !== null);
+
+  const replication = Object.fromEntries(LEVERS.map((l) => {
+    const lifts = withLeverData.map((x) => x[l]!.lift).filter(Number.isFinite);
+    const negative = lifts.filter((x) => x < 0).length;
+    const agreeing = Math.max(negative, lifts.length - negative);
+    const rate = lifts.length === 0 ? 0 : agreeing / lifts.length;
+    return [l, {
+      categories: lifts.length,
+      agreeing,
+      // Two thirds is the line: below it the lever is closer to a coin flip than
+      // to a finding, and a percentile on it must not be quoted as predictive.
+      evidence: rate >= 0.667 ? 'replicates' : 'inconsistent',
+      medianLift: round(median(lifts)),
+    }];
+  }));
+
+  writeFileSync(OUT_SELLERS, `${JSON.stringify({ replication, categories: table }, null, 2)}\n`);
+
+  const withLevers = Object.values(table).filter((c) => (c as { levers: unknown }).levers !== null).length;
+  console.log(
+    `\n${Object.keys(table).length} categories with >=${MIN_SELLERS_FOR_PERCENTILES} qualifying sellers ` +
+      `(>=${MIN_SELLER_SALES} sales, >=${MIN_SELLER_REVIEWS} reviews each), ` +
+      `${withLevers} of them with >=${MIN_SELLERS_FOR_LEVERS} for quartile comparison.\n  ${OUT_SELLERS}`,
+  );
+}
 
 function main(): void {
   console.log(`Reading ${RAW}`);
@@ -301,6 +500,8 @@ function main(): void {
       },
     };
   }
+
+  deriveSellers();
 
   writeFileSync(OUT_JSON, `${JSON.stringify(table, null, 2)}\n`);
   // A runtime array, with the union derived from it — not a bare `type`. The union alone
