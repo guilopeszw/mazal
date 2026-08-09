@@ -74,21 +74,25 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: "Invalid request body" }, 400);
   }
 
-  let sessionId = sessionIdFromCookieHeader(request.headers.get("cookie"));
+  let sessionId: string;
   let setCookie: string | undefined;
-  if (!sessionId) {
-    try {
+  let continuation: { providerThreadId?: string } | null;
+  try {
+    const existingSessionId = sessionIdFromCookieHeader(request.headers.get("cookie"));
+    if (existingSessionId) {
+      sessionId = existingSessionId;
+    } else {
       const session = createChatSession();
       sessionId = session.id;
       setCookie = session.setCookie;
-    } catch {
-      return json({ error: "Service unavailable" }, 503);
     }
-  }
 
-  const continuation = chatRequest.conversationId
-    ? verifyConversationId(chatRequest.conversationId, sessionId)
-    : {};
+    continuation = chatRequest.conversationId
+      ? verifyConversationId(chatRequest.conversationId, sessionId)
+      : {};
+  } catch {
+    return json({ error: "Service unavailable" }, 503);
+  }
   if (!continuation) return json({ error: "Invalid request body" }, 400);
 
   const mode = narrationMode();

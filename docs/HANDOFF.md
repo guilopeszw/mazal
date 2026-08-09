@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 17:29 BRT · Codex · web chat API Task 4 fix round 1
+
+**Done:** Closed the missing configuration-error boundary in `POST /api/chat`: a request with an existing signed cookie now returns generic `503` when `MAZAL_CHAT_SESSION_SECRET` is absent or too short, instead of rejecting before a response. The same boundary covers cookie/session creation and conversation-handle HMAC verification; invalid handles still return `400`. Task 4 is 27/27, the full chat API suite is 46/46, and web typecheck/diff check are green. Commit follows this handoff entry.
+
+**Next:** Add the server-only Deco provider in its own task; pass any provider-created thread id only into `issueConversationId`, never into browser input.
+
+**Blocked / watch out:** `MAZAL_CHAT_SESSION_SECRET` must be deployed as a high-entropy value of at least 32 bytes. Cache and rate limiting remain process-local, bounded best-effort controls by design.
+
+---
+
 ## 2026-08-09 17:22 BRT · Codex · web chat API Task 4
 
 **Done:** Replaced the provisional opaque chat id with HMAC-signed session cookies and signed, expiring conversation envelopes bound to the cookie session. The route rejects external, altered, expired, and cross-session handles; provider thread ids can only emerge after server-side verification. Added a 100-entry canonical rendered-content cache (fixture/template only), with response handles reconstructed per caller, plus a bounded rolling live limiter that returns the exact `429 { error: "RATE_LIMITED" }` and never falls back. The focused chat API suite is 25/25; web typecheck and diff check are green. Commit follows this handoff entry.

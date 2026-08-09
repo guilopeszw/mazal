@@ -122,6 +122,23 @@ test("continues only a handle verified against the caller's signed session", asy
   expect(second.headers.get("set-cookie")).toBeNull();
 });
 
+test.each([
+  ["is removed", undefined],
+  ["is too short", "short"],
+] as const)("fails closed when the session secret %s while verifying an existing cookie", async (_label, secret) => {
+  const body = JSON.stringify({ scenarioKey: "case2", userMessage: "Onde está o problema?" });
+  const issued = await POST(requestFor(body));
+  const cookie = cookieHeader(issued);
+
+  if (secret === undefined) delete process.env["MAZAL_CHAT_SESSION_SECRET"];
+  else process.env["MAZAL_CHAT_SESSION_SECRET"] = secret;
+  const response = await POST(requestFor(body, { cookie })).catch(() => null);
+
+  expect(response).not.toBeNull();
+  expect(response!.status).toBe(503);
+  await expect(responseBody(response!)).resolves.toEqual({ error: "Service unavailable" });
+});
+
 test("rejects a handle signed for another session", async () => {
   const body = JSON.stringify({ scenarioKey: "case2", userMessage: "Onde está o problema?" });
   const first = await POST(requestFor(body));
