@@ -111,15 +111,20 @@ export type Action = {
 /**
  * The operations Mazal is willing to perform, and deliberately no more.
  *
- * Every one is reversible and none of them spends money that was not already
- * budgeted: pausing stops spend, a bid or budget change moves a number the
- * seller already set. There is no "create campaign", no "raise budget without a
- * ceiling", and no creative edit — those are decisions, not repairs, and the
- * seller makes decisions.
+ * **Every one of these can only ever reduce spend.** Pausing stops it, a
+ * frequency cap slows delivery, and a budget change is decrease-only — the
+ * multiplier is at most 1. That is the guarantee, and it is structural rather
+ * than procedural: there is no operation in this union that could spend a
+ * seller's money, so no bug, no crafted request and no confused agent can.
+ *
+ * Raising a budget is not a repair, it is a decision to spend more, and the
+ * seller makes those. It stays in the plan as advice with `actor: 'seller'`.
+ * There is no create-campaign and no creative edit for the same reason.
  */
 export type ExecutableOp =
   | { op: 'pause_campaign' }
-  | { op: 'set_daily_budget'; multiplier: number }
+  /** `multiplier` is in (0, 1]. Values above 1 are rejected, not clamped. */
+  | { op: 'reduce_daily_budget'; multiplier: number }
   | { op: 'set_frequency_cap'; perWeek: number };
 
 /** The pre-flight answer. */

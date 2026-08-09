@@ -51,7 +51,12 @@ const PLAYBOOK: Record<FaultKind, Template[]> = {
     { title: 'Pause spend until tracking is confirmed', change: 'Set the campaign to paused', confidence: 'high', reversible: true, actor: 'mazal', execution: { op: 'pause_campaign' } },
   ],
   budget_cap: [
-    { title: 'Raise the bid or accept lower volume', change: 'Increase the daily budget by 20%, or hold it and expect fewer impressions', confidence: 'medium', reversible: true, actor: 'mazal', execution: { op: 'set_daily_budget', multiplier: 1.2 } },
+    /**
+     * The seller's, not Mazal's. Raising a budget is a decision to spend more
+     * money, and Mazal performs no operation that can increase spend — see
+     * ExecutableOp. It is advice here, with no Run control beside it.
+     */
+    { title: 'Raise the budget, or accept lower volume', change: 'Increase the daily budget, or hold it and expect fewer impressions', confidence: 'medium', reversible: true, actor: 'seller' },
   ],
   thin_pdp: [
     { title: 'Add product photos', change: 'Bring the product page to at least six images, including one in use', confidence: 'medium', reversible: true, actor: 'seller' },

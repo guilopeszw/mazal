@@ -92,14 +92,21 @@ export async function execute(op: ExecutableOp): Promise<ExecutionResult> {
       return { mode: "live", target: campaign, ok: r.ok, detail: `Campaign set to PAUSED — ${r.detail}` };
     }
 
-    case "set_daily_budget": {
+    case "reduce_daily_budget": {
       /**
-       * Clamped here *as well as* at the route boundary. The route validates
-       * what arrives over HTTP; this guards every other caller, including a
-       * future one that does not go through it. A ceiling enforced in one layer
-       * is a ceiling that moves the first time someone calls the other.
+       * Rejected, not clamped, if it is not a reduction.
+       *
+       * Clamping a bad multiplier to 1.0 would silently turn "spend 3x more"
+       * into "change nothing" and report success. Refusing says what happened.
+       * Checked here as well as at the route boundary: the route validates what
+       * arrives over HTTP, this guards every other caller, and a ceiling
+       * enforced in one layer is a ceiling that moves the first time someone
+       * calls the other.
        */
-      const factor = Math.min(Math.max(op.multiplier, 0.5), 1.5);
+      if (!(op.multiplier > 0 && op.multiplier <= 1)) {
+        return { mode: "live", target: campaign, ok: false, detail: "refused: Mazal only ever reduces a budget" };
+      }
+      const factor = Math.max(op.multiplier, 0.25);
       const current = Number(process.env["META_DAILY_BUDGET_CENTS"] ?? "0");
       if (!Number.isFinite(current) || current <= 0) {
         return { mode: "live", target: campaign, ok: false, detail: "no current daily budget to scale from" };

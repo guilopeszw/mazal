@@ -27,9 +27,12 @@ const log: { at: string; receipt: string; actions: Action[]; mode: string }[] = 
  */
 const executableOp = z.discriminatedUnion("op", [
   z.object({ op: z.literal("pause_campaign") }),
-  // Bounded here as well as in the client. A ceiling that exists in one layer
-  // is a ceiling that moves the first time someone calls the other one.
-  z.object({ op: z.literal("set_daily_budget"), multiplier: z.number().min(0.5).max(1.5) }),
+  /**
+   * Decrease-only, and bounded here as well as in the client. There is no
+   * multiplier above 1 that this endpoint will accept, so no request reaching
+   * it can raise a seller's spend.
+   */
+  z.object({ op: z.literal("reduce_daily_budget"), multiplier: z.number().gt(0).max(1) }),
   z.object({ op: z.literal("set_frequency_cap"), perWeek: z.number().int().min(1).max(14) }),
 ]);
 

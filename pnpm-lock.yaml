@@ -86,6 +86,10 @@ importers:
       '@mazal/data':
         specifier: workspace:*
         version: link:../data
+    devDependencies:
+      '@mazal/sim':
+        specifier: workspace:*
+        version: link:../sim
 
   packages/ingest:
     dependencies:
