@@ -36,9 +36,68 @@ export type ExecutionResult = {
   target?: string;
   detail: string;
   ok: boolean;
+  /**
+   * What this changed, and what it was before.
+   *
+   * Every action in the playbook claims `reversible: true`. Until this existed
+   * that was an assertion nobody could act on — a seller who paused a campaign
+   * had no way back. The prior value is read before the write, so undo restores
+   * what was actually there rather than what we assumed.
+   */
+  undo?: { target: string; field: string; previous: string; label: string };
 };
 
+/** Read a field before overwriting it, so there is something to go back to. */
+async function readField(objectId: string, field: string): Promise<string | null> {
+  const token = process.env["META_ACCESS_TOKEN"]!;
+  try {
+    const res = await fetch(
+      `${GRAPH}/${encodeURIComponent(objectId)}?fields=${encodeURIComponent(field)}&access_token=${encodeURIComponent(token)}`,
+      { signal: AbortSignal.timeout(TIMEOUT_MS) },
+    );
+    if (!res.ok) return null;
+    const payload = (await res.json()) as Record<string, unknown>;
+    const value = payload[field];
+    return value === undefined || value === null ? null : String(value);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Put back exactly what was there.
+ *
+ * Refuses anything it did not itself record, so this cannot be used as a
+ * general write channel — an undo that accepts arbitrary field/value pairs is
+ * the unrestricted API we spent the last hour removing.
+ */
+export async function undo(u: NonNullable<ExecutionResult["undo"]>): Promise<ExecutionResult> {
+  if (!executeConfigured()) {
+    return { mode: "simulated", ok: true, detail: "nothing was changed, so there is nothing to undo" };
+  }
+  if (!ALLOWED_UNDO_FIELDS.has(u.field)) {
+    return { mode: "live", ok: false, detail: `refused: ${u.field} is not a field Mazal restores` };
+  }
+
+  const r = await post(u.target, { [u.field]: u.previous });
+  return { mode: "live", target: u.target, ok: r.ok, detail: `${u.label} — ${r.detail}` };
+}
+
+/** Only the three fields the three operations touch. Nothing else is restorable. */
+const ALLOWED_UNDO_FIELDS = new Set(["status", "daily_budget", "frequency_control_specs"]);
+
+/**
+ * One environment variable that stops every write, everywhere, without a
+ * redeploy or a code change.
+ *
+ * If something goes wrong while a real account is connected — mid-demo, or
+ * worse, mid-seller — the answer cannot be "push a fix". Setting
+ * MAZAL_EXECUTE_DISABLED returns the whole product to the simulated path it
+ * ships in by default, and the screen says so because it reads the mode from
+ * the response.
+ */
 export function executeConfigured(): boolean {
+  if (process.env["MAZAL_EXECUTE_DISABLED"]) return false;
   return Boolean(process.env["META_ACCESS_TOKEN"] && process.env["META_CAMPAIGN_ID"]);
 }
 
@@ -88,8 +147,13 @@ export async function execute(op: ExecutableOp): Promise<ExecutionResult> {
 
   switch (op.op) {
     case "pause_campaign": {
+      const previous = (await readField(campaign, "status")) ?? "ACTIVE";
       const r = await post(campaign, { status: "PAUSED" });
-      return { mode: "live", target: campaign, ok: r.ok, detail: `Campaign set to PAUSED — ${r.detail}` };
+      return {
+        mode: "live", target: campaign, ok: r.ok,
+        detail: `Campaign set to PAUSED — ${r.detail}`,
+        ...(r.ok ? { undo: { target: campaign, field: "status", previous, label: `Campaign set back to ${previous}` } } : {}),
+      };
     }
 
     case "reduce_daily_budget": {
@@ -113,7 +177,11 @@ export async function execute(op: ExecutableOp): Promise<ExecutionResult> {
       }
       const next = Math.round(current * factor);
       const r = await post(campaign, { daily_budget: String(next) });
-      return { mode: "live", target: campaign, ok: r.ok, detail: `Daily budget ${current} → ${next} cents — ${r.detail}` };
+      return {
+        mode: "live", target: campaign, ok: r.ok,
+        detail: `Daily budget ${current} → ${next} cents — ${r.detail}`,
+        ...(r.ok ? { undo: { target: campaign, field: "daily_budget", previous: String(current), label: `Daily budget back to ${current} cents` } } : {}),
+      };
     }
 
     case "set_frequency_cap": {
@@ -122,10 +190,15 @@ export async function execute(op: ExecutableOp): Promise<ExecutionResult> {
       if (!adSet) {
         return { mode: "live", ok: false, detail: "frequency caps need META_ADSET_ID — not set" };
       }
+      const previous = (await readField(adSet, "frequency_control_specs")) ?? "[]";
       const r = await post(adSet, {
         frequency_control_specs: JSON.stringify([{ event: "IMPRESSIONS", interval_days: 7, max_frequency: op.perWeek }]),
       });
-      return { mode: "live", target: adSet, ok: r.ok, detail: `Frequency capped at ${op.perWeek}/week — ${r.detail}` };
+      return {
+        mode: "live", target: adSet, ok: r.ok,
+        detail: `Frequency capped at ${op.perWeek}/week — ${r.detail}`,
+        ...(r.ok ? { undo: { target: adSet, field: "frequency_control_specs", previous, label: "Frequency cap removed" } } : {}),
+      };
     }
   }
 }

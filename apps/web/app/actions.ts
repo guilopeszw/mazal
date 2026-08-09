@@ -11,7 +11,7 @@ import {
 import { benchmarks } from "@mazal/data";
 import { parseMetaCsv, productCardSchema } from "@mazal/ingest";
 import { buildUploadAnswer, type Answer } from "@/lib/answers";
-import { execute } from "@/lib/meta";
+import { execute, undo, type ExecutionResult } from "@/lib/meta";
 import { formatCount, formatPercent } from "@/lib/format";
 
 /**
@@ -173,12 +173,27 @@ export async function diagnoseUpload(input: {
  */
 export async function runPlan(
   actions: Action[],
-): Promise<{ receipt: string; mode: "simulated" | "live"; results: { id: string; detail: string; ok: boolean }[] }> {
+  /**
+   * Sent by the caller and remembered here, so a double-click, a retry or a
+   * refresh cannot run the same plan twice. Pausing twice is harmless; halving
+   * a budget twice is a quarter of what the seller set.
+   */
+  idempotencyKey?: string,
+): Promise<{
+  receipt: string;
+  mode: "simulated" | "live";
+  results: { id: string; detail: string; ok: boolean }[];
+  undo: NonNullable<ExecutionResult["undo"]>[];
+}> {
+  if (idempotencyKey) {
+    const already = alreadyRun.get(idempotencyKey);
+    if (already) return already;
+  }
   // Same rule as the route, restated rather than imported: Mazal never performs
   // what only the seller can do, and this is a second front door.
   const mine = actions.filter((a) => a?.actor === "mazal").slice(0, 20);
 
-  const results: { id: string; detail: string; ok: boolean; mode: "simulated" | "live" }[] = [];
+  const results: (ExecutionResult & { id: string })[] = [];
   for (const a of mine) {
     if (!a.execution) {
       results.push({ id: a.id, mode: "simulated", ok: true, detail: "no executable operation — logged only" });
@@ -189,9 +204,37 @@ export async function runPlan(
 
   const live = results.some((r) => r.mode === "live");
   const at = new Date().toISOString();
-  return {
+  const answer = {
     receipt: `MZL-${at.slice(0, 10).replace(/-/g, "")}-${String(Date.now() % 10000).padStart(4, "0")}`,
-    mode: live ? "live" : "simulated",
+    mode: (live ? "live" : "simulated") as "simulated" | "live",
     results: results.map(({ id, detail, ok }) => ({ id, detail, ok })),
+    undo: results.flatMap((r) => (r.undo ? [r.undo] : [])),
   };
+
+  if (idempotencyKey) alreadyRun.set(idempotencyKey, answer);
+  return answer;
+}
+
+/** In memory, like the log. It only has to outlive a double-click. */
+const alreadyRun = new Map<string, Awaited<ReturnType<typeof runPlan>>>();
+
+/**
+ * Put back what a run changed.
+ *
+ * Only restores values Mazal itself recorded before writing, and only on the
+ * three fields the three operations touch — an undo that accepts arbitrary
+ * field/value pairs would be the unrestricted write channel this product
+ * deliberately does not have.
+ */
+export async function undoRun(
+  entries: NonNullable<ExecutionResult["undo"]>[],
+): Promise<{ ok: boolean; details: string[] }> {
+  const out: string[] = [];
+  let ok = true;
+  for (const e of entries.slice(0, 20)) {
+    const r = await undo(e);
+    out.push(r.detail);
+    if (!r.ok) ok = false;
+  }
+  return { ok, details: out };
 }
