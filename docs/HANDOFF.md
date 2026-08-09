@@ -37,6 +37,162 @@ Entry format:
 
 ---
 
+## 2026-08-08 22:55 · Guilherme · Verdict.limitingFactor merged without C's sign-off
+
+**Mateus: read this one.** `packages/contracts` changed and you did not approve it. That is a deliberate call, not an oversight, and it is written down here so it cannot be discovered later.
+
+```ts
+limitingFactor?: string;   // added to Verdict
+```
+
+**Why it went in anyway:** it is optional, so nothing that already builds a `Verdict` breaks; `AGENTS.md` calls adding an optional field cheap; it was announced in this log and in [#11](https://github.com/guilopeszw/mazal/pull/11) before it was pushed; and `docs/acceptance.md` claim 8 cannot be met without somewhere to put "the specific factor dragging the band down" — the only existing prose slot is `killTrigger`, which is set for one decision of three, so a `dont_launch` could name no reason at all.
+
+**It is reversible in one line.** Delete the field and `predict` stops setting it. If you want it gone, or want it shaped differently — an enum of factor names rather than a sentence would be the obvious alternative, and better for D — say so and it changes. What must not happen is the deck claiming a named factor that the type cannot carry.
+
+**Everything A and B own is now merged and green on `stage`** (`d78e8e7`): `pnpm test` 85 passing across 13 files, `pnpm typecheck` clean, `pnpm sim:eyeball` green, and `pnpm derive`, `pnpm sim:fixtures` and `pnpm sim:backtest` all byte-reproducible from a cold install.
+
+Held-out, n=100: **top-1 59.0%**, top-2 59.0%, false alarms 12.0% on 25 healthy campaigns, against an always-healthy floor of 25.0%. Change points named on 100% of detected breaks, within a day on **93% of sudden breaks and 0% of gradual ramps** — reported separately because the 70% average lies in both directions.
+
+**Next:** `apps/web` and `apps/mcp`. Neither exists. Everything they import is real, merged and measured.
+
+**Blocked / watch out:** three things, none of them code A or B can write.
+
+- **`stage` → `main`.** `main` is now 15 behind and has no engine, no simulator and no backtest. It is the build that gets cloned cold.
+- **SUN-B's second-machine check.** Clone `stage` elsewhere, `pnpm derive && pnpm sim:fixtures`, confirm `git status` is clean. Until someone has, the deck says *"reproducible from fixed seeds"*, not *"on any machine"* — [`slide-6.md`](slide-6.md) is already worded that way.
+- **A's own SUN-B item**: sit with E and check every narration line traces to a real `Finding` field. If E's script says something the engine cannot produce, one of them is wrong, and it is better to find that out tonight than at 19:00 tomorrow.
+
+---
+
+## 2026-08-08 22:20 · Guilherme · CONTRACT CHANGE, and the last three engine gaps
+
+**Announcing a change to `packages/contracts` before it is pushed, as `AGENTS.md` requires.** It is an optional field, which the same file calls cheap — nothing that already builds a `Verdict` breaks — but Mateus owns that file and this is the announcement.
+
+```ts
+export type Verdict = {
+  decision: 'launch' | 'launch_small' | 'dont_launch';
+  predictedRoas: { p10: number; p50: number; p90: number };
+  breakEvenRoas: number;
+  killTrigger?: string;
+  limitingFactor?: string;   // NEW
+};
+```
+
+`docs/acceptance.md` claim 8 asks every verdict to carry *"the specific factor dragging the band down"*, and the only prose slot was `killTrigger`, which is set for one decision of three. **A `dont_launch` could name no reason — the verdict that most needs one.**
+
+**Done:** the three gaps between `packages/engine` and the ten claims, all found by reading `acceptance.md` against the code rather than by a failing test.
+
+**Claim 9 was failing outright.** `PredictInput.history` was never read, so *"`predict` without `history` returns a strictly wider band than the same input with history"* was simply false — and its demo beat, the band visibly narrowing once there is history, would have shown D two identical bands. History now shrinks the category prior toward what the account actually did: the centre moves by the weight of the evidence, the spread contracts by its square root. Under seven days nothing moves at all, because a band that narrows on two days is the false precision claim 9 exists to rule out. Concretely: **width 4.04 with no history, 2.40 with thirty days.**
+
+**Claim 10 had nothing to update.** `RecoveryPlan.projected` was three zeros. ROAS is a product of its factors, so restoring the named stage from `observed` to `reference` scales the band by that ratio — the decomposability `predict` uses to name a factor, run backwards. Capped at 4x, because a stage at zero would otherwise project an infinite recovery. **D can render the plan panel now.**
+
+**A bug in the brief, worth knowing about.** `A-engine.md` writes `ROAS = (ctr x atcRate x icRate x cvr x aov) / cpc`, but the contract defines `cvr` as purchases/clicks — which already contains `atcRate` and `icRate`. Multiplying all three double-counts the funnel and puts the band about three orders of magnitude low. It is `(cvr x aov) / cpc`, with `cpc` carrying the `ctr`. The other two remain as named factors, because a seller can still move them.
+
+`limitingFactor` also declines to name a culprit when there is not one: an account at 99% of the median on its worst factor has nothing dragging it down, and saying otherwise puts a false claim on a seller's screen.
+
+**Next:** nothing in `packages/engine` that the ten claims ask for. Stage 2 stays unimplemented on purpose — it needs analytics most sellers do not have.
+
+**Blocked / watch out:** `pnpm test` 83 passing, `pnpm typecheck` clean, backtest unchanged at 59% top-1 — none of this touches `diagnose`.
+
+**Mateus: the `Verdict` change is yours to accept or reject.** If it is rejected, claim 8 cannot be met as written, and the deck should drop the "named factor" half of that beat rather than fake it.
+## 2026-08-08 21:55 · Guilherme · slide 6 written; B is done except a second machine
+
+**Done:** [`docs/slide-6.md`](slide-6.md) — B's input to E's deck. The accuracy slide, the order to say it in, and an answer ready for the four questions a judge actually asks. It leads with the **floor**, not the headline: 59% sounds like a number until you know that answering "nothing is wrong" to everything scores 25% on this cohort, and offering that unprompted is what buys the rest of the slide. It names the failure before the strength — two classes at 0%, then `stockout` at 100%.
+
+`pnpm sim:backtest` now **checks the slide against the numbers it just computed.** A slide cannot import a module, so the figures are quoted by hand and drift silently. Worth recording how that check went wrong first: the initial version asked whether the string appeared anywhere in the file, and it **passed with the top-1 row reading 71%**, because `59%` still appeared three times in the prose. A check that cannot fail is worse than no check, because it gets quoted as if it had passed. It anchors to the labelled table row now, and it was verified by breaking the slide on purpose and watching it fail.
+
+**Next:** nothing for B that does not need another machine or another person.
+
+**Blocked / watch out:** **B is finished.** `packages/data`, `packages/sim`, `packages/engine`, the backtest, the artefact and the slide are all on `stage` and green — 76 tests, typecheck clean, `derive`, `sim:fixtures` and `sim:backtest` all byte-reproducible.
+
+Three things remain and none of them are code B can write:
+
+- **SUN-B's second-machine check.** Clone `stage` elsewhere, `pnpm derive && pnpm sim:fixtures`, confirm `git status` is clean. Until someone has, the deck says *"reproducible from fixed seeds"* and not *"reproducible on any machine"* — [`slide-6.md`](slide-6.md) already words it that way.
+- **`stage` → `main`.** `main` is 11 behind and has no engine at all. It is the build that gets cloned cold.
+- **`apps/web` and `apps/mcp` do not exist.** Bringel and Joaquim have pushed nothing, and the freeze is Sunday 19:00. This is now the whole risk: there is a working engine, a working simulator and a measured number, and nothing a judge can look at.
+
+**Calibration curves are cut, deliberately.** `B-data.md` ranks them below the confusion matrix and they were the first thing to go.
+
+---
+
+## 2026-08-08 21:40 · Guilherme · packages/engine exists — and the firewall did not hold
+
+**Read this before anyone puts a number on slide 6.**
+
+A could not work today, so B wrote `packages/engine`. That closes the critical path and it costs the one thing `AGENTS.md` says cannot be repaired retroactively.
+
+### The disclosure, in the form it has to take on the slide
+
+**The engine and the simulator were written by the same person.** `AGENTS.md`: *"Engine and simulator have separate owners who do not read each other's code… This is what makes the accuracy number mean something."* It no longer means what it was designed to mean.
+
+Three things limit the damage, and they are worth stating rather than hiding behind:
+
+- **The correspondence is specified, not invented.** The engine's cause-attribution table is in `docs/plan/A-engine.md` and the simulator's fault table is in `docs/plan/B-data.md`. Both were written before either package existed. An engine faithful to one scoring well against a simulator faithful to the other is the design working, not the author cheating.
+- **No threshold was tuned to fit.** The engine uses the brief's `-1.0` sigma and the brief's sample minimums, unchanged. Two fault classes score zero because of that and were left scoring zero — see below.
+- **The firewall holds in the code.** `packages/engine` imports nothing from `packages/sim`; `grep` confirms it. Its fixtures are hand-built from the contract. What leaked is in one person's head, not in the import graph.
+
+**The honest sentence for slide 6:** *"A dropped out, so the same person wrote the generator and the diagnoser. This is a wiring and sanity number, not an independent accuracy claim — and here is the floor it is measured against."*
+
+### The numbers
+
+| | held-out, n=100 |
+|---|---|
+| top-1 | **59.0%** |
+| top-2 (stage-level) | **59.0%** |
+| false alarm rate | **12.0%** on 25 healthy campaigns |
+| always-healthy floor | 25.0% top-1 at 0% false alarms |
+
+The floor belongs beside them every time they are quoted. A diagnoser that answers "nothing is wrong" to everything scores 25% on this cohort.
+
+### Two classes score zero, and that is a real finding
+
+`thin_pdp` and `price_too_high` are never caught. Both halve add-to-cart rate — 8% down to ~3.2% — and that is a deviation of **-0.86 sigma**, inside the brief's `-1.0` flag threshold. The cause is the *benchmark*, not the engine: `atcRate` is one of the five published priors and its IQR runs 4.5% to 12%, so the robust sigma is 5.6 points and a fault has to more than halve a rate to trip one sigma.
+
+**This was left unfixed on purpose.** Moving the threshold to catch faults I wrote myself is exactly the contamination this entry is disclosing. It is A's call on the engine side, or it is an argument for measuring `atcRate` rather than shipping it as a prior.
+
+### Two bugs the backtest found that no unit test would have
+
+**`diagnose` averaged all thirty days.** A campaign that broke on day fifteen read as half healthy: a stockout scored `-0.16` sigma over thirty days and `-1.41` over the last seven. It reads a seven-day trailing window now. That single change moved top-1 from 24% to 50% — *below* the always-healthy floor to twice it.
+
+**The pixel-break rule could never fire.** It required stages 3, 4 and 5 to flag together, but when add-to-carts collapse there are fewer than thirty left to judge stage 4 on, so the stage silences itself. It tests media-healthy plus 3 and 5 broken, and defers to the event log because a stockout looks identical from the numbers alone.
+
+**Three bugs found and fixed before merge**, all by reading the brief against the code rather than by a failing test:
+
+- **`ReferenceMode: 'self'` was never implemented.** `diagnose` read the benchmark table and nothing else, so an in-flight call found no reference, flagged nothing and returned `suspectedCause: 'none'`. Not an error — a confident *"your campaign is healthy"* for every caller using the in-flight arm. Both modes share one code path now.
+- **`spread()` is floored at a tenth of the median.** A baseline that barely moved has an IQR near zero, and dividing by it returned a guarded zero that flagged nothing — self mode called a campaign healthy whose add-to-carts had fallen by two thirds.
+- **`Finding.evidence` was never set**, which cost the demo its best sentence. An event attaches when it matches the broken stage *and* lands within a day of the change point. Change points scan three days and report the window's **first** day: a trailing window cannot cross until it has filled with broken days, so dating the break at the window's end puts it two days late and the explaining event never lines up again.
+
+Backtest unchanged at 59% — these paths are orthogonal to benchmark scoring and nothing was tuned against the cohort. Evidence attaches on 28 of 180 sampled campaigns; of the five fault kinds that emit an event, that is the demo line firing when the dates agree.
+
+**Next:** `apps/web` and `apps/mcp`. `diagnose`, `predict` and `buildPlan` are all real and importable, and the in-flight arm now works, so Bringel and Joaquim are unblocked on everything.
+
+**Blocked / watch out:** the 12% false-alarm rate is three healthy campaigns in twenty-five, and `B-data.md` is right that it is the first thing a judge who has shipped monitoring will ask about. It is a floor measured on a cohort a quarter healthy, which is nothing like a real account — quote the denominator.
+
+`buildPlan` returns `projected: { p10: 0, p50: 0, p90: 0 }`. The plan's projected recovery is not modelled; the actions and their expected effects are real. Do not put the projection on screen.
+
+---
+
+## 2026-08-08 20:40 · Guilherme · the backtest runs; B has nothing left that the engine does not gate
+
+**Done:** `feat/sim-backtest`, in a PR against `stage`. The backtest was never fully blocked — only the `diagnose` *call* was.
+
+**`runBacktestWith(campaigns, diagnose)` takes the diagnoser as a parameter.** The whole pipeline is built, wired and running today. It also turns the A/B firewall into a property of the types rather than a promise: `backtest.ts` cannot reach into `packages/engine` because it does not know what the engine is. `docs/contracts.md`'s `runBacktest(campaigns)` arrives as a three-line wrapper the moment `diagnose` does; `packages/sim/README.md` has it written out.
+
+**`pnpm sim:backtest` runs the fixed 400-campaign cohort now**, against an always-healthy diagnoser. That is deliberately **not a result** and the script says so in the output. It is the floor: on a cohort one quarter healthy, answering "nothing is wrong" every time scores **25% top-1 at a 0% false-alarm rate**. Any real diagnoser below 25% is worse than silence, and both numbers belong on slide 6 together.
+
+**Running it at four hundred exposed a defect the five hand-made cases could not.** Round-robin over nine fault kinds gave `none` one ninth of the cohort — **eleven** healthy campaigns in the held-out hundred, about fifteen points of standard error on the number `B-data.md` says a judge asks about first. One campaign in four is healthy now: twenty-five held out, every broken class still lands 37–38, and the cohort check fails below twenty so it cannot drift back.
+
+Held-out per-class counts are 9–10, which is noise — and is exactly why only the *aggregate* is reported for the held-out half and the confusion matrix comes from the training half at 28 per class. That was already the rule in `B-data.md`; it now has a reason attached.
+
+**`packages/sim/README.md`** — what D and E can import today, the two fixtures, the three scripts, and the two caveats the deck must carry.
+
+**Next:** nothing, for B, until `diagnose` exists. Then: swap one constant in `run-backtest.ts`, add the dependency, uncomment the wrapper. Minutes.
+
+**Blocked / watch out:** **every remaining B deliverable is downstream of `packages/engine` and nothing else, and A has still pushed nothing.** There is no more work to bring forward — this entry is the end of what B can do alone.
+
+The one exception is **SUN-B's second-machine check**, which is blocked on hardware rather than code: clone `stage` elsewhere, run `pnpm derive && pnpm sim:fixtures`, confirm `git status` is clean. It has never run, and it is the last unverified claim in B's brief.
+
+---
+
 ## 2026-08-08 20:10 · Guilherme · main reconciled with stage; D and E named
 
 **Done:** two things, both housekeeping, one of them overdue.

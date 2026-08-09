@@ -1,0 +1,264 @@
+// ─── packages/sim/run-backtest.ts ────────────────────────────────────────
+// Runnable: pnpm sim:backtest
+//
+// Runs the fixed 400-campaign cohort through the engine, prints the three
+// numbers slide 6 shows, and writes docs/backtest-results.md — the committed
+// artefact the deck is built from, so the slide and the repo cannot disagree.
+//
+// Deterministic end to end: fixed seeds, no clock and no unseeded randomness
+// anywhere in packages/sim. Re-running leaves git clean.
+
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { benchmarks } from '@mazal/data';
+import { diagnose } from '@mazal/engine';
+import { runBacktestWith } from './backtest.ts';
+import { COHORT_SIZE, HELD_OUT, generateCohort, splitCohort } from './cohort.ts';
+import type { FaultKind } from '@mazal/contracts';
+import { FAULT_KINDS } from './faults.ts';
+import { formatConfusion, perClassRecall } from './score.ts';
+
+const OUT = resolve(import.meta.dirname, '../../docs/backtest-results.md');
+
+const { train, held } = splitCohort(generateCohort());
+const report = runBacktestWith(held, diagnose);
+const trainReport = runBacktestWith(train, diagnose);
+const heldHealthy = held.filter((c) => c.fault.kind === 'none').length;
+
+/**
+ * docs/acceptance.md claim 1: "Diagnosis.changePoint.date lands within +/-1 day
+ * of it across the held-out set."
+ *
+ * Split by fault shape, because the aggregate is misleading. A stockout has a
+ * day it happened; creative fatigue decays a few per cent a day and budget caps
+ * raise CPM gradually, so there is no single day those campaigns broke and no
+ * detector can name one. Reporting them together buries a 93% inside a 70%.
+ */
+const SUDDEN = new Set(['stockout', 'eta_shock', 'pixel_break', 'checkout_friction']);
+const dayGap = (a: string, b: string) =>
+  Math.abs(Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86_400_000;
+
+const changePoint = { detected: 0, named: 0, sudden: 0, suddenOk: 0, gradual: 0, gradualOk: 0 };
+for (const c of held) {
+  if (!c.fault.injectedOn) continue;
+  const d = diagnose({
+    days: c.days, card: c.card, events: c.events,
+    reference: { kind: 'benchmark', table: benchmarks },
+  });
+  if (!d.primary) continue;
+  changePoint.detected += 1;
+  if (!d.changePoint) continue;
+  changePoint.named += 1;
+
+  const ok = dayGap(d.changePoint.date, c.fault.injectedOn) <= 1;
+  if (SUDDEN.has(c.fault.kind)) {
+    changePoint.sudden += 1;
+    if (ok) changePoint.suddenOk += 1;
+  } else {
+    changePoint.gradual += 1;
+    if (ok) changePoint.gradualOk += 1;
+  }
+}
+const share = (a: number, b: number) => (b === 0 ? '—' : `${((a / b) * 100).toFixed(0)}%`);
+
+const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
+
+// ─── terminal ────────────────────────────────────────────────────────────
+
+console.log('diagnoser: @mazal/engine');
+console.log('  ⚠ The engine and the simulator were written by the same person. The A/B');
+console.log('    firewall did not hold, so this is a wiring and sanity number, not an');
+console.log('    accuracy claim. Floor to beat: 25.0% top-1 at 0% false alarms.\n');
+
+console.log(`held-out n       ${report.n}`);
+console.log(`top-1            ${pct(report.top1)}`);
+console.log(`top-2            ${pct(report.top2)}   (stage-level — see score.ts)`);
+console.log(`false alarm rate ${pct(report.falseAlarmRate)}   on ${heldHealthy} healthy campaigns`);
+console.log(`change point named  ${share(changePoint.named, changePoint.detected)} of detected breaks`);
+console.log(`  within +/-1 day   ${share(changePoint.suddenOk, changePoint.sudden)} sudden` +
+  `, ${share(changePoint.gradualOk, changePoint.gradual)} gradual`);
+
+console.log('\nconfusion — TRAINING half only, safe to show A');
+console.log(formatConfusion(trainReport));
+console.log(`\nwrote ${OUT}`);
+
+// ─── committed artefact ──────────────────────────────────────────────────
+
+const recallRows = perClassRecall(trainReport)
+  .map((r) => `| \`${r.fault}\` | ${r.n} | ${r.correct} | ${r.n === 0 ? '—' : pct(r.correct / r.n)} |`)
+  .join('\n');
+
+/** The class most often mistaken for this one — the sentence a judge actually wants. */
+const confusedWith = (fault: FaultKind): string => {
+  const row = trainReport.confusion[fault];
+  // A plain loop rather than filter/map/sort: `k !== fault` narrows a union
+  // against itself down to never, and every count downstream becomes any.
+  let worstKind: FaultKind | null = null;
+  let worstCount = 0;
+  for (const k of FAULT_KINDS) {
+    if (k === fault) continue;
+    if (row[k] > worstCount) { worstKind = k; worstCount = row[k]; }
+  }
+
+  return worstKind ? `\`${worstKind}\` (${worstCount})` : '—';
+};
+
+const worst = perClassRecall(trainReport)
+  .filter((r) => r.fault !== 'none' && r.n > 0)
+  .sort((a, b) => a.correct / a.n - b.correct / b.n)
+  .slice(0, 3)
+  .map((r) => `- \`${r.fault}\` — ${pct(r.correct / r.n)} recall, most often called ${confusedWith(r.fault)}`)
+  .join('\n');
+
+const md = `# Backtest results
+
+Generated by \`pnpm sim:backtest\`. Committed, never hand-edited — the deck is built from
+this file so the slide and the repo cannot disagree.
+
+Deterministic: ${COHORT_SIZE} campaigns from fixed seeds, ${HELD_OUT} held out, no clock and no
+unseeded randomness anywhere in \`packages/sim\`. Re-running leaves git clean.
+
+## Read this before quoting the number
+
+**The engine and the simulator were written by the same person.** \`AGENTS.md\` requires
+separate owners who do not read each other's code — *"This is what makes the accuracy
+number mean something"*. A could not work on the day, B filled in, and the firewall did
+not hold.
+
+**This is a wiring and sanity number, not an independent accuracy claim.** Three things
+limit the damage, and they are worth saying rather than hiding behind:
+
+- The engine's cause table (\`docs/plan/A-engine.md\`) and the simulator's fault table
+  (\`docs/plan/B-data.md\`) were both written before either package existed. The
+  correspondence is specified, not invented.
+- No threshold was tuned to fit. The brief's −1.0 sigma and sample minimums, unchanged.
+  Two fault classes score zero because of that, and were left scoring zero.
+- \`packages/engine\` imports nothing from \`packages/sim\`, and its fixtures are hand-built
+  from the contract. What leaked is in one person's head, not the import graph.
+
+## Held-out results
+
+| | n = ${report.n} |
+|---|---|
+| top-1 | **${pct(report.top1)}** |
+| top-2 (stage-level) | **${pct(report.top2)}** |
+| false alarm rate | **${pct(report.falseAlarmRate)}** on ${heldHealthy} healthy campaigns |
+| always-healthy floor | 25.0% top-1 at 0% false alarms |
+
+**Quote the floor beside the number.** A diagnoser answering *"nothing is wrong"* to
+everything scores 25% here, because a quarter of the cohort is healthy. Anything below
+that is worse than silence.
+
+**Quote the denominator too.** The false-alarm rate rests on ${heldHealthy} campaigns, and a cohort
+a quarter healthy is nothing like a real account, where nearly everything is fine. It is a
+floor, not a forecast.
+
+top-2 is stage-level, not cause-level: \`Diagnosis\` carries one \`suspectedCause\` and a
+\`Finding\` carries a \`causeLayer\`, not a \`FaultKind\`, so it asks whether the right *stage*
+was named. A stockout called a thin PDP is a near miss — both break stage 3 and the seller
+is sent to the right part of the funnel.
+
+## Change points — claim 1
+
+*"Given a daily series, Mazal names the date performance changed, within a day of when it
+actually did."* Measured against the day the simulator injected the fault, over held-out
+breaks the engine detected at all — it cannot name a date for a break it never found.
+
+| | |
+|---|---|
+| breaks detected | ${changePoint.detected} |
+| a date was named | **${share(changePoint.named, changePoint.detected)}** |
+| within ±1 day — **sudden** breaks | **${share(changePoint.suddenOk, changePoint.sudden)}** (${changePoint.suddenOk}/${changePoint.sudden}) |
+| within ±1 day — **gradual** ramps | **${share(changePoint.gradualOk, changePoint.gradual)}** (${changePoint.gradualOk}/${changePoint.gradual}) |
+
+**Report these separately or the number lies.** A stockout has a day it happened, and the
+engine finds it. \`creative_fatigue\` decays CTR a few per cent a day and \`budget_cap\` lifts
+CPM gradually — there is no single day those campaigns broke, so no detector can name one
+and ours is honestly late rather than wrong. What it reports for a ramp is the day the
+metric *crossed*, which is a true statement about a different event.
+
+The demo runs on \`eta_shock\`, which is a sudden break.
+
+## Per-class recall — training half only
+
+A never sees a per-class breakdown of the held-out set (\`docs/plan/B-data.md\`), only its
+aggregate. This table is the training half, where the per-class counts are large enough to
+mean anything.
+
+| fault | n | correct | recall |
+|---|---|---|---|
+${recallRows}
+
+### Where it does worst
+
+${worst}
+
+\`thin_pdp\` and \`price_too_high\` are the honest failure and belong on the slide as one
+sentence. Both halve add-to-cart rate — 8% to about 3.2% — which is **−0.86 sigma** against
+a benchmark whose IQR runs 4.5% to 12%. The brief flags at −1.0, so neither trips it. The
+cause is the *reference*, not the detector: \`atcRate\` is one of the five published priors,
+and its spread is wide enough that a fault must more than halve a rate to register.
+
+Fixing it means moving a threshold to catch faults the same author wrote, which is the
+contamination this page exists to disclose. Left alone deliberately.
+
+## Confusion matrix — training half
+
+Rows are the injected fault, columns the suspected cause.
+
+\`\`\`
+${formatConfusion(trainReport)}
+\`\`\`
+`;
+
+writeFileSync(OUT, md);
+
+// ─── the deck must not drift from the repo ───────────────────────────────
+
+/**
+ * docs/slide-6.md quotes these numbers by hand, because a slide cannot import a
+ * module. "The deck and the repo cannot disagree" is only true if something
+ * checks, so this is the something: change a threshold, re-run, and the slide
+ * that no longer matches fails here rather than in front of a judge.
+ */
+const SLIDE = resolve(import.meta.dirname, '../../docs/slide-6.md');
+
+if (existsSync(SLIDE)) {
+  const slide = readFileSync(SLIDE, 'utf8');
+  const falseAlarms = Math.round(report.falseAlarmRate * heldHealthy);
+
+  /**
+   * Anchored to the labelled row, not searched for anywhere in the file.
+   * "Does 59% appear somewhere" passes while the top-1 row reads 71%, because
+   * the same figure appears three more times in the prose — a check that cannot
+   * fail is worse than no check, since it is quoted as if it had passed.
+   */
+  const rowValue = (label: string): number | null => {
+    const m = slide.match(new RegExp(`\\|\\s*${label}[^|]*\\|\\s*\\*\\*([\\d.]+)%`));
+    return m?.[1] === undefined ? null : Number(m[1]);
+  };
+
+  const stale: string[] = [];
+  for (const [label, expected] of [
+    ['Names the right cause', report.top1 * 100],
+    ['Names the right funnel stage', report.top2 * 100],
+    ['False alarms on healthy campaigns', report.falseAlarmRate * 100],
+  ] as [string, number][]) {
+    const found = rowValue(label);
+    if (found === null || Math.abs(found - expected) > 0.05) {
+      stale.push(`${label}: ${expected.toFixed(1)}% (slide says ${found === null ? 'nothing' : `${found}%`})`);
+    }
+  }
+  if (!slide.includes(`${falseAlarms} of ${heldHealthy}`)) {
+    stale.push(`false alarm denominator: ${falseAlarms} of ${heldHealthy}`);
+  }
+
+  if (stale.length > 0) {
+    console.log('\n⚠ docs/slide-6.md is stale — it no longer quotes:');
+    for (const line of stale) console.log(`    ${line}`);
+    console.log('  Update the slide before anyone presents it.');
+    process.exitCode = 1;
+  } else {
+    console.log('slide-6.md quotes the current numbers. ok');
+  }
+}

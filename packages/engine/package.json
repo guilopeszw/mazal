@@ -1,17 +1,16 @@
 {
-  "name": "@mazal/sim",
+  "name": "@mazal/engine",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@mazal/contracts": "workspace:*",
-    "@mazal/data": "workspace:*",
-    "@mazal/engine": "workspace:*"
+    "@mazal/data": "workspace:*"
   }
 }

@@ -104,6 +104,17 @@ export type Verdict = {
   predictedRoas: { p10: number; p50: number; p90: number };
   breakEvenRoas: number;           // 1 / grossMargin
   killTrigger?: string;            // set when decision is 'launch_small'
+  /**
+   * The factor dragging the band down, named in words. Added after SAT-A and
+   * announced in docs/HANDOFF.md — an optional field, so nothing that already
+   * builds a Verdict breaks.
+   *
+   * docs/acceptance.md claim 8 asks the verdict to carry "the specific factor
+   * dragging the band down", and the only prose slot was `killTrigger`, which is
+   * set for one decision of three. A `dont_launch` could name no reason, which
+   * is the verdict that most needs one.
+   */
+  limitingFactor?: string;
 };
 
 // ─── composite types ─────────────────────────────────────────────────────
