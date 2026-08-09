@@ -68,6 +68,23 @@ export type Verdict = {
 **Blocked / watch out:** `pnpm test` 83 passing, `pnpm typecheck` clean, backtest unchanged at 59% top-1 — none of this touches `diagnose`.
 
 **Mateus: the `Verdict` change is yours to accept or reject.** If it is rejected, claim 8 cannot be met as written, and the deck should drop the "named factor" half of that beat rather than fake it.
+## 2026-08-08 21:55 · Guilherme · slide 6 written; B is done except a second machine
+
+**Done:** [`docs/slide-6.md`](slide-6.md) — B's input to E's deck. The accuracy slide, the order to say it in, and an answer ready for the four questions a judge actually asks. It leads with the **floor**, not the headline: 59% sounds like a number until you know that answering "nothing is wrong" to everything scores 25% on this cohort, and offering that unprompted is what buys the rest of the slide. It names the failure before the strength — two classes at 0%, then `stockout` at 100%.
+
+`pnpm sim:backtest` now **checks the slide against the numbers it just computed.** A slide cannot import a module, so the figures are quoted by hand and drift silently. Worth recording how that check went wrong first: the initial version asked whether the string appeared anywhere in the file, and it **passed with the top-1 row reading 71%**, because `59%` still appeared three times in the prose. A check that cannot fail is worse than no check, because it gets quoted as if it had passed. It anchors to the labelled table row now, and it was verified by breaking the slide on purpose and watching it fail.
+
+**Next:** nothing for B that does not need another machine or another person.
+
+**Blocked / watch out:** **B is finished.** `packages/data`, `packages/sim`, `packages/engine`, the backtest, the artefact and the slide are all on `stage` and green — 76 tests, typecheck clean, `derive`, `sim:fixtures` and `sim:backtest` all byte-reproducible.
+
+Three things remain and none of them are code B can write:
+
+- **SUN-B's second-machine check.** Clone `stage` elsewhere, `pnpm derive && pnpm sim:fixtures`, confirm `git status` is clean. Until someone has, the deck says *"reproducible from fixed seeds"* and not *"reproducible on any machine"* — [`slide-6.md`](slide-6.md) already words it that way.
+- **`stage` → `main`.** `main` is 11 behind and has no engine at all. It is the build that gets cloned cold.
+- **`apps/web` and `apps/mcp` do not exist.** Bringel and Joaquim have pushed nothing, and the freeze is Sunday 19:00. This is now the whole risk: there is a working engine, a working simulator and a measured number, and nothing a judge can look at.
+
+**Calibration curves are cut, deliberately.** `B-data.md` ranks them below the confusion matrix and they were the first thing to go.
 
 ---
 
