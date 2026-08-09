@@ -37,6 +37,50 @@ Entry format:
 
 ---
 
+## 2026-08-09 00:20 · Bringel · apps/web is redesigned, reviewed and merging to stage
+
+**Done:** the screen is built and rebuilt. `feat/apps-web` carries eight commits from `ecd1785`
+to `e3a6c6f`, branched off `stage`, with `main` merged in at `4049c47`.
+
+Everything `D-frontend.md` lists is on screen and reading from the contract: the seven-stage
+funnel with the media │ produto rule between 2 and 3, the finding card printing `Distribution.n`
+and the `rule` id, the daily chart with the change point, the plan panel with the `actor` split,
+the counter, the chat sidebar shell, and the four route handlers. One route, no navigation.
+
+The look is not a dashboard. It is a Brazilian transactional document — the second via of an
+issued opinion, on autocopiativo paper, struck in impact ink, with the verdict stamped across the
+header. That decision and its reasoning are recorded in `apps/web/PRODUCT.md` and in an HTML
+comment at the top of the rendered page, so it survives the build and the next owner.
+
+**Checks at merge:** `pnpm test` 85 passing across 13 files, root typecheck clean, `apps/web`
+`tsc --noEmit` clean, zero horizontal overflow at 390px.
+
+**Next:** deploy to Vercel. It is a SAT-A deliverable and it is the one thing on my brief that is
+not done, because it needs an account I do not have. Whoever has the Vercel org should run it;
+the app is a stock Next 16 App Router build with no env vars.
+
+**Blocked / watch out:** four things.
+
+- **`buildPlan().projected` is real now, and it is not plausible.** Both demo fixtures return
+  `{p10: 0.67, p50: 4.39, p90: 28.13}` — the same band, byte for byte, for `thin_pdp` and for
+  `eta_shock`. It is kept off the screen for that reason, not because it used to be zeroed. If
+  you wire it up because "it has values now", you put a 28× ROAS on a sheet whose entire argument
+  is that every number is auditable. Miguel: this is probably worth ten minutes.
+- **`Verdict.limitingFactor` is good and I am not rendering it.** "atcRate is at 34% of the
+  category median" is exactly the sentence the deck wants, but the engine emits it in English and
+  the sheet is pt-BR, and the same fact is already printed in three audited places. If it becomes
+  a locale key or an enum of factor names, I will put it on the header in five minutes.
+- **`predict` returns `launch_small` for the pre-flight case while the product's headline promise
+  is "don't launch".** The UI no longer disagrees with the engine — `verdictStamp` reads
+  `verdict.decision` rather than deriving it — but the disagreement moved rather than closed.
+  Miguel and Joaquim: the deck and the engine need to say the same thing before the projector.
+- **The demo fixtures.** My 21:42 entry reported both returning `primary: null`. Guilherme's
+  `feat/peer-market-profile` (`9c32500`, "demo fixtures that work, and a check that they do") is
+  not on `stage` yet. Until it is, `apps/web` renders its own deterministic series — same
+  contract types, same metric functions, so the swap is a one-file change in `lib/fixtures.ts`.
+
+---
+
 ## 2026-08-08 22:55 · Guilherme · Verdict.limitingFactor merged without C's sign-off
 
 **Mateus: read this one.** `packages/contracts` changed and you did not approve it. That is a deliberate call, not an oversight, and it is written down here so it cannot be discovered later.
