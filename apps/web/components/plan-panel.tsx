@@ -18,6 +18,18 @@ import { formatMetric, metricLabel } from "@/lib/format";
 
 type Mode = "choice" | "edit" | "declined";
 
+/** The operation in the words of the API that receives it. */
+function describe(op: NonNullable<Action["execution"]>): string {
+  switch (op.op) {
+    case "pause_campaign":
+      return "status: ACTIVE → PAUSED";
+    case "reduce_daily_budget":
+      return `daily budget × ${op.multiplier} (a reduction — Mazal cannot raise it)`;
+    case "set_frequency_cap":
+      return `frequency cap: ${op.perWeek} per week`;
+  }
+}
+
 export function PlanPanel({
   actions,
   projected,
@@ -97,6 +109,17 @@ export function PlanPanel({
                   {a.title}
                 </p>
                 <p className="m-0 mt-0.5 text-[13px] text-ink-soft">{a.change}</p>
+                {a.execution && (
+                  /*
+                   * The literal change, not the sentence describing it. A seller
+                   * consents to what will happen; "pause the campaign until the
+                   * ETA recovers" is the reason, `status: ACTIVE -> PAUSED` is
+                   * the act. Approving prose is not approving a write.
+                   */
+                  <p className="tnum m-0 mt-1 text-[12.5px] text-ink-faint">
+                    Mazal will send: <span className="text-ink-soft">{describe(a.execution)}</span>
+                  </p>
+                )}
                 <p className="tnum m-0 mt-1 text-[13px] text-ink-soft">
                   {metricLabel(a.expectedEffect.metric)}:{" "}
                   {formatMetric(a.expectedEffect.metric, a.expectedEffect.from)} →{" "}

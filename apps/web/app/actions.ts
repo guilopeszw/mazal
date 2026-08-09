@@ -13,6 +13,7 @@ import { parseMetaCsv, productCardSchema } from "@mazal/ingest";
 import { buildUploadAnswer, type Answer } from "@/lib/answers";
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
+import { record } from "@/lib/audit";
 import { execute, executeConfigured, undo, type ExecutionResult } from "@/lib/meta";
 import { formatCount, formatPercent } from "@/lib/format";
 
@@ -216,6 +217,19 @@ export async function runPlan(
     undoToken: null as string | null,
   };
 
+  record(
+    results.map((r) => ({
+      at,
+      receipt: answer.receipt,
+      mode: r.mode,
+      actionId: r.id,
+      ...(r.target ? { target: r.target } : {}),
+      detail: r.detail,
+      ok: r.ok,
+      undoable: Boolean(r.undo),
+    })),
+  );
+
   const undoable = results.flatMap((r) => (r.undo ? [r.undo] : []));
   if (undoable.length > 0) {
     // Handed out as an unguessable id. The client can ask for the undo to
@@ -250,11 +264,14 @@ export async function undoRun(token: string): Promise<{ ok: boolean; details: st
   undoStore.delete(token);
 
   const out: string[] = [];
+  const at = new Date().toISOString();
   let ok = true;
   for (const e of entries.slice(0, 20)) {
     const r = await undo(e);
     out.push(r.detail);
     if (!r.ok) ok = false;
+    // An undo is a write too, and belongs in the record beside the run it reversed.
+    record([{ at, receipt: `undo:${token.slice(0, 8)}`, mode: r.mode, actionId: e.field, ...(r.target ? { target: r.target } : {}), detail: r.detail, ok: r.ok, undoable: false }]);
   }
   return { ok, details: out };
 }
@@ -290,7 +307,18 @@ export async function unlockExecution(secret: string): Promise<{ ok: boolean }> 
   if (!expected || secret !== expected) return { ok: false };
 
   const jar = await cookies();
-  jar.set("mazal-exec", expected, { httpOnly: true, sameSite: "strict", secure: true, path: "/" });
+  /**
+   * Fifteen minutes. Authorisation to spend someone's money should be measured
+   * in minutes, not "until you close the tab" — an unlocked session left open
+   * on a laptop is a standing permission nobody granted.
+   */
+  jar.set("mazal-exec", expected, {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: true,
+    path: "/",
+    maxAge: 15 * 60,
+  });
   return { ok: true };
 }
 

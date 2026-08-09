@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Action } from "@mazal/contracts";
+import { record } from "@/lib/audit";
 import { execute, executeConfigured, type ExecutionResult } from "@/lib/meta";
 
 /**
@@ -117,6 +118,21 @@ export async function POST(request: Request) {
   const at = new Date().toISOString();
   const receipt = `MZL-${at.slice(0, 10).replace(/-/g, "")}-${String(log.length + 1).padStart(4, "0")}`;
   log.push({ at, receipt, actions: actions as Action[], mode: live ? "live" : "simulated" });
+
+  // This route writes to Meta as surely as the server action does, and an audit
+  // that covers one of two write paths is not an audit.
+  record(
+    results.map((r) => ({
+      at,
+      receipt,
+      mode: r.mode,
+      actionId: r.id,
+      ...(r.target ? { target: r.target } : {}),
+      detail: r.detail,
+      ok: r.ok,
+      undoable: Boolean(r.undo),
+    })),
+  );
 
   return Response.json({
     receipt,
