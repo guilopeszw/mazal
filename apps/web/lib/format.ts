@@ -16,6 +16,12 @@ const pct = new Intl.NumberFormat("en", {
 const brl = new Intl.NumberFormat("en", { style: "currency", currency: "BRL" });
 const num = new Intl.NumberFormat("en", { maximumFractionDigits: 2 });
 const int = new Intl.NumberFormat("en");
+/** Money as a seller reads it: whole reais, no cents. */
+const brlWhole = new Intl.NumberFormat("en", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 0,
+});
 
 type Shape = "rate" | "money" | "ratio" | "count";
 
@@ -37,6 +43,12 @@ const METRICS: Record<string, { label: string; short: string; shape: Shape; deno
   reviewAvg: { label: "Average rating", short: "rating", shape: "count", denominator: "reviews" },
   photos: { label: "Photos on the listing", short: "photos", shape: "count", denominator: "products" },
   descriptionLength: { label: "Description length", short: "copy", shape: "count", denominator: "products" },
+  /**
+   * Not a funnel metric — this is what a reallocation moves. It is here so the
+   * plan panel prints "Daily budget: R$134 → R$104" rather than the raw field
+   * name and two decimal places of a solver output.
+   */
+  dailyBudget: { label: "Daily budget", short: "budget", shape: "money", denominator: "days" },
 };
 
 export const metricLabel = (metric: string) => METRICS[metric]?.label ?? metric;
@@ -50,7 +62,9 @@ export const denominatorOf = (metric: string) => METRICS[metric]?.denominator ??
 export function formatMetric(metric: string, value: number): string {
   switch (METRICS[metric]?.shape) {
     case "money":
-      return brl.format(value);
+      // A budget is read in whole reais; a CPA of R$4.20 is not. The cents
+      // matter where the number is small and are noise where it is a budget.
+      return metric === "dailyBudget" ? brlWhole.format(value) : brl.format(value);
     case "rate":
       return pct.format(value);
     default:
@@ -62,6 +76,16 @@ export const formatCount = (value: number) => int.format(value);
 
 /** Money that is not a metric — spend, revenue, a break-even. */
 export const formatBRL = (value: number) => brl.format(value);
+
+/**
+ * Money as a seller reads it: whole reais, no cents.
+ *
+ * A budget of "R$251.53" invites arithmetic nobody asked for, and two decimal
+ * places on a recommendation implies a precision the fit does not have —
+ * `docs/allocator-results.md` puts the median error in the marginal at 13%. The
+ * cents are noise dressed as accuracy.
+ */
+export const formatMoney = (value: number) => brlWhole.format(value);
 
 /** A stored fraction read as a percentage — a gross margin, never a funnel rate. */
 export const formatPercent = (value: number) => pct.format(value);
