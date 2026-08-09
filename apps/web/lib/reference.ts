@@ -47,7 +47,7 @@ const BENCHMARK_METRICS = new Set<string>([
 const isBenchmarkMetric = (metric: string): metric is BenchmarkMetric =>
   BENCHMARK_METRICS.has(metric);
 
-const int = new Intl.NumberFormat("pt-BR");
+const int = new Intl.NumberFormat("en");
 
 export function provenanceFor(
   finding: Finding,
@@ -57,32 +57,32 @@ export function provenanceFor(
   if (reference.kind === "self") {
     return {
       kind: "self",
-      label: `linha de base da própria campanha · ${reference.baselineDays} dias`,
+      label: `the campaign's own baseline · ${reference.baselineDays} days`,
     };
   }
 
   // Not every metric the engine flags has a benchmark row — `cpc`, `costPerAtc`, `roas`
   // and frequency are all derived from stored counts and are not in `BenchmarkMetric`.
   if (!isBenchmarkMetric(finding.metric)) {
-    return { kind: "unknown", label: "sem linha de referência para esta métrica" };
+    return { kind: "unknown", label: "no reference line for this metric" };
   }
 
   const distribution = reference.table[category]?.metrics[finding.metric];
   if (!distribution) {
-    return { kind: "unknown", label: `sem benchmark para ${category}` };
+    return { kind: "unknown", label: `no benchmark for ${category}` };
   }
 
   if (distribution.source === "prior" || distribution.n === 0) {
     return {
       kind: "prior",
-      label: "estimativa publicada para o varejo brasileiro — não medida",
+      label: "a published estimate for Brazilian retail — not measured",
     };
   }
 
   return {
     kind: "measured",
     n: distribution.n,
-    label: `mediana da categoria · n = ${int.format(distribution.n)} ${
+    label: `category median · n = ${int.format(distribution.n)} ${
       distribution.source === "olist" ? "Olist" : "Meta"
     }`,
   };

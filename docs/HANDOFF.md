@@ -37,6 +37,40 @@ Entry format:
 
 ---
 
+## 2026-08-09 01:30 · Guilherme · peer comparison, and a SECOND contract change
+
+**Mateus: this is the second time `packages/contracts` has changed without you.** Both additive, both announced, neither approved. Say if you want them shaped differently or gone.
+
+```ts
+export type SellerLever, SellerBenchmark, SellerLeverName,
+              LeverReplication, SellerBenchmarkTable, CardFinding   // all NEW
+```
+
+Nothing existing changed. `Verdict.limitingFactor` from the earlier entry is the other one.
+
+**Done:** a second capability, arrived at by grilling the direction first rather than building on an assumption. `diagnose` asks what broke in a campaign; **`profileCard(card, sellerBenchmarks)` asks what is different about this store compared to the stores it competes with.** Separate export, not a third `ReferenceMode` arm — a `Finding` needs a funnel stage and none of these belong to one.
+
+`pnpm derive` gains a seller pass writing `packages/data/seller-benchmarks.json`. A seller is scoped to one category, because the same shop sells brooms and headphones and is a different competitor in each. Two gates: percentiles need 20 qualifying sellers (≥10 sales, ≥5 reviews each) and reach **22 of 62** categories; quartile comparison needs 30 so a quartile is more than four shops, and reaches **18**. Below a gate `profileCard` returns nothing rather than something thin.
+
+### The finding, and a correction to it
+
+**One lever replicates. Four do not.** Better-reviewed sellers promise shorter delivery in **16 of 18** categories, median 7% less. `price` agrees in 11 of 18; `freightRatio`, `photos` and `descriptionLength` agree in **9 of 18**, which is a coin flip.
+
+**I got this wrong first.** An early read of three categories said freight ratio was the lever, and it was an artifact of the sample. Anyone quoting that from a conversation should use the table in [`peer-comparison.md`](peer-comparison.md) instead.
+
+Delivery ETA is a product-layer variable, invisible in Ads Manager, and it is what `eta_shock` already diagnoses in-campaign. The pre-flight and the in-flight answer point at the same lever, which is the thesis arriving on its own out of the seller data.
+
+**Nobody can see a competitor's campaign numbers.** Meta exposes creative, never performance. Sellers are ranked on mean review score, which is a proxy and is labelled one everywhere. Order volume was rejected as the outcome because top-reviewed sellers have *fewer* orders in every category measured — ranking on it would have inverted the question.
+
+### Two engine bugs fixed on the way
+
+**`thin_pdp` was the fallback for any unexplained stage-3 break**, so a seller with eight photos and nine hundred characters was told their page was thin. It now requires the card to sit at or below the category's lower quartile. Worth knowing: Olist barely separates good sellers from bad on photos — 1.79 against 1.93 — so the evidence for that fault existing at all is weak in this data.
+
+**Cause attribution answered from the pattern before it read the card.** A pixel break and a thin page look identical in the numbers, so every stage-3 break severe enough to zero out purchases was claimed as a tracking break. Precedence is now explicit event, then card evidence, then pattern — and `pixel_break` measures "near zero" against the reference rather than in sigmas, because `atcRate`'s spread is wide enough that a twentieth of reference is only 1.4 sigma down. **`pixel_break` recall 96% → 100%.** Top-1 unchanged at 59%.
+
+**Next:** slide 7 gets one line — *"we can tell a seller what the sellers beating them do differently, from public data, with no integration"* — and the number is **delivery, not shipping cost**. Slide 6 stays the backtest; an unvalidated capability does not belong on the accuracy slide.
+
+**Blocked / watch out:** `apps/web` and `apps/mcp` still do not exist. `pnpm test` 92 passing across 15 files, `pnpm typecheck` clean, every generator byte-reproducible.
 ## 2026-08-09 00:20 · Bringel · apps/web is redesigned, reviewed and merging to stage
 
 **Done:** the screen is built and rebuilt. `feat/apps-web` carries eight commits from `ecd1785`
@@ -606,3 +640,13 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 **Next:** `packages/contracts` — the six types from `docs/contracts.md` plus `metrics.ts` with its three assertions. This is C's package, but it is the only hard blocker for the other four people and B is the only one online, so B ships it and hands guardianship to C on arrival. Twenty minutes. Then `packages/data` (Olist derivation), then the simulator.
 
 **Blocked / watch out:** Nobody else is online yet. A arrives Saturday night and takes `packages/engine`; tell them about the A/B firewall the moment they start, because it is the one rule that cannot be fixed retroactively — once B's fault-injection logic has been read by A, the backtest number is worthless for the rest of the weekend.
+
+---
+
+## 2026-08-09 · D-frontend session · chat-first UI ported into apps/web
+
+**Done:** Replaced the carbonless-paper sheet in `apps/web` with the approved chat-first interface, on `feat/peer-market-profile`, uncommitted. Old presentation deleted (`components/despacho|funnel-block|finding-entry|plan-panel|daily-chart`, `components/document/*`, `lib/series.ts`, `lib/verdict.ts`); new `components/chat.tsx` + `components/answer.tsx`, `lib/answers.ts` runs `diagnose`/`predict`/`profileCard`/`measurability` in the server component so the benchmark JSON never ships to the client (verified: 596K of client chunks, no benchmark strings). `lib/fixtures.ts` now imports `packages/sim/fixtures/demo-case*.json` at build time — regenerating the fixtures re-derives every number on screen at the next build. UI copy and number formatting switched to English (`en` locale, BRL kept) to match the prototype. `pnpm typecheck`, `pnpm --filter web build`, `pnpm test` (96) all green.
+
+**Next:** Commit + merge to `stage` when the regenerated fixtures land; re-run the build afterwards since the fixtures are baked in at build time.
+
+**Blocked / watch out:** With the current `demo-case2.json`, the engine's change point (2026-07-11) lands 2 days before the `eta_change` event (2026-07-13), so `Finding.evidence` is not attached and the evidence card does not render. The UI handles both shapes; if the demo needs the evidence sentence, the regenerated fixture's event has to land within a day of the detected change point.
