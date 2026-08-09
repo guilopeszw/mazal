@@ -81,7 +81,7 @@ mean anything.
 | `creative_fatigue` | 28 | 9 | 32.1% |
 | `price_too_high` | 28 | 0 | 0.0% |
 | `checkout_friction` | 28 | 5 | 17.9% |
-| `pixel_break` | 28 | 27 | 96.4% |
+| `pixel_break` | 28 | 28 | 100.0% |
 | `budget_cap` | 28 | 11 | 39.3% |
 | `thin_pdp` | 28 | 0 | 0.0% |
 
@@ -112,7 +112,7 @@ eta_shock              6      0     19      0      0      2      0      1      0
 creative_fatigue      17      0      0      9      2      0      0      0      0
 price_too_high        24      0      0      0      0      3      0      1      0
 checkout_friction     20      0      0      0      2      5      0      1      0
-pixel_break            0      0      0      0      0      0     27      1      0
+pixel_break            0      0      0      0      0      0     28      0      0
 budget_cap            17      0      0      0      0      0      0     11      0
 thin_pdp              26      0      0      0      0      2      0      0      0
 ```

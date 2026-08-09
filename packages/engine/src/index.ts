@@ -290,26 +290,61 @@ function attribute(primary: Finding | null, flagged: Finding[], input: DiagnoseI
     return t.reach === 0 ? 0 : t.impressions / t.reach;
   })();
 
-  // "Everything down uniformly, sudden" — the last row of the brief's signature
-  // table. A pixel that stopped reporting kills every conversion the tracker
-  // sees while impressions and clicks keep running, so stages 3, 4 and 5 all
-  // break together and the media stages do not. It is checked first because it
-  // is the most common real "my campaign died" cause, and because a seller sent
-  // to rewrite their creative here spends another week for nothing.
-  //
-  // Stage 4 cannot be part of the test even though a pixel break kills it too:
-  // when add-to-carts collapse there are fewer than thirty left to judge
-  // checkouts on, so stage 4 silences itself. Requiring it would mean the rule
-  // never fires. Stage 2 is out for the usual reason — it needs analytics.
-  //
-  // A stockout looks identical from the numbers alone, so an event that explains
-  // a single stage wins: the event log is what separates them.
+  /**
+   * Precedence: an explicit event beats card evidence, and card evidence beats
+   * pattern inference. A pixel break and a thin product page look identical in
+   * the numbers — both take add-to-carts down and purchases with them — so the
+   * pattern rule below cannot be allowed to answer first. It used to, and it
+   * claimed every stage-3 break severe enough to zero out purchases.
+   */
+  if (has(input, 'pixel_error')) return 'pixel_break';
+
   const broken = new Set(flagged.map((f) => f.stage));
+
+  if (primary.stage === 3) {
+    if (has(input, 'stockout') || input.card.stockOnHand === 0) return 'stockout';
+    if (has(input, 'price_change') || (row && input.card.price > row.price.p75)) return 'price_too_high';
+
+    /**
+     * `thin_pdp` now has to be earned. It was the fallback for any unexplained
+     * stage-3 break, so a seller with eight photos and nine hundred characters
+     * was told their page was thin and sent to rewrite a page that was fine.
+     *
+     * Olist barely separates good sellers from bad on either field — 1.79 photos
+     * against 1.93 — so the evidence for this fault is thin in its own right.
+     * Requiring the card to actually be below the category's lower quartile is
+     * the least we can do before naming it.
+     */
+    const thinPhotos = row ? input.card.pdpImages <= row.photos.p25 : false;
+    const thinCopy = row ? input.card.pdpDescriptionLength <= row.descriptionLength.p25 : false;
+    if (thinPhotos || thinCopy) return 'thin_pdp';
+  }
+
+  /**
+   * "Everything down uniformly, sudden" — the last row of the brief's signature
+   * table, and now the fallback rather than the first answer. Stage 4 cannot be
+   * part of the test: when add-to-carts collapse there are fewer than thirty
+   * left to judge checkouts on, so the stage silences itself and requiring it
+   * would mean the rule never fires. Stage 2 is out for the usual reason.
+   */
   const mediaHealthy = !broken.has(0) && !broken.has(1);
   const explained = ['stockout', 'eta_change', 'price_change', 'budget_change'] as const;
-  const hasExplanation = explained.some((t) => has(input, t));
 
-  if (mediaHealthy && broken.has(3) && broken.has(5) && !hasExplanation) return 'pixel_break';
+  /**
+   * "Near zero" means near zero, so it is measured against the reference itself
+   * rather than in sigmas. A sigma threshold reads differently for every metric
+   * — atcRate's benchmark spread is wide enough that a stage at a twentieth of
+   * its reference is only 1.4 sigma down — and a mild dip on a page the card
+   * says is fine is not a tracking break. Calling it one sends a seller to check
+   * a pixel that was never broken.
+   */
+  const NEAR_ZERO = 0.15;
+  const collapsed = (stage: FunnelStage) =>
+    flagged.some((f) => f.stage === stage && f.observed <= f.reference * NEAR_ZERO);
+
+  if (mediaHealthy && collapsed(3) && collapsed(5) && !explained.some((t) => has(input, t))) {
+    return 'pixel_break';
+  }
 
   switch (primary.stage) {
     case 0:
@@ -317,8 +352,8 @@ function attribute(primary: Finding | null, flagged: Finding[], input: DiagnoseI
     case 1:
       return 'creative_fatigue';
     case 3:
-      if (has(input, 'stockout') || input.card.stockOnHand === 0) return 'stockout';
-      if (has(input, 'price_change') || (row && input.card.price > row.price.p75)) return 'price_too_high';
+      // Card evidence was checked above and did not explain it. Saying so is a
+      // better answer than naming a cause the card contradicts.
       return 'thin_pdp';
     case 4:
       if (has(input, 'eta_change') || (row && input.card.deliveryEtaDays > row.deliveryDays.p75)) return 'eta_shock';
