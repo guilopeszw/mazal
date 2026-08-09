@@ -15,6 +15,15 @@ Entry format:
 
 ---
 
+## 2026-08-09 16:56 BRT · Codex · web chat API Task 2
+
+**Done:** deterministic chat narration guard, templates, and known-case fixtures are implemented in `apps/web/app/api/chat/` and will be committed as `feat(web): validate deterministic chat narration`. The guard rejects literal provider digits, unknown/prototype/missing paths, incompatible formatters, unresolved braces, control characters, and digits introduced through text substitutions. Focal narration tests (10) and the web typecheck are green.
+
+**Next:** integrate these functions into `POST /api/chat`, selecting a known fixture only for a resolved `case1`/`case2` and otherwise using `templateFor`.
+
+**Blocked / watch out:** fixture prose assumes a primary finding and first recovery action; `templateFor` is the safe fallback for healthy or actionless contexts. No `packages/contracts` or other package changed.
+
+
 ## 2026-08-09 16:15 BRT · Bringel's agent · the chat shell's chrome, and stage→main
 
 **Done:** three things, in this order.

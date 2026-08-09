@@ -1,0 +1,154 @@
+import type { ResolvedContext } from "./context.ts";
+import { fixtureFor } from "./fixtures.ts";
+import { parseStructuredNarration, renderNarration } from "./narration.ts";
+import { templateFor } from "./template.ts";
+import { expect, test } from "vitest";
+
+const context: ResolvedContext = {
+  input: {
+    days: [],
+    card: {
+      category: "health_beauty",
+      price: 100,
+      grossMargin: 0.5,
+      shippingCost: 0,
+      deliveryEtaDays: 3,
+      stockOnHand: 10,
+      reviewCount: 20,
+      reviewAvg: 4.5,
+      pdpImages: 4,
+      pdpDescriptionLength: 200,
+      returnPolicyDays: 7,
+      paymentMethods: ["pix"],
+      offer: "none",
+    },
+    events: [],
+    reference: { kind: "self", baselineDays: 14 },
+  },
+  diagnosis: {
+    primary: {
+      stage: 3,
+      severity: "primary",
+      metric: "atcRate",
+      observed: 0.045,
+      reference: 0.1,
+      spread: 0.01,
+      deviation: -5.5,
+      sampleSize: 120,
+      rule: "stage3.atc_below_benchmark",
+      causeLayer: "product",
+    },
+    secondary: [],
+    suspectedCause: "thin_pdp",
+  },
+  plan: {
+    actions: [
+      {
+        id: "improve-pdp",
+        title: "Melhore a página do produto",
+        change: "Adicione imagens úteis",
+        expectedEffect: { metric: "atcRate", from: 0.045, to: 0.1 },
+        confidence: "high",
+        reversible: true,
+        actor: "seller",
+      },
+    ],
+    projected: { p10: 1.2, p50: 1.5, p90: 1.8 },
+  },
+};
+
+test("renders a valid known fixture through the deterministic renderer", () => {
+  const narration = fixtureFor("case1", context);
+
+  expect(narration).toContain("4,5%");
+  expect(narration).toContain("Melhore a página do produto");
+  expect(narration).not.toMatch(/{{|}}/);
+});
+
+test("rejects prototype paths from a provider", () => {
+  expect(() =>
+    renderNarration(
+      { verdict: "{{__proto__|text}}", evidence: "Evidência", plan: "Plano" },
+      context,
+    ),
+  ).toThrow();
+});
+
+test("rejects an incompatible formatter for a deterministic value", () => {
+  expect(() =>
+    renderNarration(
+      {
+        verdict: "{{diagnosis.primary.observed|brl}}",
+        evidence: "Evidência",
+        plan: "Plano",
+      },
+      context,
+    ),
+  ).toThrow();
+});
+
+test("rejects an unknown formatter", () => {
+  expect(() =>
+    renderNarration(
+      {
+        verdict: "{{diagnosis.primary.observed|rounded}}",
+        evidence: "Evidência",
+        plan: "Plano",
+      },
+      context,
+    ),
+  ).toThrow();
+});
+
+test("rejects a literal numeric claim from a provider", () => {
+  expect(() => renderNarration({ verdict: "Caiu 12%", evidence: "x", plan: "y" }, context)).toThrow();
+});
+
+test("rejects a placeholder whose deterministic value is absent", () => {
+  expect(() =>
+    renderNarration(
+      {
+        verdict: "Veredito",
+        evidence: "{{diagnosis.primary.evidence.detail|text}}",
+        plan: "Plano",
+      },
+      context,
+    ),
+  ).toThrow();
+});
+
+test("rejects unresolved braces after interpolation", () => {
+  expect(() =>
+    renderNarration({ verdict: "Veredito {{", evidence: "Evidência", plan: "Plano" }, context),
+  ).toThrow();
+});
+
+test("rejects digits introduced by an untyped text value", () => {
+  const numericTextContext: ResolvedContext = {
+    ...context,
+    plan: {
+      ...context.plan,
+      actions: [{ ...context.plan.actions[0], title: "Adicione 3 imagens" }],
+    },
+  };
+
+  expect(() =>
+    renderNarration(
+      { verdict: "Veredito", evidence: "Evidência", plan: "{{plan.firstAction.title|text}}" },
+      numericTextContext,
+    ),
+  ).toThrow();
+});
+
+test("parses only a strict, trimmed structured narration", () => {
+  expect(
+    parseStructuredNarration({ verdict: " Veredito ", evidence: " Evidência ", plan: " Plano " }),
+  ).toEqual({ verdict: "Veredito", evidence: "Evidência", plan: "Plano" });
+  expect(() =>
+    parseStructuredNarration({ verdict: "Veredito", evidence: "Evidência", plan: "Plano", extra: true }),
+  ).toThrow();
+});
+
+test("renders the fallback template with the same guard", () => {
+  expect(templateFor(context)).toContain("4,5%");
+});
