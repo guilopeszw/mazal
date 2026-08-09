@@ -802,3 +802,11 @@ Two shapes in `derive.ts` to check when the real numbers land: an order's catego
 **Next:** Review the PR, run the hosted Vercel preview when it appears, and merge only after the project checks are green.
 
 **Blocked / watch out:** The local `apps/web` production build still hits a restricted-process/Turbopack limitation in this environment; this is documented and should be rechecked by Vercel CI rather than treated as a source-level failure.
+
+## 2026-08-09 · E-agent · post-PR deployment check
+
+**Done:** Verified the connected repository and deployment state. PR #1 is still open in `JucaGF/mazal`; the remote `main` still points to `afb9a90`. Vercel built the integration branch successfully, but the preview returned 404 because the build completed in 150 ms with no output files.
+
+**Next:** Merge PR #1 in `JucaGF/mazal`, configure the `mazal` Vercel project as the `apps/web` Next.js app, then trigger a new preview and confirm `/` returns 200 before relying on production.
+
+**Blocked / watch out:** The current `READY` deployment is not evidence that the web app is served. The separate `mcp` project is deployed on Node 24 and its `/mcp` endpoint requires authentication; there is no `/health` route.
