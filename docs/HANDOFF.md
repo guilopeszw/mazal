@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 01:42 BRT · E-agent (Joaquim) · pacote de PRDs
+
+**Done:** plano aprovado e commitado em `3b15884`; onze PRDs autocontidos criados em `docs/prds/e-agent/`, cobrindo fixtures, MCP, Deco, narração, chat, demo, pitch, Meta read-only e writes futuros.
+
+**Next:** executar `docs/prds/e-agent/01-demo-fixtures.md` com A/B e iniciar `02-mcp-scaffold.md` na branch de E sem esperar o frontend.
+
+**Blocked / watch out:** PRD 01 permanece dependência externa; PRD 07 só começa quando D integrar `apps/web`; PRD 10 é stretch e não entra antes do caminho de demo estar congelado.
+
 ## 2026-08-09 01:33 BRT · E-agent (Joaquim) · planejamento de MCP, Deco e demo
 
 **Done:** auditoria completa do brief de E, decisões de arquitetura fechadas com o responsável e plano salvo em `docs/superpowers/plans/2026-08-09-e-agent.md`. Branch `joaquim/feat/agent-mcp` criada a partir de `main`; nenhuma implementação iniciada.
