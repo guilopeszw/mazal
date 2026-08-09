@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { OlistCategory } from "@mazal/contracts";
 import type { Answer, AnswerKey } from "@/lib/answers";
 import { AnswerBody } from "./answer";
 import { Upload } from "./upload";
@@ -95,7 +96,14 @@ function ThemeToggle() {
 
 type Turn = { id: number; asked: string; answer: Answer };
 
-export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
+export function Chat({
+  answers,
+  categories,
+}: {
+  answers: Record<AnswerKey, Answer>;
+  /** Passed down rather than imported, so the client never pulls in the contract runtime. */
+  categories: readonly OlistCategory[];
+}) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -189,6 +197,7 @@ export function Chat({ answers }: { answers: Record<AnswerKey, Answer> }) {
         {uploading && (
           <div className="mt-[26px]">
             <Upload
+              categories={categories}
               onAnswer={(answer) => {
                 ask(answer.asked, answer);
                 setUploading(false);

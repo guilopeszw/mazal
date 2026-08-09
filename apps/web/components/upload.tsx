@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { OLIST_CATEGORIES, type CampaignDay, type OlistCategory } from "@mazal/contracts";
+import type { CampaignDay, OlistCategory } from "@mazal/contracts";
 import {
   categoryDefaults,
   diagnoseUpload,
@@ -48,9 +48,13 @@ const input =
 export function Upload({
   onAnswer,
   onClose,
+  categories,
 }: {
   onAnswer: (answer: Answer) => void;
   onClose: () => void;
+  /** The 62 category names, handed down from the server so this component never
+   *  pulls @mazal/contracts into the client bundle. */
+  categories: readonly OlistCategory[];
 }) {
   const [parsed, setParsed] = useState<{
     fileName: string;
@@ -188,7 +192,7 @@ export function Upload({
                   <option value="" disabled>
                     Choose a category…
                   </option>
-                  {OLIST_CATEGORIES.map((c) => (
+                  {categories.map((c) => (
                     <option key={c} value={c}>
                       {c.replace(/_/g, " ")}
                     </option>
