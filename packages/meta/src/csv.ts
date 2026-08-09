@@ -36,6 +36,12 @@ export type AdsManagerCsvOptions = {
    * folds it first.
    */
   perEntity?: boolean;
+  /**
+   * The campaign every entity belongs to. Only read when `perEntity` is on —
+   * without it the ad set's name ends up in the campaign column too, which is
+   * a shape Ads Manager never exports.
+   */
+  campaignName?: string;
 };
 
 /**
@@ -49,7 +55,7 @@ export type AdsManagerCsvOptions = {
  * is exactly what that rule exists to prevent.
  */
 export function toAdsManagerCsv(entities: MetaEntityDays[], options: AdsManagerCsvOptions = {}): string {
-  const { currency = 'BRL', perEntity = false } = options;
+  const { currency = 'BRL', perEntity = false, campaignName: campaign } = options;
 
   const header = [
     'Reporting starts',
@@ -71,7 +77,7 @@ export function toAdsManagerCsv(entities: MetaEntityDays[], options: AdsManagerC
     'Website purchase ROAS (return on ad spend)',
   ];
 
-  const campaignName = entities[0]?.name ?? 'Campaign';
+  const campaignName = campaign ?? entities[0]?.name ?? 'Campaign';
 
   const rows: string[][] = [];
   for (const entity of entities) {

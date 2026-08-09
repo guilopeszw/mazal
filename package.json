@@ -13,7 +13,8 @@
     "sim:eyeball": "node packages/sim/eyeball.ts",
     "sim:fixtures": "node packages/sim/write-fixtures.ts && node packages/sim/write-account-fixture.ts",
     "sim:backtest": "node packages/sim/run-backtest.ts",
-    "sim:allocator": "node packages/sim/run-allocator.ts"
+    "sim:allocator": "node packages/sim/run-allocator.ts",
+    "meta:fixtures": "node packages/meta/generate.ts"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

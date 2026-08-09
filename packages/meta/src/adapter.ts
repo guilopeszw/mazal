@@ -100,6 +100,7 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
 
   const entities = new Map<string, MetaEntityDays>();
   const unknownActions = new Set<string>();
+  const campaignIds = new Set<string>();
   let currency: string | undefined;
 
   rows.forEach((raw, rowIndex) => {
@@ -123,6 +124,7 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
     const level: 'campaign' | 'adset' = typeof row.adset_id === 'string' ? 'adset' : 'campaign';
     const id = level === 'adset' ? row.adset_id! : row.campaign_id;
     const name = (level === 'adset' ? row.adset_name : row.campaign_name) ?? id;
+    if (typeof row.campaign_id === 'string' && row.campaign_id.length > 0) campaignIds.add(row.campaign_id);
 
     if (typeof row.account_currency === 'string') currency ??= row.account_currency;
 
@@ -235,10 +237,22 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
     );
   }
 
+  /**
+   * The same fold the CSV path uses, so the two routes into the engine cannot
+   * disagree about what a day is.
+   *
+   * When every row belongs to one campaign, the total is that campaign and
+   * carries its id — not the id of whichever ad set happened to be first in the
+   * response. Three ad sets under one campaign are one funnel seen in pieces,
+   * and the piece that was written down first is not the name of the whole.
+   */
+  const [onlyCampaign] = campaignIds;
+  const total = foldDaysByDate(list.flatMap((entity) => entity.days)).map((day) =>
+    campaignIds.size === 1 && onlyCampaign ? { ...day, campaignId: onlyCampaign } : day,
+  );
+
   return {
-    // The same fold the CSV path uses, so the two routes into the engine cannot
-    // disagree about what a day is.
-    total: foldDaysByDate(list.flatMap((entity) => entity.days)),
+    total,
     entities: list,
     ...(currency ? { currency } : {}),
     warnings,

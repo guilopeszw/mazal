@@ -1,0 +1,3169 @@
+{
+  "data": [
+    {
+      "date_start": "2026-07-01",
+      "date_stop": "2026-07-01",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "120.97",
+      "impressions": "6366",
+      "reach": "5536",
+      "inline_link_clicks": "67",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "8"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "55"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "374.34"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-01",
+      "date_stop": "2026-07-01",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "106.01",
+      "impressions": "5579",
+      "reach": "4851",
+      "inline_link_clicks": "58",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "48"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "328.06"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-01",
+      "date_stop": "2026-07-01",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "29.64",
+      "impressions": "1560",
+      "reach": "1356",
+      "inline_link_clicks": "16",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "13"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "91.72"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-02",
+      "date_stop": "2026-07-02",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "132.54",
+      "impressions": "7033",
+      "reach": "5960",
+      "inline_link_clicks": "60",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "49"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "318.85"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-02",
+      "date_stop": "2026-07-02",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "82.53",
+      "impressions": "4379",
+      "reach": "3711",
+      "inline_link_clicks": "37",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "30"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "198.53"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-02",
+      "date_stop": "2026-07-02",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "32.51",
+      "impressions": "1725",
+      "reach": "1462",
+      "inline_link_clicks": "15",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "12"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "78.21"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-03",
+      "date_stop": "2026-07-03",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "123.76",
+      "impressions": "6812",
+      "reach": "5630",
+      "inline_link_clicks": "73",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "8"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "4"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "60"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "431.62"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-03",
+      "date_stop": "2026-07-03",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "58.38",
+      "impressions": "3213",
+      "reach": "2655",
+      "inline_link_clicks": "34",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "28"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "203.58"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-03",
+      "date_stop": "2026-07-03",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "45.57",
+      "impressions": "2508",
+      "reach": "2073",
+      "inline_link_clicks": "27",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "22"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "158.92"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-04",
+      "date_stop": "2026-07-04",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "125.65",
+      "impressions": "6371",
+      "reach": "5138",
+      "inline_link_clicks": "65",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "53"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "293.13"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-04",
+      "date_stop": "2026-07-04",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "60.70",
+      "impressions": "3078",
+      "reach": "2482",
+      "inline_link_clicks": "31",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "141.61"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-04",
+      "date_stop": "2026-07-04",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "68.95",
+      "impressions": "3496",
+      "reach": "2820",
+      "inline_link_clicks": "36",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "30"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "160.85"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-05",
+      "date_stop": "2026-07-05",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "92.97",
+      "impressions": "5017",
+      "reach": "3950",
+      "inline_link_clicks": "45",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "37"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "249.33"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-05",
+      "date_stop": "2026-07-05",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "64.47",
+      "impressions": "3479",
+      "reach": "2739",
+      "inline_link_clicks": "31",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "172.89"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-05",
+      "date_stop": "2026-07-05",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "64.64",
+      "impressions": "3488",
+      "reach": "2747",
+      "inline_link_clicks": "31",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "173.37"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-06",
+      "date_stop": "2026-07-06",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "93.46",
+      "impressions": "4336",
+      "reach": "3336",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "298.93"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-06",
+      "date_stop": "2026-07-06",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "93.67",
+      "impressions": "4346",
+      "reach": "3343",
+      "inline_link_clicks": "39",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "32"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "299.58"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-06",
+      "date_stop": "2026-07-06",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "61.16",
+      "impressions": "2838",
+      "reach": "2183",
+      "inline_link_clicks": "25",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "195.61"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-07",
+      "date_stop": "2026-07-07",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "91.54",
+      "impressions": "4326",
+      "reach": "3253",
+      "inline_link_clicks": "41",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "34"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "237.92"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-07",
+      "date_stop": "2026-07-07",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "99.28",
+      "impressions": "4692",
+      "reach": "3528",
+      "inline_link_clicks": "44",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "4"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "36"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "258.05"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-07",
+      "date_stop": "2026-07-07",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "38.33",
+      "impressions": "1812",
+      "reach": "1362",
+      "inline_link_clicks": "17",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "14"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "99.62"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-08",
+      "date_stop": "2026-07-08",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "113.39",
+      "impressions": "5845",
+      "reach": "4298",
+      "inline_link_clicks": "43",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "35"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "187.17"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-08",
+      "date_stop": "2026-07-08",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "99.38",
+      "impressions": "5123",
+      "reach": "3767",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "164.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-08",
+      "date_stop": "2026-07-08",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "27.78",
+      "impressions": "1432",
+      "reach": "1053",
+      "inline_link_clicks": "11",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "9"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "45.86"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-09",
+      "date_stop": "2026-07-09",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "131.48",
+      "impressions": "6077",
+      "reach": "4372",
+      "inline_link_clicks": "62",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "51"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "212.57"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-09",
+      "date_stop": "2026-07-09",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "81.86",
+      "impressions": "3784",
+      "reach": "2722",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "132.35"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-09",
+      "date_stop": "2026-07-09",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "32.25",
+      "impressions": "1491",
+      "reach": "1073",
+      "inline_link_clicks": "15",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "12"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "52.14"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-10",
+      "date_stop": "2026-07-10",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "144.69",
+      "impressions": "7711",
+      "reach": "5430",
+      "inline_link_clicks": "63",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "52"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "215.81"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-10",
+      "date_stop": "2026-07-10",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "68.24",
+      "impressions": "3637",
+      "reach": "2561",
+      "inline_link_clicks": "30",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "101.79"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-10",
+      "date_stop": "2026-07-10",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "53.28",
+      "impressions": "2839",
+      "reach": "2000",
+      "inline_link_clicks": "23",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "19"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "79.46"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-11",
+      "date_stop": "2026-07-11",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "126.06",
+      "impressions": "6441",
+      "reach": "4442",
+      "inline_link_clicks": "70",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "57"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "390.84"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-11",
+      "date_stop": "2026-07-11",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "60.90",
+      "impressions": "3112",
+      "reach": "2146",
+      "inline_link_clicks": "34",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "28"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "188.81"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-11",
+      "date_stop": "2026-07-11",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "69.18",
+      "impressions": "3534",
+      "reach": "2438",
+      "inline_link_clicks": "39",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "32"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "214.47"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-12",
+      "date_stop": "2026-07-12",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "104.49",
+      "impressions": "5655",
+      "reach": "3821",
+      "inline_link_clicks": "54",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "44"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "249.33"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-12",
+      "date_stop": "2026-07-12",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "72.45",
+      "impressions": "3922",
+      "reach": "2650",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "172.89"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-12",
+      "date_stop": "2026-07-12",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "72.65",
+      "impressions": "3932",
+      "reach": "2657",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "173.37"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-13",
+      "date_stop": "2026-07-13",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "96.16",
+      "impressions": "4909",
+      "reach": "3251",
+      "inline_link_clicks": "44",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "36"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "74.73"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-13",
+      "date_stop": "2026-07-13",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "96.38",
+      "impressions": "4920",
+      "reach": "3258",
+      "inline_link_clicks": "44",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "36"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "74.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-13",
+      "date_stop": "2026-07-13",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "62.93",
+      "impressions": "3213",
+      "reach": "2128",
+      "inline_link_clicks": "29",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "24"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "48.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-14",
+      "date_stop": "2026-07-14",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "98.24",
+      "impressions": "5527",
+      "reach": "3589",
+      "inline_link_clicks": "68",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "56"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "79.31"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-14",
+      "date_stop": "2026-07-14",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "106.55",
+      "impressions": "5994",
+      "reach": "3892",
+      "inline_link_clicks": "74",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "61"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "86.02"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-14",
+      "date_stop": "2026-07-14",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "41.14",
+      "impressions": "2314",
+      "reach": "1503",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "33.20"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-15",
+      "date_stop": "2026-07-15",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "121.52",
+      "impressions": "5923",
+      "reach": "3773",
+      "inline_link_clicks": "61",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "50"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "93.59"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-15",
+      "date_stop": "2026-07-15",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "106.49",
+      "impressions": "5190",
+      "reach": "3306",
+      "inline_link_clicks": "54",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "44"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "82.01"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-15",
+      "date_stop": "2026-07-15",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "29.77",
+      "impressions": "1451",
+      "reach": "924",
+      "inline_link_clicks": "15",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "12"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "22.93"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-16",
+      "date_stop": "2026-07-16",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "126.13",
+      "impressions": "6756",
+      "reach": "4223",
+      "inline_link_clicks": "71",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "58"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "106.28"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-16",
+      "date_stop": "2026-07-16",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "78.54",
+      "impressions": "4207",
+      "reach": "2629",
+      "inline_link_clicks": "44",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "36"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "66.18"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-16",
+      "date_stop": "2026-07-16",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "30.94",
+      "impressions": "1657",
+      "reach": "1036",
+      "inline_link_clicks": "17",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "14"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "26.07"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-17",
+      "date_stop": "2026-07-17",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "144.94",
+      "impressions": "7568",
+      "reach": "4643",
+      "inline_link_clicks": "71",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "9"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "58"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "107.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-17",
+      "date_stop": "2026-07-17",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "68.37",
+      "impressions": "3569",
+      "reach": "2190",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "50.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-17",
+      "date_stop": "2026-07-17",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "53.37",
+      "impressions": "2787",
+      "reach": "1709",
+      "inline_link_clicks": "26",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "39.73"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-18",
+      "date_stop": "2026-07-18",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "127.83",
+      "impressions": "5447",
+      "reach": "3281",
+      "inline_link_clicks": "56",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "46"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "97.71"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-18",
+      "date_stop": "2026-07-18",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "61.75",
+      "impressions": "2631",
+      "reach": "1585",
+      "inline_link_clicks": "27",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "22"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "47.20"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-18",
+      "date_stop": "2026-07-18",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "70.15",
+      "impressions": "2989",
+      "reach": "1801",
+      "inline_link_clicks": "31",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.62"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-19",
+      "date_stop": "2026-07-19",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "99.96",
+      "impressions": "5041",
+      "reach": "2983",
+      "inline_link_clicks": "51",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "42"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "83.11"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-19",
+      "date_stop": "2026-07-19",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "69.31",
+      "impressions": "3496",
+      "reach": "2068",
+      "inline_link_clicks": "35",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "29"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "57.63"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-19",
+      "date_stop": "2026-07-19",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "69.50",
+      "impressions": "3505",
+      "reach": "2074",
+      "inline_link_clicks": "35",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "29"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "57.79"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-20",
+      "date_stop": "2026-07-20",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "84.48",
+      "impressions": "4370",
+      "reach": "2541",
+      "inline_link_clicks": "62",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "51"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "74.73"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-20",
+      "date_stop": "2026-07-20",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "84.67",
+      "impressions": "4380",
+      "reach": "2546",
+      "inline_link_clicks": "63",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "52"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "74.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-20",
+      "date_stop": "2026-07-20",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "55.28",
+      "impressions": "2860",
+      "reach": "1663",
+      "inline_link_clicks": "41",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "34"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "48.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-21",
+      "date_stop": "2026-07-21",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "100.35",
+      "impressions": "5609",
+      "reach": "3205",
+      "inline_link_clicks": "55",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "8"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "45"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "79.31"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-21",
+      "date_stop": "2026-07-21",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "108.84",
+      "impressions": "6084",
+      "reach": "3477",
+      "inline_link_clicks": "59",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "9"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "48"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "86.02"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-21",
+      "date_stop": "2026-07-21",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "42.01",
+      "impressions": "2349",
+      "reach": "1342",
+      "inline_link_clicks": "23",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "19"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "33.20"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-22",
+      "date_stop": "2026-07-22",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "110.93",
+      "impressions": "6534",
+      "reach": "3671",
+      "inline_link_clicks": "71",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "58"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "187.17"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-22",
+      "date_stop": "2026-07-22",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "97.21",
+      "impressions": "5726",
+      "reach": "3217",
+      "inline_link_clicks": "62",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "51"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "164.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-22",
+      "date_stop": "2026-07-22",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "27.18",
+      "impressions": "1601",
+      "reach": "899",
+      "inline_link_clicks": "18",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "15"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "45.86"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-23",
+      "date_stop": "2026-07-23",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "139.69",
+      "impressions": "7241",
+      "reach": "4000",
+      "inline_link_clicks": "84",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "9"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "69"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "106.28"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-23",
+      "date_stop": "2026-07-23",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "86.97",
+      "impressions": "4508",
+      "reach": "2491",
+      "inline_link_clicks": "52",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "43"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "66.18"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-23",
+      "date_stop": "2026-07-23",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "34.26",
+      "impressions": "1776",
+      "reach": "981",
+      "inline_link_clicks": "20",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "16"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "26.07"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-24",
+      "date_stop": "2026-07-24",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "139.33",
+      "impressions": "8086",
+      "reach": "4395",
+      "inline_link_clicks": "77",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "8"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "63"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "215.81"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-24",
+      "date_stop": "2026-07-24",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "65.71",
+      "impressions": "3814",
+      "reach": "2073",
+      "inline_link_clicks": "36",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "30"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "101.79"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-24",
+      "date_stop": "2026-07-24",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "51.30",
+      "impressions": "2978",
+      "reach": "1618",
+      "inline_link_clicks": "29",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "24"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "79.46"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-25",
+      "date_stop": "2026-07-25",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "129.97",
+      "impressions": "7001",
+      "reach": "3743",
+      "inline_link_clicks": "68",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "56"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "97.71"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-25",
+      "date_stop": "2026-07-25",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "62.78",
+      "impressions": "3382",
+      "reach": "1809",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "47.20"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-25",
+      "date_stop": "2026-07-25",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "71.32",
+      "impressions": "3841",
+      "reach": "2054",
+      "inline_link_clicks": "37",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "30"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.62"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-26",
+      "date_stop": "2026-07-26",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "105.56",
+      "impressions": "5188",
+      "reach": "2731",
+      "inline_link_clicks": "43",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "35"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "83.11"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-26",
+      "date_stop": "2026-07-26",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "73.20",
+      "impressions": "3598",
+      "reach": "1893",
+      "inline_link_clicks": "29",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "24"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "57.63"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-26",
+      "date_stop": "2026-07-26",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "73.40",
+      "impressions": "3608",
+      "reach": "1899",
+      "inline_link_clicks": "30",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "57.79"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-27",
+      "date_stop": "2026-07-27",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "96.40",
+      "impressions": "4521",
+      "reach": "2342",
+      "inline_link_clicks": "58",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "48"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "74.73"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-27",
+      "date_stop": "2026-07-27",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "96.61",
+      "impressions": "4531",
+      "reach": "2348",
+      "inline_link_clicks": "58",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "48"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "74.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-27",
+      "date_stop": "2026-07-27",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "63.08",
+      "impressions": "2959",
+      "reach": "1533",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "48.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-28",
+      "date_stop": "2026-07-28",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "101.30",
+      "impressions": "5723",
+      "reach": "2920",
+      "inline_link_clicks": "60",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "8"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "49"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "79.31"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-28",
+      "date_stop": "2026-07-28",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "109.86",
+      "impressions": "6207",
+      "reach": "3167",
+      "inline_link_clicks": "65",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "9"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "53"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "86.02"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-28",
+      "date_stop": "2026-07-28",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "42.41",
+      "impressions": "2396",
+      "reach": "1222",
+      "inline_link_clicks": "25",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "33.20"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-29",
+      "date_stop": "2026-07-29",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "114.67",
+      "impressions": "5481",
+      "reach": "2754",
+      "inline_link_clicks": "52",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "43"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-29",
+      "date_stop": "2026-07-29",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "100.49",
+      "impressions": "4804",
+      "reach": "2414",
+      "inline_link_clicks": "46",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "38"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-29",
+      "date_stop": "2026-07-29",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "28.10",
+      "impressions": "1343",
+      "reach": "675",
+      "inline_link_clicks": "13",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "11"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-30",
+      "date_stop": "2026-07-30",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385110001",
+      "adset_name": "Lookalike 1% — compradores",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "132.17",
+      "impressions": "6626",
+      "reach": "3280",
+      "inline_link_clicks": "84",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "69"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "106.28"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-30",
+      "date_stop": "2026-07-30",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385120001",
+      "adset_name": "Interesse — relógios",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "82.29",
+      "impressions": "4125",
+      "reach": "2042",
+      "inline_link_clicks": "52",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "43"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "66.18"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-30",
+      "date_stop": "2026-07-30",
+      "campaign_id": "sim-881889",
+      "campaign_name": "Relógios — sempre ativo",
+      "adset_id": "2385130001",
+      "adset_name": "Retargeting — 30 dias",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "32.42",
+      "impressions": "1625",
+      "reach": "805",
+      "inline_link_clicks": "21",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "17"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "26.07"
+        }
+      ]
+    }
+  ],
+  "paging": {
+    "cursors": {
+      "before": "MAZALQVFPZ",
+      "after": "MAZALQVFPa"
+    }
+  },
+  "__mazal_fixture": {
+    "kind": "fixture",
+    "generator": "packages/meta/generate.ts",
+    "derivedFrom": "packages/sim/fixtures/demo-case2.json",
+    "note": "Synthetic. No Meta account was called to produce this file."
+  }
+}
