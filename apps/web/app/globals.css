@@ -1,128 +1,142 @@
 @import "tailwindcss";
 
 /**
- * Via do Cliente — the world's materials.
+ * Mazal — functionalist.
  *
- * The ground is not cream. Brazilian carbonless copy paper (papel autocopiativo) comes in a
- * fixed set of vias: white first, pink second, green third, yellow fourth. This surface is
- * the green via — the copy that stays with the customer — and that is a chalky institutional
- * green, not a warm parchment. Getting this wrong turns the whole world into a nostalgia
- * pastiche of a document rather than a document.
+ * A seller is being told what to do with their money by software they met two
+ * minutes ago. Everything here is in service of that number looking *measured*
+ * rather than *sold*: one accent, one type family, a strict scale, and no
+ * decoration that could be mistaken for confidence.
  *
- * Three inks, and they carry the funnel's entire message without relying on hue: impact
- * black is a value the engine judged and passed, aniline red is a stamp, and carbon ghost is
- * the smudged second impression — what a symptom looks like on a copy nobody judged.
+ * The ground is off-white rather than white. Pure white on a projector clips to
+ * a glare and every hairline on it disappears; a warm paper tone keeps the rules
+ * visible in a room nobody controls the lighting of.
  */
 @theme {
-  --color-desk: #b9c3ac;
-  --color-paper: #d9e0ce;
-  --color-paper-band: #d0d9c3;
-  --color-paper-edge: #c3cdb4;
+  /* surfaces */
+  --color-ground: #fafaf8;
+  --color-raised: #ffffff;
+  --color-sunken: #f2f2ee;
+  --color-line: #e6e6e0;
+  --color-line-strong: #d3d3ca;
 
-  --color-ink: #17190f;
-  --color-ink-soft: #454a38;
+  /* ink */
+  --color-ink: #16181c;
+  --color-ink-soft: #5c6169;
+  --color-ink-faint: #8a9099;
+
   /**
-   * The carbon ghost has a floor it cannot go under. A second impression really is faint, and
-   * the honest colour for it measured 2.74:1 against this paper — below the 4.5:1 body-text
-   * floor, on the type carrying every downstream stage. It is lifted to 4.68:1 and the
-   * "ghostliness" is carried by what a carbon copy actually does instead: it prints lighter
-   * *and* it prints the word SINTOMA, so the distinction never rests on lightness alone.
+   * One accent, and it is functional: it marks what Mazal is confident about and
+   * nothing else. Green because the verdict is the product, and 0.62 lightness
+   * clears 4.5:1 on the ground while staying legible inverted on dark.
    */
-  --color-ghost: #59634c;
-  --color-rule: #a4ad93;
-  --color-rule-strong: #6e7860;
+  --color-accent: #0f9d63;
+  --color-accent-soft: #e6f5ee;
+  --color-accent-ink: #0a6b44;
 
-  --color-stamp: #b32a18;
-  --color-stamp-soft: #d3583f;
-  --color-seal: #46356a;
+  /** A judgement against the seller's interest gets its own colour, used once. */
+  --color-warn: #b4472c;
+  --color-warn-soft: #fbeae5;
 
-  --font-form: var(--font-form), ui-sans-serif, system-ui, sans-serif;
-  --font-struck: var(--font-struck), ui-monospace, monospace;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /** Numbers only. Tabular figures stop a changing value from shifting its neighbours. */
+  --font-num: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 /**
- * The sheet sits on a desk, so it casts a real shadow: an offset and a soft blur, never a
- * zero-offset halo. Paper is thin, so the offset is small and the blur is wide.
+ * Dark is not the light palette inverted. The ground lifts off pure black —
+ * #0d0f12 rather than #000 — because a true black behind a bright card reads as
+ * a hole, and the ink drops to an off-white for the same reason white-on-black
+ * body text is tiring to read.
  */
-@utility sheet-shadow {
-  box-shadow:
-    0 1px 2px rgb(23 25 15 / 0.16),
-    0 12px 32px -8px rgb(23 25 15 / 0.28);
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --color-ground: #0d0f12;
+      --color-raised: #16191e;
+      --color-sunken: #1b1f25;
+      --color-line: #262b33;
+      --color-line-strong: #363d47;
+
+      --color-ink: #e8eaed;
+      --color-ink-soft: #9aa1ab;
+      --color-ink-faint: #6b727c;
+
+      --color-accent: #2bbd80;
+      --color-accent-soft: #10261e;
+      --color-accent-ink: #6fdcaa;
+
+      --color-warn: #e0755a;
+      --color-warn-soft: #2a1712;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --color-ground: #0d0f12;
+    --color-raised: #16191e;
+    --color-sunken: #1b1f25;
+    --color-line: #262b33;
+    --color-line-strong: #363d47;
+
+    --color-ink: #e8eaed;
+    --color-ink-soft: #9aa1ab;
+    --color-ink-faint: #6b727c;
+
+    --color-accent: #2bbd80;
+    --color-accent-soft: #10261e;
+    --color-accent-ink: #6fdcaa;
+
+    --color-warn: #e0755a;
+    --color-warn-soft: #2a1712;
+  }
+
+  html {
+    background: var(--color-ground);
+  }
+
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+  }
+
+  /** Every number Mazal prints is a measurement. Tabular figures say so. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /** A visible focus ring is not optional — the seller may be on a keyboard. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 /**
- * Leader dots. A fiscal form runs a dotted rule from a field's label to its value so the eye
- * cannot land on the wrong row — the same job a zebra stripe does, done with less ink.
+ * Motion earns its place only on state change: a message arriving, a panel
+ * opening. Nothing loops, nothing draws attention to itself, and all of it stops
+ * for anyone who has asked it to.
  */
-@utility leader {
-  background-image: radial-gradient(circle, var(--color-rule) 1px, transparent 1px);
-  background-position: 0 bottom;
-  background-size: 6px 3px;
-  background-repeat: repeat-x;
+@utility rise {
+  animation: rise 320ms cubic-bezier(0.16, 0.84, 0.44, 1) both;
 }
 
-/**
- * The tear-off. A perforation is a line of punched holes, so it is drawn as holes in the
- * paper rather than as a dashed border sitting on top of it.
- */
-@utility perforation {
-  background-image: radial-gradient(
-    circle at center,
-    var(--color-desk) 0 2.5px,
-    transparent 2.5px
-  );
-  background-size: 12px 12px;
-  background-repeat: repeat-x;
-  background-position: center;
-}
-
-/**
- * The stock itself. `public/stock.svg` carries two octaves of fractal mottle and a stretched
- * fibre pass; painting a flat hex here is what made the last build's paper read as a colour
- * rather than a material. Tiled, because a sheet is cut from a roll.
- */
-@utility stock {
-  background-color: var(--color-paper);
-  background-image: url("/stock.svg");
-  background-size: 420px 420px;
-  background-repeat: repeat;
-}
-
-/**
- * A struck impression. The irregularity lives in `components/document/ink.tsx` as an SVG
- * filter, because breaking a letterform edge needs displacement and a CSS mask cannot do it —
- * the periodic gradient this replaces dipped 14% every 4px and never touched a glyph.
- */
-@utility struck-a {
-  filter: url(#ink-a);
-}
-
-@utility struck-b {
-  filter: url(#ink-b);
-}
-
-/**
- * The one authored moment: the die coming down. It plays once, on load, on the verdict only —
- * the mark the room reads first arrives by being struck rather than by fading in. Everything
- * else on the sheet is already printed when you get there.
- */
-@keyframes strike {
-  0% {
+@keyframes rise {
+  from {
     opacity: 0;
-    transform: rotate(-7deg) scale(1.5);
+    transform: translateY(6px);
   }
-  55% {
+  to {
     opacity: 1;
-    transform: rotate(-7deg) scale(0.965);
+    transform: none;
   }
-  100% {
-    opacity: 1;
-    transform: rotate(-7deg) scale(1);
-  }
-}
-
-@utility strike-down {
-  animation: strike 420ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
