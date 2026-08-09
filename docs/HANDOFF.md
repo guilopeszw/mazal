@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 17:08 BRT · Codex · web chat API Task 3
+
+**Done:** Implemented `POST /api/chat` on `feat/web-chat-api` with bounded streaming JSON input, exact host/origin validation, fixture/template selection, generic errors, `no-store`, and a provisional opaque server-issued `conversationId`. Added 10 route tests; all 29 chat API tests, Next type generation, web typecheck, diff check, and a local fixture smoke are green. Commit follows this handoff entry.
+
+**Next:** Task 4 replaces the provisional `conversation.ts` issuer with signed-cookie identity, session verification, expiry, and complete continuation tests.
+
+**Blocked / watch out:** Live Deco mode is deliberately not implemented here. The sandbox blocked the first local port bind (`EPERM`); the authorized smoke started and returned the expected fixture response. The report is `.superpowers/sdd/2026-08-09-web-chat-api/task-3-report.md`.
+
 ## 2026-08-09 17:00 BRT · Codex · web chat API Task 2 fix round 1
 
 **Done:** `fixtureFor` now falls back to `templateFor` when a known scenario resolves healthy or without a recovery action; it no longer attempts placeholders absent from that context. The narration registry omits text values with digits unless a safe template needs them, preserving rejection when a provider tries to interpolate them. Tests now exercise both engine-resolved demo scenarios plus healthy/actionless fallback paths; 14 narration tests, the web typecheck, and diff check are green.
