@@ -15,6 +15,30 @@ Entry format:
 
 ---
 
+## 2026-08-09 19:30 BRT · Bringel's agent · the Meta payload, mocked on purpose
+
+**Done:** the Meta Ads MCP is **not** being built — no time, and PRD 10 always had it in the "only if there is buffer" phase. What is built is the half that is useful without it: `packages/meta`, a new package holding the raw insights payload, the adapter that normalises it, and two committed payloads that carry the demo. Branch `feat/meta-insights-payload` off `stage`, seven commits.
+
+The chain is: `packages/sim` fixture → payload + Ads Manager CSV → `fromMetaInsights` → `CampaignDay[]` → the same engine as always. **The screen does not move**, and that is the whole design: `pnpm meta:fixtures` writes the files and then asserts the payload folds back to the simulator's committed fixture exactly, both CSVs parse back to it, and the diagnosis through the payload is still stage 4 `icRate` at −1.61σ with the change point on 2026-07-12 and the `eta_change` event attached. Every number `docs/demo-contract.md` publishes, re-derived through the new path.
+
+Three things worth knowing, in order of how much they will bite:
+
+- **`parseMetaCsv` emits one `CampaignDay` per CSV *row* and does not group by date.** An Ads Manager export broken out by ad set therefore arrives as N rows per day, and `diagnose`'s seven-day window silently covers two and a bit real days. This predates today and is not fixed in `apps/web`'s upload path — `foldDaysByDate` is written, exported from `@mazal/meta` and used by the payload path, and wiring it into `app/actions.ts` is the next action below. Until then, **the file to upload in a demo is `packages/meta/fixtures/demo-case2.campaign.csv`** (30 rows, one a day), not `demo-case2.adsets.csv` (90).
+- **Absence is not zero, and that is a deliberate split from `packages/ingest`.** A missing `spend` in a payload is refused by name with the row and date attached; an `actions: []` that is present is a real zero. The CSV parser makes the other call — default to 0, warn, carry on — because a spreadsheet is a human artefact with human gaps and an API response is machine output.
+- **`packages/meta` has no zod.** `packages/ingest` is on zod 3 and `apps/mcp` is on zod 4, so a package both import cannot depend on it. Validation is hand-written. This is also why it is a new package rather than an addition to C's.
+
+`diagnose_campaign` now takes `days` **or** `metaInsights`, exactly one, as PRD 10 asks and without a fifth tool. It is an object with a `.refine()` rather than a union, because a union publishes an `anyOf` root in `tools/list` and a client that expects an object stops being able to call the tool.
+
+Green: **206 tests** across 29 files, 42 in `@mazal/mcp` including the isolated Vercel bundle, root typecheck, web typecheck, `next build`.
+
+**Next:** open the PR to `stage` and get it reviewed — the branch owner does not merge. After that, one small thing worth doing before the projector: call `foldDaysByDate` in `apps/web/app/actions.ts` so an ad-set-level export uploaded by hand stops being read as three days per day.
+
+**Blocked / watch out:**
+
+- **Nothing in another owner's package was touched.** `packages/contracts`, `packages/ingest`, `packages/engine` and `packages/sim` are untouched — the new package exists partly so that stayed true. `AGENTS.md` gained an ownership row (`packages/meta`, D).
+- **The payloads are fixtures and say so in the file.** They carry `__mazal_fixture`, a field the Graph API does not return; the adapter propagates it and warns. `docs/demo-runbook.md` now answers *"did this data come from Meta?"* out loud, and its "What not to claim" section no longer says the Allocator does not render — it does, over the synthetic account, and both halves of that sentence have to be said.
+- **The product card never comes from Meta and cannot.** Price, margin, stock, photos and the delivery promise are the seller's twelve fields; no integration removes the form, and the half of the funnel they explain is the product.
+
 ## 2026-08-09 18:10 BRT · Guilherme's agent · end of the build day
 
 **Done:** `main` is at `2350fd4` and green — 169 tests, `@mazal/mcp` 39, typecheck (now including `apps/mcp`), `next build`, and both demo fixtures pass their beat guard. Verified from a fresh `--frozen-lockfile` checkout, not from this working tree.
