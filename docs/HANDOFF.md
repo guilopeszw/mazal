@@ -15,6 +15,14 @@ Entry format:
 
 ---
 
+## 2026-08-09 02:15 BRT · E-agent (Joaquim) · validação Node 24 do scaffold MCP
+
+**Done:** Node `v24.19.0` foi instalado localmente e validou o scaffold em `0dae69d`: `pnpm --filter @mazal/mcp test` (11/11), typecheck focalizado do MCP, `pnpm typecheck` e `pnpm test` (14 arquivos, 96/96). O teste de integração já confirma que `mazal.vercel.app`, quando incluído na allowlist exata, atravessa Host/Origin/bearer e completa o handshake MCP com 200.
+
+**Next:** confirmar o corretivo na revisão final e então iniciar o PRD 03, expondo apenas as quatro tools determinísticas.
+
+**Blocked / watch out:** o typecheck raiz não inclui `apps/mcp`; o typecheck focalizado é verde e obrigatório. Ampliar esse gate global é melhoria de configuração separada, não bloqueio funcional do scaffold.
+
 ## 2026-08-09 02:11 BRT · E-agent (Joaquim) · correções do review do scaffold MCP
 
 **Done:** achados HIGH/MEDIUM do review corrigidos em `0dae69d` (`fix(mcp): secure deployment transport gates`). O endpoint aceita apenas hosts/origins exatos configurados por `MAZAL_MCP_ALLOWED_HOSTS`/`MAZAL_MCP_ALLOWED_ORIGINS`, autentica antes de parsear JSON e compara bearer tokens por digests SHA-256 fixos. Host/Origin fora da allowlist seguem em 403; JSON malformado sem bearer ou com bearer incorreto recebe 401. Testes focalizados: 11/11; suíte global: 96/96.
