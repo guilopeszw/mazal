@@ -53,7 +53,7 @@ test('the isolated bundle exposes named MCP HTTP methods and rejects an unauthen
     expect(entrypoint.DELETE).toEqual(expect.any(Function));
 
     const response = await entrypoint.POST(
-      new Request('https://localhost/api/mcp.mjs', {
+      new Request('https://localhost/mcp', {
         method: 'POST',
         headers: { Host: 'localhost' },
       }),
@@ -79,7 +79,7 @@ test('the isolated bundle completes an authenticated MCP handshake', async () =>
       allowedOrigins: ['mazal-mcp.vercel.app'],
     });
     const response = await handler(
-      new Request('https://mazal-mcp.vercel.app/api/mcp.mjs', {
+      new Request('https://mazal-mcp.vercel.app/mcp', {
         method: 'POST',
         headers: {
           Accept: 'application/json, text/event-stream',

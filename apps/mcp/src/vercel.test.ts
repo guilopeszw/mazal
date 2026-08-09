@@ -48,7 +48,7 @@ test('routes the public MCP URL to the Vercel artifact before authentication', a
     allowedHosts: ['mazal-mcp.vercel.app'],
     allowedOrigins: ['mazal-mcp.vercel.app'],
   });
-  const response = await handler(new Request(`https://mazal-mcp.vercel.app${route.dest}`, {
+  const response = await handler(new Request('https://mazal-mcp.vercel.app/mcp', {
     method: 'POST',
     headers: {
       Host: 'mazal-mcp.vercel.app',
