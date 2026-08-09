@@ -88,6 +88,14 @@ Every session appends to `docs/HANDOFF.md` before it ends, attended or not — w
 - **Scheduling, checkpoints, what gets cut** → [`docs/plan/README.md`](docs/plan/README.md).
 - **Your own assignment** → `docs/plan/{A-engine,B-data,C-ingest,D-frontend,E-agent}.md`. Read yours; you do not need anyone else's.
 
+## Deco Studio
+
+`.mcp.json` registers the Deco Studio workspace as an MCP server, so any agent working in this repo — Claude Code, Codex, anything that reads `.mcp.json` — gets the deco tools without configuring them by hand. The file holds a URL and nothing else.
+
+**Authenticate once per machine.** In Claude Code that is `/mcp` → `deco-studio`. The config is shared; the credential is yours and never enters the repo. `DECO_MCP_URL` overrides the workspace if you are pointed at a different one.
+
+This is the same Studio workspace that already holds the `Mazal` agent and the Custom Connection wrapping our deployed MCP — see [`docs/mazal-mcp-vercel-deco.md`](docs/mazal-mcp-vercel-deco.md). That agent's configuration currently lives only in the Studio UI, with no history and no review: if you change it, say so in `docs/HANDOFF.md`, because nothing else will record that you did.
+
 ## Superseded
 
 `prd.md` and `demo-script.md` are background reading, and this file wins wherever they disagree. Two things in them are stale and must not be built against:
