@@ -2,9 +2,10 @@
 // The Allocator, layers 1 and 2 of `optimization.md`: a response curve per
 // adset, and the split of a fixed budget across them.
 //
-// Every expected value here comes from an independent source — a curve whose
-// true parameters the test chose, or a property that must hold at any optimum —
-// never from re-running the implementation's own arithmetic.
+// Expected values come from an independent source wherever the assertion is
+// about a computed number: worked by hand from the Hill formula, or a property
+// that must hold at any optimum. `daysFrom` still generates its inputs with
+// `valueAt`, which is fine — that is the fixture, not the expectation.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -65,8 +66,18 @@ describe('fitCurve', () => {
     // Recovery is judged on what the curve PREDICTS, not on its parameters:
     // vMax and k trade off against each other, so two different parameter sets
     // can describe the same curve to within a rounding error.
-    for (const s of [30, 75, 150, 300]) {
-      expect(valueAt(fitted, s)).toBeCloseTo(valueAt(TRUE, s), 1);
+    //
+    // The expected values are worked by hand from V(s) = 40s/(120+s) rather
+    // than by calling `valueAt`, which would have compared the implementation
+    // against itself — a wrong Hill formula passed that version.
+    const expected: Record<number, number> = {
+      30: (40 * 30) / 150,   //  8.0000
+      75: (40 * 75) / 195,   // 15.3846
+      150: (40 * 150) / 270, // 22.2222
+      300: (40 * 300) / 420, // 28.5714
+    };
+    for (const [s, want] of Object.entries(expected)) {
+      expect(valueAt(fitted, Number(s))).toBeCloseTo(want, 1);
     }
     expect(fitted.source).toBe('fitted');
   });
@@ -263,5 +274,121 @@ describe('reallocate', () => {
     const r = reallocate(already, { valuePerConversion: VALUE });
     expect(r.gain).toBeLessThan(0.01);
     expect(r.moves).toEqual([]);
+  });
+});
+
+describe('the guarantee under bad input', () => {
+  const c: ResponseCurve = { vMax: 60, k: 200, alpha: 1, n: 30, source: 'fitted' };
+  const VALUE = 50;
+
+  it('never spends a non-finite budget', () => {
+    // `budget <= 0` is false for NaN, so this walked into the solver and came
+    // back with a split of R$24,494,697 a day.
+    for (const budget of [NaN, Infinity, -Infinity]) {
+      const { split, totalSpend } = allocate([{ id: 'a', curve: c }], {
+        budget,
+        valuePerConversion: VALUE,
+      });
+      expect(totalSpend).toBe(0);
+      expect(split.every((s) => s.spend === 0)).toBe(true);
+    }
+  });
+
+  it('never proposes a move out of a non-finite current spend', () => {
+    const r = reallocate(
+      [{ id: 'a', curve: c, spend: NaN }, { id: 'b', curve: c, spend: 200 }],
+      { valuePerConversion: VALUE },
+    );
+    // If we cannot read what they spend today, we do not get to say what they
+    // should spend tomorrow.
+    expect(r.moves).toEqual([]);
+    expect(r.budget).toBe(0);
+  });
+
+  it('funds nothing when nothing can be solved, whatever the array order', () => {
+    // Dead curves used to hand the entire budget to whichever adset was first.
+    const dead: ResponseCurve = { vMax: 0, k: 200, alpha: 1, n: 5, source: 'fitted' };
+    for (const order of [['a', 'b'], ['b', 'a']]) {
+      const { split, totalSpend } = allocate(
+        order.map((id) => ({ id, curve: dead })),
+        { budget: 300, valuePerConversion: VALUE },
+      );
+      expect(totalSpend).toBe(0);
+      expect(split.every((s) => s.spend === 0)).toBe(true);
+    }
+  });
+
+  it('never exceeds the budget on a curve it cannot solve', () => {
+    // alpha = 2 is accepted by the contract and breaks the solver's assumption
+    // that the marginal is finite at zero and decreasing. It spent R$574 of 300.
+    const steep: ResponseCurve = { vMax: 60, k: 200, alpha: 2, n: 30, source: 'fitted' };
+    const { totalSpend } = allocate(
+      [{ id: 'a', curve: steep }, { id: 'b', curve: c }],
+      { budget: 300, valuePerConversion: VALUE },
+    );
+    expect(totalSpend).toBeLessThanOrEqual(300 + 1e-6);
+  });
+
+  it('stops where spending stops paying, rather than emptying the budget', () => {
+    const big = allocate([{ id: 'a', curve: c }], {
+      budget: 5000,
+      valuePerConversion: VALUE,
+    });
+    expect(big.totalSpend).toBeLessThan(5000);
+    expect(big.totalSpend).toBeCloseTo(big.profitMaxBudget, 3);
+    expect(big.profit).toBeGreaterThan(0);
+  });
+});
+
+describe('fitCurve identifiability', () => {
+  const prior = priorCurve({ cpc: 1.2, cvr: 0.02, typicalSpend: 100 });
+
+  it('refuses to call a flat-budget campaign fitted', () => {
+    // 14 days at a steady R$100. The old sweep returned k = 0.96 and priced the
+    // marginal return 79x too low, labelled `fitted`.
+    const days = Array.from({ length: 14 }, (_, i) => ({
+      date: `2026-06-${String(i + 1).padStart(2, '0')}`,
+      campaignId: 'c1',
+      spend: 100,
+      impressions: 0,
+      reach: 0,
+      clicks: 0,
+      addToCarts: 0,
+      checkoutsInitiated: 0,
+      purchases: 5,
+      revenue: 0,
+    }));
+    const fitted = fitCurve(days, prior);
+    expect(fitted.source).not.toBe('fitted');
+    expect(fitted.k).toBe(prior.k);
+  });
+
+  it('still fits when the seller actually moved their budget', () => {
+    const truth: ResponseCurve = { vMax: 40, k: 120, alpha: 1, n: 0, source: 'prior' };
+    const days = [20, 40, 60, 90, 120, 160, 200, 260, 320, 400].map((spend, i) => ({
+      date: `2026-06-${String(i + 1).padStart(2, '0')}`,
+      campaignId: 'c1',
+      spend,
+      impressions: 0,
+      reach: 0,
+      clicks: 0,
+      addToCarts: 0,
+      checkoutsInitiated: 0,
+      purchases: valueAt(truth, spend),
+      revenue: 0,
+    }));
+    expect(fitCurve(days, prior).source).toBe('fitted');
+  });
+});
+
+describe('marginalRevenue is the derivative of valueAt', () => {
+  it('matches a central difference across the curve', () => {
+    // The relationship the whole optimum rests on, and nothing tested it.
+    const c: ResponseCurve = { vMax: 60, k: 200, alpha: 1, n: 30, source: 'fitted' };
+    const h = 1e-5;
+    for (const s of [1, 10, 50, 200, 1000]) {
+      const numeric = ((valueAt(c, s + h) - valueAt(c, s - h)) / (2 * h)) * 50;
+      expect(marginalRevenue(c, s, 50)).toBeCloseTo(numeric, 6);
+    }
   });
 });

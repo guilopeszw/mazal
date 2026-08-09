@@ -69,7 +69,12 @@ export function marginalRevenue(
     s === 0
       ? a === 1
         ? curve.vMax / curve.k
-        : Number.POSITIVE_INFINITY
+        : a < 1
+          ? Number.POSITIVE_INFINITY
+          : // For a > 1 the curve leaves the origin flat: s^(a-1) -> 0, so the
+            // first real buys nothing. Returning Infinity here claimed the
+            // opposite and handed the solver a bracket with no root in it.
+            0
       : (curve.vMax * a * ka * Math.pow(s, a - 1)) / (denom * denom);
   return slope * valuePerConversion;
 }
@@ -119,6 +124,28 @@ export function fitCurve(days: CampaignDay[], prior: ResponseCurve): ResponseCur
   const spends = usable.map((d) => d.spend);
   const values = usable.map((d) => d.purchases);
   const maxSpend = Math.max(...spends);
+  const minSpend = Math.min(...spends);
+
+  /**
+   * A curve is only identifiable if the spend actually moved.
+   *
+   * `k` is the spend at which half the ceiling is reached, and a campaign held
+   * at a flat daily budget contains no evidence about it: every `h` takes the
+   * same value, the residuals are `y - ȳ` for every `k`, and SSE is exactly
+   * flat. The sweep does not fail on that — it keeps the first grid point it
+   * saw, `maxSpend / 100`, and returns a confident curve. Measured on 14 days
+   * at R$100 against a truth of k = 300, it came back k = 0.96 and priced the
+   * marginal return at R$0.02 where the truth was R$1.88, stamped `fitted`.
+   *
+   * Both demo fixtures sit in exactly that regime, and so does any seller who
+   * left their daily budget alone — which is most of them. Below a doubling of
+   * spend the honest answer is the prior, and the label has to say so; the
+   * boundary where the fit starts recovering is around 1.7x.
+   */
+  const identifiable = minSpend > 0 && maxSpend / minSpend >= 2;
+  if (!identifiable) {
+    return { ...prior, n, source: n > 0 ? 'blended' : 'prior' };
+  }
 
   /** Best `vMax` for this `k`, and the error it leaves behind. */
   const evaluate = (k: number): { vMax: number; sse: number } => {
@@ -185,6 +212,29 @@ export function fitCurve(days: CampaignDay[], prior: ResponseCurve): ResponseCur
   };
 }
 
+/**
+ * A curve this module will actually solve against.
+ *
+ * `alpha` is a public contract field, so a caller can hand us any number, and
+ * the solver's whole method — bisect on a shared marginal — assumes the marginal
+ * is finite at zero and strictly decreasing. That is only true at alpha <= 1.
+ * At alpha = 2 the bisection ran on a bracket with no root in it and returned a
+ * split that spent R$574 of a R$300 budget: not a worse answer, a broken
+ * guarantee. Anything we cannot solve is treated as a curve that earns nothing,
+ * which spends nothing.
+ */
+function usable(curve: ResponseCurve): boolean {
+  return (
+    Number.isFinite(curve.vMax) &&
+    Number.isFinite(curve.k) &&
+    Number.isFinite(curve.alpha) &&
+    curve.vMax > 0 &&
+    curve.k > 0 &&
+    curve.alpha > 0 &&
+    curve.alpha <= 1
+  );
+}
+
 export type Adset = { id: string; curve: ResponseCurve };
 
 export type AllocateOptions = {
@@ -249,11 +299,35 @@ export function allocate(adsets: Adset[], options: AllocateOptions): Allocation 
     profit: 0,
     profitMaxBudget: 0,
   });
-  if (adsets.length === 0 || budget <= 0) return zero();
+
+  /**
+   * Nothing non-finite gets past here.
+   *
+   * `budget <= 0` is false for NaN, so a NaN budget used to walk straight into
+   * the solver, collapse lambda onto its floor, and come back with a split of
+   * R$24,494,697 a day — which `reallocate` then rendered as a move for a seller
+   * to act on. A guarantee that holds only for well-formed input is not one, and
+   * this is the boundary where the input stops being ours.
+   */
+  if (
+    adsets.length === 0 ||
+    !Number.isFinite(budget) ||
+    budget <= 0 ||
+    !Number.isFinite(valuePerConversion) ||
+    valuePerConversion <= 0 ||
+    !Number.isFinite(minPerAdset) ||
+    minPerAdset < 0
+  ) {
+    return zero();
+  }
+
+  // A curve we cannot solve against earns nothing, so it is funded nothing.
+  const solvable = adsets.filter((a) => usable(a.curve));
+  if (solvable.length === 0) return zero();
 
   // The budget at which spending stops paying for itself: one real in, one real
-  // of margin out. Reported whatever the seller's budget actually is.
-  const profitMaxBudget = adsets.reduce(
+  // of margin out. Over the adsets that can actually be funded.
+  const profitMaxBudget = solvable.reduce(
     (sum, a) => sum + spendForMarginal(a.curve, 1, valuePerConversion),
     0,
   );
@@ -262,8 +336,18 @@ export function allocate(adsets: Adset[], options: AllocateOptions): Allocation 
     const spends = new Map<string, number>();
     if (members.length === 0) return spends;
 
-    // Total spend falls as the shared marginal rises, so bisect on the marginal.
-    let lo = 1e-9;
+    /**
+     * Total spend falls as the shared marginal rises, so bisect on the marginal.
+     *
+     * The floor is 1, not zero: at a shared marginal of 1 the last real spent
+     * earns back exactly itself, and below that every further real destroys
+     * value. Without the floor `allocate` maximised conversions subject to
+     * spending the budget exactly, which on a R$5,000 budget against a curve
+     * peaking at R$575 returned a split it called best and priced at a loss of
+     * R$2,115 — while the profit optimum it reported in the same object was
+     * +R$1,651. It now spends up to the budget and stops where spending pays.
+     */
+    let lo = 1;
     let hi = Math.max(
       ...members.map((a) => marginalRevenue(a.curve, 0, valuePerConversion)),
     );
@@ -282,11 +366,21 @@ export function allocate(adsets: Adset[], options: AllocateOptions): Allocation 
       spends.set(a.id, spendForMarginal(a.curve, lambda, valuePerConversion));
     }
 
-    // Bisection lands within a rounding error of the budget; the remainder goes
-    // to the largest holding so the split sums to what the seller actually has.
+    /**
+     * Bisection lands within a rounding error of the target; the remainder goes
+     * to the largest holding so the split sums to it.
+     *
+     * Only a rounding error, though. When every member wants zero at every
+     * lambda — dead curves, or a margin of zero — the sum is 0 and the residual
+     * is the entire budget, which this used to hand to `members[0]`: the whole
+     * of a seller's money on one adset, chosen by array position, priced at a
+     * straight loss. And now that lambda is floored at 1, a total below the
+     * budget is the correct answer rather than an error to patch over.
+     */
     const sum = [...spends.values()].reduce((acc, s) => acc + s, 0);
     const residual = total - sum;
-    if (residual !== 0) {
+    const roundingOnly = Math.abs(residual) <= Math.max(1e-6, total * 1e-9);
+    if (residual !== 0 && roundingOnly) {
       let biggest = members[0]!.id;
       for (const a of members) {
         if ((spends.get(a.id) ?? 0) > (spends.get(biggest) ?? 0)) biggest = a.id;
@@ -356,7 +450,29 @@ export function reallocate(
   options: { valuePerConversion: number; minPerAdset?: number },
 ): Reallocation {
   const { valuePerConversion, minPerAdset } = options;
-  const budget = adsets.reduce((sum, a) => sum + Math.max(0, a.spend), 0);
+
+  /**
+   * The current spends are the one input this function cannot second-guess:
+   * they define the budget, and the budget is the ceiling the whole guarantee
+   * rests on. `Math.max(0, NaN)` is `NaN`, so a single unparsed figure used to
+   * poison the total and come back out as a move for the seller to act on.
+   *
+   * If we cannot read what they are spending today we do not get to say what
+   * they should spend tomorrow, so this reports nothing rather than guessing.
+   */
+  const readable = adsets.every((a) => Number.isFinite(a.spend) && a.spend >= 0);
+  if (!readable || adsets.length === 0) {
+    return {
+      budget: 0,
+      currentProfit: 0,
+      bestProfit: 0,
+      gain: 0,
+      best: adsets.map((a) => ({ id: a.id, spend: 0 })),
+      moves: [],
+    };
+  }
+
+  const budget = adsets.reduce((sum, a) => sum + a.spend, 0);
 
   const profitOf = (curve: ResponseCurve, spend: number) =>
     valueAt(curve, spend) * valuePerConversion - spend;
@@ -386,6 +502,24 @@ export function reallocate(
           })
           .filter((m) => Math.abs(m.delta) >= MOVE_FLOOR)
           .sort((a, b) => b.delta - a.delta);
+
+  // Dropping the small moves must not drop the money in them. Whatever the
+  // filter removed is folded into the largest surviving move, so what the seller
+  // is shown still balances — the alternative is a list that quietly loses a
+  // real a day per adset and claims to sum to zero.
+  if (moves.length > 0) {
+    const shownDelta = moves.reduce((sum, m) => sum + m.delta, 0);
+    const allDelta = best.split.reduce(
+      (sum, s) => sum + (s.spend - Math.max(0, adsets.find((a) => a.id === s.id)?.spend ?? 0)),
+      0,
+    );
+    const dropped = allDelta - shownDelta;
+    if (dropped !== 0) {
+      const biggest = moves[0]!;
+      biggest.delta += dropped;
+      biggest.to = biggest.from + biggest.delta;
+    }
+  }
 
   return {
     budget,
