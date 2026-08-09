@@ -110,7 +110,12 @@ export function predict(input: PredictInput): Verdict {
    */
   const logSpread = (q: Quantiles): number => {
     if (q.median <= 0 || q.p75 <= 0 || q.p25 <= 0) return 0;
-    return (Math.log(q.p75) - Math.log(q.p25)) / 2;
+    // 1.349, the same constant `spread()` uses on the funnel side: p25 and p75
+    // sit 1.349 sigma apart, not 2. Halving the interquartile range gives
+    // 0.6745 sigma, and treating that as sigma made a band labelled p10-p90
+    // about a p19-p81 — narrower than it claims, which is the same kind of
+    // error as the p99 it replaced, in the other direction.
+    return (Math.log(q.p75) - Math.log(q.p25)) / 1.349;
   };
 
   const spreads = [

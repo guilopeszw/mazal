@@ -18,9 +18,10 @@ diagnose({ days, card, events, reference: { kind: 'benchmark', table: benchmarks
 
 | | |
 |---|---|
-| `Verdict.decision` | `dont_launch` |
-| `predictedRoas` | p10 **0.27**, p50 **0.93**, p90 **3.26** |
-| `breakEvenRoas` | **4.10** (22% margin) |
+| `Verdict.decision` | `launch_small` |
+| `predictedRoas` | p10 **0.15**, p50 **0.93**, p90 **5.96** |
+| `breakEvenRoas` | **4.10** (24% margin) |
+| `killTrigger` | *"Stop if ROAS is below 4.10 after 100 clicks."* |
 | `limitingFactor` | set — *"no campaign history yet, so the band is category-wide — instrument aov first"* |
 | `primary.stage` | **3** · `atcRate` |
 | `primary.observed` / `reference` | **2.35%** against **8.00%** |
@@ -57,6 +58,8 @@ diagnose({ days, card, events, reference: { kind: 'self', baselineDays: 14 } })
 **The line the demo rests on:** checkouts collapsed on the day the supplier's delivery estimate moved. `Finding.evidence` carries the event, so the sentence is auditable rather than asserted.
 
 ## What the engine will not do, stated rather than worked around
+
+**`dont_launch` is rare without history, and that is the design working.** It needs the band's p90 to sit under break-even, and with category-only priors the band is honestly wide — 27 of 1080 sampled cards, 2.5%. `docs/acceptance.md` claim 9 asks for exactly this: *"with thin data the band is wide, Mazal says so"*. A pre-flight verdict that confidently rules products out on category medians alone would be the thing to distrust. Case 1 is `launch_small` with a `killTrigger`, which is also what a seller will almost always see.
 
 **`price_too_high` cannot be a pre-flight case.** Zero seeds in 900 satisfy the full contract — the engine names it only when price exceeds the category p75, and that rarely coincides with a `dont_launch` verdict and a non-empty plan. Do not script a demo beat around it.
 
