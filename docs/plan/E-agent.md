@@ -4,6 +4,8 @@
 
 `apps/mcp` — the MCP server exposing the engine as four tools, registered in deco Studio as a Custom Connection.
 
+The optional Meta Ads MCP integration: prepare a read-only adapter that can obtain live campaign insights from the official Meta Ads MCP, normalize them into the existing `CampaignDay` shape, and feed the Mazal engine. This integration is disabled by default and must never be a dependency of the CSV/fixture demo.
+
 `POST /api/chat` in `apps/web` — the only route in the whole product that touches an LLM.
 
 The narration prompts. The deck. The demo.
@@ -34,6 +36,8 @@ Every tool returns typed JSON straight from the deterministic engine. The tools 
 ## Do not touch
 
 `packages/*` source. `apps/web` except your one route handler. `packages/contracts` after SAT-A.
+
+The Meta integration must not add a fifth public Mazal tool, change the frozen contract, or enable real writes. `execute_plan` remains simulated; Meta write actions are future scope.
 
 ---
 
@@ -122,7 +126,11 @@ Rehearse three times minimum, out loud, timed. Five minutes is much shorter than
 
 **SUN-A** — **deco Studio connection live and answering "what happened to my campaign?" end to end.** This is the insurance policy and it must work today. `/api/chat` wired into D's sidebar.
 
+If the core MCP path is green, leave the Meta Ads source scaffolded behind a feature flag and verify that its disabled state falls back cleanly to CSV/fixtures. Only attempt a live Meta read connection after the Deco fallback is stable.
+
 **SUN-B** — full demo run once, every LLM response captured as a fixture. Deck done, with B's real numbers on slide 6. Sit with A and verify every narration line traces to an actual `Finding` field — if the script says something the engine cannot produce, fix the script.
+
+If time remains after the demo path is captured, connect the official Meta Ads MCP in read-only mode, map one campaign's insights into `CampaignDay`, and run the existing diagnosis. Do not let OAuth, transport, or account permissions delay the demo.
 
 **SUN-C** — you own the laptop. Backup video recorded. Rehearse three times. Two of you take judge Q&A from `docs/acceptance.md`.
 
