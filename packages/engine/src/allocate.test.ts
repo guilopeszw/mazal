@@ -392,3 +392,93 @@ describe('marginalRevenue is the derivative of valueAt', () => {
     }
   });
 });
+
+describe('value per conversion is a property of the thing sold', () => {
+  // The seller's real question: a broom campaign and a blender campaign share
+  // one wallet. A conversion on the blender is worth several on the broom, so a
+  // single shared `valuePerConversion` cannot express the trade at all — the
+  // allocator would move money toward whichever curve is steeper in
+  // CONVERSIONS, which is the wrong unit. Money is the unit.
+  const cheap: ResponseCurve = { vMax: 40, k: 60, alpha: 1, n: 30, source: 'fitted' };
+  const dear: ResponseCurve = { vMax: 6, k: 60, alpha: 1, n: 30, source: 'fitted' };
+
+  it('sends money to the product that earns more, not the one that converts more', () => {
+    // `cheap` converts almost seven times as often. `dear` earns 20x per sale,
+    // so at equal spend it is worth far more — and the split must say so.
+    const { split } = allocate(
+      [
+        { id: 'broom', curve: cheap, valuePerConversion: 5 },
+        { id: 'blender', curve: dear, valuePerConversion: 100 },
+      ],
+      { budget: 300 },
+    );
+    const by = Object.fromEntries(split.map((s) => [s.id, s.spend]));
+    expect(by['blender']).toBeGreaterThan(by['broom']!);
+  });
+
+  it('still equalises the marginal return, now measured in reais', () => {
+    const adsets = [
+      { id: 'broom', curve: cheap, valuePerConversion: 5 },
+      { id: 'blender', curve: dear, valuePerConversion: 100 },
+    ];
+    const { split } = allocate(adsets, { budget: 300 });
+
+    const marginals = split
+      .filter((s) => s.spend > 0)
+      .map((s) => {
+        const a = adsets.find((x) => x.id === s.id)!;
+        return marginalRevenue(a.curve, s.spend, a.valuePerConversion!);
+      });
+    for (const m of marginals) expect(m).toBeCloseTo(marginals[0]!, 4);
+  });
+
+  it('falls back to the shared value when an adset does not carry its own', () => {
+    // One margin for the whole account is still the right answer when every
+    // adset sells the same product.
+    const shared = allocate(
+      [{ id: 'a', curve: cheap }, { id: 'b', curve: dear }],
+      { budget: 300, valuePerConversion: 50 },
+    );
+    const spelled = allocate(
+      [
+        { id: 'a', curve: cheap, valuePerConversion: 50 },
+        { id: 'b', curve: dear, valuePerConversion: 50 },
+      ],
+      { budget: 300 },
+    );
+    expect(shared.split).toEqual(spelled.split);
+  });
+
+  it('funds nothing for an entity whose margin cannot be read', () => {
+    const { split } = allocate(
+      [
+        { id: 'a', curve: cheap, valuePerConversion: NaN },
+        { id: 'b', curve: dear, valuePerConversion: 100 },
+      ],
+      { budget: 300 },
+    );
+    expect(split.find((s) => s.id === 'a')!.spend).toBe(0);
+    // `b` is funded, but only to where its own last real earns back itself —
+    // 129.74 here, not the whole 300. Spending the remainder would destroy
+    // value, and the allocator stops rather than emptying the budget.
+    const b = split.find((s) => s.id === 'b')!.spend;
+    expect(b).toBeGreaterThan(0);
+    expect(b).toBeLessThan(300);
+    expect(marginalRevenue(dear, b, 100)).toBeCloseTo(1, 3);
+  });
+
+  it('moves money between products at the same total spend', () => {
+    const r = reallocate(
+      [
+        { id: 'broom', curve: cheap, valuePerConversion: 5, spend: 240 },
+        { id: 'blender', curve: dear, valuePerConversion: 100, spend: 60 },
+      ],
+      {},
+    );
+    expect(r.budget).toBeCloseTo(300, 6);
+    expect(r.gain).toBeGreaterThan(0);
+    const by = Object.fromEntries(r.moves.map((m) => [m.id, m.delta]));
+    expect(by['blender']).toBeGreaterThan(0);
+    expect(by['broom']).toBeLessThan(0);
+  });
+});
