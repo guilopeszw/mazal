@@ -96,6 +96,19 @@ type NarrationResponse = {
   warning?: string;
 };
 
+function isNarrationResponse(value: unknown): value is NarrationResponse {
+  if (!value || typeof value !== "object") return false;
+
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record["message"] === "string" &&
+    typeof record["conversationId"] === "string" &&
+    record["conversationId"].length >= 40 &&
+    record["conversationId"].length <= 2_000 &&
+    (record["warning"] === undefined || typeof record["warning"] === "string")
+  );
+}
+
 function CardTurnView({
   turn,
   active,
@@ -115,15 +128,17 @@ function CardTurnView({
       {/* The loader appears only when the pending answer carries a plan of
           action — that is the wait it narrates. Every other answer keeps the
           breathing mark. */}
-      {reveal.thinking ? (
-        turn.answer.plan ? (
-          <PlanLoader benchmarkCount={benchmarkCount} />
+      <div aria-live="polite">
+        {reveal.thinking ? (
+          turn.answer.plan ? (
+            <PlanLoader benchmarkCount={benchmarkCount} />
+          ) : (
+            <Thinking />
+          )
         ) : (
-          <Thinking />
-        )
-      ) : (
-        <AnswerBody answer={turn.answer} reveal={reveal} />
-      )}
+          <AnswerBody answer={turn.answer} reveal={reveal} />
+        )}
+      </div>
     </div>
   );
 }
@@ -134,9 +149,12 @@ function NarrationTurnView({ turn }: { turn: NarrationTurn }) {
       <div className="rise max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
         {turn.asked}
       </div>
-      <div className="rise max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-raised px-4 py-2.5 text-[15px] leading-relaxed text-ink sm:max-w-[80%]">
+      <div
+        aria-live="polite"
+        className="rise max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-raised px-4 py-2.5 text-[15px] leading-relaxed text-ink sm:max-w-[80%]"
+      >
         <p className="m-0 whitespace-pre-wrap">{turn.message}</p>
-        {turn.warning && (
+        {turn.warning !== undefined && (
           <p className="mt-3 mb-0 text-sm text-ink-soft">
             Narração ao vivo indisponível. Exibindo uma resposta segura verificada.
           </p>
@@ -257,7 +275,9 @@ export function Chat({
       });
       if (!response.ok) throw new Error("Chat request failed");
 
-      const narration = (await response.json()) as NarrationResponse;
+      const narration: unknown = await response.json();
+      if (!isNarrationResponse(narration)) throw new Error("Invalid chat response");
+
       setTurns((turns) => [
         ...turns,
         {
@@ -265,7 +285,7 @@ export function Chat({
           kind: "narration",
           asked,
           message: narration.message,
-          ...(narration.warning ? { warning: narration.warning } : {}),
+          ...(narration.warning !== undefined ? { warning: narration.warning } : {}),
         },
       ]);
       setConversationId(narration.conversationId);
