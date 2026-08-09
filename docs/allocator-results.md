@@ -10,12 +10,12 @@ declined to advise         0   (no identifiable curve)
 no profitable spend        0   (nothing to allocate)
 scored                   200
 
-profit captured — Mazal        69.0%
+profit captured — Mazal        71.4%
 profit captured — status quo    2.0%
 profit captured — even split   25.3%
 profit captured — greedy      -75.4%
 
-median error in the marginal   14.1%   (at the spend the money is at)
+median error in the marginal   13.3%   (at the spend the money is at)
 ```
 
 "Profit captured" is profit at Mazal's split over profit at the true optimum, both evaluated on the true curves. The gap is what `optimization.md` §5 calls **regret**.
@@ -26,9 +26,9 @@ median error in the marginal   14.1%   (at the spend the money is at)
 
 **Greedy loses money.** Putting the whole wallet on the product with the best historical ROAS returns **−75.4%** of the achievable profit — worse than doing nothing. That is the headline result and it is the one sellers need, because greedy is what they actually do. It fails for one reason a seller can hold: *the best product fills up.*
 
-**69% is not 94%.** `optimization.md` §5 imagines "94% of achievable profit". We do not get there, and the reason is visible in the last line: the marginal return still carries a **14% median error** at the spend the money is actually sitting at. Products close to the break-even margin get zeroed when they should be funded, and each of those is a large slice of what was available.
+**71% is not 94%.** `optimization.md` §5 imagines "94% of achievable profit". We do not get there, and the reason is visible in the last line: the marginal return still carries a **14% median error** at the spend the money is actually sitting at. Products close to the break-even margin get zeroed when they should be funded, and each of those is a large slice of what was available.
 
-It was 37.7% until the fit stopped reading the wrong column — see below. Both numbers are in this file on purpose: the first was honest and the second is better, and the difference was a choice about which count to fit, not a change to the method.
+It was 37.7% until the fit stopped reading the wrong column, then 69.0% until it stopped extrapolating past the tested range — see below. Every number is kept in this file on purpose: each was honest when published, and the improvements were choices about what the data can support, not changes to the scoring.
 
 ## Fit the bend where the bend is visible
 
@@ -39,6 +39,23 @@ Saturation is a media fact: the auction gets dearer as daily spend rises, so the
 So the two questions are answered by two columns. `k` — where it bends — is read off clicks. `vMax` — how high it reaches — is then solved on purchases with that bend held, because the ceiling must stay a conversions quantity. Clicks are only used when there are meaningfully more of them than purchases, so a CSV without a click column falls back to the single-signal fit.
 
 That one change took the marginal error from 31.2% to **14.1%** and the profit captured from 37.7% to **69.0%**, with every baseline untouched.
+
+## Where the loss actually was, and one idea that failed
+
+Measured rather than guessed. Of the profit not captured:
+
+- **16.5%** is products we fund at zero that the oracle funds
+- **83.5%** is misallocation among funded products, and the visible symptom is that we spent **111%** of what the oracle spent
+
+The first instinct was that products near break-even were being zeroed by the λ floor. Sweeping that floor from 1.0 down to 0.6 changed the result by **nothing at all** — it never binds, because the budget constraint binds first. Wrong hypothesis, cheaply disproved.
+
+The bias check explained it. The median fitted curve is nearly right (`k` +0.5%, marginal +1.8%) while the **means are +38%**: a long right tail of over-hopeful curves, and those are exactly the ones that attract money. Variance, not bias.
+
+**Capping `k` at twice the largest spend actually tested** took it from 69.0% to 71.4%. `k` is the spend at half the ceiling, so a `k` far above anything the seller ever spent is a claim about a region the data never visited — and out there the curve is nearly straight, so every large `k` fits about as well. The result is flat across caps of 1.5× to 3×, which is what distinguishes a real effect from a constant tuned to a seed.
+
+**One idea failed and is worth recording.** Scaling each ceiling by `quality` — the fraction of day-to-day movement the fit explains — before allocating. The reasoning was sound: profit is concave, so under-funding a good product costs little and over-funding a bad one costs a lot. It measured **−4.7%**.
+
+It fails because `quality` is low even for a correct curve when purchases are one or two a day, so it crushes every ceiling at once. Nothing looks profitable, the budget still has to go somewhere, and it lands on whichever product is least badly wrong. A discount that fires on every curve is a rescaling, and the allocation only depends on the curves relative to each other. `quality` is still reported — a caller deciding whether to show a number should know how well it is supported — it just cannot be spent.
 
 ## Why `k` is not the metric
 
