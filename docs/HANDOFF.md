@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 18:05 BRT · Codex · web chat API plan
+
+**Done:** Implemented and reviewed Tasks 1–5 on `feat/web-chat-api` through commits `bb4b92c`, `aa87b3d`, `f6cedd6`, `16921b7`, `31bea16`, `af7e95f`, `5726475`, and `2e1483f`: strict public schema and deterministic engine resolution; token-guarded fixtures/templates; bounded secure `POST /api/chat`; signed session-bound continuity, rendered-content cache and live limiter; and typed narration turns in the chat shell. The chat API suite is green (46 tests), web typecheck and Webpack production build are green, and the HTTP smoke matrix passed.
+
+**Next:** If a documented public Deco Agent endpoint/SDK with continuation semantics becomes available, implement the server-only provider and local capture workflow; until then keep Production `NARRATION_MODE=fixture`.
+
+**Blocked / watch out:** No public Deco Agent contract is documented in this checkout, so Tasks 6–7 live/capture work was deliberately not invented. The route keeps live unavailable and never falls back silently. The default Turbopack build is blocked by the environment's process-port restriction; `next build --webpack` passes. Deployment still requires `MAZAL_CHAT_SESSION_SECRET`, `MAZAL_CHAT_ALLOWED_HOSTS`, and Production `NARRATION_MODE=fixture`.
+
+---
+
 ## 2026-08-09 17:29 BRT · Codex · web chat API Task 4 fix round 1
 
 **Done:** Closed the missing configuration-error boundary in `POST /api/chat`: a request with an existing signed cookie now returns generic `503` when `MAZAL_CHAT_SESSION_SECRET` is absent or too short, instead of rejecting before a response. The same boundary covers cookie/session creation and conversation-handle HMAC verification; invalid handles still return `400`. Task 4 is 27/27, the full chat API suite is 46/46, and web typecheck/diff check are green. Commit follows this handoff entry.
