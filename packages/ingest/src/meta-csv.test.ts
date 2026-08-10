@@ -226,3 +226,71 @@ describe('parseMetaCsv', () => {
     expect(warnings.some(w => w.includes('totals row'))).toBe(true);
   });
 });
+
+test('a conversion-value column never lands in its count twin', () => {
+  // Header matching is by substring, so "Adds to cart conversion value" used to
+  // match 'adds to cart' and write reais into the cart count — about a 40x
+  // inflation of stage 3's numerator, with no warning, which reads as a healthy
+  // product page and moves the blame one stage down the funnel.
+  const csv = [
+    'Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Adds to cart,Adds to cart conversion value,Checkouts initiated,Purchases,Purchases conversion value',
+    '2026-07-01,Congelados,45.00,6000,4200,90,12,478.80,9,6,239.40',
+  ].join('\n');
+
+  const { days } = parseMetaCsv(csv);
+
+  expect(days[0]!.addToCarts).toBe(12);
+  expect(days[0]!.checkoutsInitiated).toBe(9);
+  expect(days[0]!.purchases).toBe(6);
+  expect(days[0]!.revenue).toBe(239.4);
+});
+
+test('a spelled-out rate column never lands in the click count', () => {
+  // "CTR (link click-through rate)" strips to `ctr` and is skipped. Spelled out
+  // without the parenthetical there is no `ctr` substring, so it matched
+  // 'link click' — and the percent sign is stripped, so 1.53% became 1.53 clicks.
+  const csv = [
+    'Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Link click-through rate',
+    '2026-07-01,Congelados,45.00,6000,4200,90,1.53%',
+  ].join('\n');
+
+  const { days } = parseMetaCsv(csv);
+  expect(days[0]!.clicks).toBe(90);
+});
+
+test('two columns mapping to one field keep the first and say so', () => {
+  // Exports routinely carry both a total and its unique twin. The write used to
+  // be unconditional, so column order decided the funnel's size — silently, and
+  // unique counts are always the smaller ones.
+  const csv = [
+    'Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Unique link clicks',
+    '2026-07-01,Congelados,45.00,6000,4200,500,320',
+  ].join('\n');
+
+  const { days, warnings } = parseMetaCsv(csv);
+  expect(days[0]!.clicks).toBe(500);
+  expect(warnings.some((w) => w.includes('both map to clicks'))).toBe(true);
+});
+
+test('a blank column does not claim the field ahead of a real one', () => {
+  // Meta prints "—" for a zero-conversion day, so this is an ordinary export.
+  // The blank Purchases column used to claim the field with 0 and the populated
+  // Website purchases beside it was skipped — a false leak at stage 5.
+  const csv = [
+    'Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Purchases,Website purchases',
+    '2026-07-01,Congelados,45.00,6000,4200,90,—,25',
+  ].join('\n');
+
+  const { days } = parseMetaCsv(csv);
+  expect(days[0]!.purchases).toBe(25);
+});
+
+test('a column missing everywhere still lands on zero', () => {
+  const csv = [
+    'Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Purchases',
+    '2026-07-01,Congelados,45.00,6000,4200,90,—',
+  ].join('\n');
+
+  const { days } = parseMetaCsv(csv);
+  expect(days[0]!.purchases).toBe(0);
+});

@@ -211,8 +211,12 @@ const PIXEL_STAGES = new Set<FunnelStage>([3, 4, 5, 6]);
  */
 export function noPixelEvidence(days: CampaignDay[], events: StoreEvent[]): boolean {
   if (events.some((e) => e.type === 'pixel_error')) return false;
+  // Counts only. Revenue is not evidence that the funnel was observed: an
+  // ordinary Ads Manager preset reports "Purchases conversion value" and no
+  // count column at all, and requiring revenue to be zero let that export
+  // through to be diagnosed as a broken product page.
   return days.every(
-    (d) => d.addToCarts === 0 && d.checkoutsInitiated === 0 && d.purchases === 0 && d.revenue === 0,
+    (d) => d.addToCarts === 0 && d.checkoutsInitiated === 0 && d.purchases === 0,
   );
 }
 

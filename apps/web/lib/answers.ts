@@ -22,6 +22,7 @@ import {
   reallocate,
   valueAt,
   measurability,
+  noPixelEvidence,
   predict,
   profileCard,
 } from "@mazal/engine";
@@ -192,11 +193,19 @@ const stageTitle = (stage: FunnelStage) =>
   `Stage ${stage} · ${FUNNEL_STAGES.find((s) => s.stage === stage)?.label ?? ""}`;
 
 /** The seven funnel rows: leak from the finding itself, healthy stages from the window. */
-function stageRows(diagnosis: Diagnosis, window: CampaignDay) {
+function stageRows(diagnosis: Diagnosis, window: CampaignDay, unpixelled = false) {
   const leak = diagnosis.primary?.stage ?? null;
   return FUNNEL_STAGES.map(({ stage, label, unassessed }) => {
     const name = `${stage} · ${label}`;
     if (unassessed) return { name, state: "mute" as const, value: "no analytics", tag: "skipped" };
+
+    // Nothing was reported downstream of the click, so the engine judged none
+    // of it. Printing `ATC 0.0%` beside prose that says we cannot see the
+    // funnel is the answer contradicting itself in the same breath — and the
+    // zero is the more believable half.
+    if (unpixelled && stage >= 3) {
+      return { name, state: "mute" as const, value: "not reported", tag: "skipped" };
+    }
 
     const tone = toneFor(stage, leak);
     if (tone === "leak") {
@@ -329,13 +338,14 @@ function diagnoseAnswer(args: {
   asked: string;
   diagnosis: Diagnosis;
   days: CampaignDay[];
+  events: StoreEvent[];
   window: CampaignDay;
   card: ProductCard;
   reference: ReferenceMode;
   plan: RecoveryPlan;
   noteSuffix?: string;
 }): Answer {
-  const { asked, diagnosis, days, window, card, reference, plan, noteSuffix = "" } = args;
+  const { asked, diagnosis, days, events, window, card, reference, plan, noteSuffix = "" } = args;
   const primary = diagnosis.primary;
   const charts = buildDiagnoseCharts(diagnosis, days, window, card);
 
@@ -343,6 +353,35 @@ function diagnoseAnswer(args: {
   const measured = Object.values(categoryRow).filter((m) => m.n > 0);
   const orders = Math.max(0, ...measured.map((m) => m.n));
   const benchmarkNote = `${measured.length} of the 12 category benchmarks are measured from ${formatCount(orders)} Olist orders; the other ${12 - measured.length} are published priors, marked as estimates wherever they appear.`;
+
+  /**
+   * `primary: null` carries two opposite meanings and they must not render the
+   * same. One is "nothing broke". The other is "there was nothing to look at":
+   * a seller whose customers buy on iFood, on WhatsApp or in a marketplace has
+   * no pixel on that checkout, so Meta reports every conversion column as zero
+   * and `diagnose` correctly declines to judge stages 3-6.
+   *
+   * Telling that seller their funnel is fine is the same failure as telling
+   * them their product page is thin — an answer about data nobody collected.
+   * The engine owns the rule; this asks it rather than re-deriving it.
+   */
+  if (!primary && noPixelEvidence(days, events)) {
+    return {
+      asked,
+      verdict: [
+        { text: "Your ads ran. ", tone: "good" },
+        { text: "What happened after the click, we cannot see." },
+      ],
+      said:
+        "Meta reported no add-to-carts, checkouts or purchases on any day of this export — not low, none at all. Either the export is missing its conversion count columns, or the sale happens somewhere the pixel cannot follow: iFood, WhatsApp, a marketplace. Either way the funnel below the click was never counted, so it is left blank rather than drawn as zero: a chart of unreported conversions is a picture of a collapse that may not have happened.",
+      stages: stageRows(diagnosis, window, true),
+      rows: [],
+      // Deliberately no charts. The funnel would draw three stages at zero and
+      // the margin chart would assert a thirty-day loss computed from revenue
+      // this same answer just called unmeasured.
+      note: benchmarkNote + noteSuffix,
+    };
+  }
 
   if (!primary) {
     return {
@@ -425,6 +464,7 @@ export function buildUploadAnswer(
     asked,
     diagnosis,
     days,
+    events,
     window: aggregate(days.slice(-WINDOW_DAYS)),
     card,
     reference,
@@ -658,6 +698,7 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
     asked: "My ROAS dropped this week",
     diagnosis,
     days: case2.days,
+    events: case2.events,
     window,
     card: case2.card,
     reference,
