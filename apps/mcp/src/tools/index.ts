@@ -8,6 +8,7 @@ import {
   executePlanInputSchema,
   predictCampaignInputSchema,
 } from '../schemas.js';
+import { UI_RESOURCE_URI_BY_TOOL } from '../ui/resources.js';
 import { buildRecoveryPlan } from './build-recovery-plan.js';
 import { diagnoseCampaign } from './diagnose-campaign.js';
 import { executePlan } from './execute-plan.js';
@@ -63,6 +64,9 @@ export function registerMazalTools(
     {
       description: 'Diagnose the earliest broken campaign funnel stage.',
       inputSchema: diagnoseCampaignInputSchema,
+      // MCP Apps (spec 2026-01-26): hosts that support `ui://` resources render
+      // the tool result through this view instead of prose.
+      _meta: { ui: { resourceUri: UI_RESOURCE_URI_BY_TOOL['diagnose_campaign'] } },
     },
     (input) => jsonResult(diagnoseCampaign(input)),
   );
@@ -72,6 +76,7 @@ export function registerMazalTools(
     {
       description: 'Predict a deterministic launch verdict from server benchmarks.',
       inputSchema: predictCampaignInputSchema,
+      _meta: { ui: { resourceUri: UI_RESOURCE_URI_BY_TOOL['predict_campaign'] } },
     },
     (input) => jsonResult(predictCampaign(input)),
   );

@@ -1,3 +1,6 @@
 .vercel
 # The build now writes Vercel's Build Output API tree, which `.vercel` already
 # covers. `/api/mcp.mjs` was the old target and no longer exists.
+
+# Built MCP App view HTML — `scripts/build-ui.mjs` regenerates it.
+src/ui/dist/

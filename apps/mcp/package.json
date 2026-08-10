@@ -8,7 +8,7 @@
   "scripts": {
     "build:vercel": "node scripts/build-vercel.mjs",
     "test": "pnpm run typecheck && pnpm run typecheck:vercel-compat && vitest run --passWithNoTests",
-    "typecheck": "tsc -p tsconfig.json --pretty false",
+    "typecheck": "tsc -p tsconfig.json --pretty false && tsc -p tsconfig.ui.json --pretty false",
     "typecheck:vercel-compat": "tsc -p tsconfig.vercel-compat.json --pretty false"
   },
   "dependencies": {
@@ -21,6 +21,8 @@
     "zod": "^4.2.0"
   },
   "devDependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.7.5",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "esbuild": "^0.28.1",
     "vitest": "^3.2.7"
   }
