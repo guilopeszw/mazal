@@ -122,11 +122,15 @@ Each of the ten questions describes a problem a seller actually has. Each become
 
 *From Q10: where the trust line sits. This directly validates the propose → edit → execute design.*
 
-**Claim:** the plan renders as individually-toggleable actions, each showing what changes, expected effect, confidence, and reversibility. Three choices: **Run all · Edit first · I'll do it myself.** Editing an action updates the projection. Execution is logged and receipted, and the demo says out loud that writes are simulated.
+**Claim:** the plan renders as individually-toggleable actions, each showing what changes, expected effect, confidence, and reversibility. Three choices: **Run all · Edit first · I'll do it myself.** Editing an action updates the projection. Execution is logged and receipted, and every receipt says which mode it was in — `simulated` writes nothing, `live` called Meta. With no credentials the build is simulated, which is what a cold clone does and what the demo runs.
 
-**Demo beat:** the pause before clicking. *"It proposes. You decide. It never spends your money without asking."*
+**Demo beat:** the pause before clicking. *"Mazal can pause your campaign, slow it, or lower its budget. It cannot raise your spend — there is no operation in the product that does that, and you approve each one."*
 
-**Test:** `execute_plan` appends to the action log and returns a receipt. It has no Meta API client to call — the absence is the guarantee.
+**Test:** `packages/engine/src/execution.test.ts` walks every fault the engine can name, at both cause layers, and asserts that no action Mazal can run increases spend. The guarantee is `ExecutableOp`: a closed union of `pause_campaign`, `reduce_daily_budget` (multiplier in `(0, 1]`, rejected rather than clamped above 1) and `set_frequency_cap`. Raising a budget is a decision to spend more, so it stays advice with `actor: 'seller'` and no Run control.
+
+**This claim was rewritten.** It used to read *"it has no Meta API client to call — the absence is the guarantee"*, which was true until `apps/web/lib/meta.ts` shipped and is false now. The replacement is stronger: an absent client is a fact about today's build that any commit can change, while a spend-raising operation that does not exist in the type system fails the suite the moment someone adds one.
+
+**What execution does not reach.** Meta grants Standard Access to `ads_management` without App Review, and Standard Access only reaches ad accounts our own developers own or administer. That is enough to pause *ours* on stage. It is not enough to touch a seller's account — that needs Advanced Access, App Review and Business Verification. Anything said on stage must say which of the two it just did.
 
 ---
 
@@ -162,7 +166,7 @@ Meta optimises inside Meta. It cannot see your margin, your stock, your delivery
 Computed, not quoted. Per-category medians and quartiles derived from the Olist dataset, in BRL, for Brazilian sellers. Every reference number in the UI prints the sample size behind it.
 
 **"What if it's wrong?"**
-It proposes, you approve, and writes are simulated in this build. It reports its own confidence — on thin data it says it cannot predict yet and names the number to instrument first.
+It proposes, you approve, and the receipt names which mode it ran in — simulated unless credentials are configured and a 15-minute unlock has been entered. It reports its own confidence — on thin data it says it cannot predict yet and names the number to instrument first.
 
 **"How is this a business?"**
 Zero-integration onboarding: a CSV plus a two-minute form, no Meta app review. Every competitor needs OAuth before it can say hello.

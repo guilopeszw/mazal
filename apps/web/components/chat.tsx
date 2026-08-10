@@ -20,6 +20,7 @@ const CHIPS: { key: AnswerKey; text: string }[] = [
   { key: "diagnose", text: "My ROAS dropped this week" },
   { key: "atc", text: "Why is my ATC rate low?" },
   { key: "predict", text: "Should I launch this campaign?" },
+  { key: "allocate", text: "Where should my budget go?" },
 ];
 
 /**

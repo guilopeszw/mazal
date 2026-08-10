@@ -2,7 +2,13 @@
 
 ## Estado
 
-A operação está ativa em produção: a Vercel serve o MCP em Node 24, a Custom Connection `Mazal MCP` guarda o bearer secret e o agente `Mazal` usa somente essa conexão. Um diagnóstico real foi executado pelo Studio e registrado no Monitoramento.
+**Corrigido em 2026-08-09.** A versão anterior deste arquivo dizia que a operação estava ativa em produção, que a Custom Connection `Mazal MCP` guardava o bearer secret, que o agente `Mazal` usava somente essa conexão, e que um diagnóstico real tinha sido executado pelo Studio e registrado no Monitoramento.
+
+Lido contra a organização `guilherme-works-btg1` no mesmo dia, nada disso existia: oito agentes, todos padrão do Studio Pack, e quatro conexões — Deco Store, MCP Registry, Deco CMS self, GitHub. Sem agente `Mazal`, sem conexão `Mazal MCP`. Um diagnóstico não pode ter passado por uma conexão que não existe.
+
+Agora existem, e estão versionados em [`docs/deco-agent.md`](deco-agent.md) — configuração do Studio não tem histórico nem revisão, então o repositório guarda a cópia que tem.
+
+O que falta é um campo: o header `Authorization: Bearer <token>` na conexão. Sem ele `CONNECTION_TEST` retorna `healthy: false`, que é o estado correto para um arquivo em git.
 
 Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor de token.
 
@@ -11,7 +17,9 @@ Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor 
 1. Criar ou selecionar um projeto Vercel para este monorepo.
 2. Definir **Root Directory** como `apps/mcp` e manter habilitada a inclusão de arquivos externos ao diretório raiz. O pacote depende de `packages/contracts`, `packages/data` e `packages/engine` pelo workspace pnpm.
 3. Confirmar **Node.js 24.x** nas configurações do projeto. `apps/mcp/package.json` também fixa `24.x`.
-4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` gera a Function Node autocontida em `apps/mcp/api/mcp.mjs`; `apps/mcp/vercel.json` encaminha a URL pública `/mcp` para esse artefato antes do filesystem, sem migrar para Edge ou Workers.
+4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` grava a árvore da Build Output API em `apps/mcp/.vercel/output`: a Function fica em `functions/mcp.func/` e é servida em `/mcp` sem nenhuma rota declarada.
+
+   **Não voltar a gerar `api/mcp.mjs`.** Aquela versão dependia da detecção zero-config da Vercel, que varre a ÁRVORE DE FONTES atrás de `api/*.mjs` — e o arquivo é gerado durante o build e está no gitignore, então na hora da varredura ele não existe. Nenhuma Function era criada, a rota apontava para o nada, e toda URL respondia 404 enquanto o build reportava sucesso. `apps/mcp/src/vercel.test.ts` trava isso.
 5. Configurar as variáveis abaixo no secret manager da Vercel para Production. Configurar Preview somente se houver um host de preview explicitamente autorizado.
 6. Implantar e anotar a URL estável como `https://<VERCEL_PRODUCTION_HOST>/mcp` nesta seção. Não usar uma URL de preview na conexão de produção.
 

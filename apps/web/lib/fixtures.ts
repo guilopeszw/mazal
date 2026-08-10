@@ -1,6 +1,8 @@
+import type { CampaignDay, ProductCard } from "@mazal/contracts";
 import type { LabelledCampaign } from "@mazal/contracts";
 import case1Json from "../../../packages/sim/fixtures/demo-case1.json";
 import case2Json from "../../../packages/sim/fixtures/demo-case2.json";
+import accountJson from "../../../packages/sim/fixtures/demo-account.json";
 
 /**
  * The two committed demo campaigns, read at build time straight from
@@ -18,3 +20,23 @@ export const demoCases = {
   /** In-flight: two good weeks, then a stage broke mid-flight. */
   case2: case2Json as unknown as LabelledCampaign,
 } as const;
+
+/**
+ * One seller, three products, one wallet — the account the Allocator advises on.
+ *
+ * The response curves the simulator generated from are deliberately NOT in this
+ * file. The engine has to recover them from the days like it would for a real
+ * seller, and a fixture that shipped the answer next to the question would make
+ * every number on the screen unfalsifiable.
+ */
+export type AccountProductFixture = {
+  id: string;
+  card: ProductCard;
+  days: CampaignDay[];
+  currentSpend: number;
+};
+
+export const demoAccount = accountJson as unknown as {
+  seed: number;
+  products: AccountProductFixture[];
+};

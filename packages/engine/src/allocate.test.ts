@@ -392,3 +392,219 @@ describe('marginalRevenue is the derivative of valueAt', () => {
     }
   });
 });
+
+describe('value per conversion is a property of the thing sold', () => {
+  // The seller's real question: a broom campaign and a blender campaign share
+  // one wallet. A conversion on the blender is worth several on the broom, so a
+  // single shared `valuePerConversion` cannot express the trade at all — the
+  // allocator would move money toward whichever curve is steeper in
+  // CONVERSIONS, which is the wrong unit. Money is the unit.
+  const cheap: ResponseCurve = { vMax: 40, k: 60, alpha: 1, n: 30, source: 'fitted' };
+  const dear: ResponseCurve = { vMax: 6, k: 60, alpha: 1, n: 30, source: 'fitted' };
+
+  it('sends money to the product that earns more, not the one that converts more', () => {
+    // `cheap` converts almost seven times as often. `dear` earns 20x per sale,
+    // so at equal spend it is worth far more — and the split must say so.
+    const { split } = allocate(
+      [
+        { id: 'broom', curve: cheap, valuePerConversion: 5 },
+        { id: 'blender', curve: dear, valuePerConversion: 100 },
+      ],
+      { budget: 300 },
+    );
+    const by = Object.fromEntries(split.map((s) => [s.id, s.spend]));
+    expect(by['blender']).toBeGreaterThan(by['broom']!);
+  });
+
+  it('still equalises the marginal return, now measured in reais', () => {
+    const adsets = [
+      { id: 'broom', curve: cheap, valuePerConversion: 5 },
+      { id: 'blender', curve: dear, valuePerConversion: 100 },
+    ];
+    const { split } = allocate(adsets, { budget: 300 });
+
+    const marginals = split
+      .filter((s) => s.spend > 0)
+      .map((s) => {
+        const a = adsets.find((x) => x.id === s.id)!;
+        return marginalRevenue(a.curve, s.spend, a.valuePerConversion!);
+      });
+    for (const m of marginals) expect(m).toBeCloseTo(marginals[0]!, 4);
+  });
+
+  it('falls back to the shared value when an adset does not carry its own', () => {
+    // One margin for the whole account is still the right answer when every
+    // adset sells the same product.
+    const shared = allocate(
+      [{ id: 'a', curve: cheap }, { id: 'b', curve: dear }],
+      { budget: 300, valuePerConversion: 50 },
+    );
+    const spelled = allocate(
+      [
+        { id: 'a', curve: cheap, valuePerConversion: 50 },
+        { id: 'b', curve: dear, valuePerConversion: 50 },
+      ],
+      { budget: 300 },
+    );
+    expect(shared.split).toEqual(spelled.split);
+  });
+
+  it('funds nothing for an entity whose margin cannot be read', () => {
+    const { split } = allocate(
+      [
+        { id: 'a', curve: cheap, valuePerConversion: NaN },
+        { id: 'b', curve: dear, valuePerConversion: 100 },
+      ],
+      { budget: 300 },
+    );
+    expect(split.find((s) => s.id === 'a')!.spend).toBe(0);
+    // `b` is funded, but only to where its own last real earns back itself —
+    // 129.74 here, not the whole 300. Spending the remainder would destroy
+    // value, and the allocator stops rather than emptying the budget.
+    const b = split.find((s) => s.id === 'b')!.spend;
+    expect(b).toBeGreaterThan(0);
+    expect(b).toBeLessThan(300);
+    expect(marginalRevenue(dear, b, 100)).toBeCloseTo(1, 3);
+  });
+
+  it('moves money between products at the same total spend', () => {
+    const r = reallocate(
+      [
+        { id: 'broom', curve: cheap, valuePerConversion: 5, spend: 240 },
+        { id: 'blender', curve: dear, valuePerConversion: 100, spend: 60 },
+      ],
+      {},
+    );
+    expect(r.budget).toBeCloseTo(300, 6);
+    expect(r.gain).toBeGreaterThan(0);
+    const by = Object.fromEntries(r.moves.map((m) => [m.id, m.delta]));
+    expect(by['blender']).toBeGreaterThan(0);
+    expect(by['broom']).toBeLessThan(0);
+  });
+});
+
+describe('the fit reads the signal that carries the shape', () => {
+  /**
+   * Where the curve bends is a media fact — the auction gets dearer as spend
+   * rises — and it is visible in clicks, which come in hundreds a day. It is
+   * *also* in purchases, which come in ones and twos, and at that size the day
+   * noise is bigger than the bend. Fitting the shape to purchases fits noise.
+   *
+   * So: `k` from the high-count signal, `vMax` from the low-count one. The
+   * ceiling is a conversions quantity and must stay measured in conversions.
+   */
+  const truth: ResponseCurve = { vMax: 3, k: 150, alpha: 1, n: 0, source: 'prior' };
+  const prior = priorCurve({ cpc: 1.2, cvr: 0.02, typicalSpend: 100 });
+
+  /** Days on the true curve, with realistic per-day noise on the counts. */
+  const noisyDays = (seed: number) => {
+    let s = seed;
+    const rand = () => ((s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+    const levels = [40, 70, 100, 150, 220];
+    return Array.from({ length: 30 }, (_, i) => {
+      const spend = levels[i % levels.length]!;
+      // Purchases follow the true curve; clicks are the same shape, 200x larger.
+      const exact = valueAt(truth, spend);
+      const jitter = 0.75 + rand() * 0.5;
+      const purchases = Math.max(0, Math.round(exact * jitter));
+      const clicks = Math.max(0, Math.round(exact * 200 * (0.95 + rand() * 0.1)));
+      return {
+        date: `2026-06-${String(i + 1).padStart(2, '0')}`,
+        campaignId: 'c1',
+        spend,
+        impressions: clicks * 90,
+        reach: clicks * 60,
+        clicks,
+        addToCarts: Math.round(clicks * 0.08),
+        checkoutsInitiated: Math.round(clicks * 0.04),
+        purchases,
+        revenue: purchases * 120,
+      };
+    });
+  };
+
+  it('recovers the bend far better than fitting purchases alone', () => {
+    const days = noisyDays(7);
+    const got = fitCurve(days, prior);
+
+    // The marginal at the operating spend is the only quantity allocation
+    // depends on, so that is what has to be close.
+    const want = marginalRevenue(truth, 100, 50);
+    const mine = marginalRevenue(got, 100, 50);
+    expect(Math.abs(mine - want) / want).toBeLessThan(0.15);
+  });
+
+  it('keeps the ceiling in conversions, not clicks', () => {
+    const days = noisyDays(11);
+    const got = fitCurve(days, prior);
+    // vMax is a purchases-per-day quantity: ~3 here, not ~600.
+    expect(got.vMax).toBeGreaterThan(1);
+    expect(got.vMax).toBeLessThan(10);
+  });
+
+  it('still works when clicks are absent', () => {
+    // An upload with no click column must not lose the fit entirely.
+    const days = noisyDays(13).map((d) => ({ ...d, clicks: 0, impressions: 0 }));
+    const got = fitCurve(days, prior);
+    expect(got.source).toBe('fitted');
+    expect(got.vMax).toBeGreaterThan(0);
+  });
+});
+
+describe('the fit does not claim a ceiling it never tested', () => {
+  const prior = priorCurve({ cpc: 1.2, cvr: 0.02, typicalSpend: 100 });
+
+  it('caps k at twice the largest spend actually seen', () => {
+    // A near-straight stretch of curve fits equally well under any large k, and
+    // the fit will happily pick one — which reads downstream as "this still
+    // scales" and pulls money into a region the data never visited.
+    const truth: ResponseCurve = { vMax: 500, k: 9000, alpha: 1, n: 0, source: 'prior' };
+    const levels = [30, 45, 60, 80, 100];
+    const days = Array.from({ length: 30 }, (_, i) => {
+      const spend = levels[i % levels.length]!;
+      const clicks = Math.round(valueAt(truth, spend) * 200);
+      return {
+        date: `2026-06-${String(i + 1).padStart(2, '0')}`,
+        campaignId: 'c1',
+        spend,
+        impressions: clicks * 90,
+        reach: clicks * 60,
+        clicks,
+        addToCarts: Math.round(clicks * 0.08),
+        checkoutsInitiated: Math.round(clicks * 0.04),
+        purchases: Math.round(valueAt(truth, spend)),
+        revenue: 0,
+      };
+    });
+
+    const got = fitCurve(days, prior);
+    expect(got.k).toBeLessThanOrEqual(100 * 2 + 1e-9);
+  });
+
+  it('reports how much of the movement it explains', () => {
+    const truth: ResponseCurve = { vMax: 8, k: 120, alpha: 1, n: 0, source: 'prior' };
+    const levels = [40, 70, 110, 160, 220];
+    const clean = Array.from({ length: 30 }, (_, i) => {
+      const spend = levels[i % levels.length]!;
+      const v = valueAt(truth, spend);
+      return {
+        date: `2026-06-${String(i + 1).padStart(2, '0')}`,
+        campaignId: 'c1',
+        spend,
+        impressions: 0,
+        reach: 0,
+        clicks: 0,
+        addToCarts: 0,
+        checkoutsInitiated: 0,
+        purchases: v,
+        revenue: 0,
+      };
+    });
+
+    const got = fitCurve(clean, prior);
+    // A curve that explains a noiseless series should be near 1.
+    expect(got.quality).toBeGreaterThan(0.95);
+    // And a prior, which explains nothing, records no quality at all.
+    expect(fitCurve([], prior).quality).toBeUndefined();
+  });
+});
