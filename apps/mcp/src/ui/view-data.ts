@@ -180,6 +180,12 @@ export type StageRowVM = {
 };
 
 export type DiagnosisViewModel = {
+  /**
+   * Nothing downstream was reported, so the headline is about what cannot be
+   * seen rather than about health. Exposed because the tile colours its
+   * headline, and green is a faster read than the sentence it sits on.
+   */
+  unpixelled: boolean;
   slices: FunnelSliceVM[];
   stages: StageRowVM[];
   /** The decision, in the seller's words, date included. */
@@ -308,6 +314,7 @@ export function diagnosisViewModel(
     : undefined;
 
   return {
+    unpixelled,
     slices,
     stages,
     headline,

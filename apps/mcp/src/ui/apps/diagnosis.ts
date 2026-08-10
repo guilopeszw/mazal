@@ -43,7 +43,7 @@ function render(result: unknown, input: Record<string, unknown> | undefined): vo
   );
   root.replaceChildren(
     el('h1', {}, ['Funnel diagnosis']),
-    el('p', { class: `headline${diagnosis.primary ? '' : ' ok'}` }, [
+    el('p', { class: `headline${diagnosis.primary || vm.unpixelled ? '' : ' ok'}` }, [
       el('strong', {}, [vm.headline]),
     ]),
     ...(vm.detail ? [el('p', { class: 'note' }, [vm.detail])] : []),

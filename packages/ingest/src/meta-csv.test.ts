@@ -226,3 +226,21 @@ describe('parseMetaCsv', () => {
     expect(warnings.some(w => w.includes('totals row'))).toBe(true);
   });
 });
+
+test('a conversion-value column never lands in its count twin', () => {
+  // Header matching is by substring, so "Adds to cart conversion value" used to
+  // match 'adds to cart' and write reais into the cart count — about a 40x
+  // inflation of stage 3's numerator, with no warning, which reads as a healthy
+  // product page and moves the blame one stage down the funnel.
+  const csv = [
+    'Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Adds to cart,Adds to cart conversion value,Checkouts initiated,Purchases,Purchases conversion value',
+    '2026-07-01,Congelados,45.00,6000,4200,90,12,478.80,9,6,239.40',
+  ].join('\n');
+
+  const { days } = parseMetaCsv(csv);
+
+  expect(days[0]!.addToCarts).toBe(12);
+  expect(days[0]!.checkoutsInitiated).toBe(9);
+  expect(days[0]!.purchases).toBe(6);
+  expect(days[0]!.revenue).toBe(239.4);
+});

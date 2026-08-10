@@ -1,6 +1,8 @@
 import { expect, test } from "vitest";
 import type { CampaignDay, ProductCard } from "@mazal/contracts";
 
+import { parseMetaCsv } from "@mazal/ingest";
+
 import { buildUploadAnswer } from "./answers.ts";
 
 /**
@@ -79,7 +81,7 @@ test("the rows and charts do not contradict the words above them", () => {
   // Stages 3-6 were never judged: none of them may print a value that reads
   // as a verdict beside prose saying the funnel is unobservable.
   for (const stage of [3, 4, 5, 6]) {
-    const row = answer.stages.find((r) => r.name.startsWith(`${stage} ·`))!;
+    const row = answer.stages!.find((r) => r.name.startsWith(`${stage} ·`))!;
     expect(row.state, row.name).toBe("mute");
     expect(row.value, row.name).not.toMatch(/0\.0%|R\$/);
   }
@@ -87,4 +89,27 @@ test("the rows and charts do not contradict the words above them", () => {
   // No funnel drawn at zero, and no margin chart asserting a loss computed
   // from revenue this same answer called unmeasured.
   expect(answer.charts).toBeUndefined();
+});
+
+test("a ROAS-only export is not diagnosed as a broken product page", () => {
+  // An ordinary Ads Manager preset: a seller reporting on return keeps the
+  // value columns and no count columns at all. Revenue arrives, every count is
+  // zero, and the seller used to be told "Your product page broke" with a
+  // two-action plan to rewrite it — from an export that never counted a cart.
+  const rows = [
+    "Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Purchases conversion value,Purchase ROAS",
+  ];
+  for (let i = 1; i <= 30; i++) {
+    rows.push(`2026-07-${String(i).padStart(2, "0")},Congelados,45.00,6000,4200,90,1800,3.2`);
+  }
+  const { days } = parseMetaCsv(rows.join("\n"));
+  expect(days[0]!.revenue).toBeGreaterThan(0);
+  expect(days[0]!.purchases).toBe(0);
+
+  const answer = buildUploadAnswer(days, frozenGoods, [], "Diagnose export.csv");
+  const verdict = answer.verdict.map((v) => v.text).join("");
+
+  expect(verdict).not.toContain("product page");
+  expect(verdict).toContain("cannot see");
+  expect(answer.said).toContain("conversion count columns");
 });

@@ -373,7 +373,7 @@ function diagnoseAnswer(args: {
         { text: "What happened after the click, we cannot see." },
       ],
       said:
-        "Meta reported no add-to-carts, checkouts or purchases on any day of this export — not low, none at all. That is what a campaign looks like when the sale happens somewhere the pixel cannot follow: iFood, WhatsApp, a marketplace. Everything downstream of the click is unmeasured, so it is left blank rather than drawn as zero: a chart of unreported conversions is a picture of a collapse that may not have happened.",
+        "Meta reported no add-to-carts, checkouts or purchases on any day of this export — not low, none at all. Either the export is missing its conversion count columns, or the sale happens somewhere the pixel cannot follow: iFood, WhatsApp, a marketplace. Either way the funnel below the click was never counted, so it is left blank rather than drawn as zero: a chart of unreported conversions is a picture of a collapse that may not have happened.",
       stages: stageRows(diagnosis, window, true),
       rows: [],
       // Deliberately no charts. The funnel would draw three stages at zero and

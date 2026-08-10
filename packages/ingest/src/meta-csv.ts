@@ -21,6 +21,14 @@ const COLUMN_MAP: Array<{ match: string; field: keyof CampaignDay | '_dateEnd' |
   { match: 'amount spent',                field: 'spend' },
   { match: 'impressions',                 field: 'impressions' },
   { match: 'reach',                       field: 'reach' },
+  // Value columns before their count twins, for the same reason
+  // 'purchases conversion value' is listed above 'purchases': matching is by
+  // substring, so "Adds to cart conversion value" would otherwise land in the
+  // add-to-cart *count* and write reais where a number of carts belongs. The
+  // contract has no home for cart value, so these are dropped rather than kept.
+  { match: 'adds to cart conversion value',     field: '_skip' },
+  { match: 'add to cart conversion value',      field: '_skip' },
+  { match: 'checkouts initiated conversion value', field: '_skip' },
   { match: 'adds to cart',                field: 'addToCarts' },
   { match: 'add to cart',                 field: 'addToCarts' },
   { match: 'checkouts initiated',         field: 'checkoutsInitiated' },
