@@ -13,7 +13,8 @@ import { build } from 'esbuild';
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = resolve(appRoot, 'src/ui/dist');
 
-const VIEWS = ['diagnosis', 'prediction'];
+/** The views, and the only files the Vercel build copies out of `outDir`. */
+export const VIEWS = ['diagnosis', 'prediction'];
 
 await mkdir(outDir, { recursive: true });
 

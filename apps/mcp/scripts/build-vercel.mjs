@@ -41,8 +41,16 @@ await mkdir(functionDir, { recursive: true });
 
 // The MCP App views first: the function reads `./dist/<view>.html` relative to
 // its own bundle, so the HTML ships inside the function directory.
-await import('./build-ui.mjs');
-await cp(resolve(appRoot, 'src/ui/dist'), resolve(functionDir, 'dist'), { recursive: true });
+const { VIEWS } = await import('./build-ui.mjs');
+// Named files, not the directory. `src/ui/dist` is gitignored and never
+// cleaned, so anything left in it — a renamed view, a deleted one, a local
+// preview — would otherwise ship inside the function and keep shipping.
+// Copying by name also means a build cannot silently deploy a view that the
+// current source no longer produces.
+await mkdir(resolve(functionDir, 'dist'), { recursive: true });
+for (const view of VIEWS) {
+  await cp(resolve(appRoot, `src/ui/dist/${view}.html`), resolve(functionDir, `dist/${view}.html`));
+}
 
 await build({
   bundle: true,
