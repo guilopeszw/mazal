@@ -54,6 +54,10 @@ O servidor aceita um token por vez, portanto a rotação deve ocorrer em uma jan
 4. Executar handshake, `tools/list` e uma chamada real; confirmar a chamada no Monitor.
 5. Remover o token anterior do gerenciador seguro após a validação. Se a validação falhar, restaurar o valor anterior apenas pelos dois secret managers e repetir o deploy; nunca copiar o token para o Git.
 
+## O health check do Studio
+
+`CONNECTION_TEST` não faz handshake MCP: envia um POST JSON-RPC `ping` cru com os headers da conexão (`decocms/studio`, `apps/api/src/storage/connection.ts`) e considera saudável `2xx` ou `404`. O fetch do Node manda `Accept: */*`, e o transport Streamable HTTP exigia os dois content-types literais — respondia `406` e o Studio reportava `healthy: false` mesmo com auth e host corretos. O servidor agora trata o wildcard como o que ele significa em HTTP e responde o ping com `200 {"result":{}}`. Um `Accept` explícito sem wildcard continua recebendo `406`.
+
 ## Custom Connection Deco
 
 1. Abrir **Settings → Connections → Add connection → Custom Connection**.
@@ -76,7 +80,7 @@ Criar o Agent “Mazal”, conectar Meta Ads ou habilitar qualquer quinto tool p
 - [x] `POST https://mcp-cyan-gamma.vercel.app/mcp` sem `Authorization` retorna `401`.
 - [x] O mesmo endpoint com a credencial da conexão conclui o handshake `initialize` em Streamable HTTP.
 - [x] A resposta do handshake identifica o servidor como `Mazal MCP`.
-- [x] `tools/list` retorna exatamente os quatro nomes listados acima, sem tools adicionais.
+- [x] `tools/list` retorna os quatro nomes listados acima e mais um: `ON_MCP_CONFIGURATION`, o callback de ciclo de vida que o Deco Studio invoca a cada create/update de conexão cuja configuração mudou (`decocms/studio`, `apps/api/src/tools/connection/{create,update}.ts`). Sem ele o Studio exibe "Tool ON_MCP_CONFIGURATION not found" ao salvar a conexão. Aqui é um no-op autenticado — este servidor não tem estado de configuração para reagir — e não deve ser habilitado como tool do agente.
 - [x] Uma chamada real de `diagnose_campaign` com payload válido retorna sucesso MCP.
 - [ ] Uma chamada inválida continua sendo recusada pelo schema; autenticação, Host e Origin permanecem ativos.
 
