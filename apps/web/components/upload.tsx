@@ -5,6 +5,7 @@ import type { CampaignDay, OlistCategory } from "@mazal/contracts";
 import {
   categoryDefaults,
   diagnoseUpload,
+  preflightUpload,
   parseCsv,
   type InferredNumericField,
 } from "@/app/actions";
@@ -65,7 +66,7 @@ export function Upload({
   const [category, setCategory] = useState<"" | OlistCategory>("");
   const [assumed, setAssumed] = useState<Partial<Record<InferredNumericField, string>>>(STATIC_DEFAULTS);
   const [edited, setEdited] = useState<ReadonlySet<InferredNumericField>>(new Set());
-  const [busy, setBusy] = useState<"parse" | "diagnose" | null>(null);
+  const [busy, setBusy] = useState<"parse" | "diagnose" | "preflight" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleFile = async (file: File | undefined) => {
@@ -96,26 +97,56 @@ export function Upload({
     });
   };
 
+  /** The card the form currently describes — the same one both buttons ask about. */
+  const statedFrom = (form: HTMLFormElement) => {
+    const data = new FormData(form);
+    const num = (name: string) => Number(data.get(name));
+    return {
+      stated: {
+        category: category as OlistCategory,
+        price: num("price"),
+        shippingCost: num("shippingCost"),
+        deliveryEtaDays: num("deliveryEtaDays"),
+      },
+      corrections: Object.fromEntries([...edited].map((f) => [f, Number(assumed[f])])),
+    };
+  };
+
+  /**
+   * "Is this worth advertising?" — the product, not the campaign.
+   *
+   * It asks nothing of the CSV, which is the point: a seller whose sales happen
+   * on iFood or in WhatsApp has no funnel for Mazal to read, and this is the
+   * answer that does not need one. Offered beside the diagnosis rather than
+   * instead of it, because the seller does not know in advance which of the two
+   * their data can support.
+   */
+  const preflight = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const form = e.currentTarget.form;
+    if (!form || category === "") return;
+    setBusy("preflight");
+    setError(null);
+    try {
+      const result = await preflightUpload(statedFrom(form));
+      if (!result.ok) setError(result.error);
+      else onAnswer(result.answer);
+    } catch {
+      setError("Pre-flight failed. Try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!parsed || category === "") return;
-    const data = new FormData(e.currentTarget);
-    const num = (name: string) => Number(data.get(name));
     setBusy("diagnose");
     setError(null);
     try {
       const result = await diagnoseUpload({
         fileName: parsed.fileName,
         days: parsed.days,
-        stated: {
-          category,
-          price: num("price"),
-          shippingCost: num("shippingCost"),
-          deliveryEtaDays: num("deliveryEtaDays"),
-        },
-        corrections: Object.fromEntries(
-          [...edited].map((f) => [f, Number(assumed[f])]),
-        ),
+        ...statedFrom(e.currentTarget),
       });
       if (!result.ok) setError(result.error);
       else onAnswer(result.answer);
@@ -270,6 +301,15 @@ export function Upload({
               className="flex min-h-11 items-center justify-center self-start rounded-full bg-accent px-5 text-sm font-[540] text-ground transition-[opacity,scale] duration-150 active:scale-[.97] disabled:opacity-40 disabled:active:scale-100"
             >
               {busy === "diagnose" ? "Diagnosing…" : "Diagnose this campaign"}
+            </button>
+            <button
+              type="button"
+              onClick={preflight}
+              disabled={busy !== null || category === ""}
+              title="Reads the product and its category — no campaign data needed"
+              className="flex min-h-11 items-center justify-center self-start rounded-full border border-line px-5 text-sm font-[540] text-ink transition-[opacity,scale,border-color] duration-150 hover:border-line-strong active:scale-[.97] disabled:opacity-40 disabled:active:scale-100"
+            >
+              {busy === "preflight" ? "Checking…" : "Is it worth advertising?"}
             </button>
           </form>
         )}
