@@ -15,6 +15,11 @@ Entry format:
 
 ---
 
+## 2026-08-10 04:06 UTC · Codex · resolução de conflitos do PR README
+**Done:** merge de `origin/main` em `joaquim/feat/sync-e-agent-to-main` com conflitos resolvidos em `README.md` e `docs/HANDOFF.md`. O README manteve a versão em pt-BR desta branch; o HANDOFF preservou o histórico de `main` e manteve as entradas desta branch no topo. Commit: `585735d`.
+**Next:** revisar o PR no GitHub e confirmar que o conflito foi marcado como resolvido.
+**Blocked / watch out:** `code_review` falhou duas vezes com `HTTP 400: requested model is not supported`; `codeql_checker` rodou sem alertas.
+
 ## 2026-08-10 · Codex · entrega do README de produto
 **Done:** substituído o README provisório por uma narrativa em pt-BR sobre a tese de Mazal, o problema do leak, o fluxo pre-flight/in-flight, o engine, os dados, o simulator, a ingestão, a web, o MCP, as evidências, os limites e os próximos passos. `pnpm sim:fixtures` confirmou os dois casos da demo; `pnpm sim:backtest` reproduziu 59,0% top-1, 59,0% top-2 em estágio e 12,0% de falsos alarmes em 25 saudáveis. Também passaram `pnpm test` (603 testes), `pnpm typecheck`, `pnpm build`, links locais e `git diff --check`.
 **Next:** revisar o texto no contexto da apresentação e, se aprovado, integrar esta branch pelo fluxo normal em direção a `stage`.
