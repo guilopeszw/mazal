@@ -26,7 +26,7 @@ export const MAX_DAYS = 1100;
 const MAX_EVENTS = 500;
 const MAX_ACTIONS = 20;
 /** A raw insights response is one row per entity per day, so it needs headroom. */
-const MAX_INSIGHT_ROWS = 5000;
+export const MAX_INSIGHT_ROWS = 5000;
 /**
  * Rows, not days: a payload broken out by ad set carries several rows per day.
  * The handler checks the folded day count against `MAX_DAYS` afterwards, so the

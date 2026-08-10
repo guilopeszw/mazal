@@ -1,0 +1,67 @@
+{
+  "__mazal_assumed": {
+    "note": "NOT a real Meta response. This is the shape apps/mcp/src/meta-client is written against, pending `pnpm meta:probe`. Task 11 of docs/superpowers/plans/2026-08-10-meta-mcp-integration.md replaces it with a redacted capture.",
+    "assumes": [
+      "the reporting tool returns Graph-shaped rows under `data`",
+      "daily granularity arrives as one row per date_start with date_stop equal to it",
+      "link clicks arrive as inline_link_clicks, not clicks",
+      "numbers arrive as strings"
+    ]
+  },
+  "data": [
+    {
+      "date_start": "2026-07-01",
+      "date_stop": "2026-07-01",
+      "campaign_id": "23851234567890123",
+      "campaign_name": "Assumed campaign",
+      "account_id": "act_1234567890",
+      "account_currency": "BRL",
+      "spend": "120.50",
+      "impressions": "3040",
+      "reach": "2610",
+      "inline_link_clicks": "31",
+      "actions": [
+        { "action_type": "add_to_cart", "value": "4" },
+        { "action_type": "initiate_checkout", "value": "2" },
+        { "action_type": "purchase", "value": "1" }
+      ],
+      "action_values": [{ "action_type": "purchase", "value": "189.90" }]
+    },
+    {
+      "date_start": "2026-07-02",
+      "date_stop": "2026-07-02",
+      "campaign_id": "23851234567890123",
+      "campaign_name": "Assumed campaign",
+      "account_id": "act_1234567890",
+      "account_currency": "BRL",
+      "spend": "118.00",
+      "impressions": "2980",
+      "reach": "2555",
+      "inline_link_clicks": "29",
+      "actions": [
+        { "action_type": "add_to_cart", "value": "3" },
+        { "action_type": "initiate_checkout", "value": "1" },
+        { "action_type": "purchase", "value": "1" }
+      ],
+      "action_values": [{ "action_type": "purchase", "value": "179.90" }]
+    },
+    {
+      "date_start": "2026-07-03",
+      "date_stop": "2026-07-03",
+      "campaign_id": "23851234567890123",
+      "campaign_name": "Assumed campaign",
+      "account_id": "act_1234567890",
+      "account_currency": "BRL",
+      "spend": "121.75",
+      "impressions": "3110",
+      "reach": "2690",
+      "inline_link_clicks": "33",
+      "actions": [
+        { "action_type": "add_to_cart", "value": "5" },
+        { "action_type": "initiate_checkout", "value": "2" },
+        { "action_type": "purchase", "value": "2" }
+      ],
+      "action_values": [{ "action_type": "purchase", "value": "349.80" }]
+    }
+  ]
+}
