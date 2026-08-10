@@ -175,6 +175,36 @@ const STAGE_EVENTS: Partial<Record<FunnelStage, readonly StoreEvent['type'][]>> 
 const daysApart = (a: string, b: string): number =>
   Math.abs(Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86_400_000;
 
+/**
+ * The stages whose numerator only exists because a pixel reported it. Stages 0
+ * and 1 are Meta's own delivery numbers and arrive whatever the seller sells.
+ */
+const PIXEL_STAGES = new Set<FunnelStage>([3, 4, 5, 6]);
+
+/**
+ * True when Meta reported no conversion of any kind, on any day.
+ *
+ * That is the signature of a seller whose customers buy where the pixel cannot
+ * follow — iFood, WhatsApp, a marketplace, an Instagram DM — which is a large
+ * share of Brazilian small sellers rather than an edge case. The columns are
+ * not zero; they are absent, and the difference matters: judged as zero, "no
+ * one who clicked ever added to cart" is a catastrophic conversion failure,
+ * and the engine would name a cause for it and propose a fix. A seller would
+ * rewrite a product page that was never the problem.
+ *
+ * The minimum-sample gate cannot catch this. Stage 3 is gated on *clicks*,
+ * which are healthy; it is the numerator that is missing.
+ *
+ * A pixel that reports *something* — even one add-to-cart a day — is a pixel
+ * that is working, and a funnel that dies under it is a real break. That is
+ * the line this draws, and it is why `pixel_break` still fires.
+ */
+export function pixelReportedNothing(days: CampaignDay[]): boolean {
+  return days.every(
+    (d) => d.addToCarts === 0 && d.checkoutsInitiated === 0 && d.purchases === 0 && d.revenue === 0,
+  );
+}
+
 export function diagnose(input: DiagnoseInput): Diagnosis {
   const ref = input.reference;
   const self = ref.kind === 'self';
@@ -190,7 +220,12 @@ export function diagnose(input: DiagnoseInput): Diagnosis {
     : [];
   const flagged: Finding[] = [];
 
+  const unpixelled = pixelReportedNothing(input.days);
+
   for (const spec of MEASURED_STAGES) {
+    // Nothing downstream was ever reported: judge none of it. See
+    // `pixelReportedNothing` — absent is not zero.
+    if (unpixelled && PIXEL_STAGES.has(spec.stage)) continue;
     if (spec.sample(total) < spec.minSample) continue;
 
     const reference = self
