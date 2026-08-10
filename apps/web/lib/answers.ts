@@ -193,11 +193,19 @@ const stageTitle = (stage: FunnelStage) =>
   `Stage ${stage} · ${FUNNEL_STAGES.find((s) => s.stage === stage)?.label ?? ""}`;
 
 /** The seven funnel rows: leak from the finding itself, healthy stages from the window. */
-function stageRows(diagnosis: Diagnosis, window: CampaignDay) {
+function stageRows(diagnosis: Diagnosis, window: CampaignDay, unpixelled = false) {
   const leak = diagnosis.primary?.stage ?? null;
   return FUNNEL_STAGES.map(({ stage, label, unassessed }) => {
     const name = `${stage} · ${label}`;
     if (unassessed) return { name, state: "mute" as const, value: "no analytics", tag: "skipped" };
+
+    // Nothing was reported downstream of the click, so the engine judged none
+    // of it. Printing `ATC 0.0%` beside prose that says we cannot see the
+    // funnel is the answer contradicting itself in the same breath — and the
+    // zero is the more believable half.
+    if (unpixelled && stage >= 3) {
+      return { name, state: "mute" as const, value: "not reported", tag: "skipped" };
+    }
 
     const tone = toneFor(stage, leak);
     if (tone === "leak") {
@@ -365,10 +373,12 @@ function diagnoseAnswer(args: {
         { text: "What happened after the click, we cannot see." },
       ],
       said:
-        "Meta reported no add-to-carts, checkouts or purchases on any day of this export — not low, none at all. That is what a campaign looks like when the sale happens somewhere the pixel cannot follow: iFood, WhatsApp, a marketplace. Delivery and attention are judged below; everything downstream of the click is unmeasured, and calling it healthy would be inventing an answer. Ask about a launch instead — a pre-flight needs the product, not the pixel.",
-      stages: stageRows(diagnosis, window),
+        "Meta reported no add-to-carts, checkouts or purchases on any day of this export — not low, none at all. That is what a campaign looks like when the sale happens somewhere the pixel cannot follow: iFood, WhatsApp, a marketplace. Everything downstream of the click is unmeasured, so it is left blank rather than drawn as zero: a chart of unreported conversions is a picture of a collapse that may not have happened.",
+      stages: stageRows(diagnosis, window, true),
       rows: [],
-      charts,
+      // Deliberately no charts. The funnel would draw three stages at zero and
+      // the margin chart would assert a thirty-day loss computed from revenue
+      // this same answer just called unmeasured.
       note: benchmarkNote + noteSuffix,
     };
   }

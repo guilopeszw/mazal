@@ -178,3 +178,51 @@ test("parses only a strict, trimmed structured narration", () => {
 test("renders the fallback template with the same guard", () => {
   expect(templateFor(context)).toContain("4,5%");
 });
+
+test("chat does not tell an off-pixel seller their funnel is fine", () => {
+  // The second door. The sheet was fixed and this route still said, verbatim:
+  // "Não há um vazamento confirmado nesta leitura." — the same false all-clear
+  // in Portuguese, reachable by any caller that supplies its own context.
+  const days = Array.from({ length: 30 }, (_, i) => ({
+    date: `2026-07-${String(i + 1).padStart(2, "0")}`,
+    campaignId: "congelados",
+    spend: 45,
+    impressions: 6_000 + i * 40,
+    reach: 4_200 + i * 30,
+    clicks: 90 + (i % 7) * 6,
+    addToCarts: 0,
+    checkoutsInitiated: 0,
+    purchases: 0,
+    revenue: 0,
+  }));
+
+  const context = resolveContext({
+    userMessage: "minha campanha caiu",
+    context: {
+      days,
+      card: {
+        category: "food",
+        price: 39.9,
+        grossMargin: 0.45,
+        shippingCost: 12,
+        deliveryEtaDays: 2,
+        stockOnHand: 80,
+        reviewCount: 12,
+        reviewAvg: 4.6,
+        pdpImages: 5,
+        pdpDescriptionLength: 380,
+        returnPolicyDays: 7,
+        paymentMethods: ["credit", "pix"],
+        offer: "none",
+      },
+      events: [],
+      reference: { kind: "benchmark" },
+    },
+  } as never);
+
+  const said = templateFor(context);
+
+  expect(said).not.toContain("Não há um vazamento confirmado");
+  expect(said).toContain("não conseguimos ver");
+  expect(said).toMatch(/iFood|WhatsApp|marketplace/);
+});

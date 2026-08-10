@@ -10,10 +10,18 @@
 // decision leads, the number is the evidence, and translating a label is
 // allowed while changing a value never is.
 
-import type { CampaignDay, Diagnosis, FunnelStage, ReferenceMode, Verdict } from '@mazal/contracts';
+import type {
+  CampaignDay,
+  Diagnosis,
+  FunnelStage,
+  ReferenceMode,
+  StoreEvent,
+  Verdict,
+} from '@mazal/contracts';
 import { aggregate, atcRate, cpm, ctr, cvr, icRate, roas } from '@mazal/contracts/metrics';
 import {
   MEASURED_STAGES,
+  noPixelEvidence,
   SELF_MIN_BASELINE_DAYS,
   SELF_WINDOW_DAYS,
   WINDOW_DAYS,
@@ -193,7 +201,13 @@ export function diagnosisViewModel(
   days: CampaignDay[],
   diagnosis: Diagnosis,
   reference?: ReferenceMode,
+  events: StoreEvent[] = [],
 ): DiagnosisViewModel {
+  // Nothing was reported downstream of the click, so the engine judged none of
+  // stages 3-6. Drawing them as `ok` at 0.0% under a headline saying nothing
+  // broke is the tile contradicting itself, with the zero the more believable
+  // half. See `noPixelEvidence` — absent is not zero, and it is not health.
+  const unpixelled = noPixelEvidence(days, events);
   const self = reference?.kind === 'self';
   const window = aggregate(days.slice(-(self ? SELF_WINDOW_DAYS : WINDOW_DAYS)));
   // The engine's own baseline slice: history before the window it is compared
@@ -243,6 +257,10 @@ export function diagnosisViewModel(
     // No baseline, no judgment. `selfReference` returned null for every stage,
     // so the engine compared nothing — printing a value here would turn silence
     // into health, which is the one thing this view must never do.
+    if (unpixelled && stage >= 3) {
+      return { name, state: 'mute', value: 'not reported — the sale happens where the pixel cannot follow' };
+    }
+
     if (!judged) {
       return {
         name,
@@ -277,9 +295,11 @@ export function diagnosisViewModel(
     ? `Your ${STAGE_NOUN[p.stage]} broke${
         diagnosis.changePoint ? ` on ${formatDate(diagnosis.changePoint.date)}` : ''
       }.`
-    : judged
-      ? 'No stage broke — and that is a real answer.'
-      : 'Not enough history to judge this yet.';
+    : unpixelled
+      ? 'Your ads ran. What happens after the click, we cannot see.'
+      : judged
+        ? 'No stage broke — and that is a real answer.'
+        : 'Not enough history to judge this yet.';
   const detail = p
     ? `Yours: ${metricPhrase(p.metric, p.observed)}. Stores like yours: ${metricPhrase(
         p.metric,

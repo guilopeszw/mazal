@@ -66,4 +66,25 @@ test("a campaign whose pixel does report is still diagnosed normally", () => {
   const verdict = answer.verdict.map((v) => v.text).join("");
 
   expect(verdict).not.toContain("cannot see");
+  // Positive assertion, because the negative one above passes even with the
+  // branch removed — `diagnose` flags stage 3 here, so `primary` is non-null
+  // and the branch is unreachable either way. This is what actually pins it:
+  // a terrible-but-reported rate must be judged, never excused.
+  expect(verdict).toContain("product page");
+});
+
+test("the rows and charts do not contradict the words above them", () => {
+  const answer = buildUploadAnswer(offPixelDays(), frozenGoods, [], "Diagnose export.csv");
+
+  // Stages 3-6 were never judged: none of them may print a value that reads
+  // as a verdict beside prose saying the funnel is unobservable.
+  for (const stage of [3, 4, 5, 6]) {
+    const row = answer.stages.find((r) => r.name.startsWith(`${stage} ·`))!;
+    expect(row.state, row.name).toBe("mute");
+    expect(row.value, row.name).not.toMatch(/0\.0%|R\$/);
+  }
+
+  // No funnel drawn at zero, and no margin chart asserting a loss computed
+  // from revenue this same answer called unmeasured.
+  expect(answer.charts).toBeUndefined();
 });
