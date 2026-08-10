@@ -11,11 +11,10 @@ import { runView } from './runtime.js';
 
 const root = mount();
 
-function slice(vm: FunnelSliceVM, max: number): HTMLElement {
-  const width = max > 0 ? Math.max(2, (vm.value / max) * 100) : 2;
+function slice(vm: FunnelSliceVM): HTMLElement {
   return el('div', { class: `slice ${vm.tone}` }, [
     el('span', { class: 'label' }, [vm.label]),
-    el('div', { class: 'track' }, [el('div', { class: 'bar', style: `width:${width}%` })]),
+    el('div', { class: 'track' }, [el('div', { class: 'bar', style: `width:${vm.width}%` })]),
     el('span', { class: 'count' }, [vm.display]),
   ]);
 }
@@ -37,15 +36,13 @@ function render(result: unknown, input: Record<string, unknown> | undefined): vo
   // The reference the tool was called with: it sets the window the engine
   // measured over and whether it had a baseline to judge against at all.
   const vm = diagnosisViewModel(days, diagnosis, input?.reference as ReferenceMode | undefined);
-  const max = Math.max(...vm.slices.map((s) => s.value));
-
   root.replaceChildren(
     el('h1', {}, ['Funnel diagnosis']),
     el('p', { class: `headline${diagnosis.primary ? '' : ' ok'}` }, [
       el('strong', {}, [vm.headline]),
     ]),
     ...(vm.detail ? [el('p', { class: 'note' }, [vm.detail])] : []),
-    el('div', { class: 'funnel' }, vm.slices.map((s) => slice(s, max))),
+    el('div', { class: 'funnel' }, vm.slices.map(slice)),
     el('div', { class: 'stages' }, vm.stages.map(stageRow)),
     ...(vm.evidence ? [el('p', { class: 'note' }, [`What changed in the store: ${vm.evidence}.`])] : []),
   );
