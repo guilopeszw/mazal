@@ -15,6 +15,22 @@ Entry format:
 
 ---
 
+## 2026-08-09 22:55 BRT · Bringel's agent · the deck, built; PR #42 merged; stage resynced
+
+**Done:** three things.
+
+*PR #42.* Reviewed and merged (`c5bd1c0`). The branch was behind `main` and conflicted in this file; resolved by keeping the log chronological — the 22:10 entry above the 21:33 one, nothing dropped. Gate on the real merge: **294 tests**, root typecheck, and `pnpm --filter web build` green; Vercel SUCCESS. The review found nothing to fix: every number in `apps/mcp/src/ui/view-data.ts` is engine output or a `@mazal/contracts/metrics` function, the silence threshold is the engine's own `MEASURED_STAGES`, and the views build DOM through `createElement` — no `innerHTML` anywhere.
+
+*The stash is not a pendency.* A session report described unfinished WIP on "plain-language view-data tests". That work was committed at 22:15 as `991a783` and pushed — it is the two tests at `view-data.test.ts` that pin the translated prose and the no-jargon sweep. The report describes the state before that commit (it says 45 MCP tests; the merge has 68).
+
+*The deck is slides.* `docs/deck.html` renders all nine plus two appendix slides from `docs/deck.md` — scroll-snap, arrow-key nav, both themes, no external assets. Slide 9's test count was **175 and is now 294**, and it gained a row for the Studio views that PR #42 landed.
+
+**Next:** eyeball the two tiles on the Studio home board — still nobody has seen those pixels. That was the merged PR's own next action and merging did not do it.
+
+**Blocked / watch out:** `stage` had drifted **behind** `main` — the chat API (#37) and the Deco health fix (#38/#40) went straight to `main` and never came back. Merged `main` into `stage` and pushed; the two are identical at `db572d0`. If you land anything on `main` directly again, merge it back the same day. The Studio OAuth grant (~150 scopes, incl. `ORGANIZATION_DELETE`) is still live — revoke it after the demo.
+
+---
+
 ## 2026-08-09 22:10 BRT · Guilherme's agent · Deco Studio renders the charts, not prose
 
 **Done:** the MCP now exposes two `ui://` resources per the MCP Apps extension (`modelcontextprotocol/ext-apps`, spec 2026-01-26, the contract Deco's `MCPAppRenderer` reads): `ui://mazal/diagnosis` — the funnel with the leak marked — and `ui://mazal/prediction` — the break-even and the band. `diagnose_campaign` and `predict_campaign` carry `_meta.ui.resourceUri`, so a tool result in Studio chat renders as the chart. The agent's `metadata.ui.homeTiles` puts both on the org home board fed by `demo-case2` (eta_shock, stage 4 leak). Every number in a view is engine output or a contract rate function — the views mirror `apps/web/lib/answers.ts` and a stage under the engine's own `minSample` renders "not judged", never a value.

@@ -1,0 +1,687 @@
+<title>Mazal — the deck</title>
+
+<style>
+/* ─── tokens ───────────────────────────────────────────────────────────
+   Light is the base. Dark redefines only these, twice: once for the
+   un-stamped OS-dark document, once for an explicit toggle. Nothing below
+   this block names a colour literal. */
+:root {
+  --paper:    #FCFCFA;
+  --bar:      #E4ECE5;
+  --ink:      #171C18;
+  --ink-soft: #626B64;
+  --rule:     #CDD3CD;
+  --leak:     #B3372C;
+  --leak-bg:  #F4E4E1;
+  --stamp:    #2F6B4F;
+
+  --display: Georgia, "Iowan Old Style", "Times New Roman", ui-serif, serif;
+  --body: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+  --data: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  --well: 68rem;
+  --pad: clamp(1.5rem, 4vw, 4.5rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:    #141815;
+    --bar:      #1E2620;
+    --ink:      #E9EDE8;
+    --ink-soft: #98A29A;
+    --rule:     #2E372F;
+    --leak:     #E4756A;
+    --leak-bg:  #2C1D1B;
+    --stamp:    #6FB08D;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:    #141815;
+  --bar:      #1E2620;
+  --ink:      #E9EDE8;
+  --ink-soft: #98A29A;
+  --rule:     #2E372F;
+  --leak:     #E4756A;
+  --leak-bg:  #2C1D1B;
+  --stamp:    #6FB08D;
+}
+
+/* ─── page ─────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: clamp(0.95rem, 0.5vw + 0.8rem, 1.0625rem);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.deck {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck { scroll-behavior: auto; }
+}
+
+.slide {
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  padding: var(--pad);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: clamp(1.25rem, 3vh, 2.5rem);
+  border-bottom: 1px solid var(--rule);
+}
+
+.inner { width: 100%; max-width: var(--well); margin-inline: auto; }
+
+/* ─── the rail: slide number │ title │ hypothesis ──────────────────── */
+.rail {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  font-family: var(--data);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.7rem;
+}
+.rail .n { color: var(--ink); font-variant-numeric: tabular-nums; }
+/* The divider motif — the same bar that splits the funnel on slide 2. */
+.rail .bar { color: var(--rule); }
+.rail .h {
+  margin-left: auto;
+  color: var(--leak);
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 0.1rem 0.45rem;
+  letter-spacing: 0.1em;
+}
+
+/* ─── slide face ───────────────────────────────────────────────────── */
+.face { align-self: center; display: flex; flex-direction: column; gap: clamp(1rem, 2.2vh, 1.75rem); }
+
+h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 5.2vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0;
+}
+h1 .quiet { color: var(--ink-soft); }
+
+.lede { max-width: 62ch; font-size: clamp(1rem, 0.6vw + 0.9rem, 1.25rem); margin: 0; }
+.lede + .lede { margin-top: -0.4rem; }
+.face p { margin: 0; max-width: 68ch; }
+
+strong { font-weight: 650; }
+em { font-style: italic; }
+
+.big {
+  font-family: var(--data);
+  font-size: clamp(0.95rem, 0.5vw + 0.8rem, 1.15rem);
+  letter-spacing: 0.02em;
+}
+
+/* ─── presenter note: the deck's real structural split ─────────────── */
+.note {
+  border-top: 1px solid var(--rule);
+  padding-top: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-family: var(--data);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.note p { margin: 0; max-width: 88ch; }
+.note .say::before {
+  content: "SAY";
+  display: inline-block;
+  margin-right: 0.65rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  vertical-align: 0.08em;
+}
+.note .beat { color: var(--ink); }
+.note .beat::before {
+  content: "DEMO";
+  display: inline-block;
+  margin-right: 0.65rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--stamp);
+  border-radius: 2px;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  color: var(--stamp);
+  vertical-align: 0.08em;
+}
+.note .warn { color: var(--leak); }
+.note .cmd {
+  font-size: 0.75rem;
+  color: var(--ink);
+  background: var(--bar);
+  border-radius: 2px;
+  padding: 0.15rem 0.45rem;
+  align-self: flex-start;
+}
+
+/* ─── the funnel: the thesis, drawn ────────────────────────────────── */
+.funnel { display: flex; flex-direction: column; gap: 0.55rem; }
+.funnel-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 1px repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+  align-items: stretch;
+}
+.stage {
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.7rem 0.5rem;
+  font-family: var(--data);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.stage .sn { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.stage.seen { color: var(--ink-soft); background: transparent; }
+.stage.dark-zone { color: var(--ink); background: var(--bar); border-color: transparent; }
+.divider { background: var(--rule); }
+.funnel-caps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 1px repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+  font-family: var(--data);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.cap-left { grid-column: 1 / 4; }
+.cap-right { grid-column: 5 / 9; color: var(--ink); }
+@media (max-width: 700px) {
+  .funnel-row, .funnel-caps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .divider { display: none; }
+  .cap-left, .cap-right { grid-column: 1 / 3; }
+}
+
+/* ─── ledger tables ────────────────────────────────────────────────── */
+.ledger-wrap { overflow-x: auto; }
+table.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--data);
+  font-size: clamp(0.78rem, 0.35vw + 0.68rem, 0.92rem);
+  font-variant-numeric: tabular-nums;
+}
+table.ledger td { padding: 0.55rem 0.75rem; border: none; }
+/* green-bar continuous-form paper — the underwriter's own stationery */
+table.ledger tr:nth-child(odd) td { background: var(--bar); }
+table.ledger td:first-child { color: var(--ink-soft); }
+table.ledger td:last-child { text-align: right; color: var(--ink); font-weight: 650; white-space: nowrap; }
+table.ledger td.zero { color: var(--leak); }
+table.ledger tr.floor td { background: transparent; border-top: 1px solid var(--rule); }
+table.ledger tr.floor td:last-child { font-weight: 400; color: var(--ink-soft); }
+
+/* ─── the allocator: before → after ────────────────────────────────── */
+.alloc { display: flex; flex-direction: column; gap: 0.5rem; }
+.alloc-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 12rem) 1fr auto;
+  gap: 0.9rem;
+  align-items: center;
+  font-family: var(--data);
+  font-size: 0.8rem;
+}
+.alloc-row .who { color: var(--ink-soft); }
+.track { display: flex; flex-direction: column; gap: 0.22rem; min-width: 0; }
+.bar-before, .bar-after { height: 0.62rem; border-radius: 1px; }
+.bar-before { background: var(--rule); }
+.bar-after { background: var(--ink); }
+.alloc-row.up .bar-after { background: var(--stamp); }
+.alloc-row .delta { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
+.alloc-row .runs {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: var(--stamp);
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 0.05rem 0.35rem;
+  margin-left: 0.5rem;
+}
+@media (max-width: 640px) {
+  .alloc-row { grid-template-columns: 1fr; gap: 0.3rem; }
+}
+
+/* ─── the guarantee, stamped ───────────────────────────────────────── */
+.stamped {
+  border: 1px solid var(--leak);
+  border-left-width: 3px;
+  border-radius: 2px;
+  background: var(--leak-bg);
+  padding: clamp(0.9rem, 2vw, 1.4rem);
+  font-family: var(--display);
+  font-size: clamp(1.05rem, 1.4vw + 0.75rem, 1.5rem);
+  line-height: 1.35;
+  max-width: 46ch;
+}
+.stamped .no { color: var(--leak); }
+
+/* ─── refusal list (slide 8) ───────────────────────────────────────── */
+.refusals { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.9rem; }
+.refusals li { display: grid; grid-template-columns: minmax(0, 15rem) 1fr; gap: 0.9rem; align-items: baseline; }
+.refusals .what {
+  font-family: var(--data);
+  font-size: 0.82rem;
+  color: var(--leak);
+  letter-spacing: 0.01em;
+}
+.refusals .why { color: var(--ink-soft); font-size: 0.95rem; }
+@media (max-width: 700px) { .refusals li { grid-template-columns: 1fr; gap: 0.15rem; } }
+
+/* ─── the three choices (slide 5) ──────────────────────────────────── */
+.choices { display: flex; flex-wrap: wrap; gap: 0.6rem; font-family: var(--data); font-size: 0.85rem; }
+.choices span { border: 1px solid var(--rule); border-radius: 2px; padding: 0.4rem 0.8rem; }
+.choices span.mine { border-color: var(--ink); }
+
+/* ─── Q&A ──────────────────────────────────────────────────────────── */
+.qa { display: flex; flex-direction: column; gap: 1.1rem; }
+.qa dt { font-family: var(--display); font-size: 1.15rem; margin-bottom: 0.25rem; }
+.qa dd { margin: 0; color: var(--ink-soft); max-width: 72ch; }
+.qa > div { border-left: 1px solid var(--rule); padding-left: 1rem; }
+
+/* ─── hypotheses map ───────────────────────────────────────────────── */
+.hyp { display: flex; flex-direction: column; gap: 0.75rem; }
+.hyp-row { display: grid; grid-template-columns: 3rem 1fr auto; gap: 1rem; align-items: baseline; padding-bottom: 0.75rem; border-bottom: 1px solid var(--rule); }
+.hyp-row .tag { font-family: var(--data); font-size: 0.85rem; color: var(--leak); }
+.hyp-row .where { font-family: var(--data); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); white-space: nowrap; }
+@media (max-width: 620px) { .hyp-row { grid-template-columns: 3rem 1fr; } .hyp-row .where { grid-column: 2; } }
+
+/* ─── progress rail + controls ─────────────────────────────────────── */
+.progress {
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  height: 2px;
+  background: transparent;
+  z-index: 10;
+}
+.progress i { display: block; height: 100%; width: 0; background: var(--ink); transition: width 120ms linear; }
+@media (prefers-reduced-motion: reduce) { .progress i { transition: none; } }
+
+.hint {
+  position: fixed;
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  bottom: clamp(0.75rem, 2vw, 1.5rem);
+  font-family: var(--data);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.3rem 0.55rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+:focus-visible { outline: 2px solid var(--leak); outline-offset: 3px; }
+</style>
+
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+<main class="deck" id="deck" tabindex="-1">
+
+  <!-- 1 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">01</span><span class="bar">│</span><span>The problem, in one seller's words</span></div>
+    <div class="face inner">
+      <h1>“My ads stopped working.”</h1>
+      <p class="lede">A Brazilian seller opens Meta Ads Manager and watches ROAS fall from <strong>2.4</strong> to <strong>0.6</strong>.</p>
+      <p class="lede">Ads Manager tells them <strong>what</strong> happened. It cannot tell them <strong>where</strong> — and it has never seen their product page, their margin, their stock, or their delivery promise.</p>
+      <p class="lede">So they do the only thing the dashboard suggests. They change the creative.</p>
+    </div>
+    <div class="note inner">
+      <p class="say">Most of the time the creative was fine. The money was leaking somewhere Meta cannot see.</p>
+    </div>
+  </section>
+
+  <!-- 2 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">02</span><span class="bar">│</span><span>Why that guess is usually wrong</span><span class="h">H1</span></div>
+    <div class="face inner">
+      <h1>The ad worked.<br><span class="quiet">The page didn't.</span></h1>
+      <p class="lede">A funnel has seven stages. Meta owns the top three.</p>
+      <div class="funnel">
+        <div class="funnel-row">
+          <div class="stage seen"><span class="sn">0</span>delivery</div>
+          <div class="stage seen"><span class="sn">1</span>attention</div>
+          <div class="stage seen"><span class="sn">2</span>landing</div>
+          <div class="divider"></div>
+          <div class="stage dark-zone"><span class="sn">3</span>product</div>
+          <div class="stage dark-zone"><span class="sn">4</span>intent</div>
+          <div class="stage dark-zone"><span class="sn">5</span>purchase</div>
+          <div class="stage dark-zone"><span class="sn">6</span>unit economics</div>
+        </div>
+        <div class="funnel-caps">
+          <div class="cap-left">Meta can see this</div>
+          <div class="cap-right">Nobody instruments this</div>
+        </div>
+      </div>
+      <p class="lede">A break below the click looks identical, from inside Ads Manager, to a break above it. Same falling ROAS, same red arrow, <em>completely different fix.</em></p>
+    </div>
+    <div class="note inner">
+      <p class="say">This is the misattribution the whole product exists to correct.</p>
+    </div>
+  </section>
+
+  <!-- 3 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">03</span><span class="bar">│</span><span>What Mazal does</span></div>
+    <div class="face inner">
+      <h1>It names the stage, dates the break, and says why.</h1>
+      <p class="lede">One screen: the funnel with the leaking stage marked, the day it turned, and the store event that explains it.</p>
+      <p class="lede">Then a plan — each action labelled with <strong>who can run it.</strong></p>
+    </div>
+    <div class="note inner">
+      <p class="beat">Beat 1 — <em>“Why did my campaign stop working?”</em></p>
+      <p class="say">Every number on this screen was computed by TypeScript we wrote. The model chose the words, not the arithmetic.</p>
+    </div>
+  </section>
+
+  <!-- 4 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">04</span><span class="bar">│</span><span>The thing nobody else will say</span></div>
+    <div class="face inner">
+      <h1>“Don't launch this.”</h1>
+      <p class="lede">Before a real is spent: a break-even ROAS from the seller's own margin, and a p10–p90 band.</p>
+      <p class="lede">When the band cannot be narrowed, Mazal says which number to instrument first instead of guessing.</p>
+    </div>
+    <div class="note inner">
+      <p class="beat">Beat 3 — <em>“Should I launch this campaign?”</em></p>
+      <p class="say">Meta is not incentivised to tell you not to spend. Our most valuable output is a refusal.</p>
+    </div>
+  </section>
+
+  <!-- 5 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">05</span><span class="bar">│</span><span>It asks before it acts</span><span class="h">H3</span></div>
+    <div class="face inner">
+      <h1>Run all <span class="quiet">·</span> Edit first <span class="quiet">·</span> I'll do it myself</h1>
+      <p class="lede">Some actions are marked <strong>yours to do — Mazal can't.</strong> That is the design, not a limitation.</p>
+      <div class="choices">
+        <span>Run all</span><span>Edit first</span><span class="mine">I'll do it myself</span>
+      </div>
+      <div class="stamped">
+        Mazal can pause your campaign, slow it, or lower its budget.
+        <span class="no">It cannot raise your spend</span> — there is no operation in the product that does that, and you approve each one.
+      </div>
+    </div>
+    <div class="note inner">
+      <p class="say"><strong>Say the sentence exactly.</strong> It is <code>ExecutableOp</code>: a closed union of pause, reduce-budget, and frequency cap. A multiplier above 1 is <em>rejected, not clamped.</em></p>
+      <p><code>packages/engine/src/execution.test.ts</code> walks every fault at both cause layers to keep it true — the guarantee is a type, not a policy.</p>
+    </div>
+  </section>
+
+  <!-- 6 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">06</span><span class="bar">│</span><span>How we know it's right — do not cut for time</span></div>
+    <div class="face inner">
+      <h1>We built a causal simulator.</h1>
+      <p class="lede">Sample a real Brazilian store from 97,000 Olist orders, inject <strong>one</strong> fault, run 30 days of funnel maths. The label is decided first — it is never derived from the metrics.</p>
+      <p class="big"><strong>400 campaigns. 100 held out. Nine fault kinds.</strong></p>
+      <div class="ledger-wrap">
+        <table class="ledger">
+          <tbody>
+            <tr><td>Names the right cause</td><td>59%</td></tr>
+            <tr><td>False alarms on 25 healthy campaigns</td><td>12%</td></tr>
+            <tr><td>Names the change point on detected breaks</td><td>100%</td></tr>
+            <tr><td>Change point within ±1 day — <strong>sudden</strong> breaks</td><td>93%</td></tr>
+            <tr><td>Change point within ±1 day — <strong>gradual</strong> ramps</td><td class="zero">0%</td></tr>
+            <tr class="floor"><td>Chance floor</td><td>25%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="note inner">
+      <p class="cmd">pnpm sim:backtest</p>
+      <p class="say"><strong>Volunteer the 0%.</strong> Quote sudden and gradual separately and never average them. One number over two populations that behave nothing alike would flatter the gradual case and understate the sudden one.</p>
+      <p class="warn">And volunteer this: <code>thin_pdp</code> and <code>price_too_high</code> score 0%. It is a benchmark-width problem — −0.86σ against a 4.5–12% IQR — and we deliberately did not fix it by moving the −1.0σ threshold. Moving a threshold until your own test passes is how you stop being able to trust it.</p>
+    </div>
+  </section>
+
+  <!-- 7 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">07</span><span class="bar">│</span><span>The money slide</span><span class="h">H2</span></div>
+    <div class="face inner">
+      <h1>“You're leaving R$1,643 a month on the table. Same budget, different split.”</h1>
+      <p class="lede">Three products share one wallet. The one that converts most often is not the one worth the most money.</p>
+      <div class="alloc">
+        <div class="alloc-row up">
+          <span class="who">liquidificador</span>
+          <span class="track"><i class="bar-before" style="width:45%"></i><i class="bar-after" style="width:94%"></i></span>
+          <span class="delta">R$60 → R$126</span>
+        </div>
+        <div class="alloc-row">
+          <span class="who">home appliances</span>
+          <span class="track"><i class="bar-before" style="width:100%"></i><i class="bar-after" style="width:78%"></i></span>
+          <span class="delta">R$134 → R$104 <span class="runs">MAZAL RUNS THIS</span></span>
+        </div>
+        <div class="alloc-row">
+          <span class="who">furniture bedroom</span>
+          <span class="track"><i class="bar-before" style="width:47%"></i><i class="bar-after" style="width:16%"></i></span>
+          <span class="delta">R$63 → R$21 <span class="runs">MAZAL RUNS THIS</span></span>
+        </div>
+      </div>
+      <p class="lede">The budget does not move. <strong>The money does.</strong></p>
+      <div class="ledger-wrap">
+        <table class="ledger">
+          <tbody>
+            <tr><td>Mazal</td><td>71.4% of achievable profit</td></tr>
+            <tr><td>Even split</td><td>25.3%</td></tr>
+            <tr><td>Greedy — all budget on the best ROAS</td><td class="zero">−75.4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="note inner">
+      <p class="beat">Beat 4 — <em>“Where should my budget go?”</em></p>
+      <p class="cmd">pnpm sim:allocator</p>
+      <p class="say">Measured against curves the engine never sees, over 200 simulated accounts. Greedy is what sellers actually do, and it returns <em>less than nothing.</em> One reason, and a seller can hold it: <strong>the best product fills up.</strong></p>
+      <p class="warn">Do not claim 94%. <code>optimization.md</code> imagines it; we get 71.4%, and the reason is a 14% median error in the marginal return.</p>
+    </div>
+  </section>
+
+  <!-- 8 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">08</span><span class="bar">│</span><span>What we deliberately did not build</span></div>
+    <div class="face inner">
+      <h1>Saying no is the slide.</h1>
+      <ul class="refusals">
+        <li>
+          <span class="what">No deep learning.</span>
+          <span class="why">On this exact problem, published: linear regression R² 0.74, LSTM 0.56. Simple beat deep, explainable beat both.</span>
+        </li>
+        <li>
+          <span class="what">No bandits, no Bayesian optimization.</span>
+          <span class="why">They need live evaluation loops. A half-built GP that does not converge on stage is worse than a solver that always does.</span>
+        </li>
+        <li>
+          <span class="what">No response curve for a flat budget.</span>
+          <span class="why">A campaign held at one budget contains no evidence about any other budget. The fit refuses rather than returning confident nonsense.</span>
+        </li>
+        <li>
+          <span class="what">No Meta Ads MCP.</span>
+          <span class="why">Not built, on purpose.</span>
+        </li>
+      </ul>
+    </div>
+    <div class="note inner">
+      <p class="say">Judges reward a team that knows what it chose not to build.</p>
+    </div>
+  </section>
+
+  <!-- 9 ─────────────────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">09</span><span class="bar">│</span><span>Where it stands</span></div>
+    <div class="face inner">
+      <h1>Built, tested, and honest about the edges.</h1>
+      <div class="ledger-wrap">
+        <table class="ledger">
+          <tbody>
+            <tr><td>Tests</td><td>294</td></tr>
+            <tr><td>Categories benchmarked</td><td>62 — 99.84% of Olist orders</td></tr>
+            <tr><td>MCP server</td><td>live, bearer-gated, in production</td></tr>
+            <tr><td>Renders inside Deco Studio</td><td>two ui:// views — the funnel and the band</td></tr>
+            <tr><td>Execution against Meta</td><td>opt-in, off by default, decrease-only</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lede"><strong>Roadmap, in order:</strong> rung 1 of the execution ladder — Mazal composes the change, the seller confirms <em>inside Meta</em>, and we hold no credential at all. Then bandits, then effective ROAS with the organic tail.</p>
+    </div>
+    <div class="note inner">
+      <p class="say">The safest version is not the one we built tonight, and we know which one it is.</p>
+    </div>
+  </section>
+
+  <!-- appendix: hypotheses ──────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">A1</span><span class="bar">│</span><span>Appendix — the three hypotheses, mapped</span></div>
+    <div class="face inner">
+      <h1 class="quiet">Where each one lands.</h1>
+      <div class="hyp">
+        <div class="hyp-row">
+          <span class="tag">H1</span>
+          <span>Sellers blame creative for product and offer problems</span>
+          <span class="where">Slides 2, 3</span>
+        </div>
+        <div class="hyp-row">
+          <span class="tag">H2</span>
+          <span>The loss is material — days of dead spend before anyone acts</span>
+          <span class="where">Slides 6, 7</span>
+        </div>
+        <div class="hyp-row">
+          <span class="tag">H3</span>
+          <span>A verdict changes behaviour</span>
+          <span class="where">Slide 5</span>
+        </div>
+      </div>
+    </div>
+    <div class="note inner">
+      <p class="say">Read <code>demo-runbook.md</code> before presenting: the commands, the three live beats, and the things not to claim.</p>
+    </div>
+  </section>
+
+  <!-- appendix: Q&A ─────────────────────────────────────────────────── -->
+  <section class="slide">
+    <div class="rail inner"><span class="n">A2</span><span class="bar">│</span><span>Appendix — questions, and the honest answers</span></div>
+    <div class="face inner">
+      <dl class="qa">
+        <div>
+          <dt>“Isn't this a dashboard?”</dt>
+          <dd>A dashboard shows ROAS is 0.6. Mazal says the ad worked and the product page didn't, and hands you actions tagged with who can perform them. We built the opposite of a dashboard: it shows one thing, the leak.</dd>
+        </div>
+        <div>
+          <dt>“How do you know it isn't hallucinating?”</dt>
+          <dd>The model never touches arithmetic. Every finding carries the rule id, the observed value, the reference, and the sample size. Audit any number on screen right now.</dd>
+        </div>
+        <div>
+          <dt>“Doesn't Meta's own AI do this?”</dt>
+          <dd>Meta optimises inside Meta. It cannot see your margin, your stock, your delivery ETA, or your product page — and it is not incentivised to tell you not to spend.</dd>
+        </div>
+        <div>
+          <dt>“Where are your benchmarks from?”</dt>
+          <dd>Computed, not quoted. Per-category medians and quartiles from Olist, in BRL. Every reference number prints its sample size.</dd>
+        </div>
+        <div>
+          <dt>“What if it's wrong?”</dt>
+          <dd>It proposes, you approve, and the receipt names which mode it ran in. On thin data it says it cannot predict yet and names the number to instrument first.</dd>
+        </div>
+        <div>
+          <dt>“Can it spend my money?”</dt>
+          <dd>Slide 5's sentence, exactly.</dd>
+        </div>
+        <div>
+          <dt>“How is this a business?”</dt>
+          <dd>Zero integration to diagnose — a CSV and a two-minute form. One OAuth to execute. Every competitor needs OAuth before it can say hello.</dd>
+        </div>
+      </dl>
+    </div>
+    <div class="note inner">
+      <p class="say">Every number in this deck is regenerated by a command, and the command is named beside it. If a figure is not reproducible from the repo, it does not go on a slide.</p>
+    </div>
+  </section>
+
+</main>
+
+<div class="hint" id="hint">↑ ↓ / SPACE</div>
+
+<script>
+(function () {
+  var deck = document.getElementById('deck');
+  var bar = document.getElementById('bar');
+  var hint = document.getElementById('hint');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+
+  function paint() {
+    var max = deck.scrollHeight - deck.clientHeight;
+    bar.style.width = (max > 0 ? (deck.scrollTop / max) * 100 : 0) + '%';
+  }
+  deck.addEventListener('scroll', paint, { passive: true });
+  paint();
+
+  function current() {
+    var top = deck.scrollTop;
+    var best = 0, dist = Infinity;
+    slides.forEach(function (s, i) {
+      var d = Math.abs(s.offsetTop - top);
+      if (d < dist) { dist = d; best = i; }
+    });
+    return best;
+  }
+
+  function go(step) {
+    var next = Math.min(slides.length - 1, Math.max(0, current() + step));
+    slides[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case 'ArrowDown': case 'ArrowRight': case 'PageDown': case ' ':
+        e.preventDefault(); go(1); break;
+      case 'ArrowUp': case 'ArrowLeft': case 'PageUp':
+        e.preventDefault(); go(-1); break;
+      case 'Home':
+        e.preventDefault(); slides[0].scrollIntoView({ block: 'start' }); break;
+      case 'End':
+        e.preventDefault(); slides[slides.length - 1].scrollIntoView({ block: 'start' }); break;
+    }
+  });
+
+  // The hint has done its job once the presenter has moved once.
+  var seen = false;
+  deck.addEventListener('scroll', function () {
+    if (seen) return;
+    seen = true;
+    hint.style.display = 'none';
+  }, { passive: true, once: true });
+})();
+</script>
