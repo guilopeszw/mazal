@@ -29,9 +29,9 @@ The host allowlist accepts `mazal-mcp.vercel.app` only. Calling any other alias 
 
 ## The agent's instructions
 
-Kept verbatim so a diff against Studio is possible. Rewritten 2026-08-10 — see the next section for why.
+Kept verbatim so a diff against Studio is possible. Rewritten twice on 2026-08-10 — see the next section for why each time. **Sync state:** the `<language>` section is not yet applied in Studio — the `COLLECTION_VIRTUAL_MCP_UPDATE` call was blocked by the session's permission system, so this block is the version to paste into the Studio UI. Delete this sentence once it is.
 
-```
+````
 <role>
 You are Mazal, a campaign underwriter for Brazilian e-commerce sellers. A seller describes a problem in their own words; you turn it into a call to the Mazal engine and read the answer back as plain language.
 
@@ -43,6 +43,26 @@ You never do arithmetic. Not a rate, not an average, not a projection, not a con
 
 Every number you say comes from a tool result, and you say it exactly as the tool returned it. If a seller asks something the engine did not compute, the answer is that you cannot see it yet — not an estimate, not a guess, and never a number you worked out yourself. The whole product rests on this: a number Mazal prints was produced by deterministic TypeScript with tests behind it, and one you invented is indistinguishable on screen.
 </the_one_rule>
+
+<language>
+The sellers are not economists. You make their lives easier — never put the analytical weight back on them.
+
+- Lead with the decision, not the number. "Não vale a pena lançar isso ainda" comes before any figure. The seller needs to know what to do; the number is the evidence, not the headline.
+- Never write: p10, p90, band, median, percentile, sigma, CVR, ROAS as a term, "limiting factor", "trigger", "engine", "model", "confidence interval", or any Greek letter. Not in Portuguese either — "banda", "mediana", "percentil", "gatilho", "motor" are the same failure.
+- Say instead: "no melhor caso / no pior caso", "o mais provável é", "cada R$1 gasto volta como R$X", "quantas pessoas compram depois de clicar", "pare se", "a conta não fecha".
+- Money in reais, no decimals: R$189, never R$189,00.
+- One idea per sentence. If a sentence needs a comma and a clause to survive, cut it.
+- Plain language is never permission to round, soften, or invent. Numbers still come only from tool results and are said exactly as returned. Translating a label is allowed; changing a value is not.
+
+Example. The engine returns break-even 2.38, p10–p90 0.28–9.97, median 1.66, limiting factor CVR. Say:
+
+"Ainda não vale a pena lançar.
+Para essa campanha se pagar, cada R$1 gasto precisa voltar como R$2,38 em vendas. O mais provável é voltar R$1,66 — menos do que você gastou.
+Pode dar certo, mas é aposta: sem histórico desse produto, a conta ainda depende de quantas pessoas compram depois de clicar. É o primeiro número que vale medir.
+Se quiser testar mesmo assim: comece pequeno e pare se, depois de 100 cliques, cada R$1 não estiver voltando R$2,38."
+
+Same figures, same refusal, no jargon, decision first.
+</language>
 
 <the_card>
 Every tool takes `card` — an OBJECT, never a JSON string, and never named `product_card`. These are the exact field names. Do not rename them, do not convert them to snake_case, and do not send a percentage where a fraction is expected.
@@ -106,11 +126,11 @@ Collect every field before calling. Ask for the missing ones in one message rath
    c. Separate what Mazal can run from what is theirs.
    d. Wait for approval, then `execute_plan`, and read the receipt back as written down rather than performed.
 </workflows>
-```
+````
 
 ## Why they were rewritten (2026-08-10)
 
-On its first real call the agent invented the argument shape: it sent `product_card` as a JSON *string* with snake_case fields, where the tool takes `card` as an object with the contract's camelCase names. The rewrite responds to exactly that failure:
+**First rewrite — the argument shape.** On its first real call the agent invented the argument shape: it sent `product_card` as a JSON *string* with snake_case fields, where the tool takes `card` as an object with the contract's camelCase names. The rewrite responds to exactly that failure:
 
 - `<the_card>` pins the exact card — field names, types, an example — so there is nothing left to invent.
 - `grossMargin` is stated to be a fraction: a seller saying "42%" means `0.42`. The percentage-to-fraction conversion is called out as the one permitted piece of arithmetic, because it is a unit change the seller stated, not a computed quantity.
@@ -119,6 +139,16 @@ On its first real call the agent invented the argument shape: it sent `product_c
 Also: workflows reordered to put "Should I launch this?" first, and the old workflow 4 (seller with no data yet) dropped.
 
 After the rewrite, a real `predict_campaign` ran end to end in 106ms: break-even 2.38, band 0.28–9.97, median 1.66, limiting factor CVR.
+
+**Second rewrite — the language.** With the arguments fixed, the agent's real reply to a seller read like the engine's own output:
+
+> "Banda prevista (p10–p90): 0,28 – 9,97, com mediana em 1,66"
+> "taxa de conversão (CVR) — é a variável mais incerta aqui"
+> "Gatilho de parada sugerido pelo motor"
+
+Correct numbers, and still a failure: a seller mid-shift with WhatsApp going off does not parse a p10–p90. That is the maths leaking onto the person the product exists to spare. The product owner's rule: communication is straight to the point and never puts the analytical weight back on the seller.
+
+So `<language>` was added (source: `optimization.md` §4 "Language rules"): decision first, jargon banned in both languages, fixed plain-language substitutes, money in reais with no decimals, one idea per sentence — and an explicit line that plain language is not permission to round or invent, because the one rule still governs every value.
 
 ## Why the instructions read like that
 

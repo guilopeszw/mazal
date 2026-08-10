@@ -99,7 +99,7 @@ Read [`demo-runbook.md`](demo-runbook.md) before presenting: it has the commands
 
 `pnpm sim:backtest`
 
-**Volunteer the 0%.** Quote sudden and gradual separately — the 70% average lies in both directions, and offering the split is worth more than the number.
+**Volunteer the 0%.** Quote sudden and gradual separately and never average them. `sim:backtest` prints no combined figure on purpose: one number over two populations that behave nothing alike would flatter the gradual case and understate the sudden one. Offering the split is worth more than any single number.
 
 **And volunteer this:** `thin_pdp` and `price_too_high` score 0%. It is a benchmark-width problem — −0.86σ against a 4.5–12% IQR — and we deliberately did not fix it by moving the −1.0σ threshold. Moving a threshold until your own test passes is how you stop being able to trust it.
 
