@@ -15,6 +15,34 @@ Entry format:
 
 ---
 
+## 2026-08-10 20:30 BRT · Guilherme's agent · the web app is live, and it stopped lying to a bakery
+
+**Done:** `apps/web` is **deployed and public** at `https://mazal-web-puce.vercel.app` — page 200, `POST /api/chat` 200, answering in Portuguese from the real engine. First successful production deploy this project has ever had. Four earlier attempts errored in 3–4s and the reason was two settings that must be set together: Root Directory `apps/web` **and** "Include files outside the Root Directory". With only the first, pnpm cannot resolve `@mazal/contracts`; with only the second, Vercel looks for `next` in the root `package.json` and does not find it. A root `vercel.json` declaring `framework: nextjs` does **not** work around it — the Next builder checks the Root Directory's package.json regardless.
+
+Three aliases point at the project. Only `mazal-web-puce.vercel.app` is public; the team-scoped one 302s to `vercel.com/sso-api`. All three are in `MAZAL_CHAT_ALLOWED_HOSTS`, which is matched against the raw `Host` header — miss one and its chat 403s while the page loads fine, which looks like a working demo until someone types.
+
+**Mazal was telling an off-pixel seller their product page was thin.** The whole thread of this session, and it came from asking what a real bakery would see: a friend selling frozen goods through **iFood and WhatsApp**, where Meta has no pixel on the checkout and reports every conversion column as zero. Four surfaces had to be fixed, found one at a time by review:
+
+- The engine flagged stage 3 and named `thin_pdp` — gated on *clicks*, which are healthy, so only the numerator was missing. Guarded (#55).
+- The sheet then said "No leak found. Every measured stage sits inside its reference." Four of them were never measured (#57).
+- The chat route said the same thing in Portuguese, reachable by any caller supplying its own context.
+- The MCP tile said "No stage broke", and after the text was fixed it still **painted in the success colour**.
+
+The sheet also contradicted itself: with `primary: null` every stage rendered `ok`, so four unjudged stages each printed a value, the funnel drew three stages at zero, and the margin chart asserted a thirty-day loss computed from revenue the same answer had just called unmeasured. Rows 3–6 mute now and the charts are omitted.
+
+**The CSV parser was corrupting real exports, silently, in four ways.** All found by one reviewer running ~55 real Ads Manager column names through it. `"Adds to cart conversion value"` matched `'adds to cart'` and wrote **reais into a count field** — a ~40× inflation that reads as a healthy product page. `"Link click-through rate"` spelled out landed `1.53%` as `1.53` clicks. `Link clicks` beside `Unique link clicks` let column *order* decide the funnel's size. And a blank column — Meta prints `—` for a zero-conversion day — claimed its field with `0` ahead of a populated twin. The first three are fixed by skips; the last two by the rule underneath them: **first write wins, second becomes a warning naming the header it ignored.** A substring skip-list cannot stay complete for a vocabulary Meta keeps extending.
+
+**Next:** wire the pre-flight to an uploaded card. It is the one beat an off-pixel seller's setup does not break — `predict` needs the product, not the pixel — and today the chip renders the *fixture's* card, so there is no path from an upload to a pre-flight on their own product.
+
+**Blocked / watch out:** four things.
+
+- **Do not cite the backtest as evidence about `noPixelEvidence`.** The simulator derives `revenue = purchases × aov`, so a day with revenue and no purchases is **unconstructible in the cohort**. 59.0% unmoved means the cohort never exercises that clause, not that the change is safe. I repeated that claim several times before a review caught it.
+- **`pnpm typecheck` green does not mean `next build` green.** They check different files: `tsc --build` passes on a commit whose `next build` fails, because the app tsconfig picks up `apps/web/**/*.test.ts`. And do not grep the build for "Compiled successfully" — webpack prints it *before* the type check that then fails. Read exit codes. A gate of mine shipped a broken build to review by doing exactly this.
+- **An off-pixel seller is still only half-served.** They get CPM, CTR and an honest refusal. `Action.title` also comes back in English inside Portuguese prose on the chat path — visible on the public URL.
+- **Five checks that could not fail turned up in one session**, three of them mine and every one caught by a reviewer rather than by me: a `minSample` loop whose guard skipped every iteration, a boundary test that never sampled the boundary, a "reproduces nowhere" claim that reproduced exactly, a negative assertion that held with the fix removed, and the build grep above. A green suite is not evidence until something has been broken on purpose and watched to fail.
+
+---
+
 ## 2026-08-10 19:40 BRT · Guilherme's agent · Mazal told a bakery to rewrite a page that was fine
 
 **Done:** a guard in `packages/engine` — A's package, taken on Guilherme's call because A is unavailable. **The engine was fabricating a diagnosis for any seller whose checkout Meta cannot see.**
