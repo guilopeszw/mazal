@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 21:33 BRT · Codex · resolução dos conflitos do PR #37
+
+**Done:** atualizado `feat/web-chat-api` contra `origin/main`, reconciliando `apps/web/components/chat.tsx` com a rota de narração tipada e preservando o histórico de `docs/HANDOFF.md`. Commit `dcb565a` publicado em `origin`.
+
+**Next:** revisar o PR #37 no GitHub e fazer o merge quando as verificações hospedadas estiverem verdes.
+
+**Blocked / watch out:** `pnpm test` (221 testes), `pnpm typecheck`, `pnpm --filter web build` e `git diff --check` passaram. O checkout principal local não foi alterado.
+
+---
+
 ## 2026-08-09 18:05 BRT · Codex · web chat API plan
 
 **Done:** Implemented and reviewed Tasks 1–5 on `feat/web-chat-api` through commits `bb4b92c`, `aa87b3d`, `f6cedd6`, `16921b7`, `31bea16`, `af7e95f`, `5726475`, and `2e1483f`: strict public schema and deterministic engine resolution; token-guarded fixtures/templates; bounded secure `POST /api/chat`; signed session-bound continuity, rendered-content cache and live limiter; and typed narration turns in the chat shell. The chat API suite is green (46 tests), web typecheck and Webpack production build are green, and the HTTP smoke matrix passed.
