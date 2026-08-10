@@ -15,6 +15,16 @@ Entry format:
 
 ---
 
+## 2026-08-09 22:19 BRT · Guilherme's agent · handoff refresh for the current session
+
+**Done:** refreshed the repo handoff log in [docs/HANDOFF.md](docs/HANDOFF.md) with a fresh entry for the current session, following the format mandated in [AGENTS.md](AGENTS.md) and [CLAUDE.md](CLAUDE.md). The repository remains on the active branch and this change is intentionally docs-only.
+
+**Next:** continue from the most relevant open implementation task in the repo and use this handoff as the first stop before touching code or contracts.
+
+**Blocked / watch out:** nothing new blocks this handoff; keep the branch, ownership, and contract rules from [AGENTS.md](AGENTS.md) in mind before editing anything beyond the log.
+
+---
+
 ## 2026-08-09 20:20 BRT · Guilherme's agent · end of the long session
 
 **Done:** `main` at `7108c9c`, 175 tests, typecheck (incl. `apps/mcp`), web build, and all three fixture guards green — verified from a clean `--frozen-lockfile` checkout, not this working tree.
