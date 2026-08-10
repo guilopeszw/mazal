@@ -15,6 +15,36 @@ Entry format:
 
 ---
 
+## 2026-08-10 16:20 BRT · Guilherme's agent · somebody finally looked at the tiles
+
+**Done:** five PRs on `stage` — #48, #49, #50, #51, #52. `stage` at `08f9a9f`, verified as a whole rather than branch by branch: typecheck, **298 root tests**, **72 `@mazal/mcp`**, both fixture guards, `next build`, and `sim:backtest` regenerating `docs/backtest-results.md` byte-identical.
+
+**The tiles have been seen now, and looking found four things no test could.** `apps/mcp/scripts/preview-ui.mjs` renders both views to standalone HTML with no Studio, no host and no model — it bundles each view with the MCP Apps runtime aliased to a stub that hands it the tool result directly, so the view code, the CSS and the engine output are all the real ones. Chrome headless screenshots it without the browser extension:
+
+```
+node apps/mcp/scripts/preview-ui.mjs
+'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+  --headless=new --disable-gpu --user-data-dir=/tmp/cp --window-size=760,900 \
+  --screenshot=shot.png file://$PWD/apps/mcp/src/ui/dist-preview/diagnosis.html
+```
+
+What it found, in order of how badly it would have shown on a projector: the funnel bars were a share of the largest stage, and the largest stage is impressions — 91,837 to 954 to 103 to 12 to 7 — so four of five bars sat on the 2% floor and the chart on the centrepiece tile carried no information. The prediction tile printed the limiting factor twice, because `killTrigger` already ends with it. `AtcRate` and `IcRate` reached the seller verbatim, the exact jargon the views were rewritten to remove. And every limiting-factor sentence read *"at 34% of **the what is typical for the category**"*.
+
+Bars are now step-to-step survival, capped and floored. Stage 0→1 stays a sliver and that is honest: the demo's click-through is 1.0%, and anything under the 2% floor draws the floor — the smallest mark the chart can make without making none.
+
+**Two `Diagnosis` shapes mean opposite things and the view read them the same way.** Under a week of baseline, `selfReference` returns null for every stage, `diagnose` compares nothing, and it returns `primary: null` — byte for byte what a healthy campaign returns. The tile printed *"No stage broke — and that is a real answer."* It also windowed on `WINDOW_DAYS` while the engine judges self mode on `SELF_WINDOW_DAYS`, so a stage the engine skipped for thin data rendered `ok` with a value. Both fixed; `packages/engine` gained two exports (`SELF_WINDOW_DAYS`, `SELF_MIN_BASELINE_DAYS`) so the rule stays the engine's, and the backtest artefact is byte-identical.
+
+**Next:** send one message to `Mazal` in Studio and read the reply back with `COLLECTION_THREAD_MESSAGES_LIST`. It is the one item from this session's list still unverified, and it needs **model credit, not Studio access** — see below.
+
+**Blocked / watch out:** four things.
+
+- **The Studio agent still cannot answer, and it is not the model id this time.** The tiers were repointed at `gemini-3.5-flash`, but the key behind them (`aik_8xQPqS1y19TO6-v19NYOW`, labelled *"minha chave"*) is a **bring-your-own Google key on the free tier**, and it **appears to be out of quota** — inferred from the error signature, not read off a dashboard. That is also why `gemini-2.5-flash` failed with *"no longer available to new users"* — the free-tier signature. The Deco AI Gateway has **$1.22** left and is a separate provider; pointing the tiers at it would spend that. **Nothing in the demo needs it**: `apps/web` runs `NARRATION_MODE=fixture` with no LLM at all, and the MCP is live and bearer-gated for any MCP client.
+- **Three of the four defects in my own work this session were checks that could not fail.** A `minSample` loop whose guard skipped every iteration. A boundary test that sampled 6 and 10 but never 7, so `>=` could slip to `>`. A "reproduces nowhere" claim about test counts that reproduced exactly, at the commit it was written on. Each looked like a passing test or a verified fact. The repo already had this lesson written down from the backtest check that passed with the top-1 row reading 71% — it is worth re-reading before trusting a green suite.
+- **`build-ui.mjs` must never clear `src/ui/dist`.** It is tempting: `build-vercel.mjs` used to copy that directory wholesale, so stale files shipped. But `resources.test.ts` spawns `build-ui` and `vercel-bundle.test.ts` spawns `build-vercel`, vitest runs files in parallel, and clearing a shared directory mid-build is a race. The #51 review provoked it deliberately: **10 of 10 runs bad at a 30–40ms stagger**, and worse than a flaky test — `cp -r` of a directory mid-rebuild copies whatever exists and **exits 0**, so the failure mode is a silent incomplete deploy, not a red suite. `build-vercel` now copies the two views **by name** from `build-ui`'s `VIEWS` export instead. Add a view in one place and both follow; a missing one throws `ENOENT` and fails the build loudly.
+- **One session per worktree.** Still true, and it cost fifteen minutes again at the start of this one.
+
+---
+
 ## 2026-08-10 12:55 BRT · Guilherme's agent · the Studio agent was answering nothing
 
 **Done:** the thing that matters in this entry is one line long. **Studio's org settings pinned all three chat tiers to `gemini-2.5-flash`, and Google now refuses to serve it** — *"This model models/gemini-2.5-flash is no longer available to new users."* The 02:49 thread against the `Mazal` agent has exactly two messages in it: a real seller question — *"I have a product I have not advertised yet. Can you tell me if it can pay for itself before I spend anything?"* — and that error. Every Studio chat with the agent was failing. Tiers now point at `gemini-3.5-flash` (same key, tools + reasoning, 1M context).
