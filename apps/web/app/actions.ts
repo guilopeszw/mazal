@@ -11,7 +11,7 @@ import {
 import { benchmarks } from "@mazal/data";
 import { parseMetaCsv, productCardSchema } from "@mazal/ingest";
 import { foldDaysByDate } from "@mazal/meta";
-import { buildUploadAnswer, type Answer } from "@/lib/answers";
+import { buildPreflightAnswer, buildUploadAnswer, type Answer } from "@/lib/answers";
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { record } from "@/lib/audit";
@@ -116,6 +116,30 @@ const FIELD_WORDS: Record<InferredNumericField, string> = {
   pdpDescriptionLength: "description length",
   returnPolicyDays: "return policy days",
 };
+
+/**
+ * "Is this product worth advertising?" for a card the seller filled in.
+ *
+ * The one answer that survives a seller whose checkout Mazal cannot see: it
+ * reads the product and the category table, so it needs no pixel, no
+ * conversions and no campaign at all. Until this existed, the pre-flight chip
+ * rendered the fixture's card and there was no path from an upload to a
+ * pre-flight on the seller's own product.
+ */
+export async function preflightUpload(input: {
+  stated: StatedCard;
+  corrections: Partial<Record<InferredNumericField, number>>;
+}): Promise<{ ok: true; answer: Answer } | { ok: false; error: string }> {
+  const parsed = productCardSchema.safeParse({ ...input.stated, ...input.corrections });
+  if (!parsed.success) {
+    return { ok: false, error: "Those product details do not form a valid card." };
+  }
+
+  return {
+    ok: true,
+    answer: buildPreflightAnswer(parsed.data, "Is this product worth advertising?"),
+  };
+}
 
 export async function diagnoseUpload(input: {
   fileName: string;
