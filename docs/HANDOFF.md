@@ -15,6 +15,24 @@ Entry format:
 
 ---
 
+## 2026-08-09 20:20 BRT · Guilherme's agent · end of the long session
+
+**Done:** `main` at `7108c9c`, 175 tests, typecheck (incl. `apps/mcp`), web build, and all three fixture guards green — verified from a clean `--frozen-lockfile` checkout, not this working tree.
+
+The MCP is **live in production**. `https://mazal-mcp.vercel.app/mcp` returns our own `Unauthorized`, not Vercel's wall. Three separate causes, any one of which alone produced the same 404: Vercel Authentication scoped `all_except_custom_domains` (a `.vercel.app` URL is not a custom domain, so the panel appeared to save and nothing changed); the function never existed, because the build wrote gitignored `api/mcp.mjs` and Vercel scans the *source tree* for `api/*.mjs`; and the test that should have caught it read the routes back out of the config file it had just parsed. Now built into the Build Output API, where the build's output IS the deployment.
+
+The **Deco integration did not exist.** `mazal-mcp-vercel-deco.md` claimed a live Custom Connection, an agent, and a real diagnosis in Monitoring. The org held eight Studio Pack defaults and four unrelated connections. Both now exist (`conn_ZovZcL4B9Fplj0h06GO0f`, `vir_s9bfvfwe5vloXTD6Ttn_o`), versioned in `docs/deco-agent.md` because Studio config has no history — which is exactly how that claim survived a day.
+
+The **Allocator is on screen**: four sections on the `allocate` answer — the reallocation, the Money Line, the budget walk, and a plan whose actor split falls straight out of `ExecutableOp` (Mazal runs the cuts; raising a budget is the seller's). 71.4% of achievable profit against 25.3% even-split and -75.4% greedy, `pnpm sim:allocator`.
+
+`docs/deck.md` is nine slides, every figure checked against a live run.
+
+**Next:** the deck is written but not built as slides. Bringel's PR #32 (mocked Meta payload; his own findings unaddressed — leave it to him) and Joaquim's `feat/web-chat-api` are unmerged and unreviewed.
+
+**Blocked / watch out:** the Deco connection has **no `Authorization` header** — set it to Vercel's `MAZAL_MCP_BEARER_TOKEN` and `CONNECTION_TEST` goes healthy. The OAuth grant taken for Studio is ~150 scopes including `ORGANIZATION_DELETE` and `DATABASES_RUN_SQL`; revoke when done. `COLLECTION_CONNECTIONS_LIST` returns `connection_token` in plaintext. `thin_pdp` and `price_too_high` still score 0% and that is deliberate — do not fix it by moving the -1.0 sigma threshold.
+
+---
+
 ## 2026-08-09 18:10 BRT · Guilherme's agent · end of the build day
 
 **Done:** `main` is at `2350fd4` and green — 169 tests, `@mazal/mcp` 39, typecheck (now including `apps/mcp`), `next build`, and both demo fixtures pass their beat guard. Verified from a fresh `--frozen-lockfile` checkout, not from this working tree.
