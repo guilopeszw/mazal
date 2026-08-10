@@ -299,13 +299,17 @@ export function Chat({
 
   /**
    * Re-measure when something other than typing changes the dock's height: a
-   * rotation, a sidebar, the first turn docking it. `submit` runs while
+   * rotation, or the first turn docking it. `submit` runs while
    * `started` is still false, so the first turn would otherwise write `0px` and
    * be saved only by the floor until the next keystroke.
    */
   useEffect(() => {
     reserveDockRoom();
     window.addEventListener("resize", reserveDockRoom);
+    // Not the sidebar: opening it changes `--rail`, not the viewport, so no
+    // resize fires and `--dock` stays stale until the next keystroke. Only
+    // reachable under 34rem of available width, where the form stops being
+    // max-w-bound and can rewrap.
     return () => window.removeEventListener("resize", reserveDockRoom);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started]);
