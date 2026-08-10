@@ -2,7 +2,13 @@
 
 ## Estado
 
-A operação está ativa em produção: a Vercel serve o MCP em Node 24, a Custom Connection `Mazal MCP` guarda o bearer secret e o agente `Mazal` usa somente essa conexão. Um diagnóstico real foi executado pelo Studio e registrado no Monitoramento.
+**Corrigido em 2026-08-09.** A versão anterior deste arquivo dizia que a operação estava ativa em produção, que a Custom Connection `Mazal MCP` guardava o bearer secret, que o agente `Mazal` usava somente essa conexão, e que um diagnóstico real tinha sido executado pelo Studio e registrado no Monitoramento.
+
+Lido contra a organização `guilherme-works-btg1` no mesmo dia, nada disso existia: oito agentes, todos padrão do Studio Pack, e quatro conexões — Deco Store, MCP Registry, Deco CMS self, GitHub. Sem agente `Mazal`, sem conexão `Mazal MCP`. Um diagnóstico não pode ter passado por uma conexão que não existe.
+
+Agora existem, e estão versionados em [`docs/deco-agent.md`](deco-agent.md) — configuração do Studio não tem histórico nem revisão, então o repositório guarda a cópia que tem.
+
+O que falta é um campo: o header `Authorization: Bearer <token>` na conexão. Sem ele `CONNECTION_TEST` retorna `healthy: false`, que é o estado correto para um arquivo em git.
 
 Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor de token.
 
@@ -11,7 +17,9 @@ Não registrar neste arquivo, no Git, em tickets ou em screenshots nenhum valor 
 1. Criar ou selecionar um projeto Vercel para este monorepo.
 2. Definir **Root Directory** como `apps/mcp` e manter habilitada a inclusão de arquivos externos ao diretório raiz. O pacote depende de `packages/contracts`, `packages/data` e `packages/engine` pelo workspace pnpm.
 3. Confirmar **Node.js 24.x** nas configurações do projeto. `apps/mcp/package.json` também fixa `24.x`.
-4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` gera a Function Node autocontida em `apps/mcp/api/mcp.mjs`; `apps/mcp/vercel.json` encaminha a URL pública `/mcp` para esse artefato antes do filesystem, sem migrar para Edge ou Workers.
+4. Manter `apps/mcp/src/vercel-entrypoint.ts` como o entrypoint fonte. `pnpm run build:vercel` grava a árvore da Build Output API em `apps/mcp/.vercel/output`: a Function fica em `functions/mcp.func/` e é servida em `/mcp` sem nenhuma rota declarada.
+
+   **Não voltar a gerar `api/mcp.mjs`.** Aquela versão dependia da detecção zero-config da Vercel, que varre a ÁRVORE DE FONTES atrás de `api/*.mjs` — e o arquivo é gerado durante o build e está no gitignore, então na hora da varredura ele não existe. Nenhuma Function era criada, a rota apontava para o nada, e toda URL respondia 404 enquanto o build reportava sucesso. `apps/mcp/src/vercel.test.ts` trava isso.
 5. Configurar as variáveis abaixo no secret manager da Vercel para Production. Configurar Preview somente se houver um host de preview explicitamente autorizado.
 6. Implantar e anotar a URL estável como `https://<VERCEL_PRODUCTION_HOST>/mcp` nesta seção. Não usar uma URL de preview na conexão de produção.
 
@@ -46,6 +54,10 @@ O servidor aceita um token por vez, portanto a rotação deve ocorrer em uma jan
 4. Executar handshake, `tools/list` e uma chamada real; confirmar a chamada no Monitor.
 5. Remover o token anterior do gerenciador seguro após a validação. Se a validação falhar, restaurar o valor anterior apenas pelos dois secret managers e repetir o deploy; nunca copiar o token para o Git.
 
+## O health check do Studio
+
+`CONNECTION_TEST` não faz handshake MCP: envia um POST JSON-RPC `ping` cru com os headers da conexão (`decocms/studio`, `apps/api/src/storage/connection.ts`) e considera saudável `2xx` ou `404`. O fetch do Node manda `Accept: */*`, e o transport Streamable HTTP exigia os dois content-types literais — respondia `406` e o Studio reportava `healthy: false` mesmo com auth e host corretos. O servidor agora trata o wildcard como o que ele significa em HTTP e responde o ping com `200 {"result":{}}`. Um `Accept` explícito sem wildcard continua recebendo `406`.
+
 ## Custom Connection Deco
 
 1. Abrir **Settings → Connections → Add connection → Custom Connection**.
@@ -68,7 +80,7 @@ Criar o Agent “Mazal”, conectar Meta Ads ou habilitar qualquer quinto tool p
 - [x] `POST https://mcp-cyan-gamma.vercel.app/mcp` sem `Authorization` retorna `401`.
 - [x] O mesmo endpoint com a credencial da conexão conclui o handshake `initialize` em Streamable HTTP.
 - [x] A resposta do handshake identifica o servidor como `Mazal MCP`.
-- [x] `tools/list` retorna exatamente os quatro nomes listados acima, sem tools adicionais.
+- [x] `tools/list` retorna os quatro nomes listados acima e mais um: `ON_MCP_CONFIGURATION`, o callback de ciclo de vida que o Deco Studio invoca a cada create/update de conexão cuja configuração mudou (`decocms/studio`, `apps/api/src/tools/connection/{create,update}.ts`). Sem ele o Studio exibe "Tool ON_MCP_CONFIGURATION not found" ao salvar a conexão. Aqui é um no-op autenticado — este servidor não tem estado de configuração para reagir — e não deve ser habilitado como tool do agente.
 - [x] Uma chamada real de `diagnose_campaign` com payload válido retorna sucesso MCP.
 - [ ] Uma chamada inválida continua sendo recusada pelo schema; autenticação, Host e Origin permanecem ativos.
 

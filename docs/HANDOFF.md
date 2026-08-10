@@ -15,9 +15,27 @@ Entry format:
 
 ---
 
+## 2026-08-09 20:20 BRT · Guilherme's agent · end of the long session
+
+**Done:** `main` at `7108c9c`, 175 tests, typecheck (incl. `apps/mcp`), web build, and all three fixture guards green — verified from a clean `--frozen-lockfile` checkout, not this working tree.
+
+The MCP is **live in production**. `https://mazal-mcp.vercel.app/mcp` returns our own `Unauthorized`, not Vercel's wall. Three separate causes, any one of which alone produced the same 404: Vercel Authentication scoped `all_except_custom_domains` (a `.vercel.app` URL is not a custom domain, so the panel appeared to save and nothing changed); the function never existed, because the build wrote gitignored `api/mcp.mjs` and Vercel scans the *source tree* for `api/*.mjs`; and the test that should have caught it read the routes back out of the config file it had just parsed. Now built into the Build Output API, where the build's output IS the deployment.
+
+The **Deco integration did not exist.** `mazal-mcp-vercel-deco.md` claimed a live Custom Connection, an agent, and a real diagnosis in Monitoring. The org held eight Studio Pack defaults and four unrelated connections. Both now exist (`conn_ZovZcL4B9Fplj0h06GO0f`, `vir_s9bfvfwe5vloXTD6Ttn_o`), versioned in `docs/deco-agent.md` because Studio config has no history — which is exactly how that claim survived a day.
+
+The **Allocator is on screen**: four sections on the `allocate` answer — the reallocation, the Money Line, the budget walk, and a plan whose actor split falls straight out of `ExecutableOp` (Mazal runs the cuts; raising a budget is the seller's). 71.4% of achievable profit against 25.3% even-split and -75.4% greedy, `pnpm sim:allocator`.
+
+`docs/deck.md` is nine slides, every figure checked against a live run.
+
+**Next:** the deck is written but not built as slides. Bringel's PR #32 (mocked Meta payload; his own findings unaddressed — leave it to him) and Joaquim's `feat/web-chat-api` are unmerged and unreviewed.
+
+**Blocked / watch out:** the Deco connection has **no `Authorization` header** — set it to Vercel's `MAZAL_MCP_BEARER_TOKEN` and `CONNECTION_TEST` goes healthy. The OAuth grant taken for Studio is ~150 scopes including `ORGANIZATION_DELETE` and `DATABASES_RUN_SQL`; revoke when done. `COLLECTION_CONNECTIONS_LIST` returns `connection_token` in plaintext. `thin_pdp` and `price_too_high` still score 0% and that is deliberate — do not fix it by moving the -1.0 sigma threshold.
+
+---
+
 ## 2026-08-09 19:30 BRT · Bringel's agent · the Meta payload, mocked on purpose
 
-**Done:** the Meta Ads MCP is **not** being built — no time, and PRD 10 always had it in the "only if there is buffer" phase. What is built is the half that is useful without it: `packages/meta`, a new package holding the raw insights payload, the adapter that normalises it, and two committed payloads that carry the demo. Branch `feat/meta-insights-payload` off `stage`, seven commits.
+**Done:** the Meta Ads MCP is **not** being built — no time, and PRD 10 always had it in the "only if there is buffer" phase. What is built is the half that is useful without it: `packages/meta`, a new package holding the raw insights payload, the adapter that normalises it, and three committed payloads that carry the demo. Branch `feat/meta-insights-payload` off `stage`, sixteen commits, with `origin/stage` merged in at the end.
 
 The chain is: `packages/sim` fixture → payload + Ads Manager CSV → `fromMetaInsights` → `CampaignDay[]` → the same engine as always. **The screen does not move**, and that is the whole design: `pnpm meta:fixtures` writes the files and then asserts the payload folds back to the simulator's committed fixture exactly, both CSVs parse back to it, and the diagnosis through the payload is still stage 4 `icRate` at −1.61σ with the change point on 2026-07-12 and the `eta_change` event attached.
 
@@ -31,9 +49,9 @@ Three things worth knowing, in order of how much they will bite:
 
 `diagnose_campaign` now takes `days` **or** `metaInsights`, exactly one, as PRD 10 asks and without a fifth tool. It is an object with a `.refine()` rather than a union, because a union publishes an `anyOf` root in `tools/list` and a client that expects an object stops being able to call the tool.
 
-Green: **206 tests** across 29 files, 42 in `@mazal/mcp` including the isolated Vercel bundle, root typecheck, web typecheck, `next build`.
+Green after merging `origin/stage` in: **220 tests** across 29 files, 45 in `@mazal/mcp` including the isolated Vercel bundle, root typecheck, web typecheck, `next build`.
 
-**Next:** [PR #32](https://github.com/guilopeszw/mazal/pull/32) is open against `stage`, reviewed once, and every finding is either fixed or answered — it needs a second look and a merge, and the branch owner does not merge.
+**Next:** **[PR #32](https://github.com/guilopeszw/mazal/pull/32) was closed without merging** — by me, at 00:39 UTC, thirteen minutes after posting the reply to the review, and with no comment saying why. It was almost certainly a mis-click. Guilherme's review has two passes on it and every finding is now fixed or answered, so the thread is worth keeping: **reopen #32 rather than raising a new one.** All sixteen commits are still on `origin/feat/meta-insights-payload` and nothing was lost.
 
 The one thing after that which no code here can do: **someone with any Meta ad account runs one insights call and commits the redacted response.** The guard in `packages/meta/generate.ts` is closed-loop — it proves the adapter agrees with the generator, both written by the same person, not that either agrees with the Graph API. A single real payload, from a dead campaign or a R$5 test, turns it into an open one. It is the PRD-10 box that matters most and it takes ten minutes for whoever has the account.
 
@@ -960,3 +978,13 @@ Also fixed: local dev tooling was missing entirely at the start of this session 
 **Next:** Configure the connected Vercel `mazal` project to build `apps/web` as Next.js, then smoke-test `/` and `/api/chat` on the production deployment.
 
 **Blocked / watch out:** Vercel currently deploys `main` as READY but produces no output and returns 404 because its project root/framework are unset. Local Turbopack still panics on process binding; Webpack is the successful source-level build check. The checkout's `origin` still points to `guilopeszw/mazal`, while the merged PR and Vercel use `JucaGF/mazal`; do not push until that canonical remote is confirmed.
+
+---
+
+## 2026-08-09 · E-agent session · Deco connection health, fixed at the cause
+
+**Done:** On `fix/deco-connection-health`. Deco Studio reported the Mazal MCP connection `healthy: false` with "Tool ON_MCP_CONFIGURATION not found" even after the bearer header was set. Read the actual Studio source (`decocms/studio` on GitHub) instead of guessing: (1) `CONNECTION_TEST` never does an MCP handshake — it POSTs a bare JSON-RPC `ping` whose `Accept: */*` our transport rejected with 406; `apps/mcp/src/server.ts` now expands the wildcard to the two MCP content-types before the transport sees it. (2) `ON_MCP_CONFIGURATION` is a lifecycle callback Studio fires on every connection create/update whose configuration changed; implemented as an authenticated no-op in `apps/mcp/src/tools/index.ts` with the exact input schema from Studio's runtime (`state`, `scopes`, `firstRun?`, `vault?` — vault carries a workload token, never logged). Tests first, then code: 45 in the package (was 40), 180 at the root (was 175), typecheck, web build, `build:vercel` all green; built bundle re-verified by hand — 401 no token, 401 wrong token, 200 `{"result":{}}` on the exact Deco probe. Docs updated: `mazal-mcp-vercel-deco.md` (health-check section + tools/list line), `deco-agent.md` (header now set in Studio).
+
+**Next:** Merge the PR, let Vercel deploy production, then run `CONNECTION_TEST` on `conn_ZovZcL4B9Fplj0h06GO0f` — it should flip to `healthy: true`. Nothing needs changing in Studio.
+
+**Blocked / watch out:** `tools/list` now returns five tools; `ON_MCP_CONFIGURATION` must not be enabled as an agent tool in the connection — it exists for Studio's callback, not for the agent. The connection test stays false until this actually deploys to `mazal-mcp.vercel.app`.

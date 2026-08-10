@@ -6,7 +6,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { beforeAll, expect, test } from 'vitest';
 
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const bundlePath = join(appRoot, 'api', 'mcp.mjs');
+// The build writes Vercel's Build Output API tree now, not a scanned `api/`
+// directory — a function folder named `mcp.func` is served at `/mcp`.
+const bundlePath = join(appRoot, '.vercel', 'output', 'functions', 'mcp.func', 'index.mjs');
 
 const handshake = {
   jsonrpc: '2.0',
