@@ -296,3 +296,17 @@
   --color-border: var(--border);
   --color-muted-foreground: var(--muted-foreground);
 }
+
+/*
+ * Tailwind v4's preflight sets `cursor: default` on buttons, matching the
+ * native control. Every button on this screen is a custom one — chips, the
+ * send button, the plan's three choices — and a pointer is the affordance
+ * people read before they read the label. Disabled keeps the default, because
+ * a pointer over something that will not respond is a small lie.
+ */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+summary,
+label[for] {
+  cursor: pointer;
+}

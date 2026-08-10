@@ -284,8 +284,17 @@ export function Chat({
    * of work to move one number.
    */
   const reserveDockRoom = () => {
-    const height = composer.current?.offsetHeight;
-    if (height) document.documentElement.style.setProperty("--dock", `${height}px`);
+    // The dock element, not the form inside it. The dock carries the chrome —
+    // `pt-6` and a bottom padding that grows with `env(safe-area-inset-bottom)`
+    // — so measuring the form meant guessing that chrome with a constant, and
+    // the guess ran 10px short on a phone with a home indicator. Measuring the
+    // element that actually occupies the space deletes the guess.
+    //
+    // Only once docked: on the landing the composer sits in the flow and takes
+    // its own space, and reserving for it there adds dead scroll to a page that
+    // otherwise does not scroll at all.
+    const height = started ? (composer.current?.parentElement?.offsetHeight ?? 0) : 0;
+    document.documentElement.style.setProperty("--dock", `${height}px`);
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -379,7 +388,7 @@ export function Chat({
           </div>
         </header>
 
-        <main className="mx-auto max-w-[46rem] px-5 pb-[max(8rem,calc(var(--dock,0px)+3rem))]">
+        <main className="mx-auto max-w-[46rem] px-5 pb-[max(8rem,var(--dock,0px))]">
           {!started && (
             <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
               {/* The promise, not the name. With the wordmark moved into the sidebar this is
