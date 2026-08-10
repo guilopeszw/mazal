@@ -286,7 +286,12 @@ export function parseMetaCsv(text: string): MetaCsvResult {
       }
 
       if (isMissingValue(raw)) {
-        numericValues[fieldName] = 0;
+        // Noted, not claimed. Writing a 0 here let a blank column win the field
+        // ahead of a real one beside it — and Meta prints "—" for a
+        // zero-conversion day, so `Purchases` blank with `Website purchases`
+        // populated is an ordinary export, not a contrived one. Leaving the
+        // field unset lets a later column fill it; all-missing still lands on
+        // 0 through the `?? 0` below.
         warnings.push(`${fieldName} missing on ${date || 'unknown date'}`);
       } else {
         const isPtBr = ptBrColumns[i] ?? false;
