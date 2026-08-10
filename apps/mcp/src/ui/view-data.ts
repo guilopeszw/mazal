@@ -149,6 +149,17 @@ export type FunnelSliceVM = {
   value: number;
   display: string;
   tone: 'ok' | 'leak' | 'after';
+  /**
+   * Bar width as a percentage — how much of the *previous* stage survived into
+   * this one, so the first stage is always full.
+   *
+   * Not a share of the largest stage. A funnel spans orders of magnitude —
+   * 91,837 impressions to 7 purchases on the demo campaign — so against the
+   * maximum every bar below the first pins to the floor and the chart says
+   * nothing. Step-to-step is also the quantity the funnel is *about*: the
+   * stage that lost the most is the one that leaked.
+   */
+  width: number;
 };
 
 export type StageRowVM = {
@@ -194,12 +205,19 @@ export function diagnosisViewModel(
     ) >= SELF_MIN_BASELINE_DAYS;
   const leak = diagnosis.primary?.stage ?? null;
 
-  const slices = FUNNEL_COUNTS.map(({ stage, of }) => ({
-    label: FUNNEL_STAGES.find((s) => s.stage === stage)!.label,
-    value: of(window),
-    display: formatCount(of(window)),
-    tone: toneFor(stage, leak),
-  }));
+  const slices = FUNNEL_COUNTS.map(({ stage, of }, index, all): FunnelSliceVM => {
+    const value = of(window);
+    const previous = index === 0 ? value : all[index - 1]!.of(window);
+    return {
+      label: FUNNEL_STAGES.find((s) => s.stage === stage)!.label,
+      value,
+      display: formatCount(value),
+      tone: toneFor(stage, leak),
+      // A visible sliver rather than nothing when a stage keeps almost none of
+      // the one above: zero survivors is a fact worth seeing, not a blank row.
+      width: previous > 0 ? Math.max(2, (value / previous) * 100) : 2,
+    };
+  });
 
   const stages = FUNNEL_STAGES.map(({ stage, label, unassessed }): StageRowVM => {
     const name = `${stage} · ${label}`;
@@ -331,6 +349,9 @@ export type BandViewModel = {
   killTrigger?: string;
 };
 
+/** First letter up. The engine writes these to sit mid-sentence. */
+const sentence = (text: string): string => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+
 export function bandViewModel(verdict: Verdict): BandViewModel {
   const { p10, p50, p90 } = verdict.predictedRoas;
   const breakEven = verdict.breakEvenRoas;
@@ -350,7 +371,14 @@ export function bandViewModel(verdict: Verdict): BandViewModel {
     mid: at(p50),
     breakEven: at(breakEven),
     breakEvenLabel: brl.format(breakEven),
-    ...(verdict.limitingFactor ? { limitingFactor: plainProse(verdict.limitingFactor) } : {}),
+    // `killTrigger` already ends with the limiting factor — `predict` appends it
+    // there deliberately, so a `launch_small` verdict carries the same sentence
+    // twice. Rendering both printed it twice to the seller, back to back. The
+    // standalone one is for the verdicts that have no kill trigger, and it gets
+    // a capital because there it starts a sentence rather than finishing one.
+    ...(verdict.limitingFactor && !verdict.killTrigger
+      ? { limitingFactor: sentence(plainProse(verdict.limitingFactor)) }
+      : {}),
     ...(verdict.killTrigger ? { killTrigger: plainProse(verdict.killTrigger) } : {}),
   };
 }

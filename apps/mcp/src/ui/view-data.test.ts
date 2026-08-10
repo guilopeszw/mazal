@@ -44,6 +44,41 @@ describe('diagnosisViewModel', () => {
     ]);
   });
 
+  test('bar widths are step-to-step survival, not a share of the biggest stage', () => {
+    // Against the maximum, a real funnel is unreadable: demo-case2 runs 91,837
+    // impressions to 7 purchases, so every bar under the first pins to the 2%
+    // floor and the chart carries no information. Each bar is what survived the
+    // stage above it instead — which is also the quantity a funnel is about.
+    const days = healthyDays();
+    const vm = diagnosisViewModel(days, healthyDiagnosis);
+    const window = aggregate(days.slice(-WINDOW_DAYS));
+
+    expect(vm.slices[0]!.width).toBe(100);
+    expect(vm.slices[2]!.width).toBeCloseTo((window.addToCarts / window.clicks) * 100);
+    expect(vm.slices[3]!.width).toBeCloseTo((window.checkoutsInitiated / window.addToCarts) * 100);
+
+    // The property that matters, stated against the old formula rather than
+    // restating the new one: every stage below the first is now far wider than
+    // its share of the largest stage, which is what made the chart unreadable.
+    const shareOfMax = (v: number) => (v / window.impressions) * 100;
+    for (const s of vm.slices.slice(2)) {
+      expect(s.width, s.label).toBeGreaterThan(shareOfMax(s.value) * 10);
+      expect(s.width, s.label).toBeGreaterThan(5);
+    }
+
+    // Stage 0→1 stays a sliver and that is honest — a 1.1% click-through rate
+    // is a 1.1% bar. The floor keeps it visible rather than inventing width.
+    expect(vm.slices[1]!.width).toBe(2);
+    expect((window.clicks / window.impressions) * 100).toBeLessThan(2);
+
+    // A stage that keeps nothing still draws a sliver — zero is worth seeing.
+    const dead = diagnosisViewModel(
+      days.map((d) => ({ ...d, purchases: 0, revenue: 0 })),
+      healthyDiagnosis,
+    );
+    expect(dead.slices.at(-1)!.width).toBe(2);
+  });
+
   test('the leak stage is marked and downstream stages are symptoms, not causes', () => {
     const vm = diagnosisViewModel(healthyDays(), stockoutDiagnosis);
 
@@ -237,9 +272,12 @@ describe('bandViewModel', () => {
         'Stop if ROAS is below 1.50 after 100 clicks. Cvr is at 34% of the category median — the factor holding this band down.',
       limitingFactor: 'cvr is at 34% of the category median — the factor holding this band down',
     });
-    // The value survives; the labels do not.
-    expect(full.limitingFactor).toContain('34%');
-    expect(full.limitingFactor).toContain('clicks that turn into sales');
+    // `killTrigger` already ends with the limiting factor, so the standalone
+    // copy is dropped — the tile printed the same sentence twice, back to back.
+    expect(full.limitingFactor).toBeUndefined();
+    // The value and the translation survive, in the sentence that is rendered.
+    expect(full.killTrigger).toContain('34%');
+    expect(full.killTrigger).toContain('clicks that turn into sales');
     expect(full.killTrigger).toContain('R$1.50');
     expect(full.killTrigger).toContain('100 clicks');
 
@@ -250,7 +288,11 @@ describe('bandViewModel', () => {
       limitingFactor:
         'no campaign history yet, so the band is category-wide — instrument atcRate first, it is the widest factor here',
     });
+    // No kill trigger, so this one is rendered — and it starts a paragraph, so
+    // it gets a capital. The engine writes it to sit mid-sentence.
     expect(noHistory.limitingFactor).toContain('clicks that add to cart');
+    expect(noHistory.limitingFactor![0]).toBe(noHistory.limitingFactor![0]!.toUpperCase());
+    expect(noHistory.limitingFactor).toMatch(/^No campaign history yet/);
   });
 
   test('no view string puts the analytical weight back on the seller', () => {
@@ -284,15 +326,16 @@ describe('bandViewModel', () => {
         killTrigger: `Stop if ROAS is below 2.38 after 100 clicks. ${capitalised} is at 34% of the category median — the factor holding this band down.`,
         limitingFactor: sentence,
       });
-      for (const text of [...band.ends, band.breakEvenLabel, band.limitingFactor!, band.killTrigger!]) {
+      // `killTrigger` carries the limiting factor, so the standalone copy is
+      // dropped rather than printed twice — the rendered strings are these.
+      expect(band.limitingFactor).toBeUndefined();
+      for (const text of [...band.ends, band.breakEvenLabel, band.killTrigger!]) {
         expect(text, `${factor}: ${text}`).not.toMatch(banned);
       }
       // The value survives the translation.
-      expect(band.limitingFactor).toContain('34%');
+      expect(band.killTrigger).toContain('34%');
       // And it reads as a sentence: no orphaned article, no lowercase start.
-      for (const text of [band.limitingFactor!, band.killTrigger!]) {
-        expect(text, `${factor}: ${text}`).not.toContain('the what is typical');
-      }
+      expect(band.killTrigger, `${factor}`).not.toContain('the what is typical');
       expect(band.killTrigger).toMatch(/\. [A-Z]/);
     }
 
