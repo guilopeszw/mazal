@@ -21,6 +21,20 @@ export type CreateMcpHandlerOptions = {
   createActionLog?: () => ActionLog;
 };
 
+// The transport 406s any request whose `Accept` does not name both
+// `application/json` and `text/event-stream`. Deco Studio's health probe — a
+// bare JSON-RPC ping via node fetch — sends the wildcard `*/*`, which by HTTP
+// semantics accepts both, so spell them out for the transport. An explicit
+// Accept without the wildcard is a real preference and passes through untouched.
+function withMcpAccept(request: Request): Request {
+  const accept = request.headers.get('Accept');
+  if (accept && !accept.includes('*/*')) return request;
+
+  const headers = new Headers(request.headers);
+  headers.set('Accept', 'application/json, text/event-stream');
+  return new Request(request, { headers });
+}
+
 function readHostnameAllowlist(value: string | undefined): string[] | undefined {
   const hostnames = value
     ?.split(',')
@@ -82,7 +96,7 @@ export function createMcpHandler(
       return c.text('Unauthorized', 401);
     }
 
-    return handler.fetch(c.req.raw);
+    return handler.fetch(withMcpAccept(c.req.raw));
   });
 
   return app;

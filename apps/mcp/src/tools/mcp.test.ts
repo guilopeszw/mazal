@@ -36,15 +36,53 @@ async function callMcp(method: string, params: Record<string, unknown>, id: numb
   return JSON.parse(data!) as JsonRpcResponse;
 }
 
-test('tools/list exposes exactly the four public Mazal tools', async () => {
+test('tools/list exposes the four public Mazal tools and the Deco lifecycle callback', async () => {
   const response = await callMcp('tools/list', {}, 1);
 
   expect(response.result?.tools?.map((tool) => tool.name).sort()).toEqual([
+    'ON_MCP_CONFIGURATION',
     'build_recovery_plan',
     'diagnose_campaign',
     'execute_plan',
     'predict_campaign',
   ]);
+});
+
+// Deco Studio invokes ON_MCP_CONFIGURATION on every connection create/update
+// whose configuration changed (decocms/studio apps/api/src/tools/connection/
+// {create,update}.ts). A server without the tool makes that callback throw
+// "Tool ON_MCP_CONFIGURATION not found". The argument shape below is verbatim
+// what Studio sends; the vault token must never be echoed back.
+test('accepts Deco Studio\'s ON_MCP_CONFIGURATION callback and returns nothing', async () => {
+  const response = await callMcp('tools/call', {
+    name: 'ON_MCP_CONFIGURATION',
+    arguments: {
+      state: {},
+      scopes: [],
+      firstRun: true,
+      vault: {
+        baseUrl: 'https://api.decocms.example',
+        org: 'guilherme-works-btg1',
+        subjectConnectionId: 'conn_test',
+        token: 'vault-workload-token',
+      },
+    },
+  }, 4);
+
+  expect(response.error).toBeUndefined();
+  expect(response.result?.isError).not.toBe(true);
+  expect(response.result?.structuredContent).toEqual({});
+  expect(JSON.stringify(response)).not.toContain('vault-workload-token');
+});
+
+test('accepts the minimal ON_MCP_CONFIGURATION call an update sends', async () => {
+  const response = await callMcp('tools/call', {
+    name: 'ON_MCP_CONFIGURATION',
+    arguments: { state: {}, scopes: [] },
+  }, 5);
+
+  expect(response.error).toBeUndefined();
+  expect(response.result?.isError).not.toBe(true);
 });
 
 test('calls diagnose_campaign end to end through HTTP and the MCP SDK', async () => {
