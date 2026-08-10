@@ -22,6 +22,7 @@ import {
   reallocate,
   valueAt,
   measurability,
+  noPixelEvidence,
   predict,
   profileCard,
 } from "@mazal/engine";
@@ -329,13 +330,14 @@ function diagnoseAnswer(args: {
   asked: string;
   diagnosis: Diagnosis;
   days: CampaignDay[];
+  events: StoreEvent[];
   window: CampaignDay;
   card: ProductCard;
   reference: ReferenceMode;
   plan: RecoveryPlan;
   noteSuffix?: string;
 }): Answer {
-  const { asked, diagnosis, days, window, card, reference, plan, noteSuffix = "" } = args;
+  const { asked, diagnosis, days, events, window, card, reference, plan, noteSuffix = "" } = args;
   const primary = diagnosis.primary;
   const charts = buildDiagnoseCharts(diagnosis, days, window, card);
 
@@ -343,6 +345,33 @@ function diagnoseAnswer(args: {
   const measured = Object.values(categoryRow).filter((m) => m.n > 0);
   const orders = Math.max(0, ...measured.map((m) => m.n));
   const benchmarkNote = `${measured.length} of the 12 category benchmarks are measured from ${formatCount(orders)} Olist orders; the other ${12 - measured.length} are published priors, marked as estimates wherever they appear.`;
+
+  /**
+   * `primary: null` carries two opposite meanings and they must not render the
+   * same. One is "nothing broke". The other is "there was nothing to look at":
+   * a seller whose customers buy on iFood, on WhatsApp or in a marketplace has
+   * no pixel on that checkout, so Meta reports every conversion column as zero
+   * and `diagnose` correctly declines to judge stages 3-6.
+   *
+   * Telling that seller their funnel is fine is the same failure as telling
+   * them their product page is thin — an answer about data nobody collected.
+   * The engine owns the rule; this asks it rather than re-deriving it.
+   */
+  if (!primary && noPixelEvidence(days, events)) {
+    return {
+      asked,
+      verdict: [
+        { text: "Your ads ran. ", tone: "good" },
+        { text: "What happened after the click, we cannot see." },
+      ],
+      said:
+        "Meta reported no add-to-carts, checkouts or purchases on any day of this export — not low, none at all. That is what a campaign looks like when the sale happens somewhere the pixel cannot follow: iFood, WhatsApp, a marketplace. Delivery and attention are judged below; everything downstream of the click is unmeasured, and calling it healthy would be inventing an answer. Ask about a launch instead — a pre-flight needs the product, not the pixel.",
+      stages: stageRows(diagnosis, window),
+      rows: [],
+      charts,
+      note: benchmarkNote + noteSuffix,
+    };
+  }
 
   if (!primary) {
     return {
@@ -425,6 +454,7 @@ export function buildUploadAnswer(
     asked,
     diagnosis,
     days,
+    events,
     window: aggregate(days.slice(-WINDOW_DAYS)),
     card,
     reference,
@@ -658,6 +688,7 @@ export function buildAnswers(): Record<AnswerKey, Answer> {
     asked: "My ROAS dropped this week",
     diagnosis,
     days: case2.days,
+    events: case2.events,
     window,
     card: case2.card,
     reference,
