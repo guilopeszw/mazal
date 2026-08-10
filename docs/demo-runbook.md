@@ -8,7 +8,7 @@ remembered — every one has a command beside it that reproduces it.
 ```bash
 pnpm install
 pnpm typecheck        # tsc --build, plus apps/mcp
-pnpm test             # 219 tests
+pnpm test             # 220 tests
 pnpm sim:fixtures     # asserts both demo beats still hold
 pnpm meta:fixtures    # asserts the Meta payloads still fold back to them
 pnpm --filter web build && PORT=3117 pnpm --filter web start
@@ -67,7 +67,7 @@ see yet rather than inventing one.
 | Change point named on detected breaks | 100% | same report |
 | Change point within ±1 day, **sudden** breaks | 93% | same report |
 | Change point within ±1 day, **gradual** ramps | 0% | same report |
-| Tests | 219 | `pnpm test` |
+| Tests | 220 | `pnpm test` |
 
 Report sudden and gradual separately. The 70% average lies in both directions,
 and volunteering the split is worth more than the number.
@@ -80,7 +80,7 @@ stop being able to trust it.
 ## Questions you will get
 
 **"Is this just ChatGPT with a prompt?"** No. `packages/engine` is deterministic
-TypeScript with 219 tests. The model turns a `Diagnosis` into a sentence and
+TypeScript with 220 tests. The model turns a `Diagnosis` into a sentence and
 never touches a number.
 
 **"How do I know it isn't guessing?"** Every finding carries the rule that fired,
@@ -103,8 +103,9 @@ connection to Meta; we built the thing the connection would feed.
 
 **"So what does the seller have to do to get started?"** Export a CSV from Ads
 Manager and fill in twelve fields about the product. No OAuth, no app review.
-`packages/meta/fixtures/demo-case2.campaign.csv` is exactly what that export
-looks like, and it is the file to drop on the upload if someone asks to see it.
+`packages/meta/fixtures/` holds exactly what that export looks like — any of the
+three CSVs there can be dropped on the upload if someone asks to see it, including
+the one broken out by ad set.
 
 ## What not to claim
 

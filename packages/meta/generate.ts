@@ -8,9 +8,10 @@
 // prevent — `docs/demo-contract.md` publishes those numbers and a slide quotes
 // them.
 //
-// Nothing here invents a number. Both payloads are re-encodings of fixtures the
-// simulator already generated and guards:
+// Nothing here invents a number. Every payload is a re-encoding of a fixture the
+// simulator already generated and already guards:
 //
+//   demo-case1.json    → one campaign, one row a day
 //   demo-case2.json    → one campaign, split across three ad sets
 //   demo-account.json  → one account, three products, one campaign each
 //
@@ -19,7 +20,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { CampaignDay, LabelledCampaign, ProductCard } from '@mazal/contracts';
 import { benchmarks } from '@mazal/data';
-import { diagnose, fitCurve, priorCurve, reallocate } from '@mazal/engine';
+import { diagnose, fitCurve, predict, priorCurve, reallocate } from '@mazal/engine';
 import { parseMetaCsv } from '@mazal/ingest';
 import { fromMetaInsights } from './src/adapter.ts';
 import { toAdsManagerCsv, totalAsEntity } from './src/csv.ts';
@@ -181,8 +182,30 @@ function accountRows(account: AccountFixture): MetaInsightsRow[] {
 
 // ─── write ───────────────────────────────────────────────────────────────
 
+const case1 = read<LabelledCampaign>(sim('demo-case1.json'));
 const case2 = read<LabelledCampaign>(sim('demo-case2.json'));
 const account = read<AccountFixture>(sim('demo-account.json'));
+
+/**
+ * Case 1 at campaign level, one row a day.
+ *
+ * No ad set split, because there is nothing to demonstrate with one: case 1 is
+ * the pre-flight beat and the ad-set breakdown exists to exercise the fold. It
+ * is here so that all three demo data sets reach the screen by the same door —
+ * the alternative was a footnote in `docs/demo-contract.md` saying two of three
+ * are checked, which is the kind of asymmetry nobody remembers at the podium.
+ */
+const case1Payload: MetaInsightsPayload = {
+  data: case1.days.map((day) =>
+    insightsRow(day, { campaignId: day.campaignId, campaignName: 'Utilidades — teste' }),
+  ),
+  __mazal_fixture: {
+    kind: 'fixture',
+    generator: GENERATOR,
+    derivedFrom: 'packages/sim/fixtures/demo-case1.json',
+    note: NOTE,
+  },
+};
 
 const case2Payload: MetaInsightsPayload = {
   data: splitCase2(case2),
@@ -206,11 +229,18 @@ const accountPayload: MetaInsightsPayload = {
   },
 };
 
+writeFileSync(here('demo-case1.meta-insights.json'), `${JSON.stringify(case1Payload, null, 2)}\n`);
 writeFileSync(here('demo-case2.meta-insights.json'), `${JSON.stringify(case2Payload, null, 2)}\n`);
 writeFileSync(here('demo-account.meta-insights.json'), `${JSON.stringify(accountPayload, null, 2)}\n`);
 
+const case1Account = fromMetaInsights(case1Payload);
 const case2Account = fromMetaInsights(case2Payload);
 const accountAccount = fromMetaInsights(accountPayload);
+
+writeFileSync(
+  here('demo-case1.campaign.csv'),
+  toAdsManagerCsv([totalAsEntity('Utilidades — teste', case1Account.total)]),
+);
 
 const CASE2_CAMPAIGN = 'Relógios — sempre ativo';
 
@@ -255,6 +285,35 @@ const canonical = (days: CampaignDay[]) =>
 if (!same(canonical(case2Account.total), canonical(case2.days))) {
   fail.push('demo-case2: the payload does not fold back to the fixture days');
 }
+if (!same(canonical(case1Account.total), canonical(case1.days))) {
+  fail.push('demo-case1: the payload does not fold back to the fixture days');
+}
+
+/**
+ * Case 1 is the pre-flight beat, so what has to survive the trip is the verdict
+ * rather than the diagnosis. `predict` never reads the days — it works from the
+ * card and the benchmark table — so the figures below are here to catch the
+ * other direction: a day series mangled by the payload would change `diagnose`
+ * and leave the verdict alone, and the demo opens on the verdict.
+ */
+const verdict = predict({ card: case1.card, table: benchmarks });
+const preflight = diagnose({
+  days: case1Account.total,
+  card: case1.card,
+  events: case1.events,
+  reference: { kind: 'benchmark', table: benchmarks },
+});
+
+if (verdict.decision !== 'launch_small') fail.push(`demo-case1: verdict is ${verdict.decision}`);
+if (verdict.breakEvenRoas.toFixed(2) !== '4.10') {
+  fail.push(`demo-case1: break-even is ${verdict.breakEvenRoas.toFixed(2)}, not 4.10`);
+}
+if (preflight.primary?.stage !== 3) fail.push(`demo-case1: primary stage is ${preflight.primary?.stage}, not 3`);
+if (preflight.primary?.metric !== 'atcRate') fail.push(`demo-case1: primary metric is ${preflight.primary?.metric}`);
+if (preflight.primary?.deviation.toFixed(2) !== '-1.02') {
+  fail.push(`demo-case1: deviation is ${preflight.primary?.deviation.toFixed(2)}, not -1.02`);
+}
+if (preflight.suspectedCause !== 'thin_pdp') fail.push(`demo-case1: cause is ${preflight.suspectedCause}`);
 
 /**
  * And every row has to be a row Ads Manager could have exported.
@@ -365,6 +424,11 @@ if (fail.length > 0) {
 }
 
 const brl = (n: number) => `R$${Math.round(n)}`;
+console.log(`  demo-case1.meta-insights.json    ${case1Payload.data.length} rows, 1 campaign`);
+console.log(
+  `    folds back to the fixture, and still verdicts ${verdict.decision} against break-even ` +
+    `${verdict.breakEvenRoas.toFixed(2)}, stage ${preflight.primary!.stage} ${preflight.primary!.metric}. ok`,
+);
 console.log(`  demo-case2.meta-insights.json    ${case2Payload.data.length} rows, ${AD_SETS.length} ad sets`);
 console.log(
   `    folds back to the fixture, and diagnoses stage ${bench.primary!.stage} ${bench.primary!.metric} ` +

@@ -4,6 +4,7 @@ import { fromMetaInsights } from "@mazal/meta";
 import case1Json from "../../../packages/sim/fixtures/demo-case1.json";
 import case2Json from "../../../packages/sim/fixtures/demo-case2.json";
 import accountJson from "../../../packages/sim/fixtures/demo-account.json";
+import case1Insights from "../../../packages/meta/fixtures/demo-case1.meta-insights.json";
 import case2Insights from "../../../packages/meta/fixtures/demo-case2.meta-insights.json";
 import accountInsights from "../../../packages/meta/fixtures/demo-account.meta-insights.json";
 
@@ -44,14 +45,16 @@ function read(payload: unknown, file: string) {
   }
 }
 
+const case1Meta = read(case1Insights, 'demo-case1.meta-insights.json');
 const case2Meta = read(case2Insights, 'demo-case2.meta-insights.json');
 const accountMeta = read(accountInsights, 'demo-account.meta-insights.json');
 
+const case1Fixture = case1Json as unknown as LabelledCampaign;
 const case2Fixture = case2Json as unknown as LabelledCampaign;
 
 export const demoCases = {
   /** Pre-flight: campaign #1 ran badly from day one; should campaign #2 launch? */
-  case1: case1Json as unknown as LabelledCampaign,
+  case1: { ...case1Fixture, days: case1Meta.total } satisfies LabelledCampaign,
   /** In-flight: two good weeks, then a stage broke mid-flight. */
   case2: { ...case2Fixture, days: case2Meta.total } satisfies LabelledCampaign,
 } as const;

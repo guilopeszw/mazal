@@ -2,7 +2,7 @@
 
 The payload a Meta Ads integration would hand us, and the one place it becomes the contract.
 
-**The integration itself is not built.** `docs/prds/e-agent/10-meta-read-adapter.md` put it in the last phase, "only if there is buffer", and there was not. What is built is the half that is useful without it: the shape of the response, the normaliser, and two committed payloads carrying the demo.
+**The integration itself is not built.** `docs/prds/e-agent/10-meta-read-adapter.md` put it in the last phase, "only if there is buffer", and there was not. What is built is the half that is useful without it: the shape of the response, the normaliser, and three committed payloads carrying the demo.
 
 ## What is real here and what is not
 
@@ -10,7 +10,7 @@ The payload a Meta Ads integration would hand us, and the one place it becomes t
 |---|---|
 | The adapter | **Real.** `fromMetaInsights` is what `diagnose_campaign` calls on the MCP side and what `apps/web` runs at build time. A live response goes through it unchanged. |
 | The payload shape | **Real.** `GET /act_<id>/insights` with `time_increment=1`, numbers as strings, conversions inside `actions[]`. |
-| The numbers | **Fixtures.** Re-encodings of `packages/sim/fixtures/demo-case2.json` and `demo-account.json`, which the simulator generates and guards. |
+| The numbers | **Fixtures.** Re-encodings of `packages/sim/fixtures/demo-case1.json`, `demo-case2.json` and `demo-account.json`, which the simulator generates and guards. |
 | The account | **Nobody's.** No Meta account was called. Every payload here carries `__mazal_fixture`, a field the Graph API does not return, and the adapter warns when it sees one. |
 
 ## Why it is here and not in `apps/mcp/src/meta/`
@@ -30,7 +30,7 @@ Those two look identical three functions downstream and mean opposite things. `p
 
 ## No rates, at either end
 
-`ctr`, `cpc`, `cpm` and `frequency` are fields Meta genuinely returns. `MetaInsightsRow` does not declare them and the MCP boundary schema rejects them outright. The contract stores counts and derives rates; a rate that exists in the type is a rate someone reads on a busy day instead of calling the function that defines it.
+`ctr`, `cpc`, `cpm` and `frequency` are fields Meta genuinely returns. `MetaInsightsRow` does not declare them, so the adapter cannot read one, and the MCP boundary schema strips them on the way in. Strips rather than rejects: the row describes someone else's API, and refusing a response for carrying a field Meta chose to include would mean no real response could be sent at all. The contract stores counts and derives rates; a rate that exists in the type is a rate someone reads on a busy day instead of calling the function that defines it.
 
 The CSV emitter does write those columns, because a real export has them and the parser has to survive the collisions they cause — `Cost per link click` must not be read as `Link clicks`. It computes them with `@mazal/contracts/metrics`, never locally.
 
@@ -48,15 +48,17 @@ Writes the files, then asserts they still carry the demo, exiting non-zero if th
 
 | file | what it is |
 |---|---|
+| `demo-case1.meta-insights.json` | 30 rows — the pre-flight campaign, one row a day |
+| `demo-case1.campaign.csv` | the same, as an Ads Manager export |
 | `demo-case2.meta-insights.json` | 90 rows — one campaign, three ad sets, thirty days |
 | `demo-case2.adsets.csv` | the same, as an Ads Manager export with the ad set column |
-| `demo-case2.campaign.csv` | thirty rows, folded to one a day — **this is the one to upload in the demo** |
+| `demo-case2.campaign.csv` | thirty rows, one a day — the plainest export to upload |
 | `demo-account.meta-insights.json` | 90 rows — one account, three products, a campaign each |
 | `demo-account.campaigns.csv` | the same, as an export |
 
 The ad-set split is by largest remainder on integer counts and integer cents, so the three rows sum to the committed day exactly. That is what lets the gate assert equality rather than a tolerance, and it does: the payload folds back to the fixture, both CSVs parse back to it, and the diagnosis through the payload is still stage 4 `icRate` at −1.61σ with the change point on 2026-07-12 and the `eta_change` event attached.
 
-**Upload `demo-case2.campaign.csv`, not the ad-set one**, unless the caller folds first. `parseMetaCsv` emits one `CampaignDay` per CSV *row* and does not group by date, so an export broken out by ad set arrives as three rows per day and `diagnose`'s seven-day window silently covers two and a bit real days. `foldDaysByDate` is the fix and is exported here; `apps/web`'s upload path does not call it yet.
+Either CSV can be uploaded. `parseMetaCsv` emits one `CampaignDay` per CSV *row* and does not group by date, so an ad-set export arrives as three rows per day — which read as three days, and made `diagnose`'s seven-day window cover two and a bit real ones. `apps/web/app/actions.ts` folds with `foldDaysByDate` now and tells the seller their export was added up. Before that fix the ad-set file diagnosed stage 5 `checkout_friction`; after it, the true stage 4 `eta_shock`.
 
 ## `META_ADS_ENABLED`
 

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { expect, test } from 'vitest';
 import type { CampaignDay, LabelledCampaign, ProductCard } from '@mazal/contracts';
 import { benchmarks } from '@mazal/data';
-import { diagnose, fitCurve, priorCurve, reallocate } from '@mazal/engine';
+import { diagnose, fitCurve, predict, priorCurve, reallocate } from '@mazal/engine';
 import { parseMetaCsv } from '@mazal/ingest';
 import { fromMetaInsights } from './adapter.ts';
 import { foldDaysByDate } from './fold.ts';
@@ -24,11 +24,13 @@ const readText = (name: string): string =>
 const readSim = <T>(name: string): T =>
   JSON.parse(readFileSync(new URL(`../../sim/fixtures/${name}`, import.meta.url), 'utf8')) as T;
 
+const case1 = readSim<LabelledCampaign>('demo-case1.json');
 const case2 = readSim<LabelledCampaign>('demo-case2.json');
 const account = readSim<{
   products: { id: string; card: ProductCard; days: CampaignDay[]; currentSpend: number }[];
 }>('demo-account.json');
 
+const case1Payload = read<unknown>('demo-case1.meta-insights.json');
 const case2Payload = read<unknown>('demo-case2.meta-insights.json');
 const accountPayload = read<unknown>('demo-account.meta-insights.json');
 
@@ -45,6 +47,32 @@ test('the payload folds back to exactly the campaign the simulator wrote', () =>
   expect(entities).toHaveLength(3);
   expect(entities.every((e) => e.level === 'adset')).toBe(true);
   expect(canonical(total)).toEqual(canonical(case2.days));
+});
+
+test('the pre-flight case goes through the adapter too, and keeps its verdict', () => {
+  const { total, entities } = fromMetaInsights(case1Payload);
+
+  expect(entities).toHaveLength(1);
+  expect(canonical(total)).toEqual(canonical(case1.days));
+
+  // `predict` reads the card and the benchmark table, never the days — so this
+  // is here to catch the other direction. A day series mangled by the payload
+  // would move `diagnose` and leave the verdict untouched, and the pre-flight
+  // beat opens on the verdict.
+  const verdict = predict({ card: case1.card, table: benchmarks });
+  expect(verdict.decision).toBe('launch_small');
+  expect(verdict.breakEvenRoas.toFixed(2)).toBe('4.10');
+
+  const preflight = diagnose({
+    days: total,
+    card: case1.card,
+    events: case1.events,
+    reference: { kind: 'benchmark', table: benchmarks },
+  });
+  expect(preflight.primary?.stage).toBe(3);
+  expect(preflight.primary?.metric).toBe('atcRate');
+  expect(preflight.primary!.deviation.toFixed(2)).toBe('-1.02');
+  expect(preflight.suspectedCause).toBe('thin_pdp');
 });
 
 test('the CSV export parses back to the same days, by the other door', () => {

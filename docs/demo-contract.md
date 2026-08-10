@@ -70,14 +70,14 @@ Those are the only two day-one conditions the simulator has, so Case 1 is `thin_
 ## Green commands
 
 ```
-pnpm test          219 passed, 29 files
+pnpm test          220 passed, 29 files
 pnpm typecheck     clean
 pnpm sim:fixtures  both fixtures pass every assertion; git clean after
 pnpm meta:fixtures the Meta payloads fold back to those fixtures; git clean after
 pnpm sim:backtest  top-1 59.0%, floor 25.0%, false alarms 12.0% on 25 healthy
 ```
 
-Case 2's numbers above are re-derived a second way by `pnpm meta:fixtures`,
-which runs them through the Meta payload and the adapter and fails if any of
-them moves. **Case 1 is not** — it is read straight from `demo-case1.json` and
-does not go through that path.
+Every number above is re-derived a second way by `pnpm meta:fixtures`, which
+runs all three fixtures through a Meta insights payload and the adapter and
+fails if any of them moves. That is also how the screen reads them: the days
+arrive through `fromMetaInsights`, not from the JSON directly.

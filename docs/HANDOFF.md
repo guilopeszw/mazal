@@ -21,11 +21,11 @@ Entry format:
 
 The chain is: `packages/sim` fixture → payload + Ads Manager CSV → `fromMetaInsights` → `CampaignDay[]` → the same engine as always. **The screen does not move**, and that is the whole design: `pnpm meta:fixtures` writes the files and then asserts the payload folds back to the simulator's committed fixture exactly, both CSVs parse back to it, and the diagnosis through the payload is still stage 4 `icRate` at −1.61σ with the change point on 2026-07-12 and the `eta_change` event attached.
 
-That covers **case 2 and the account, not case 1**. An earlier version of this entry claimed "every number `docs/demo-contract.md` publishes", which is wider than the truth: `demo-case1.json` is still read directly, there is no payload for it, and the whole pre-flight block of the demo contract — the `launch_small` verdict, the ROAS band, break-even 4.10, stage 3 `atcRate` at −1.02σ — does not go near the adapter.
+All three fixtures go through it — case 1 and case 2 and the account. An earlier version of this entry claimed that and was, at the time, wrong: case 1 had no payload and a reviewer caught it. It has one now, and the guard checks the pre-flight numbers too (`launch_small`, break-even 4.10, stage 3 `atcRate` at −1.02σ, `thin_pdp`).
 
 Three things worth knowing, in order of how much they will bite:
 
-- **`parseMetaCsv` emits one `CampaignDay` per CSV *row* and does not group by date.** An Ads Manager export broken out by ad set therefore arrives as N rows per day, and `diagnose`'s seven-day window silently covers two and a bit real days. This predates today and is not fixed in `apps/web`'s upload path — `foldDaysByDate` is written, exported from `@mazal/meta` and used by the payload path, and wiring it into `app/actions.ts` is the next action below. Until then, **the file to upload in a demo is `packages/meta/fixtures/demo-case2.campaign.csv`** (30 rows, one a day), not `demo-case2.adsets.csv` (90).
+- **`parseMetaCsv` emits one `CampaignDay` per CSV *row* and does not group by date** — an Ads Manager export broken out by ad set arrives as N rows per day, and `diagnose` reads the last seven *entries*, so its window covered two and a bit real days and answered with full confidence about them. This predates today. **Fixed in `apps/web/app/actions.ts`**, which now folds by date and tells the seller their export was added up. The evidence for why it mattered: uploading the committed ad-set CSV before the fix answered stage 5 `cvr`, `checkout_friction`; after it, stage 4 `icRate`, `eta_shock`, which is the true one. Any Meta export can be uploaded now, not just the campaign-level one.
 - **Absence is not zero, and that is a deliberate split from `packages/ingest`.** A missing `spend` in a payload is refused by name with the row and date attached; an `actions: []` that is present is a real zero. The CSV parser makes the other call — default to 0, warn, carry on — because a spreadsheet is a human artefact with human gaps and an API response is machine output.
 - **`packages/meta` has no zod.** `packages/ingest` is on zod 3 and `apps/mcp` is on zod 4, so a package both import cannot depend on it. Validation is hand-written. This is also why it is a new package rather than an addition to C's.
 
@@ -33,7 +33,9 @@ Three things worth knowing, in order of how much they will bite:
 
 Green: **206 tests** across 29 files, 42 in `@mazal/mcp` including the isolated Vercel bundle, root typecheck, web typecheck, `next build`.
 
-**Next:** open the PR to `stage` and get it reviewed — the branch owner does not merge. After that, one small thing worth doing before the projector: call `foldDaysByDate` in `apps/web/app/actions.ts` so an ad-set-level export uploaded by hand stops being read as three days per day.
+**Next:** [PR #32](https://github.com/guilopeszw/mazal/pull/32) is open against `stage`, reviewed once, and every finding is either fixed or answered — it needs a second look and a merge, and the branch owner does not merge.
+
+The one thing after that which no code here can do: **someone with any Meta ad account runs one insights call and commits the redacted response.** The guard in `packages/meta/generate.ts` is closed-loop — it proves the adapter agrees with the generator, both written by the same person, not that either agrees with the Graph API. A single real payload, from a dead campaign or a R$5 test, turns it into an open one. It is the PRD-10 box that matters most and it takes ten minutes for whoever has the account.
 
 **Blocked / watch out:**
 
