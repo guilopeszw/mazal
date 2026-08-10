@@ -244,3 +244,30 @@ test('a conversion-value column never lands in its count twin', () => {
   expect(days[0]!.purchases).toBe(6);
   expect(days[0]!.revenue).toBe(239.4);
 });
+
+test('a spelled-out rate column never lands in the click count', () => {
+  // "CTR (link click-through rate)" strips to `ctr` and is skipped. Spelled out
+  // without the parenthetical there is no `ctr` substring, so it matched
+  // 'link click' — and the percent sign is stripped, so 1.53% became 1.53 clicks.
+  const csv = [
+    'Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Link click-through rate',
+    '2026-07-01,Congelados,45.00,6000,4200,90,1.53%',
+  ].join('\n');
+
+  const { days } = parseMetaCsv(csv);
+  expect(days[0]!.clicks).toBe(90);
+});
+
+test('two columns mapping to one field keep the first and say so', () => {
+  // Exports routinely carry both a total and its unique twin. The write used to
+  // be unconditional, so column order decided the funnel's size — silently, and
+  // unique counts are always the smaller ones.
+  const csv = [
+    'Reporting starts,Campaign name,Amount spent (BRL),Impressions,Reach,Link clicks,Unique link clicks',
+    '2026-07-01,Congelados,45.00,6000,4200,500,320',
+  ].join('\n');
+
+  const { days, warnings } = parseMetaCsv(csv);
+  expect(days[0]!.clicks).toBe(500);
+  expect(warnings.some((w) => w.includes('both map to clicks'))).toBe(true);
+});

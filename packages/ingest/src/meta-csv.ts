@@ -32,6 +32,11 @@ const COLUMN_MAP: Array<{ match: string; field: keyof CampaignDay | '_dateEnd' |
   { match: 'adds to cart',                field: 'addToCarts' },
   { match: 'add to cart',                 field: 'addToCarts' },
   { match: 'checkouts initiated',         field: 'checkoutsInitiated' },
+  // "CTR (link click-through rate)" is caught by the `ctr` skip above, but the
+  // spelled-out header contains no `ctr` substring and would match 'link click'
+  // — landing a percentage in the click count, `1.53%` parsed as 1.53 clicks.
+  { match: 'link click through rate',     field: '_skip' },
+  { match: 'link click-through rate',     field: '_skip' },
   { match: 'link click',                  field: 'clicks' },
   { match: 'purchases',                   field: 'purchases' },
   // Other skippable columns
@@ -260,6 +265,25 @@ export function parseMetaCsv(text: string): MetaCsvResult {
 
       const fieldName = col.field as string;
       const raw = values[i] ?? '';
+
+      /*
+       * Two columns can map to the same field — `Link clicks` and `Unique link
+       * clicks`, `Adds to cart` and `Website adds to cart` — and exports
+       * routinely carry both. The write used to be unconditional, so whichever
+       * Meta placed last won, silently: unique counts are always the smaller
+       * ones, so the funnel shrank by an amount decided by column order.
+       *
+       * First write wins and the second is spoken aloud. The `_skip` list above
+       * is still the right answer for value columns, which should be dropped
+       * rather than first-won — this is the net underneath it, because a skip
+       * list can never be complete for a vocabulary Meta keeps extending.
+       */
+      if (fieldName in numericValues) {
+        warnings.push(
+          `Two columns both map to ${fieldName} — using the first, ignoring "${headers[i] ?? ''}"`,
+        );
+        continue;
+      }
 
       if (isMissingValue(raw)) {
         numericValues[fieldName] = 0;
