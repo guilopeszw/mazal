@@ -68,6 +68,51 @@ test('the isolated bundle exposes named MCP HTTP methods and rejects an unauthen
   }
 });
 
+test('ships both view HTML files inside the function directory', async () => {
+  // The resource read resolves `./dist/<view>.html` against the bundle's own
+  // location, so the HTML must be deployed inside `mcp.func` — a bundle without
+  // it would list the resources and then 500 on every read.
+  for (const view of ['diagnosis', 'prediction']) {
+    const html = await readFile(
+      join(appRoot, '.vercel', 'output', 'functions', 'mcp.func', 'dist', `${view}.html`),
+      'utf8',
+    );
+    expect(html).toContain('ui/initialize');
+  }
+});
+
+test('the deployed bundle serves a ui:// resource through the authenticated transport', async () => {
+  // Imported in place — `dist/` sits next to `index.mjs` exactly as on Vercel.
+  const { createVercelHandler } = await import(pathToFileURL(bundlePath).href);
+  const handler = createVercelHandler({
+    bearerToken: 'test-token',
+    allowedHosts: ['mazal-mcp.vercel.app'],
+    allowedOrigins: ['mazal-mcp.vercel.app'],
+  });
+  const response = await handler(
+    new Request('https://mazal-mcp.vercel.app/mcp', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json, text/event-stream',
+        Authorization: 'Bearer test-token',
+        'Content-Type': 'application/json',
+        Host: 'mazal-mcp.vercel.app',
+        Origin: 'https://mazal-mcp.vercel.app',
+        'MCP-Protocol-Version': '2025-06-18',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'resources/read',
+        params: { uri: 'ui://mazal/prediction' },
+      }),
+    }),
+  );
+
+  expect(response.status).toBe(200);
+  expect(await response.text()).toContain('ui/initialize');
+});
+
 test('the isolated bundle completes an authenticated MCP handshake', async () => {
   const isolatedDirectory = await mkdtemp(join(tmpdir(), 'mazal-mcp-bundle-'));
   const isolatedBundle = join(isolatedDirectory, 'mcp.mjs');

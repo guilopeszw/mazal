@@ -15,6 +15,91 @@ Entry format:
 
 ---
 
+## 2026-08-09 22:10 BRT · Guilherme's agent · Deco Studio renders the charts, not prose
+
+**Done:** the MCP now exposes two `ui://` resources per the MCP Apps extension (`modelcontextprotocol/ext-apps`, spec 2026-01-26, the contract Deco's `MCPAppRenderer` reads): `ui://mazal/diagnosis` — the funnel with the leak marked — and `ui://mazal/prediction` — the break-even and the band. `diagnose_campaign` and `predict_campaign` carry `_meta.ui.resourceUri`, so a tool result in Studio chat renders as the chart. The agent's `metadata.ui.homeTiles` puts both on the org home board fed by `demo-case2` (eta_shock, stage 4 leak). Every number in a view is engine output or a contract rate function — the views mirror `apps/web/lib/answers.ts` and a stage under the engine's own `minSample` renders "not judged", never a value.
+
+Deployed to `mazal-mcp` production and verified: 401 without a token, 401 with a wrong one, 403 off-allowlist host, and Deco's `CONNECTION_TEST` healthy (346ms) through the stored credential. The `<language>` section of the agent instructions — pending per `deco-agent.md` — was applied to Studio in the same update; Studio and the doc are in sync again. Branch `feat/mcp-ui-resources`, 60 tests in `@mazal/mcp` (was 40), 195 at the root, typecheck and `next build` green.
+
+**Next:** eyeball the two tiles on the Studio home board — the code path is pinned by tests end to end, but no human has seen the pixels. Then review and merge the PR.
+
+**Blocked / watch out:** three things. A deploy went to the stale `mcp` project first (`vercel link --yes` failed silently on scope and the CLI fell back to the old link) — `mazal-mcp` got the correct deploy right after; the `mcp` project now serves a newer build than its docs claim, harmless but known. `vercel link` writes `apps/mcp/.env.local` with the project's env pulled — it was deleted unread; do not commit or read one. The view HTML is ~390KB each because the ext-apps SDK bundles zod; Studio HTTP-caches reads, so it costs one fetch per session.
+---
+
+## 2026-08-09 21:33 BRT · Codex · resolução dos conflitos do PR #37
+
+**Done:** atualizado `feat/web-chat-api` contra `origin/main`, reconciliando `apps/web/components/chat.tsx` com a rota de narração tipada e preservando o histórico de `docs/HANDOFF.md`. Commit `dcb565a` publicado em `origin`.
+
+**Next:** revisar o PR #37 no GitHub e fazer o merge quando as verificações hospedadas estiverem verdes.
+
+**Blocked / watch out:** `pnpm test` (221 testes), `pnpm typecheck`, `pnpm --filter web build` e `git diff --check` passaram. O checkout principal local não foi alterado.
+
+---
+
+## 2026-08-09 18:05 BRT · Codex · web chat API plan
+
+**Done:** Implemented and reviewed Tasks 1–5 on `feat/web-chat-api` through commits `bb4b92c`, `aa87b3d`, `f6cedd6`, `16921b7`, `31bea16`, `af7e95f`, `5726475`, and `2e1483f`: strict public schema and deterministic engine resolution; token-guarded fixtures/templates; bounded secure `POST /api/chat`; signed session-bound continuity, rendered-content cache and live limiter; and typed narration turns in the chat shell. The chat API suite is green (46 tests), web typecheck and Webpack production build are green, and the HTTP smoke matrix passed.
+
+**Next:** If a documented public Deco Agent endpoint/SDK with continuation semantics becomes available, implement the server-only provider and local capture workflow; until then keep Production `NARRATION_MODE=fixture`.
+
+**Blocked / watch out:** No public Deco Agent contract is documented in this checkout, so Tasks 6–7 live/capture work was deliberately not invented. The route keeps live unavailable and never falls back silently. The default Turbopack build is blocked by the environment's process-port restriction; `next build --webpack` passes. Deployment still requires `MAZAL_CHAT_SESSION_SECRET`, `MAZAL_CHAT_ALLOWED_HOSTS`, and Production `NARRATION_MODE=fixture`.
+
+---
+
+## 2026-08-09 17:29 BRT · Codex · web chat API Task 4 fix round 1
+
+**Done:** Closed the missing configuration-error boundary in `POST /api/chat`: a request with an existing signed cookie now returns generic `503` when `MAZAL_CHAT_SESSION_SECRET` is absent or too short, instead of rejecting before a response. The same boundary covers cookie/session creation and conversation-handle HMAC verification; invalid handles still return `400`. Task 4 is 27/27, the full chat API suite is 46/46, and web typecheck/diff check are green. Commit follows this handoff entry.
+
+**Next:** Add the server-only Deco provider in its own task; pass any provider-created thread id only into `issueConversationId`, never into browser input.
+
+**Blocked / watch out:** `MAZAL_CHAT_SESSION_SECRET` must be deployed as a high-entropy value of at least 32 bytes. Cache and rate limiting remain process-local, bounded best-effort controls by design.
+
+---
+
+## 2026-08-09 17:22 BRT · Codex · web chat API Task 4
+
+**Done:** Replaced the provisional opaque chat id with HMAC-signed session cookies and signed, expiring conversation envelopes bound to the cookie session. The route rejects external, altered, expired, and cross-session handles; provider thread ids can only emerge after server-side verification. Added a 100-entry canonical rendered-content cache (fixture/template only), with response handles reconstructed per caller, plus a bounded rolling live limiter that returns the exact `429 { error: "RATE_LIMITED" }` and never falls back. The focused chat API suite is 25/25; web typecheck and diff check are green. Commit follows this handoff entry.
+
+**Next:** Add the server-only Deco provider in its own task; pass any provider-created thread id only into `issueConversationId`, never into browser input.
+
+**Blocked / watch out:** `MAZAL_CHAT_SESSION_SECRET` must be a high-entropy server-only secret of at least 32 bytes in every deployed environment. Cache and rate limiting are process-local, bounded best-effort controls by design.
+
+---
+
+## 2026-08-09 17:12 BRT · Codex · web chat API Task 3 fix round 1
+
+**Done:** `readLimitedJson` now catches a rejected `reader.cancel()` after the byte cap is exceeded, then reliably throws `PayloadTooLarge` for the route's 413 response. Added `limits.test.ts` with a controlled `ReadableStream` that proves cancellation was called even when its cleanup rejects. All 30 Task 3 tests, web typecheck, and diff check are green. Commit follows this handoff entry.
+
+**Next:** Task 4 replaces the provisional conversation issuer with signed-cookie identity, expiry, verification, and continuation tests.
+
+**Blocked / watch out:** Nothing. The Task 3 report contains the RED→GREEN evidence in its Fix round 1 section.
+
+## 2026-08-09 17:08 BRT · Codex · web chat API Task 3
+
+**Done:** Implemented `POST /api/chat` on `feat/web-chat-api` with bounded streaming JSON input, exact host/origin validation, fixture/template selection, generic errors, `no-store`, and a provisional opaque server-issued `conversationId`. Added 10 route tests; all 29 chat API tests, Next type generation, web typecheck, diff check, and a local fixture smoke are green. Commit follows this handoff entry.
+
+**Next:** Task 4 replaces the provisional `conversation.ts` issuer with signed-cookie identity, session verification, expiry, and complete continuation tests.
+
+**Blocked / watch out:** Live Deco mode is deliberately not implemented here. The sandbox blocked the first local port bind (`EPERM`); the authorized smoke started and returned the expected fixture response. The report is `.superpowers/sdd/2026-08-09-web-chat-api/task-3-report.md`.
+
+## 2026-08-09 17:00 BRT · Codex · web chat API Task 2 fix round 1
+
+**Done:** `fixtureFor` now falls back to `templateFor` when a known scenario resolves healthy or without a recovery action; it no longer attempts placeholders absent from that context. The narration registry omits text values with digits unless a safe template needs them, preserving rejection when a provider tries to interpolate them. Tests now exercise both engine-resolved demo scenarios plus healthy/actionless fallback paths; 14 narration tests, the web typecheck, and diff check are green.
+
+**Next:** route integration can call `fixtureFor` for either known key without duplicating finding/action guards, then use `templateFor` for raw contexts.
+
+**Blocked / watch out:** a provider reference to any text source containing ASCII digits is deliberately rejected as missing; numeric facts must keep using their typed deterministic formatter.
+
+
+## 2026-08-09 16:56 BRT · Codex · web chat API Task 2
+
+**Done:** deterministic chat narration guard, templates, and known-case fixtures are implemented in `apps/web/app/api/chat/` and will be committed as `feat(web): validate deterministic chat narration`. The guard rejects literal provider digits, unknown/prototype/missing paths, incompatible formatters, unresolved braces, control characters, and digits introduced through text substitutions. Focal narration tests (10) and the web typecheck are green.
+
+**Next:** integrate these functions into `POST /api/chat`, selecting a known fixture only for a resolved `case1`/`case2` and otherwise using `templateFor`.
+
+**Blocked / watch out:** fixture prose assumes a primary finding and first recovery action; `templateFor` is the safe fallback for healthy or actionless contexts. No `packages/contracts` or other package changed.
+
+
 ## 2026-08-09 20:20 BRT · Guilherme's agent · end of the long session
 
 **Done:** `main` at `7108c9c`, 175 tests, typecheck (incl. `apps/mcp`), web build, and all three fixture guards green — verified from a clean `--frozen-lockfile` checkout, not this working tree.

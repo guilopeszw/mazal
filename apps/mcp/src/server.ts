@@ -10,6 +10,7 @@ import { Hono, type Context } from 'hono';
 import { InMemoryActionLog, type ActionLog } from './action-log.js';
 import { hasValidBearerToken } from './auth.js';
 import { registerMazalTools } from './tools/index.js';
+import { registerUiResources } from './ui/resources.js';
 
 export type RegisterTools = (server: McpServer, actionLog?: ActionLog) => void;
 
@@ -50,6 +51,7 @@ export function createMazalMcpServer(
 ): McpServer {
   const server = new McpServer({ name: 'Mazal MCP', version: '0.1.0' });
   registerTools(server, actionLog);
+  registerUiResources(server);
   return server;
 }
 
