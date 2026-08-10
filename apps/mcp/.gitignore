@@ -9,3 +9,8 @@ src/ui/dist/
 # `src/ui/dist/` on purpose: the Vercel build copies that directory wholesale
 # into the function bundle, so a preview left there would ship.
 src/ui/dist-preview/
+
+# Phase 0 probe output. Redacted by the script, but reviewed by a human
+# before it is committed — a capture is the one file here that came from a
+# real advertiser.
+fixtures/meta-mcp/captured-*.json
