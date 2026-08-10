@@ -3,7 +3,7 @@
 // sheet's diagnosis block. The `Diagnosis` is the tool result; the counts are
 // the tool input's own days, aggregated by the contract's `aggregate`.
 
-import type { CampaignDay, Diagnosis } from '@mazal/contracts';
+import type { CampaignDay, Diagnosis, ReferenceMode } from '@mazal/contracts';
 
 import { diagnosisViewModel, type FunnelSliceVM, type StageRowVM } from '../view-data.js';
 import { el, mount, showError } from './dom.js';
@@ -34,7 +34,9 @@ function render(result: unknown, input: Record<string, unknown> | undefined): vo
     return;
   }
 
-  const vm = diagnosisViewModel(days, diagnosis);
+  // The reference the tool was called with: it sets the window the engine
+  // measured over and whether it had a baseline to judge against at all.
+  const vm = diagnosisViewModel(days, diagnosis, input?.reference as ReferenceMode | undefined);
   const max = Math.max(...vm.slices.map((s) => s.value));
 
   root.replaceChildren(

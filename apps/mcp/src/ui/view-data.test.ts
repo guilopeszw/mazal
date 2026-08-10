@@ -1,7 +1,14 @@
 import { benchmarks } from '@mazal/data';
-import { predict, MEASURED_STAGES, WINDOW_DAYS } from '@mazal/engine';
+import {
+  diagnose,
+  predict,
+  MEASURED_STAGES,
+  SELF_MIN_BASELINE_DAYS,
+  SELF_WINDOW_DAYS,
+  WINDOW_DAYS,
+} from '@mazal/engine';
 import { aggregate } from '@mazal/contracts/metrics';
-import type { Diagnosis } from '@mazal/contracts';
+import type { Diagnosis, ReferenceMode } from '@mazal/contracts';
 import { describe, expect, test } from 'vitest';
 
 import { apparelCard, healthyDays, stockoutDiagnosis } from '../tools/test-fixtures.js';
@@ -73,6 +80,82 @@ describe('diagnosisViewModel', () => {
     expect(vm.detail).toContain('1.0% of clicks add to cart');
     expect(vm.detail).toContain('8.0%');
     expect(vm.detail).toContain('1,540 clicks');
+  });
+
+  test('self mode windows on the engine\'s shorter window, not the benchmark one', () => {
+    // `diagnose` measures self mode over SELF_WINDOW_DAYS and checks every
+    // stage's minSample against *that* window. The view aggregated seven days
+    // regardless, so its sample was always the larger one and a stage the
+    // engine had skipped rendered ok with a value.
+    const days = healthyDays();
+    const vm = diagnosisViewModel(days, healthyDiagnosis, { kind: 'self', baselineDays: 20 });
+    const window = aggregate(days.slice(-SELF_WINDOW_DAYS));
+
+    expect(vm.slices.map((s) => s.value)).toEqual([
+      window.impressions,
+      window.clicks,
+      window.addToCarts,
+      window.checkoutsInitiated,
+      window.purchases,
+    ]);
+
+    // And the sample minimums are checked against that window, which is the
+    // half that actually bit. One purchase a day straddles stage 6's minSample
+    // of 5: three over the self window, seven over the benchmark one. The view
+    // used the larger number, so it printed a verdict on a stage the engine
+    // had skipped. A fixture where every stage clears its minimum on both
+    // windows cannot tell the two apart — this one has to.
+    const straddle = healthyDays().map((d) => ({ ...d, purchases: 1, revenue: 69 }));
+    const spec6 = MEASURED_STAGES.find((s) => s.stage === 6)!;
+    expect(spec6.sample(aggregate(straddle.slice(-SELF_WINDOW_DAYS)))).toBeLessThan(spec6.minSample);
+    expect(spec6.sample(aggregate(straddle.slice(-WINDOW_DAYS)))).toBeGreaterThanOrEqual(spec6.minSample);
+
+    const economics = (r: ReferenceMode) =>
+      diagnosisViewModel(straddle, healthyDiagnosis, r).stages.find((s) => s.name.includes('Economics'))!;
+
+    expect(economics({ kind: 'self', baselineDays: 20 }).state).toBe('mute');
+    // Same days, benchmark reference: the engine does judge it, so the view may.
+    expect(economics({ kind: 'benchmark', table: benchmarks }).state).toBe('ok');
+  });
+
+  test('the view agrees with `diagnose` about when nothing was judged', () => {
+    // The predicate below duplicates the engine's baseline rule, so it is
+    // pinned to the engine's real output rather than to a reading of it.
+    const days = healthyDays();
+    // The boundary itself, both sides of it: with only 6 and 10 a `>=` that
+    // slipped to `>` passed every test.
+    for (const baselineDays of [SELF_MIN_BASELINE_DAYS - 1, SELF_MIN_BASELINE_DAYS]) {
+      const reference = { kind: 'self', baselineDays } as const;
+      const diagnosis = diagnose({ days, card: apparelCard, events: [], reference });
+      const vm = diagnosisViewModel(days, diagnosis, reference);
+
+      // Both cases return primary: null — one because nothing broke, one
+      // because nothing could be compared. Only the view can tell them apart.
+      expect(diagnosis.primary).toBeNull();
+      const judged = baselineDays >= SELF_MIN_BASELINE_DAYS;
+      expect(vm.headline.includes('Not enough history'), `baselineDays ${baselineDays}`).toBe(!judged);
+      expect(vm.stages.some((s) => s.state === 'ok'), `baselineDays ${baselineDays}`).toBe(judged);
+    }
+  });
+
+  test('no baseline is not health: silence must not render as "no stage broke"', () => {
+    // Under SELF_MIN_BASELINE_DAYS of baseline, `selfReference` returns null for
+    // every stage, so `diagnose` compares nothing and returns primary: null —
+    // the same shape a genuinely healthy campaign returns. They must not read
+    // the same on screen.
+    const days = healthyDays();
+    const vm = diagnosisViewModel(days, healthyDiagnosis, {
+      kind: 'self',
+      baselineDays: SELF_MIN_BASELINE_DAYS - 1,
+    });
+
+    expect(vm.headline).not.toContain('No stage broke');
+    expect(vm.headline).toContain('Not enough history');
+    expect(vm.stages.some((s) => s.state === 'ok')).toBe(false);
+
+    // A real healthy answer, same days, still says so.
+    const healthy = diagnosisViewModel(days, healthyDiagnosis, { kind: 'benchmark', table: benchmarks });
+    expect(healthy.headline).toContain('No stage broke');
   });
 
   test('stage 2 is never judged: the store sends no analytics', () => {

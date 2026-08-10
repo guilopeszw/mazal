@@ -123,7 +123,16 @@ export const WINDOW_DAYS = 7;
  * against and does not need seven days to beat down category noise. The brief
  * names three.
  */
-const SELF_WINDOW_DAYS = 3;
+export const SELF_WINDOW_DAYS = 3;
+
+/**
+ * Self mode needs a week of baseline before it will compare anything. Under
+ * that there is no trustworthy shape, and a "deviation" measured off three days
+ * is noise wearing a sigma. Exported because a renderer has to be able to tell
+ * "nothing broke" apart from "nothing could be judged" — they look identical in
+ * a `Diagnosis` (`primary: null`) and mean opposite things on a seller's screen.
+ */
+export const SELF_MIN_BASELINE_DAYS = 7;
 
 /** Linear-interpolated quantile on a sorted array. */
 function quantile(sorted: number[], q: number): number {
@@ -143,9 +152,7 @@ function quantile(sorted: number[], q: number): number {
  * to divide a deviation by.
  */
 function selfReference(baseline: CampaignDay[], observe: (d: CampaignDay) => number): Quantiles | null {
-  // Under a week of history there is no trustworthy shape to compare against,
-  // and a "deviation" measured off three days is noise wearing a sigma.
-  if (baseline.length < 7) return null;
+  if (baseline.length < SELF_MIN_BASELINE_DAYS) return null;
 
   const values = baseline.map(observe).filter(Number.isFinite).sort((a, b) => a - b);
   return { median: quantile(values, 0.5), p25: quantile(values, 0.25), p75: quantile(values, 0.75) };
