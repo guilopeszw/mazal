@@ -28,9 +28,9 @@ function render(result: unknown): void {
     el('h1', {}, ['Pre-flight verdict']),
     el('span', { class: `stamp ${vm.decision}` }, [STAMP[vm.decision]]),
     el('p', {}, [
-      'Every real spent has to come back as ',
+      'Each R$1 spent has to come back as ',
       el('strong', {}, [vm.breakEvenLabel]),
-      ' before this campaign breaks even.',
+      ' for this campaign to pay for itself.',
     ]),
     el('div', { class: 'band' }, [
       el('div', { class: 'track' }),
@@ -40,7 +40,7 @@ function render(result: unknown): void {
       }),
       el('div', { class: 'mid', style: `left:${vm.mid}%` }),
       el('div', { class: 'break-even', style: `left:${vm.breakEven}%` }, [
-        el('span', { class: 'flag' }, [`break-even ${vm.breakEvenLabel}`]),
+        el('span', { class: 'flag' }, [`pays for itself at ${vm.breakEvenLabel}`]),
       ]),
     ]),
     el('div', { class: 'ends' }, [
@@ -49,7 +49,7 @@ function render(result: unknown): void {
       el('span', {}, [vm.ends[2]]),
     ]),
     ...(vm.limitingFactor ? [el('p', { class: 'note' }, [vm.limitingFactor])] : []),
-    ...(vm.killTrigger ? [el('p', { class: 'note' }, [`Kill trigger: ${vm.killTrigger}`])] : []),
+    ...(vm.killTrigger ? [el('p', { class: 'note' }, [vm.killTrigger])] : []),
   );
 }
 

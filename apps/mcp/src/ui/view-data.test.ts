@@ -50,8 +50,9 @@ describe('diagnosisViewModel', () => {
     const broken = vm.stages.filter((s) => s.state === 'broken');
     expect(broken).toHaveLength(1);
     expect(broken[0]!.name).toContain('Product interest');
-    // The observed value comes from the Finding, formatted — never recomputed.
-    expect(broken[0]!.value).toContain('1.0%');
+    // The observed value comes from the Finding, formatted — never recomputed —
+    // and reads as a sentence, not a metric code.
+    expect(broken[0]!.value).toBe('1.0% of clicks add to cart');
 
     const downstream = vm.stages.filter((s) => s.value === 'symptom');
     expect(downstream.map((s) => s.name)).toEqual([
@@ -61,13 +62,17 @@ describe('diagnosisViewModel', () => {
     ]);
   });
 
-  test('the headline carries the finding verbatim: observed, reference, rule id', () => {
+  test('the headline is the decision; the evidence line carries the finding verbatim', () => {
     const vm = diagnosisViewModel(healthyDays(), stockoutDiagnosis);
 
-    expect(vm.headline).toContain('1.0%');
-    expect(vm.headline).toContain('8.0%');
-    expect(vm.headline).toContain('stage3.atcRate_below_benchmark');
-    expect(vm.changePoint).toBe('24 July');
+    // Decision first, in the seller's words — the date rides the sentence.
+    expect(vm.headline).toBe('Your product page broke on 24 July.');
+    // The evidence: observed, reference, and the sample it was measured on.
+    // No sigma, no metric codes, no rule ids — the raw diagnosis rides the
+    // tool result for anyone auditing; the tile is for the seller.
+    expect(vm.detail).toContain('1.0% of clicks add to cart');
+    expect(vm.detail).toContain('8.0%');
+    expect(vm.detail).toContain('1,540 clicks');
   });
 
   test('stage 2 is never judged: the store sends no analytics', () => {
@@ -87,7 +92,7 @@ describe('diagnosisViewModel', () => {
     const economics = vm.stages.find((s) => s.name.includes('Economics'));
 
     expect(economics?.state).toBe('mute');
-    expect(economics?.value).toContain('not judged');
+    expect(economics?.value).toContain('too few sales to judge');
 
     // The engine's threshold is the source of the silence, not a UI constant.
     const spec = MEASURED_STAGES.find((s) => s.stage === 6)!;
@@ -98,17 +103,19 @@ describe('diagnosisViewModel', () => {
 describe('bandViewModel', () => {
   const verdict = predict({ card: apparelCard, table: benchmarks });
 
-  test('every printed number is the verdict, formatted, never recomputed', () => {
+  test('every printed number is the verdict, re-expressed as reais per real spent', () => {
     const vm = bandViewModel(verdict);
-    const fmt = (v: number) =>
-      `${new Intl.NumberFormat('en', { maximumFractionDigits: 2 }).format(v)}×`;
+    // ROAS 2.38 and "R$2.38 back per R$1 spent" are the same number in the
+    // seller's unit — a label translation, not arithmetic.
+    const money = (v: number) =>
+      new Intl.NumberFormat('en', { style: 'currency', currency: 'BRL' }).format(v);
 
     expect(vm.ends).toEqual([
-      fmt(verdict.predictedRoas.p10),
-      `likely ${fmt(verdict.predictedRoas.p50)}`,
-      fmt(verdict.predictedRoas.p90),
+      `worst case ${money(verdict.predictedRoas.p10)}`,
+      `most likely ${money(verdict.predictedRoas.p50)}`,
+      `best case ${money(verdict.predictedRoas.p90)}`,
     ]);
-    expect(vm.breakEvenLabel).toBe(fmt(verdict.breakEvenRoas));
+    expect(vm.breakEvenLabel).toBe(money(verdict.breakEvenRoas));
     expect(vm.decision).toBe(verdict.decision);
   });
 
@@ -129,7 +136,7 @@ describe('bandViewModel', () => {
     }
   });
 
-  test('limiting factor and kill trigger pass through only when the engine set them', () => {
+  test('engine prose is rendered only when set, with its jargon translated and values intact', () => {
     const bare = bandViewModel({
       decision: 'launch',
       predictedRoas: { p10: 1, p50: 2, p90: 3 },
@@ -138,14 +145,59 @@ describe('bandViewModel', () => {
     expect(bare.limitingFactor).toBeUndefined();
     expect(bare.killTrigger).toBeUndefined();
 
+    // The three shapes `predict` actually emits (packages/engine/src/predict.ts).
     const full = bandViewModel({
       decision: 'launch_small',
       predictedRoas: { p10: 1, p50: 2, p90: 3 },
       breakEvenRoas: 1.5,
-      killTrigger: 'stop if ROAS stays under 1.5 after 200 clicks',
-      limitingFactor: 'the delivery promise is the factor dragging the band down',
+      killTrigger:
+        'Stop if ROAS is below 1.50 after 100 clicks. Cvr is at 34% of the category median — the factor holding this band down.',
+      limitingFactor: 'cvr is at 34% of the category median — the factor holding this band down',
     });
-    expect(full.limitingFactor).toContain('delivery promise');
-    expect(full.killTrigger).toContain('200 clicks');
+    // The value survives; the labels do not.
+    expect(full.limitingFactor).toContain('34%');
+    expect(full.limitingFactor).toContain('clicks that turn into sales');
+    expect(full.killTrigger).toContain('R$1.50');
+    expect(full.killTrigger).toContain('100 clicks');
+
+    const noHistory = bandViewModel({
+      decision: 'launch',
+      predictedRoas: { p10: 1, p50: 2, p90: 3 },
+      breakEvenRoas: 1.5,
+      limitingFactor:
+        'no campaign history yet, so the band is category-wide — instrument atcRate first, it is the widest factor here',
+    });
+    expect(noHistory.limitingFactor).toContain('clicks that add to cart');
+  });
+
+  test('no view string puts the analytical weight back on the seller', () => {
+    // The product owner's ban list, enforced over every string either view can
+    // render — labels translated, values untouched.
+    const banned = /p10|p90|p50|\bband\b|median|percentile|sigma|σ|\bcvr\b|\bctr\b|atcRate|icRate|\baov\b|\bROAS\b|limiting factor|banda|mediana|percentil/i;
+
+    const days = healthyDays();
+    for (const diagnosis of [healthyDiagnosis, stockoutDiagnosis]) {
+      const vm = diagnosisViewModel(days, diagnosis);
+      const strings = [
+        vm.headline,
+        vm.detail ?? '',
+        vm.evidence ?? '',
+        ...vm.slices.map((s) => `${s.label} ${s.display}`),
+        ...vm.stages.map((s) => `${s.name} ${s.value} ${s.tag ?? ''}`),
+      ];
+      for (const text of strings) expect(text).not.toMatch(banned);
+    }
+
+    const band = bandViewModel({
+      decision: 'launch_small',
+      predictedRoas: { p10: 0.28, p50: 1.66, p90: 9.97 },
+      breakEvenRoas: 2.38,
+      killTrigger:
+        'Stop if ROAS is below 2.38 after 100 clicks. Cvr is at 34% of the category median — the factor holding this band down.',
+      limitingFactor: 'cvr is at 34% of the category median — the factor holding this band down',
+    });
+    for (const text of [...band.ends, band.breakEvenLabel, band.limitingFactor!, band.killTrigger!]) {
+      expect(text).not.toMatch(banned);
+    }
   });
 });

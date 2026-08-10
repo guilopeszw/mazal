@@ -40,15 +40,12 @@ function render(result: unknown, input: Record<string, unknown> | undefined): vo
   root.replaceChildren(
     el('h1', {}, ['Funnel diagnosis']),
     el('p', { class: `headline${diagnosis.primary ? '' : ' ok'}` }, [
-      el('strong', {}, [vm.headline.split(' · ')[0] ?? vm.headline]),
-      vm.headline.includes(' · ') ? ` · ${vm.headline.split(' · ').slice(1).join(' · ')}` : '',
+      el('strong', {}, [vm.headline]),
     ]),
+    ...(vm.detail ? [el('p', { class: 'note' }, [vm.detail])] : []),
     el('div', { class: 'funnel' }, vm.slices.map((s) => slice(s, max))),
     el('div', { class: 'stages' }, vm.stages.map(stageRow)),
-    ...(vm.changePoint
-      ? [el('p', { class: 'note' }, [`The engine dates the turn to ${vm.changePoint}.`])]
-      : []),
-    ...(vm.evidence ? [el('p', { class: 'note' }, [`Correlated store event: ${vm.evidence}.`])] : []),
+    ...(vm.evidence ? [el('p', { class: 'note' }, [`What changed in the store: ${vm.evidence}.`])] : []),
   );
 }
 
