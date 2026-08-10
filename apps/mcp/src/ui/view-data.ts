@@ -151,7 +151,9 @@ export type FunnelSliceVM = {
   tone: 'ok' | 'leak' | 'after';
   /**
    * Bar width as a percentage — how much of the *previous* stage survived into
-   * this one, so the first stage is always full.
+   * this one, so the first stage is full whenever the campaign has any volume
+   * at all. Between 2 and 100: floored so nothing vanishes, capped because a
+   * stage can exceed the one above it in a real export.
    *
    * Not a share of the largest stage. A funnel spans orders of magnitude —
    * 91,837 impressions to 7 purchases on the demo campaign — so against the
@@ -213,9 +215,12 @@ export function diagnosisViewModel(
       value,
       display: formatCount(value),
       tone: toneFor(stage, leak),
-      // A visible sliver rather than nothing when a stage keeps almost none of
-      // the one above: zero survivors is a fact worth seeing, not a blank row.
-      width: previous > 0 ? Math.max(2, (value / previous) * 100) : 2,
+      // Floored so a stage that keeps almost none of the one above still draws
+      // a sliver — zero survivors is a fact worth seeing, not a blank row — and
+      // capped because a stage can exceed the one above it in a real export
+      // (checkouts over add-to-carts, when a cart from last week converts this
+      // one). Uncapped that bar runs past the end of its track.
+      width: previous > 0 ? Math.min(100, Math.max(2, (value / previous) * 100)) : 2,
     };
   });
 

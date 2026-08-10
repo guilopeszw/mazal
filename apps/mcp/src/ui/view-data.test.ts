@@ -77,6 +77,19 @@ describe('diagnosisViewModel', () => {
       healthyDiagnosis,
     );
     expect(dead.slices.at(-1)!.width).toBe(2);
+
+    // A stage can exceed the one above it in a real export — a cart opened last
+    // week checks out this week. The bar stops at the end of its track.
+    const overflowing = diagnosisViewModel(
+      days.map((d) => ({ ...d, checkoutsInitiated: d.addToCarts * 3 })),
+      healthyDiagnosis,
+    );
+    expect(overflowing.slices[3]!.width).toBe(100);
+    expect(overflowing.slices.every((s) => s.width >= 2 && s.width <= 100)).toBe(true);
+
+    // Nothing at all: no NaN, no blank row.
+    const empty = diagnosisViewModel([], healthyDiagnosis);
+    expect(empty.slices.every((s) => Number.isFinite(s.width) && s.width >= 2)).toBe(true);
   });
 
   test('the leak stage is marked and downstream stages are symptoms, not causes', () => {
