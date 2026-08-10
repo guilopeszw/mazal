@@ -386,3 +386,107 @@ export const BudgetWalkFigure = memo(function BudgetWalkFigure({
     </figure>
   );
 });
+
+/**
+ * The Money Line: daily profit against daily spend, and where the seller stands.
+ *
+ * Hand-drawn rather than routed through the chart library, and that is a
+ * decision rather than laziness. `time-series-chart-shell.tsx` is hard-wired to
+ * `scaleTime` and coerces x with `new Date(value)` — a spend of R$126 would
+ * become 1970-01-01T00:00:00.126Z, and those dates reach the tooltip and the
+ * accessible name. An axis that lies to a screen reader is not a cosmetic
+ * compromise, so this axis is a real linear one over reais.
+ *
+ * The two marks that matter share an x. `here` is what the current split earns;
+ * `best` is what the same money earns allocated properly. The vertical distance
+ * between them is the entire argument, which is why they are joined by a rule
+ * and labelled with the gap rather than left for the reader to subtract.
+ */
+export const MoneyLineFigure = memo(function MoneyLineFigure({
+  chart,
+}: {
+  chart: NonNullable<AnswerCharts["money"]>;
+}) {
+  const W = 640;
+  const H = 260;
+  const PAD = { top: 26, right: 22, bottom: 34, left: 46 };
+
+  const maxSpend = Math.max(...chart.points.map((p) => p.spend), chart.peak.spend);
+  const maxProfit = Math.max(...chart.points.map((p) => p.profit), chart.best.profit);
+  const minProfit = Math.min(0, ...chart.points.map((p) => p.profit));
+
+  const x = (v: number) =>
+    PAD.left + (v / maxSpend) * (W - PAD.left - PAD.right);
+  const y = (v: number) =>
+    H - PAD.bottom - ((v - minProfit) / (maxProfit - minProfit || 1)) * (H - PAD.top - PAD.bottom);
+
+  const path = chart.points
+    .map((p, i) => `${i === 0 ? "M" : "L"}${x(p.spend).toFixed(1)} ${y(p.profit).toFixed(1)}`)
+    .join(" ");
+
+  return (
+    <figure className="m-0" role="img" aria-label={chart.summary}>
+      <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" aria-hidden="true">
+        {/* The zero line, only when the curve actually crosses it. */}
+        {minProfit < 0 && (
+          <line
+            x1={PAD.left} x2={W - PAD.right} y1={y(0)} y2={y(0)}
+            stroke="var(--color-line-strong)" strokeWidth="1"
+          />
+        )}
+
+        {/* Past the peak the curve is flat and spending more is a loss. Shaded
+            as the region it is, rather than left looking like more headroom. */}
+        <rect
+          x={x(chart.peak.spend)} y={PAD.top}
+          width={Math.max(0, W - PAD.right - x(chart.peak.spend))}
+          height={H - PAD.top - PAD.bottom}
+          fill="var(--color-ink)" opacity="0.04"
+        />
+        <line
+          x1={x(chart.peak.spend)} x2={x(chart.peak.spend)}
+          y1={PAD.top} y2={H - PAD.bottom}
+          stroke="var(--color-ink-faint)" strokeWidth="1" strokeDasharray="3 3"
+        />
+
+        <path d={path} fill="none" stroke="var(--color-accent)" strokeWidth="2" />
+
+        {/* The gap. This is the feature. */}
+        <line
+          x1={x(chart.here.spend)} x2={x(chart.best.spend)}
+          y1={y(chart.here.profit)} y2={y(chart.best.profit)}
+          stroke="var(--color-ink)" strokeWidth="1.5" strokeDasharray="2 2"
+        />
+        <circle cx={x(chart.best.spend)} cy={y(chart.best.profit)} r="4.5" fill="var(--color-accent)" />
+        <circle
+          cx={x(chart.here.spend)} cy={y(chart.here.profit)} r="4.5"
+          fill="var(--color-raised)" stroke="var(--color-ink)" strokeWidth="2"
+        />
+
+        <text
+          x={x(chart.here.spend) + 9} y={y(chart.here.profit) + 14}
+          className="fill-[var(--color-ink-soft)] text-[10.5px]"
+        >
+          you are here
+        </text>
+        <text
+          x={x(chart.best.spend) + 9} y={y(chart.best.profit) - 6}
+          className="fill-[var(--color-accent-ink)] text-[10.5px] font-[560]"
+        >
+          +{chart.gain} a day, same spend
+        </text>
+
+        <text x={PAD.left} y={H - 10} className="fill-[var(--color-ink-faint)] text-[10px]">
+          R$0 a day
+        </text>
+        <text
+          x={x(chart.peak.spend)} y={H - 10} textAnchor="middle"
+          className="fill-[var(--color-ink-faint)] text-[10px]"
+        >
+          {chart.peak.label}
+        </text>
+      </svg>
+      <figcaption className="px-4 pb-3 text-[12.5px] text-ink-soft">{chart.summary}</figcaption>
+    </figure>
+  );
+});

@@ -93,15 +93,7 @@ export type AnswerCharts = {
     peers: Record<string, number>;
     summary: string;
   };
-  /**
-   * The Money Line: daily spend against daily profit, on the curve the engine
-   * fitted to this campaign's own days.
-   *
-   * Every other chart here looks backwards. This one is the only place the
-   * product says what would happen at a spend the seller has not tried — so it
-   * carries its own provenance, and it is not drawn at all unless the campaign
-   * has earned it.
-   */
+
   /**
    * The reallocation: where the seller's money is, where it should be, and the
    * difference. Held at the same total by construction — `reallocate` reads the
@@ -119,39 +111,42 @@ export type AnswerCharts = {
       direction: "up" | "down" | "hold";
       /** Reais of margin on one sale of this product. */
       value: string;
-      /** Conversions per day this product's own days support at its ceiling. */
+      /** How many days of its own history the curve was fitted to. */
       basis: string;
     }[];
     summary: string;
   };
+
   /**
-   * Each product's daily spend across the flight, on one time axis.
+   * The Money Line: what this wallet earns at every size, and where the seller
+   * stands relative to it.
    *
-   * This is the evidence for the advice above it rather than decoration. A
-   * response curve is a claim about what a different budget would do, and the
-   * only reason Mazal can make one here is that these budgets moved — the
-   * fit refuses when they have not. Showing the walk is showing why it is
-   * allowed to speak.
+   * The curve is the best profit achievable at each total budget — the engine
+   * re-allocating across every product at every point. Two marks share the same
+   * x: `here` is what the current split earns, `best` is what the frontier earns
+   * at that identical spend. The vertical gap between them is the whole feature,
+   * and it is a distance a seller can see rather than a number to be trusted.
+   *
+   * `peak` is where the curve stops rising. Past it another real earns back less
+   * than itself — a fact about the budget, not an invitation to raise it.
    */
-  budgetWalk?: {
-    /** One row per date, one key per product, plus the date itself. */
-    points: Record<string, string | number>[];
-    series: { key: string; label: string }[];
+  money?: {
+    points: { spend: number; profit: number }[];
+    here: { spend: number; profit: number; label: string };
+    best: { spend: number; profit: number; label: string };
+    peak: { spend: number; profit: number; label: string };
+    gain: string;
     summary: string;
   };
-  money?: {
-    /** Sampled along the fitted curve. Profit in BRL per day. */
-    points: { spend: number; profit: number }[];
-    /** Where the seller is standing: their own recent daily spend. */
-    here: { spend: number; profit: number };
-    /** Where profit peaks — the last real that earns back more than itself. */
-    best: { spend: number; profit: number };
-    /** Reais per day currently left on the table. */
-    gain: number;
-    headline: string;
-    /** `fitted` or `blended`; a pure prior never reaches the screen. */
-    source: 'blended' | 'fitted';
-    days: number;
+
+  /**
+   * Each product's daily spend across the flight, on one time axis. The evidence
+   * for the advice: a curve is a claim about a different budget, and the only
+   * reason Mazal can make one is that these budgets moved.
+   */
+  budgetWalk?: {
+    points: Record<string, string | number>[];
+    series: { key: string; label: string }[];
     summary: string;
   };
 };
@@ -294,8 +289,6 @@ function buildDiagnoseCharts(
    * percent mapping on the prediction band: 0 on this chart's axis *is* the
    * break-even line, and no re-based value is ever printed.
    */
-  const money = buildMoneyLine(days, card);
-
   const breakEven = predict({ card, table: benchmarks }).breakEvenRoas;
   const margin =
     days.length > 1
@@ -310,121 +303,9 @@ function buildDiagnoseCharts(
     funnel,
     ...(daily ? { daily } : {}),
     ...(margin ? { margin } : {}),
-    ...(money ? { money } : {}),
   };
 }
 
-/**
- * The Money Line — the one chart that looks forward.
- *
- * Everything else in an answer reports what happened. This fits the campaign's
- * own spend-to-conversion curve and reads two points off it: where the seller
- * is standing, and where the last real still earns back more than itself.
- *
- * Three refusals are deliberate.
- *
- * It is not drawn from a pure category prior. `fitCurve` will happily return one
- * for a campaign with no history, and it would look identical on screen — a
- * confident curve through the seller's own axis that is really the median of 62
- * categories. `source` decides, and `prior` never reaches the page.
- *
- * It never proposes a larger budget. The best point can only be a spend the
- * curve says pays for itself, and when that is above what the seller already
- * spends there is no headline at all: "you could spend more" is a decision, not
- * a repair, and this product does not make it.
- *
- * And it prints no number the engine did not produce. The gain is a difference
- * of two profits, each `valueAt` times the card's own margin, less the spend.
- */
-function buildMoneyLine(
-  days: CampaignDay[],
-  card: ProductCard,
-): AnswerCharts["money"] {
-  const spent = days.filter((d) => d.spend > 0);
-  if (spent.length < 3) return undefined;
-
-  /**
-   * The curve is only identifiable if the spend actually moved.
-   *
-   * A saturation curve is a claim about how output changes as spend changes, so
-   * fitting one to a campaign held at a constant daily budget is asking where
-   * the ceiling is from data that never approached it. The least-squares fit
-   * does not fail in that case — it succeeds, on a curve whose `k` is pinned
-   * wherever the sweep started, and then confidently reports that a campaign
-   * spending R$99 a day should spend R$1. Both demo fixtures land exactly there:
-   * their daily spend varies by 1.15× and 1.20×, and the fitted `k` comes out at
-   * R$1.0 and R$2.5.
-   *
-   * So the chart requires the seller to have actually varied their budget. Most
-   * will not have, which is the honest finding rather than a limitation to
-   * paper over: a campaign at a flat budget contains no evidence about any other
-   * budget, and the place that evidence does exist is ACROSS adsets or products
-   * spending different amounts at the same time.
-   */
-  const levels = spent.map((d) => d.spend);
-  const ratio = Math.max(...levels) / Math.min(...levels);
-  if (ratio < 2) return undefined;
-
-  const metrics = benchmarks[card.category].metrics;
-  const typicalSpend = spent.reduce((sum, d) => sum + d.spend, 0) / spent.length;
-
-  // The benchmark table publishes CPM and CTR, not CPC. Cost per click is the
-  // ratio of the two — spend over impressions, divided by clicks over
-  // impressions, with impressions cancelling — so this is the same two priors
-  // rearranged rather than a third number from somewhere else. It only sets the
-  // prior's slope, and the prior only matters while the campaign's own days are
-  // too few to speak.
-  const priorCpc = metrics.ctr.median > 0 ? metrics.cpm.median / 1000 / metrics.ctr.median : 0;
-
-  const curve = fitCurve(
-    days,
-    priorCurve({
-      cpc: priorCpc,
-      cvr: metrics.cvr.median,
-      typicalSpend,
-    }),
-  );
-  if (curve.source === "prior") return undefined;
-
-  // What one conversion is worth to this seller, from their own card.
-  const value = card.price * card.grossMargin;
-  const profitAt = (spend: number) => valueAt(curve, spend) * value - spend;
-
-  const here = { spend: typicalSpend, profit: profitAt(typicalSpend) };
-  const { profitMaxBudget } = allocate([{ id: card.category, curve }], {
-    budget: typicalSpend,
-    valuePerConversion: value,
-  });
-  const best = { spend: profitMaxBudget, profit: profitAt(profitMaxBudget) };
-  const gain = best.profit - here.profit;
-
-  // Sample past both points so the shape, not just the two dots, is visible.
-  const span = Math.max(typicalSpend, profitMaxBudget) * 1.6;
-  const points = Array.from({ length: 41 }, (_, i) => {
-    const spend = (span * i) / 40;
-    return { spend, profit: profitAt(spend) };
-  });
-
-  const cheaper = best.spend < here.spend;
-  const headline = cheaper
-    ? `Profit peaks at ${formatBRL(best.spend)} a day. You are spending ${formatBRL(here.spend)}.`
-    : `You are close to the best spend this curve can find.`;
-
-  return {
-    points,
-    here,
-    best,
-    gain,
-    headline,
-    source: curve.source,
-    days: curve.n,
-    summary: `Daily profit against daily spend, on the curve fitted to this campaign's own ${curve.n} days of spending${
-      curve.source === "blended" ? `, still leaning on the ${card.category} median because that is thin` : ""
-    }. One conversion is worth ${formatBRL(value)} at this card's price and margin. Profit peaks at ${formatBRL(best.spend)} a day; the campaign is spending ${formatBRL(here.spend)}.`,
-  };
-}
-
-/** The plan payload, p50 only — see the comment on `Answer.plan`. */
 function planPayload(
   plan: RecoveryPlan,
   diagnosis: Diagnosis,
@@ -623,6 +504,48 @@ function allocateAnswer(): Answer {
     summary: `Each product's daily budget over the flight. Mazal can only draw a curve for a product whose budget actually moved — these span more than 2× from their lowest day to their highest, which is what makes the advice above possible at all. A budget held flat carries no evidence about any other budget, and Mazal says so rather than guessing.`,
   };
 
+  /**
+   * The frontier, sampled. Each point is a full re-allocation at that budget,
+   * so the curve is the engine's answer at forty different wallet sizes rather
+   * than one answer stretched.
+   */
+  const bare = funded.map(({ id, curve, valuePerConversion }) => ({ id, curve, valuePerConversion }));
+  const profitAt = (budget: number) => {
+    if (budget <= 0) return 0;
+    const at = allocate(bare, { budget });
+    return at.split.reduce((sum, s) => {
+      const f = funded.find((x) => x.id === s.id)!;
+      if (s.spend <= 0) return sum;
+      return sum + valueAt(f.curve, s.spend) * f.valuePerConversion - s.spend;
+    }, 0);
+  };
+
+  const peakSpend = allocate(bare, { budget: advice.budget * 40 }).profitMaxBudget;
+  const span = Math.max(advice.budget, peakSpend) * 1.35;
+  const money = {
+    points: Array.from({ length: 41 }, (_, i) => {
+      const spend = (span * i) / 40;
+      return { spend, profit: profitAt(spend) };
+    }),
+    here: {
+      spend: advice.budget,
+      profit: advice.currentProfit,
+      label: `you are here · ${formatMoney(advice.currentProfit)}`,
+    },
+    best: {
+      spend: advice.budget,
+      profit: advice.bestProfit,
+      label: `same spend, better split · ${formatMoney(advice.bestProfit)}`,
+    },
+    peak: {
+      spend: peakSpend,
+      profit: profitAt(peakSpend),
+      label: `profit stops rising at ${formatMoney(peakSpend)}`,
+    },
+    gain: formatMoney(advice.gain),
+    summary: `Daily profit against daily spend, where every point is the best split the engine can find at that budget. You are below your own curve — ${formatMoney(advice.gain)} a day below it, at the spend you already run. Past ${formatMoney(peakSpend)} another real earns back less than itself; that is a fact about the budget, not a suggestion to raise it.`,
+  };
+
   const moves = {
     budget: formatMoney(advice.budget),
     gain: formatMoney(advice.gain),
@@ -700,7 +623,7 @@ function allocateAnswer(): Answer {
       projected: `${formatMoney(advice.currentProfit)} → ${formatMoney(advice.bestProfit)} a day, at the same spend`,
       assumption: `Every figure comes from each product's own curve, fitted to ${funded[0]!.curve.n} days. Mazal can make the reductions; raising a budget is a decision to spend more and stays yours. The two halves are the same size, so approving only the cuts lowers your spend rather than moving it.`,
     },
-    charts: { moves, budgetWalk },
+    charts: { moves, money, budgetWalk },
     note: `Curves fitted from each product's own ${funded[0]!.curve.n} days of spending, which varied by more than 2× — a budget that never moved carries no evidence about any other budget, and Mazal declines rather than guessing. Measured against known curves on 200 simulated accounts this captures 71% of the achievable profit, against 25% for an even split; docs/allocator-results.md has the rest, including what it does not do.`,
   };
 }
