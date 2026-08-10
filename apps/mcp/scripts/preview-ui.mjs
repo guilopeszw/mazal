@@ -16,7 +16,7 @@
 // 401/403/CONNECTION_TEST checks; the drawing is the part nobody had seen.
 //
 // Output is gitignored, next to the real build:
-//   node scripts/preview-ui.mjs && open src/ui/dist/preview-diagnosis.html
+//   node scripts/preview-ui.mjs && open src/ui/dist-preview/diagnosis.html
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
@@ -27,7 +27,9 @@ import { benchmarks } from '@mazal/data';
 import { diagnose, predict } from '@mazal/engine';
 
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const outDir = resolve(appRoot, 'src/ui/dist');
+// Not `src/ui/dist`: the Vercel build copies that directory wholesale into the
+// function bundle, so a preview left there would ship as dead weight.
+const outDir = resolve(appRoot, 'src/ui/dist-preview');
 const repoRoot = resolve(appRoot, '../..');
 
 // The fixture the agent's `metadata.ui.homeTiles` is configured with — the
@@ -61,7 +63,11 @@ await mkdir(outDir, { recursive: true });
 
 for (const [view, { result, input }] of Object.entries(VIEWS)) {
   const stub = `
-    export function structuredResult(r) { return r; }
+    export function structuredResult(result) {
+      if (result.structuredContent) return result.structuredContent;
+      const text = result.content?.find((c) => c.type === 'text');
+      return text ? JSON.parse(text.text) : undefined;
+    }
     export function runView(options) {
       const data = JSON.parse(document.getElementById('mazal-preview-data').textContent);
       try { options.render(data.result, data.input); }
@@ -82,7 +88,7 @@ for (const [view, { result, input }] of Object.entries(VIEWS)) {
       {
         name: 'preview-runtime',
         setup(b) {
-          b.onResolve({ filter: /runtime\.js$/ }, () => ({ path: 'preview-runtime', namespace: 'preview' }));
+          b.onResolve({ filter: /^\.\/runtime\.js$/ }, () => ({ path: 'preview-runtime', namespace: 'preview' }));
           b.onLoad({ filter: /.*/, namespace: 'preview' }, () => ({ contents: stub, loader: 'js' }));
         },
       },
@@ -118,7 +124,7 @@ for (const [view, { result, input }] of Object.entries(VIEWS)) {
 </html>
 `;
 
-  await writeFile(resolve(outDir, `preview-${view}.html`), html);
+  await writeFile(resolve(outDir, `${view}.html`), html);
 }
 
-console.log(`wrote ${Object.keys(VIEWS).length} previews to src/ui/dist (open preview-diagnosis.html)`);
+console.log(`wrote ${Object.keys(VIEWS).length} previews to src/ui/dist-preview (open diagnosis.html)`);

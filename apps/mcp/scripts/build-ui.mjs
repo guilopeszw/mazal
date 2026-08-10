@@ -5,7 +5,7 @@
 // would simply not load. Output goes to `src/ui/dist` (gitignored); the
 // Vercel build copies it next to the function bundle.
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
@@ -15,6 +15,10 @@ const outDir = resolve(appRoot, 'src/ui/dist');
 
 const VIEWS = ['diagnosis', 'prediction'];
 
+// Cleared first, because `build-vercel.mjs` copies this directory wholesale
+// into the function bundle. Anything stale in here ships — a renamed view, a
+// deleted one, a local preview — and keeps shipping, silently, forever.
+await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
 
 for (const view of VIEWS) {

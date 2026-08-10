@@ -4,3 +4,8 @@
 
 # Built MCP App view HTML — `scripts/build-ui.mjs` regenerates it.
 src/ui/dist/
+
+# Local previews — `scripts/preview-ui.mjs` regenerates them. Kept out of
+# `src/ui/dist/` on purpose: the Vercel build copies that directory wholesale
+# into the function bundle, so a preview left there would ship.
+src/ui/dist-preview/
