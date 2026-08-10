@@ -203,8 +203,13 @@ const PIXEL_STAGES = new Set<FunnelStage>([3, 4, 5, 6]);
  * is a pixel and it broke; their export simply starts after the break. That is
  * the strongest evidence in the input and silencing it would throw the
  * seller's own testimony away.
+ *
+ * `events` is required rather than defaulted. A caller writing
+ * `noPixelEvidence(days)` would compile, run, and silently disagree with the
+ * engine the moment a `pixel_error` exists — which is the drift this function
+ * was pulled together to prevent. The compiler asks the question instead.
  */
-export function pixelReportedNothing(days: CampaignDay[], events: StoreEvent[] = []): boolean {
+export function noPixelEvidence(days: CampaignDay[], events: StoreEvent[]): boolean {
   if (events.some((e) => e.type === 'pixel_error')) return false;
   return days.every(
     (d) => d.addToCarts === 0 && d.checkoutsInitiated === 0 && d.purchases === 0 && d.revenue === 0,
@@ -226,11 +231,11 @@ export function diagnose(input: DiagnoseInput): Diagnosis {
     : [];
   const flagged: Finding[] = [];
 
-  const unpixelled = pixelReportedNothing(input.days, input.events);
+  const unpixelled = noPixelEvidence(input.days, input.events);
 
   for (const spec of MEASURED_STAGES) {
     // Nothing downstream was ever reported: judge none of it. See
-    // `pixelReportedNothing` — absent is not zero.
+    // `noPixelEvidence` — absent is not zero.
     if (unpixelled && PIXEL_STAGES.has(spec.stage)) continue;
     if (spec.sample(total) < spec.minSample) continue;
 
