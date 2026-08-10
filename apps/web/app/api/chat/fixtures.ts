@@ -6,12 +6,12 @@ const fixtures: Record<"case1" | "case2", StructuredNarration> = {
   case1: {
     verdict: "O vazamento começa no estágio {{diagnosis.primary.stage|integer}}.",
     evidence: "A taxa observada é {{diagnosis.primary.observed|percent}}, abaixo da referência de {{diagnosis.primary.reference|percent}}.",
-    plan: "Priorize {{plan.firstAction.title|text}}.",
+    plan: "Priorize {{plan.firstAction.titlePt|text}}.",
   },
   case2: {
     verdict: "O vazamento começa no estágio {{diagnosis.primary.stage|integer}}.",
     evidence: "A taxa observada é {{diagnosis.primary.observed|percent}}, abaixo da referência de {{diagnosis.primary.reference|percent}}.",
-    plan: "Priorize {{plan.firstAction.title|text}}.",
+    plan: "Priorize {{plan.firstAction.titlePt|text}}.",
   },
 };
 

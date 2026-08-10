@@ -45,7 +45,9 @@ const context: ResolvedContext = {
   plan: {
     actions: [
       {
-        id: "improve-pdp",
+        // A real engine action id: the plan titles are translated by id, so a
+        // synthetic one publishes no `titlePt` and the narration is rejected.
+        id: "thin_pdp.0",
         title: "Melhore a página do produto",
         change: "Adicione imagens úteis",
         expectedEffect: { metric: "atcRate", from: 0.045, to: 0.1 },
@@ -62,7 +64,9 @@ test("renders a valid known fixture through the deterministic renderer", () => {
   const narration = fixtureFor("case1", context);
 
   expect(narration).toContain("4,5%");
-  expect(narration).toContain("Melhore a página do produto");
+  // The rendered plan line carries the *translated* title, keyed on the action
+  // id — not the engine's own English, and not this fixture's `title`.
+  expect(narration).toContain("adicionar fotos do produto");
   expect(narration).not.toMatch(/{{|}}/);
 });
 
