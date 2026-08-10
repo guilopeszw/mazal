@@ -33,6 +33,38 @@ The **Allocator is on screen**: four sections on the `allocate` answer — the r
 
 ---
 
+## 2026-08-09 19:30 BRT · Bringel's agent · the Meta payload, mocked on purpose
+
+**Done:** the Meta Ads MCP is **not** being built — no time, and PRD 10 always had it in the "only if there is buffer" phase. What is built is the half that is useful without it: `packages/meta`, a new package holding the raw insights payload, the adapter that normalises it, and three committed payloads that carry the demo. Branch `feat/meta-insights-payload` off `stage`, sixteen commits, with `origin/stage` merged in at the end.
+
+The chain is: `packages/sim` fixture → payload + Ads Manager CSV → `fromMetaInsights` → `CampaignDay[]` → the same engine as always. **The screen does not move**, and that is the whole design: `pnpm meta:fixtures` writes the files and then asserts the payload folds back to the simulator's committed fixture exactly, both CSVs parse back to it, and the diagnosis through the payload is still stage 4 `icRate` at −1.61σ with the change point on 2026-07-12 and the `eta_change` event attached.
+
+All three fixtures go through it — case 1 and case 2 and the account. An earlier version of this entry claimed that and was, at the time, wrong: case 1 had no payload and a reviewer caught it. It has one now, and the guard checks the pre-flight numbers too (`launch_small`, break-even 4.10, stage 3 `atcRate` at −1.02σ, `thin_pdp`).
+
+Three things worth knowing, in order of how much they will bite:
+
+- **`parseMetaCsv` emits one `CampaignDay` per CSV *row* and does not group by date** — an Ads Manager export broken out by ad set arrives as N rows per day, and `diagnose` reads the last seven *entries*, so its window covered two and a bit real days and answered with full confidence about them. This predates today. **Fixed in `apps/web/app/actions.ts`**, which now folds by date and tells the seller their export was added up. The evidence for why it mattered: uploading the committed ad-set CSV before the fix answered stage 5 `cvr`, `checkout_friction`; after it, stage 4 `icRate`, `eta_shock`, which is the true one. Any Meta export can be uploaded now, not just the campaign-level one.
+- **Absence is not zero, and that is a deliberate split from `packages/ingest`.** A missing `spend` in a payload is refused by name with the row and date attached; an `actions: []` that is present is a real zero. The CSV parser makes the other call — default to 0, warn, carry on — because a spreadsheet is a human artefact with human gaps and an API response is machine output.
+- **`packages/meta` has no zod.** `packages/ingest` is on zod 3 and `apps/mcp` is on zod 4, so a package both import cannot depend on it. Validation is hand-written. This is also why it is a new package rather than an addition to C's.
+
+`diagnose_campaign` now takes `days` **or** `metaInsights`, exactly one, as PRD 10 asks and without a fifth tool. It is an object with a `.refine()` rather than a union, because a union publishes an `anyOf` root in `tools/list` and a client that expects an object stops being able to call the tool.
+
+Green after merging `origin/stage` in: **220 tests** across 29 files, 45 in `@mazal/mcp` including the isolated Vercel bundle, root typecheck, web typecheck, `next build`.
+
+**Next:** **[PR #32](https://github.com/guilopeszw/mazal/pull/32) is open again and `MERGEABLE / CLEAN`.** It was closed without merging at 00:39 UTC — a mis-click, thirteen minutes after the reply to the review — and reopened with `origin/stage` merged in. It needs a second look and a merge, and the branch owner does not merge.
+
+After that, the one thing no code here can do: **someone with any Meta ad account runs one insights call and commits the redacted response.** `packages/meta/src/documented-shape.test.ts` now pins every field the adapter reads against Meta's published Ads Insights reference, which narrows the gap — but it checks *names*, not behaviour. Whether a value arrives as `"12"` or `12`, whether an empty `actions` is omitted or sent as `[]`, and whether the three purchase aliases carry one conversion are the three assumptions this whole package rests on, and one real response settles all three. Until then `META_ADS_ENABLED` is off and `diagnose_campaign` refuses any payload without our own fixture stamp.
+
+The one thing after that which no code here can do: **someone with any Meta ad account runs one insights call and commits the redacted response.** The guard in `packages/meta/generate.ts` is closed-loop — it proves the adapter agrees with the generator, both written by the same person, not that either agrees with the Graph API. A single real payload, from a dead campaign or a R$5 test, turns it into an open one. It is the PRD-10 box that matters most and it takes ten minutes for whoever has the account.
+
+**Blocked / watch out:**
+
+- **`apps/mcp` was changed and it is E's — Joaquim should look.** An earlier version of this entry said "nothing in another owner's package was touched", which was false and a reviewer caught it: `src/schemas.ts`, `src/tools/diagnose-campaign.ts`, `src/tools/index.ts`, `src/tools/handlers.test.ts` and `package.json` all changed. What is true is the narrower claim I had actually checked: **no `packages/*` belonging to someone else was touched** — `contracts`, `ingest`, `engine` and `sim` are untouched, and the new package exists partly so that stayed true. `AGENTS.md` §80 asks for a stop-and-append when a change touches another owner's package; this is that append, saying it plainly.
+- **`AGENTS.md` assigns `packages/meta` to D "pending E's sign-off", and D wrote that line.** The row has to exist — a package nobody owns is a package nobody regenerates — but it is a self-grant in the rules doc for a package built from E's PRD, so it now says so on its face and stays provisional until Joaquim answers.
+- **PRD 10 asked for this code in `apps/mcp/src/meta/`, and it landed in `packages/meta/`.** The reason is real — `apps/web` needs it too and an app cannot import from another app, and zod 3 vs zod 4 forbids putting it in `packages/ingest` — but the divergence was not announced when it was made. Of the PRD's remaining boxes: `META_ADS_ENABLED` **is implemented** and off by default; there is deliberately **no `schema.ts`**, because the validation is fifty lines inside `adapter.ts` and splitting it moves code without moving risk; **no Meta connection is attached** and **no real response was ever captured**, which are the two a person has to close.
+- **The payloads are fixtures and say so in the file.** They carry `__mazal_fixture`, a field the Graph API does not return; the adapter propagates it and warns. `docs/demo-runbook.md` now answers *"did this data come from Meta?"* out loud, and its "What not to claim" section no longer says the Allocator does not render — it does, over the synthetic account, and both halves of that sentence have to be said.
+- **The product card never comes from Meta and cannot.** Price, margin, stock, photos and the delivery promise are the seller's twelve fields; no integration removes the form, and the half of the funnel they explain is the product.
+
 ## 2026-08-09 18:10 BRT · Guilherme's agent · end of the build day
 
 **Done:** `main` is at `2350fd4` and green — 169 tests, `@mazal/mcp` 39, typecheck (now including `apps/mcp`), `next build`, and both demo fixtures pass their beat guard. Verified from a fresh `--frozen-lockfile` checkout, not from this working tree.

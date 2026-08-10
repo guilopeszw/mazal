@@ -1,0 +1,3065 @@
+{
+  "data": [
+    {
+      "date_start": "2026-07-01",
+      "date_stop": "2026-07-01",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "83.98",
+      "impressions": "2334",
+      "reach": "1680",
+      "inline_link_clicks": "31",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "681.96"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-02",
+      "date_stop": "2026-07-02",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "81.14",
+      "impressions": "2273",
+      "reach": "1637",
+      "inline_link_clicks": "29",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "24"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "326.76"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-03",
+      "date_stop": "2026-07-03",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "73.02",
+      "impressions": "2078",
+      "reach": "1496",
+      "inline_link_clicks": "35",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "29"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "319.07"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-04",
+      "date_stop": "2026-07-04",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "121.26",
+      "impressions": "2742",
+      "reach": "1974",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "324.94"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-05",
+      "date_stop": "2026-07-05",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "124.04",
+      "impressions": "3564",
+      "reach": "2566",
+      "inline_link_clicks": "46",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "38"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "956.67"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-06",
+      "date_stop": "2026-07-06",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "127.86",
+      "impressions": "3347",
+      "reach": "2410",
+      "inline_link_clicks": "50",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "41"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "615.16"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-07",
+      "date_stop": "2026-07-07",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "129.67",
+      "impressions": "3690",
+      "reach": "2657",
+      "inline_link_clicks": "50",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "4"
+        },
+        {
+          "action_type": "purchase",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "41"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "1027.38"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-08",
+      "date_stop": "2026-07-08",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "113.99",
+      "impressions": "2946",
+      "reach": "2121",
+      "inline_link_clicks": "41",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "34"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "647.16"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-09",
+      "date_stop": "2026-07-09",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "116.48",
+      "impressions": "3224",
+      "reach": "2321",
+      "inline_link_clicks": "39",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "32"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "664.69"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-10",
+      "date_stop": "2026-07-10",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "114.39",
+      "impressions": "3302",
+      "reach": "2377",
+      "inline_link_clicks": "49",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "4"
+        },
+        {
+          "action_type": "purchase",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "40"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "1019.93"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-11",
+      "date_stop": "2026-07-11",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "129.53",
+      "impressions": "3524",
+      "reach": "2537",
+      "inline_link_clicks": "64",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "52"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "644.27"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-12",
+      "date_stop": "2026-07-12",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "89.64",
+      "impressions": "2613",
+      "reach": "1881",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "690.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-13",
+      "date_stop": "2026-07-13",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "85.50",
+      "impressions": "2403",
+      "reach": "1730",
+      "inline_link_clicks": "34",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "28"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "716.44"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-14",
+      "date_stop": "2026-07-14",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "80.30",
+      "impressions": "2463",
+      "reach": "1773",
+      "inline_link_clicks": "41",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "34"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "612.43"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-15",
+      "date_stop": "2026-07-15",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "80.96",
+      "impressions": "2289",
+      "reach": "1648",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "656.00"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-16",
+      "date_stop": "2026-07-16",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "87.11",
+      "impressions": "2293",
+      "reach": "1651",
+      "inline_link_clicks": "21",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "17"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "395.21"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-17",
+      "date_stop": "2026-07-17",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "53.50",
+      "impressions": "1774",
+      "reach": "1277",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "334.60"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-18",
+      "date_stop": "2026-07-18",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "57.76",
+      "impressions": "1621",
+      "reach": "1167",
+      "inline_link_clicks": "24",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "20"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "725.79"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-19",
+      "date_stop": "2026-07-19",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "54.66",
+      "impressions": "1682",
+      "reach": "1211",
+      "inline_link_clicks": "25",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "330.58"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-20",
+      "date_stop": "2026-07-20",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "53.83",
+      "impressions": "1769",
+      "reach": "1274",
+      "inline_link_clicks": "25",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "325.90"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-21",
+      "date_stop": "2026-07-21",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "84.59",
+      "impressions": "2458",
+      "reach": "1770",
+      "inline_link_clicks": "35",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "29"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "632.41"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-22",
+      "date_stop": "2026-07-22",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "75.55",
+      "impressions": "2282",
+      "reach": "1643",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-23",
+      "date_stop": "2026-07-23",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "83.20",
+      "impressions": "2382",
+      "reach": "1715",
+      "inline_link_clicks": "43",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "4"
+        },
+        {
+          "action_type": "purchase",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "35"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "910.82"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-24",
+      "date_stop": "2026-07-24",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "75.72",
+      "impressions": "2348",
+      "reach": "1691",
+      "inline_link_clicks": "35",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "29"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "342.09"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-25",
+      "date_stop": "2026-07-25",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "88.36",
+      "impressions": "2375",
+      "reach": "1710",
+      "inline_link_clicks": "39",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "32"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "613.72"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-26",
+      "date_stop": "2026-07-26",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "119.24",
+      "impressions": "3000",
+      "reach": "2160",
+      "inline_link_clicks": "43",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "3"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "35"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "1131.20"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-27",
+      "date_stop": "2026-07-27",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "116.30",
+      "impressions": "3160",
+      "reach": "2275",
+      "inline_link_clicks": "45",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "37"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "650.13"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-28",
+      "date_stop": "2026-07-28",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "127.84",
+      "impressions": "3330",
+      "reach": "2398",
+      "inline_link_clicks": "50",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "41"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "829.58"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-29",
+      "date_stop": "2026-07-29",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "109.53",
+      "impressions": "3019",
+      "reach": "2174",
+      "inline_link_clicks": "47",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "39"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "631.17"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-30",
+      "date_stop": "2026-07-30",
+      "campaign_id": "sim-acct-980067",
+      "campaign_name": "Home Appliances 2",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "134.08",
+      "impressions": "3637",
+      "reach": "2619",
+      "inline_link_clicks": "39",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "32"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "318.81"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-01",
+      "date_stop": "2026-07-01",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "48.89",
+      "impressions": "2399",
+      "reach": "1727",
+      "inline_link_clicks": "41",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "34"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-02",
+      "date_stop": "2026-07-02",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "55.57",
+      "impressions": "2467",
+      "reach": "1776",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "575.33"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-03",
+      "date_stop": "2026-07-03",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "53.08",
+      "impressions": "2872",
+      "reach": "2068",
+      "inline_link_clicks": "50",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "41"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-04",
+      "date_stop": "2026-07-04",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.26",
+      "impressions": "1680",
+      "reach": "1210",
+      "inline_link_clicks": "24",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "20"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-05",
+      "date_stop": "2026-07-05",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.95",
+      "impressions": "1544",
+      "reach": "1112",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "731.06"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-06",
+      "date_stop": "2026-07-06",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.84",
+      "impressions": "1676",
+      "reach": "1207",
+      "inline_link_clicks": "23",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "19"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "562.44"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-07",
+      "date_stop": "2026-07-07",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.35",
+      "impressions": "1561",
+      "reach": "1124",
+      "inline_link_clicks": "29",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "24"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "662.08"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-08",
+      "date_stop": "2026-07-08",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "32.05",
+      "impressions": "1604",
+      "reach": "1155",
+      "inline_link_clicks": "30",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "669.22"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-09",
+      "date_stop": "2026-07-09",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "29.33",
+      "impressions": "1679",
+      "reach": "1209",
+      "inline_link_clicks": "30",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-10",
+      "date_stop": "2026-07-10",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.68",
+      "impressions": "1581",
+      "reach": "1138",
+      "inline_link_clicks": "27",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "22"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "607.29"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-11",
+      "date_stop": "2026-07-11",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.89",
+      "impressions": "1603",
+      "reach": "1154",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "617.06"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-12",
+      "date_stop": "2026-07-12",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "60.29",
+      "impressions": "2554",
+      "reach": "1839",
+      "inline_link_clicks": "35",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "29"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "727.80"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-13",
+      "date_stop": "2026-07-13",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "52.26",
+      "impressions": "2665",
+      "reach": "1919",
+      "inline_link_clicks": "46",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "38"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "742.26"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-14",
+      "date_stop": "2026-07-14",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "56.38",
+      "impressions": "2806",
+      "reach": "2020",
+      "inline_link_clicks": "51",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "42"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "570.09"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-15",
+      "date_stop": "2026-07-15",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "51.59",
+      "impressions": "2442",
+      "reach": "1758",
+      "inline_link_clicks": "44",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "36"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-16",
+      "date_stop": "2026-07-16",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "32.15",
+      "impressions": "1582",
+      "reach": "1139",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-17",
+      "date_stop": "2026-07-17",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "25.99",
+      "impressions": "1391",
+      "reach": "1002",
+      "inline_link_clicks": "25",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "647.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-18",
+      "date_stop": "2026-07-18",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "32.97",
+      "impressions": "1480",
+      "reach": "1066",
+      "inline_link_clicks": "26",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-19",
+      "date_stop": "2026-07-19",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.46",
+      "impressions": "1712",
+      "reach": "1233",
+      "inline_link_clicks": "27",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "22"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "578.15"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-20",
+      "date_stop": "2026-07-20",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "32.42",
+      "impressions": "1578",
+      "reach": "1136",
+      "inline_link_clicks": "27",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "22"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "697.87"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-21",
+      "date_stop": "2026-07-21",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "33.45",
+      "impressions": "1761",
+      "reach": "1268",
+      "inline_link_clicks": "36",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "30"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "952.75"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-22",
+      "date_stop": "2026-07-22",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "49.57",
+      "impressions": "2255",
+      "reach": "1624",
+      "inline_link_clicks": "40",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "33"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "662.97"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-23",
+      "date_stop": "2026-07-23",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "54.27",
+      "impressions": "2571",
+      "reach": "1851",
+      "inline_link_clicks": "42",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "34"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-24",
+      "date_stop": "2026-07-24",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "54.47",
+      "impressions": "2652",
+      "reach": "1909",
+      "inline_link_clicks": "48",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "6"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "39"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "1352.29"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-25",
+      "date_stop": "2026-07-25",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.09",
+      "impressions": "1633",
+      "reach": "1176",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "1294.69"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-26",
+      "date_stop": "2026-07-26",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "30.04",
+      "impressions": "1774",
+      "reach": "1277",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "598.99"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-27",
+      "date_stop": "2026-07-27",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "32.10",
+      "impressions": "1508",
+      "reach": "1086",
+      "inline_link_clicks": "26",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "1191.57"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-28",
+      "date_stop": "2026-07-28",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "31.59",
+      "impressions": "1506",
+      "reach": "1084",
+      "inline_link_clicks": "22",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "18"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-29",
+      "date_stop": "2026-07-29",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "54.98",
+      "impressions": "2357",
+      "reach": "1697",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "676.68"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-30",
+      "date_stop": "2026-07-30",
+      "campaign_id": "sim-acct-228426",
+      "campaign_name": "Small Appliances Home Oven And Coffee",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "54.61",
+      "impressions": "2367",
+      "reach": "1704",
+      "inline_link_clicks": "44",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "36"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "576.25"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-01",
+      "date_stop": "2026-07-01",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "38.63",
+      "impressions": "1916",
+      "reach": "1380",
+      "inline_link_clicks": "32",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "26"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "234.54"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-02",
+      "date_stop": "2026-07-02",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "37.57",
+      "impressions": "1751",
+      "reach": "1261",
+      "inline_link_clicks": "40",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "33"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "234.58"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-03",
+      "date_stop": "2026-07-03",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "36.78",
+      "impressions": "1560",
+      "reach": "1123",
+      "inline_link_clicks": "29",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "24"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-04",
+      "date_stop": "2026-07-04",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "37.15",
+      "impressions": "1639",
+      "reach": "1180",
+      "inline_link_clicks": "32",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "26"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "211.47"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-05",
+      "date_stop": "2026-07-05",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "33.11",
+      "impressions": "1672",
+      "reach": "1204",
+      "inline_link_clicks": "27",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "22"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "224.71"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-06",
+      "date_stop": "2026-07-06",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.29",
+      "impressions": "1781",
+      "reach": "1282",
+      "inline_link_clicks": "34",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "28"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "233.37"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-07",
+      "date_stop": "2026-07-07",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "34.87",
+      "impressions": "1462",
+      "reach": "1053",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "261.78"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-08",
+      "date_stop": "2026-07-08",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.83",
+      "impressions": "1891",
+      "reach": "1362",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "254.67"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-09",
+      "date_stop": "2026-07-09",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "36.61",
+      "impressions": "1547",
+      "reach": "1114",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-10",
+      "date_stop": "2026-07-10",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.11",
+      "impressions": "1497",
+      "reach": "1078",
+      "inline_link_clicks": "22",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "18"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-11",
+      "date_stop": "2026-07-11",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.24",
+      "impressions": "1763",
+      "reach": "1269",
+      "inline_link_clicks": "26",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-12",
+      "date_stop": "2026-07-12",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.04",
+      "impressions": "1487",
+      "reach": "1071",
+      "inline_link_clicks": "25",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "21"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "542.10"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-13",
+      "date_stop": "2026-07-13",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.78",
+      "impressions": "1762",
+      "reach": "1269",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-14",
+      "date_stop": "2026-07-14",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "36.46",
+      "impressions": "1621",
+      "reach": "1167",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-15",
+      "date_stop": "2026-07-15",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.34",
+      "impressions": "1766",
+      "reach": "1272",
+      "inline_link_clicks": "28",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "23"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-16",
+      "date_stop": "2026-07-16",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.35",
+      "impressions": "1838",
+      "reach": "1323",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "219.50"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-17",
+      "date_stop": "2026-07-17",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.73",
+      "impressions": "1628",
+      "reach": "1172",
+      "inline_link_clicks": "30",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-18",
+      "date_stop": "2026-07-18",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "35.69",
+      "impressions": "1501",
+      "reach": "1081",
+      "inline_link_clicks": "23",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "19"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "265.30"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-19",
+      "date_stop": "2026-07-19",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "64.17",
+      "impressions": "2590",
+      "reach": "1865",
+      "inline_link_clicks": "43",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "35"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "197.08"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-20",
+      "date_stop": "2026-07-20",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "64.39",
+      "impressions": "2193",
+      "reach": "1579",
+      "inline_link_clicks": "36",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "30"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-21",
+      "date_stop": "2026-07-21",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "64.53",
+      "impressions": "2698",
+      "reach": "1943",
+      "inline_link_clicks": "39",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "32"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "218.94"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-22",
+      "date_stop": "2026-07-22",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "95.84",
+      "impressions": "3247",
+      "reach": "2338",
+      "inline_link_clicks": "55",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "45"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "182.81"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-23",
+      "date_stop": "2026-07-23",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "92.03",
+      "impressions": "3166",
+      "reach": "2280",
+      "inline_link_clicks": "52",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "43"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "234.77"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-24",
+      "date_stop": "2026-07-24",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "85.08",
+      "impressions": "2677",
+      "reach": "1927",
+      "inline_link_clicks": "49",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "7"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "3"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "40"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "454.21"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-25",
+      "date_stop": "2026-07-25",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "77.05",
+      "impressions": "2819",
+      "reach": "2030",
+      "inline_link_clicks": "41",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "34"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "525.77"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-26",
+      "date_stop": "2026-07-26",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "67.48",
+      "impressions": "2208",
+      "reach": "1590",
+      "inline_link_clicks": "33",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "27"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "253.57"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-27",
+      "date_stop": "2026-07-27",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "68.13",
+      "impressions": "2465",
+      "reach": "1775",
+      "inline_link_clicks": "45",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "5"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "37"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "274.68"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-28",
+      "date_stop": "2026-07-28",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "64.75",
+      "impressions": "2404",
+      "reach": "1731",
+      "inline_link_clicks": "38",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "31"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "238.86"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-29",
+      "date_stop": "2026-07-29",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "66.91",
+      "impressions": "2254",
+      "reach": "1623",
+      "inline_link_clicks": "39",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "4"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "2"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "32"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "256.97"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-30",
+      "date_stop": "2026-07-30",
+      "campaign_id": "sim-acct-370102",
+      "campaign_name": "Furniture Bedroom",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "62.84",
+      "impressions": "1869",
+      "reach": "1346",
+      "inline_link_clicks": "30",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "3"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "25"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "263.55"
+        }
+      ]
+    }
+  ],
+  "paging": {
+    "cursors": {
+      "before": "MAZALQVFPb",
+      "after": "MAZALQVFPc"
+    }
+  },
+  "__mazal_fixture": {
+    "kind": "fixture",
+    "generator": "packages/meta/generate.ts",
+    "derivedFrom": "packages/sim/fixtures/demo-account.json",
+    "note": "Synthetic. No Meta account was called to produce this file."
+  }
+}
