@@ -107,7 +107,22 @@ function splitCase2(campaign: LabelledCampaign): MetaInsightsRow[] {
       COUNT_FIELDS.map((field) => [field, splitLargestRemainder(day[field], weights)]),
     ) as Record<(typeof COUNT_FIELDS)[number], number[]>;
     const spend = splitLargestRemainder(toCents(day.spend), weights);
-    const revenue = splitLargestRemainder(toCents(day.revenue), weights);
+
+    /**
+     * Revenue follows the purchases it came from, not the ad set weights.
+     *
+     * Splitting the two independently is arithmetically fine — each sums to its
+     * own total — and produces rows that cannot exist: a leftover cent of
+     * revenue landing on an ad set whose purchase share floored to zero. In the
+     * first version that was 37 of the 90 rows in the committed CSV, each one a
+     * stage-6 number sitting on a stage-5 zero, in a file the demo can upload.
+     *
+     * The campaign totals were right, which is exactly why the guard missed it:
+     * it folds the ad sets back up and never looks at a row on its own.
+     */
+    const purchaseParts = counts.purchases;
+    const revenueWeights = purchaseParts.some((p) => p > 0) ? purchaseParts : weights;
+    const revenue = splitLargestRemainder(toCents(day.revenue), revenueWeights);
 
     AD_SETS.forEach((name, j) => {
       const part: CampaignDay = {
@@ -232,6 +247,24 @@ const canonical = (days: CampaignDay[]) =>
 // The payload, folded back up, has to be the fixture. Not close to it.
 if (!same(canonical(case2Account.total), canonical(case2.days))) {
   fail.push('demo-case2: the payload does not fold back to the fixture days');
+}
+
+/**
+ * And every row has to be a row Ads Manager could have exported.
+ *
+ * The fold above checks the totals, which is how 37 rows carrying revenue on
+ * zero purchases sat in the committed CSV without failing anything. A guard
+ * that only ever looks at the sum cannot see a per-entity row at all.
+ */
+for (const entity of case2Account.entities) {
+  for (const day of entity.days) {
+    if (day.purchases === 0 && day.revenue > 0) {
+      fail.push(`demo-case2: ${entity.name} on ${day.date} reports revenue with no purchase behind it`);
+    }
+    if (day.checkoutsInitiated > day.addToCarts || day.purchases > day.checkoutsInitiated) {
+      fail.push(`demo-case2: ${entity.name} on ${day.date} has a funnel stage wider than the one above it`);
+    }
+  }
 }
 
 // And so does the CSV, by the other door.
