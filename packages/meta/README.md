@@ -13,6 +13,15 @@ The payload a Meta Ads integration would hand us, and the one place it becomes t
 | The numbers | **Fixtures.** Re-encodings of `packages/sim/fixtures/demo-case2.json` and `demo-account.json`, which the simulator generates and guards. |
 | The account | **Nobody's.** No Meta account was called. Every payload here carries `__mazal_fixture`, a field the Graph API does not return, and the adapter warns when it sees one. |
 
+## Why it is here and not in `apps/mcp/src/meta/`
+
+`docs/prds/e-agent/10-meta-read-adapter.md` names that path, and asks that no new `packages/*` be added. Two things it did not anticipate made that impossible:
+
+- **`apps/web` needs the adapter too**, and an app cannot import from another app. The demo's days arrive through `fromMetaInsights` at build time.
+- **`packages/ingest` is on zod 3 and `apps/mcp` is on zod 4.** The obvious other home would have forced a zod version on both.
+
+So the code moved and the validation is hand-written. The PRD's other boxes: no Meta connection is attached, no *observed* response schema was ever captured — the fixtures re-encode `packages/sim`, so what is validated is a shape we authored — there is no separate `schema.ts`, and `META_ADS_ENABLED` is skipped for the reason at the end of this file.
+
 ## The rule the whole package turns on
 
 **Absence is not zero.** A missing `spend` is refused by name, with the row and the date attached — never read as a campaign that spent nothing. But an `actions: []` that is *present* is a real zero, because Meta omits the action type of something that did not happen, and a day with no sales is a fact rather than a gap.
