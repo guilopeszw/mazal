@@ -25,6 +25,10 @@ Entry format:
 
 **And that file is now provably in sync with Studio, not asserted to be.** Pull `metadata.instructions` with `COLLECTION_VIRTUAL_MCP_GET` on `vir_s9bfvfwe5vloXTD6Ttn_o`, extract the four-backtick block out of the doc, `diff` the two: identical, 6197 characters. Run it whenever that file is touched — Studio keeps no history, so this is the only check it has.
 
+**Two corrections to the 22:10 entry below, since old entries do not get rewritten.** It says *"60 tests in `@mazal/mcp` (was 40), 195 at the root"* — **none of those three numbers reproduces from any command, at any commit.** On `origin/stage` today it is **68** and **294**; `pnpm --filter @mazal/mcp test` and `pnpm test` print both. And it cites `optimization.md` §4 as the source of the `<language>` rules, which reads like a file that does not exist — it does, it is tracked at the repo root, it is just never referenced anywhere else. Say the path.
+
+**A review of #42 after it merged found three bugs, all on the seller-facing line** — PR #49. `plainProse` matched the factor names case-sensitively while `killTrigger` capitalises the limiting factor at sentence start, so **`AtcRate` and `IcRate` reached the seller verbatim**: the exact jargon the views were rewritten to remove. Every shape also read *"at 34% of **the what is typical for the category**"*, because the replace took the noun and left the engine's article. The ban test stayed green through all of it because it fed one hand-transcribed `Cvr` shape; it now runs every factor `predict` can name.
+
 **Next:** send one message to `Mazal` in Studio — *"tenho um produto que ainda não anunciei, vale a pena?"* — then read the reply back with `COLLECTION_THREAD_MESSAGES_LIST`. It confirms two things at once: that the model fix took, and that the `<language>` rules land (decision first; no `p10`, `banda`, `mediana`, `gatilho`). It needs a human in Studio — no MCP tool runs an agent, and the Chrome extension is not connected to this machine.
 
 **Blocked / watch out:** four things.
