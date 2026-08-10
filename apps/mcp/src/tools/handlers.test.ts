@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest';
 
 import { InMemoryActionLog } from '../action-log.js';
 import { buildRecoveryPlan } from './build-recovery-plan.js';
-import { diagnoseCampaign } from './diagnose-campaign.js';
+import { diagnoseCampaign, diagnoseCampaignWithNotes } from './diagnose-campaign.js';
 import { executePlan } from './execute-plan.js';
 import { predictCampaign } from './predict-campaign.js';
 import {
@@ -68,7 +68,7 @@ describe('diagnose_campaign handler', () => {
     expect(diagnoseCampaign({ ...shared, metaInsights })).toEqual(diagnoseCampaign({ ...shared, days }));
   });
 
-  test('refuses a payload with a hole in it rather than reading the hole as zero', () => {
+  test('drops the row it cannot read, names it, and answers from the rest', () => {
     const [first, ...rest] = healthyDays();
     const row = (d: (typeof rest)[number], over: Record<string, unknown> = {}) => ({
       date_start: d.date,
@@ -84,12 +84,107 @@ describe('diagnose_campaign handler', () => {
       ...over,
     });
 
-    expect(() => diagnoseCampaign({
+    const { diagnosis, notes } = diagnoseCampaignWithNotes({
       card: apparelCard,
       events: [],
       reference: { kind: 'benchmark' as const },
       metaInsights: { data: [row(first!, { spend: '' }), ...rest.map((d) => row(d))] },
-    })).toThrow(/Absence is not zero/);
+    });
+
+    // The hole is refused by name and the rest of the month survives it.
+    expect(diagnosis).toBeDefined();
+    expect(notes.some((n) => n.includes('Absence is not zero'))).toBe(true);
+    expect(notes.some((n) => n.includes('spend'))).toBe(true);
+  });
+
+  test('hands the provenance of a fixture payload back to the caller', () => {
+    const days = healthyDays();
+    const { notes } = diagnoseCampaignWithNotes({
+      card: apparelCard,
+      events: [],
+      reference: { kind: 'benchmark' as const },
+      metaInsights: {
+        data: days.map((d) => ({
+          date_start: d.date,
+          date_stop: d.date,
+          campaign_id: d.campaignId,
+          campaign_name: 'Apparel',
+          spend: d.spend.toFixed(2),
+          impressions: String(d.impressions),
+          reach: String(d.reach),
+          inline_link_clicks: String(d.clicks),
+          actions: [{ action_type: 'purchase', value: String(d.purchases) }],
+          action_values: [{ action_type: 'purchase', value: d.revenue.toFixed(2) }],
+        })),
+        __mazal_fixture: {
+          kind: 'fixture',
+          generator: 'packages/meta/generate.ts',
+          derivedFrom: 'test',
+          note: 'Synthetic.',
+        },
+      },
+    });
+
+    // Without this the tool answers confidently about invented data and never
+    // says so — which is the whole reason the stamp exists.
+    expect(notes.some((n) => n.includes('No Meta account was called'))).toBe(true);
+  });
+
+  test('refuses to average several campaigns into one funnel', () => {
+    const days = healthyDays().slice(0, 3);
+    const rowsFor = (campaign: string) =>
+      days.map((d) => ({
+        date_start: d.date,
+        date_stop: d.date,
+        campaign_id: campaign,
+        campaign_name: campaign,
+        spend: d.spend.toFixed(2),
+        impressions: String(d.impressions),
+        reach: String(d.reach),
+        inline_link_clicks: String(d.clicks),
+        actions: [{ action_type: 'purchase', value: String(d.purchases) }],
+        action_values: [{ action_type: 'purchase', value: d.revenue.toFixed(2) }],
+      }));
+
+    expect(() => diagnoseCampaign({
+      card: apparelCard,
+      events: [],
+      reference: { kind: 'benchmark' as const },
+      metaInsights: { data: [...rowsFor('c1'), ...rowsFor('c2')] },
+    })).toThrow(/one funnel/);
+  });
+
+  test('accepts the extra fields Meta really returns instead of rejecting the response', () => {
+    const days = healthyDays();
+    const shared = { card: apparelCard, events: [], reference: { kind: 'benchmark' as const } };
+    const withRealFields = {
+      data: days.map((d) => ({
+        date_start: d.date,
+        date_stop: d.date,
+        campaign_id: d.campaignId,
+        campaign_name: 'Apparel',
+        // All real, all returned by presets nobody controls. Stripped, not read.
+        ctr: '2.14',
+        cpc: '0.69',
+        cpm: '14.74',
+        frequency: '1.15',
+        objective: 'OUTCOME_SALES',
+        account_name: 'Loja',
+        spend: d.spend.toFixed(2),
+        impressions: String(d.impressions),
+        reach: String(d.reach),
+        inline_link_clicks: String(d.clicks),
+        actions: [
+          { action_type: 'add_to_cart', value: String(d.addToCarts) },
+          { action_type: 'initiate_checkout', value: String(d.checkoutsInitiated) },
+          { action_type: 'purchase', value: String(d.purchases) },
+        ],
+        action_values: [{ action_type: 'purchase', value: d.revenue.toFixed(2) }],
+      })),
+    };
+
+    expect(diagnoseCampaign({ ...shared, metaInsights: withRealFields }))
+      .toEqual(diagnoseCampaign({ ...shared, days }));
   });
 
   test('takes days or a payload, never both and never neither', () => {

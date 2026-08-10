@@ -22,11 +22,17 @@ import { z } from 'zod';
  * a store event every other day — so the only requests they reject are the ones
  * nobody meant to send.
  */
-const MAX_DAYS = 1100;
+export const MAX_DAYS = 1100;
 const MAX_EVENTS = 500;
 const MAX_ACTIONS = 20;
 /** A raw insights response is one row per entity per day, so it needs headroom. */
 const MAX_INSIGHT_ROWS = 5000;
+/**
+ * Rows, not days: a payload broken out by ad set carries several rows per day.
+ * The handler checks the folded day count against `MAX_DAYS` afterwards, so the
+ * two doors into the engine end up with the same limit rather than one that is
+ * five times looser depending on how you arrived.
+ */
 /** Meta returns a couple of dozen action types on a busy account; this product reads three. */
 const MAX_ACTION_TYPES = 60;
 
@@ -156,15 +162,21 @@ export const publicReferenceSchema = z.discriminatedUnion('kind', [
  *
  * Every number is a string here because that is what the Graph API sends; the
  * parsing lives in `@mazal/meta`, which is the only thing in the product
- * allowed to turn Meta's vocabulary into the contract's. `ctr`, `cpc`, `cpm`
- * and `frequency` are fields Meta really returns and are deliberately absent —
- * `.strict()` rejects them, which is the boundary refusing to carry a stored
- * rate rather than trusting everyone downstream to ignore it.
+ * allowed to turn Meta's vocabulary into the contract's.
+ *
+ * **Not `.strict()`, unlike every other schema in this file.** The others
+ * describe shapes this repo defines, where an unexpected key means the caller
+ * misunderstood the contract. This one describes someone else's API, and Meta
+ * returns `ctr`, `cpc`, `cpm`, `frequency`, `objective` and `account_name`
+ * depending on the preset and on what was asked for. Rejecting those would mean
+ * a real response cannot be sent to the tool at all, and would break again on
+ * whatever Meta adds next quarter. Zod's default strip drops them, so nothing
+ * downstream can read a rate — which is the actual thing being defended.
  */
 const metaActionSchema = z.object({
   action_type: z.string().min(1).max(120),
   value: z.string().max(40),
-}).strict();
+});
 
 const metaInsightsRowSchema = z.object({
   date_start: isoDate,
@@ -181,7 +193,7 @@ const metaInsightsRowSchema = z.object({
   inline_link_clicks: z.string().max(24),
   actions: z.array(metaActionSchema).max(MAX_ACTION_TYPES).optional(),
   action_values: z.array(metaActionSchema).max(MAX_ACTION_TYPES).optional(),
-}).strict();
+});
 
 export const metaInsightsPayloadSchema = z.object({
   data: z.array(metaInsightsRowSchema).min(1).max(MAX_INSIGHT_ROWS),
@@ -189,9 +201,10 @@ export const metaInsightsPayloadSchema = z.object({
     cursors: z.object({
       before: z.string().max(2000).optional(),
       after: z.string().max(2000).optional(),
-    }).strict().optional(),
+    }).optional(),
     next: z.string().max(4000).optional(),
-  }).strict().optional(),
+    previous: z.string().max(4000).optional(),
+  }).optional(),
   __mazal_fixture: z.object({
     kind: z.literal('fixture'),
     generator: z.string().max(200),
