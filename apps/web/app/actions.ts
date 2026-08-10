@@ -126,36 +126,20 @@ const FIELD_WORDS: Record<InferredNumericField, string> = {
  * rendered the fixture's card and there was no path from an upload to a
  * pre-flight on the seller's own product.
  */
-export async function preflightUpload(input: {
-  stated: StatedCard;
-  corrections: Partial<Record<InferredNumericField, number>>;
-}): Promise<{ ok: true; answer: Answer } | { ok: false; error: string }> {
-  const parsed = productCardSchema.safeParse({ ...input.stated, ...input.corrections });
-  if (!parsed.success) {
-    return { ok: false, error: "Those product details do not form a valid card." };
-  }
-
-  return {
-    ok: true,
-    answer: buildPreflightAnswer(parsed.data, "Is this product worth advertising?"),
-  };
-}
-
-export async function diagnoseUpload(input: {
-  fileName: string;
-  days: CampaignDay[];
-  stated: StatedCard;
-  /** Inferred fields the seller corrected — those become `stated` too. */
-  corrections: Partial<Record<InferredNumericField, number>>;
-}): Promise<{ ok: true; answer: Answer } | { ok: false; error: string }> {
-  const { days, stated, corrections } = input;
-
-  // ponytail: shape guard only — the values inside came out of our own parser, and the
-  // engine's safeDiv arithmetic tolerates garbage counts without exploding.
-  if (!Array.isArray(days) || days.length === 0 || days.length > 400) {
-    return { ok: false, error: "No usable daily rows to diagnose." };
-  }
-
+/**
+ * The full card the form implies: four fields the seller stated, three medians
+ * from their category, four flat defaults, and their own corrections last.
+ *
+ * One builder for both actions. `productCardSchema` is `.strict()` with fifteen
+ * required fields, so an action that assembles its own subset does not merely
+ * lose a default — it fails validation on every call. That is exactly what the
+ * pre-flight did before this existed, and no test caught it because the test
+ * called the answer builder directly and never went through the action.
+ */
+function cardFrom(
+  stated: StatedCard,
+  corrections: Partial<Record<InferredNumericField, number>>,
+): { ok: true; card: ProductCard } | { ok: false; error: string } {
   const m = benchmarks[stated.category]?.metrics;
   if (!m) return { ok: false, error: `Unknown category: ${String(stated.category)}` };
 
@@ -181,6 +165,57 @@ export async function diagnoseUpload(input: {
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid product card." };
   }
+  return { ok: true, card: parsed.data };
+}
+
+export async function preflightUpload(input: {
+  stated: StatedCard;
+  corrections: Partial<Record<InferredNumericField, number>>;
+}): Promise<{ ok: true; answer: Answer } | { ok: false; error: string }> {
+  if (!input?.stated) return { ok: false, error: "No product to check." };
+
+  const built = cardFrom(input.stated, input.corrections ?? {});
+  if (!built.ok) return built;
+
+  /**
+   * Break-even is `1 / grossMargin`, so when the margin is Mazal's default the
+   * assumption *is* the verdict. Said out loud, the way the diagnosis path says
+   * it — a number the seller never gave should never arrive unlabelled.
+   */
+  const assumedMargin = built.card.grossMargin === STATIC_DEFAULTS.grossMargin;
+  return {
+    ok: true,
+    answer: buildPreflightAnswer(
+      built.card,
+      "Is this product worth advertising?",
+      assumedMargin
+        ? ` Mazal assumed, not you: a gross margin of ${Math.round(STATIC_DEFAULTS.grossMargin * 100)}%. Break-even is that number inverted, so correct it above if it is wrong and ask again.`
+        : "",
+    ),
+  };
+}
+
+export async function diagnoseUpload(input: {
+  fileName: string;
+  days: CampaignDay[];
+  stated: StatedCard;
+  /** Inferred fields the seller corrected — those become `stated` too. */
+  corrections: Partial<Record<InferredNumericField, number>>;
+}): Promise<{ ok: true; answer: Answer } | { ok: false; error: string }> {
+  const { days, stated, corrections } = input;
+
+  // ponytail: shape guard only — the values inside came out of our own parser, and the
+  // engine's safeDiv arithmetic tolerates garbage counts without exploding.
+  if (!Array.isArray(days) || days.length === 0 || days.length > 400) {
+    return { ok: false, error: "No usable daily rows to diagnose." };
+  }
+
+  const m = benchmarks[stated.category]?.metrics;
+  if (!m) return { ok: false, error: `Unknown category: ${String(stated.category)}` };
+
+  const built = cardFrom(stated, corrections);
+  if (!built.ok) return built;
+  const parsed = { data: built.card };
 
   /**
    * Provenance, per the contract: the four asked fields and any corrected ones are
@@ -206,8 +241,8 @@ export async function diagnoseUpload(input: {
     ? ` Mazal assumed, not you: ${inferred
         .map((f) =>
           f === "grossMargin"
-            ? `${FIELD_WORDS[f]} ${formatPercent(card.grossMargin)}`
-            : `${FIELD_WORDS[f]} ${formatCount(card[f])}`,
+            ? `${FIELD_WORDS[f]} ${formatPercent(parsed.data.grossMargin)}`
+            : `${FIELD_WORDS[f]} ${formatCount(parsed.data[f])}`,
         )
         .join(", ")}. Correct any of them in the upload form and diagnose again.`
     : "";

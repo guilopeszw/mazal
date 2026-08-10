@@ -463,7 +463,7 @@ function diagnoseAnswer(args: {
  * plan repairs a flight and there is none here, and no budget note, because
  * nobody has stated a budget. Everything printed is engine output.
  */
-export function buildPreflightAnswer(card: ProductCard, asked: string): Answer {
+export function buildPreflightAnswer(card: ProductCard, asked: string, noteSuffix = ""): Answer {
   const verdict = predict({ card, table: benchmarks });
   const { p10, p50, p90 } = verdict.predictedRoas;
   const breakEven = verdict.breakEvenRoas;
@@ -492,7 +492,7 @@ export function buildPreflightAnswer(card: ProductCard, asked: string): Answer {
       verdict.limitingFactor
         ? ` ${verdict.limitingFactor[0]!.toUpperCase()}${verdict.limitingFactor.slice(1)}.`
         : ""
-    }${verdict.killTrigger ? ` ${verdict.killTrigger}` : ""}`,
+    }`,
     band: {
       ends: [formatRoas(p10), `likely ${formatRoas(p50)}`, formatRoas(p90)],
       fill: { left: at(p10), width: at(p90) - at(p10) },
@@ -500,7 +500,9 @@ export function buildPreflightAnswer(card: ProductCard, asked: string): Answer {
       breakEven: at(breakEven),
     },
     rows: [],
-    note: "A pre-flight reads the product and the category, never the campaign — so it needs no pixel and no sales history. Nothing here was measured from your ads.",
+    note:
+      "A pre-flight reads the product and the category, never the campaign — so it needs no pixel and no sales history. Nothing here was measured from your ads." +
+      noteSuffix,
   };
 }
 

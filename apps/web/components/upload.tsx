@@ -295,6 +295,7 @@ export function Upload({
 
             {error && <p className="m-0 text-[13px] font-[540] text-warn">{error}</p>}
 
+            <div className="flex flex-wrap items-center gap-2">
             <button
               type="submit"
               disabled={busy !== null || category === ""}
@@ -311,6 +312,7 @@ export function Upload({
             >
               {busy === "preflight" ? "Checking…" : "Is it worth advertising?"}
             </button>
+            </div>
           </form>
         )}
       </div>
