@@ -15,6 +15,26 @@ Entry format:
 
 ---
 
+## 2026-08-10 19:40 BRT · Guilherme's agent · Mazal told a bakery to rewrite a page that was fine
+
+**Done:** a guard in `packages/engine` — A's package, taken on Guilherme's call because A is unavailable. **The engine was fabricating a diagnosis for any seller whose checkout Meta cannot see.**
+
+Found by asking what a real user would get. The user is a friend's bakery selling frozen goods through **iFood and WhatsApp**: no pixel on either checkout, so Meta reports spend, impressions, reach and link clicks honestly and reports zero for every conversion column. Fed that export, `diagnose` returned **stage 3, `thin_pdp`** — *your product page is too thin, that is why nobody adds to cart*. Meta had never seen a cart. Confident, wrong, and actionable: the seller rewrites a page that was never the problem.
+
+The minimum-sample gate cannot catch it. Stage 3 is gated on **clicks**, which are plentiful; the *numerator* is what is absent. And this is not an edge case here — iFood, WhatsApp, Instagram DMs and marketplaces are how a large share of Brazilian small sellers transact.
+
+Stages 3–6 are now skipped when Meta reported no conversion of any kind on any day. Stages 0–1 are Meta's own delivery numbers and stay judged, which is the product's dividing line surviving contact with a seller who has lost half the funnel. `pixel_break` still fires: a pixel reporting *anything* is a working pixel, and a logged `pixel_error` overrides the guard entirely because the seller is telling us directly that a pixel exists. Backtest unmoved — 59.0% top-1, 12.0% false alarms, `pixel_break` recall 100%, `docs/backtest-results.md` byte-identical.
+
+**Next:** wire `noPixelEvidence` into `apps/web` and `apps/mcp`. It is exported and has **no callers**, which means the fix is only half done — see below.
+
+**Blocked / watch out:** three things.
+
+- **An off-pixel seller currently renders as a healthy campaign.** The guard stops the lie; it does not yet tell the truth. `primary: null` reaches the surfaces, and both print *"No stage broke — and that is a real answer."* That is silence dressed as health — the same defect fixed for self mode in #50, arriving through a different door. **Until a surface calls `noPixelEvidence` and says it cannot see the funnel, do not put the web app in front of a seller who sells off-pixel.** They will be told everything is fine.
+- **One stray conversion in thirty days switches the guard fully off**, and the `thin_pdp` misdiagnosis comes back. The rule is all-or-nothing on purpose — anything softer needs a real "is this column trustworthy" model, which is not a weekend's work — but it is a cliff and it is worth knowing where it is.
+- **Mazal cannot diagnose a seller who does not sell through a pixel-observable checkout.** That is a scope boundary, not a bug, and it should be said out loud rather than discovered on stage. What still works for that seller is `predict_campaign`: it needs only the product card, so it answers *is this worth advertising at all* without any campaign history.
+
+---
+
 ## 2026-08-10 16:20 BRT · Guilherme's agent · somebody finally looked at the tiles
 
 **Done:** five PRs on `stage` — #48, #49, #50, #51, #52. `stage` at `08f9a9f`, verified as a whole rather than branch by branch: typecheck, **298 root tests**, **72 `@mazal/mcp`**, both fixture guards, `next build`, and `sim:backtest` regenerating `docs/backtest-results.md` byte-identical.
