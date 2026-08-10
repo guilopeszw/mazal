@@ -122,7 +122,9 @@ describe('diagnosisViewModel', () => {
     // The predicate below duplicates the engine's baseline rule, so it is
     // pinned to the engine's real output rather than to a reading of it.
     const days = healthyDays();
-    for (const baselineDays of [SELF_MIN_BASELINE_DAYS - 1, SELF_MIN_BASELINE_DAYS + 3]) {
+    // The boundary itself, both sides of it: with only 6 and 10 a `>=` that
+    // slipped to `>` passed every test.
+    for (const baselineDays of [SELF_MIN_BASELINE_DAYS - 1, SELF_MIN_BASELINE_DAYS]) {
       const reference = { kind: 'self', baselineDays } as const;
       const diagnosis = diagnose({ days, card: apparelCard, events: [], reference });
       const vm = diagnosisViewModel(days, diagnosis, reference);
