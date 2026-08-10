@@ -8,7 +8,7 @@ remembered — every one has a command beside it that reproduces it.
 ```bash
 pnpm install
 pnpm typecheck        # tsc --build, plus apps/mcp
-pnpm test             # 220 tests
+pnpm test             # 232 tests
 pnpm sim:fixtures     # asserts both demo beats still hold
 pnpm meta:fixtures    # asserts the Meta payloads still fold back to them
 pnpm --filter web build && PORT=3117 pnpm --filter web start
@@ -67,7 +67,7 @@ see yet rather than inventing one.
 | Change point named on detected breaks | 100% | same report |
 | Change point within ±1 day, **sudden** breaks | 93% | same report |
 | Change point within ±1 day, **gradual** ramps | 0% | same report |
-| Tests | 220 | `pnpm test` |
+| Tests | 232 | `pnpm test` |
 
 Report sudden and gradual separately. The 70% average lies in both directions,
 and volunteering the split is worth more than the number.
@@ -80,7 +80,7 @@ stop being able to trust it.
 ## Questions you will get
 
 **"Is this just ChatGPT with a prompt?"** No. `packages/engine` is deterministic
-TypeScript with 220 tests. The model turns a `Diagnosis` into a sentence and
+TypeScript with 232 tests. The model turns a `Diagnosis` into a sentence and
 never touches a number.
 
 **"How do I know it isn't guessing?"** Every finding carries the rule that fired,

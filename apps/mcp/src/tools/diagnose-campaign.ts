@@ -31,6 +31,34 @@ export function diagnoseCampaignWithNotes(input: unknown): DiagnoseCampaignResul
     const account = fromMetaInsights(parsed.metaInsights);
 
     /**
+     * `META_ADS_ENABLED`, the flag PRD 10 asks for, doing the only useful job
+     * available to it.
+     *
+     * The PRD wants it off by default and wants the CSV and fixture paths to
+     * work untouched when it is. There is no live Meta connection to gate, so
+     * gating "the payload arm" wholesale would just switch the demo off. What
+     * it gates instead is the distinction that actually carries risk: a payload
+     * carrying `__mazal_fixture` is one we generated and whose every number is
+     * asserted by `pnpm meta:fixtures`, and anything else is a response nobody
+     * on this team has ever seen.
+     *
+     * The adapter has never been run against a real Graph API response — its
+     * guard is closed-loop, `packages/meta/src/documented-shape.test.ts` says
+     * so — and diagnosing a seller's real campaign through code that has only
+     * ever read its own output is the kind of confidence this product exists to
+     * refuse. Turn the flag on when someone has checked one.
+     */
+    const live = !account.fixture;
+    if (live && process.env['META_ADS_ENABLED'] !== 'true') {
+      throw new MetaInsightsError(
+        'META_INSIGHTS_MALFORMED',
+        'This payload did not come from our fixtures, and META_ADS_ENABLED is not set. ' +
+          'The adapter has never been run against a real Meta response, so it will not diagnose one ' +
+          'by default. Set META_ADS_ENABLED=true once a real payload has been checked against it.',
+      );
+    }
+
+    /**
      * One campaign per call.
      *
      * `diagnose` answers "which stage of this funnel broke first", and three

@@ -70,7 +70,7 @@ Those are the only two day-one conditions the simulator has, so Case 1 is `thin_
 ## Green commands
 
 ```
-pnpm test          220 passed, 29 files
+pnpm test          232 passed, 30 files
 pnpm typecheck     clean
 pnpm sim:fixtures  both fixtures pass every assertion; git clean after
 pnpm meta:fixtures the Meta payloads fold back to those fixtures; git clean after

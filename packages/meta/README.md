@@ -20,7 +20,7 @@ The payload a Meta Ads integration would hand us, and the one place it becomes t
 - **`apps/web` needs the adapter too**, and an app cannot import from another app. The demo's days arrive through `fromMetaInsights` at build time.
 - **`packages/ingest` is on zod 3 and `apps/mcp` is on zod 4.** The obvious other home would have forced a zod version on both.
 
-So the code moved and the validation is hand-written. The PRD's other boxes: no Meta connection is attached, no *observed* response schema was ever captured — the fixtures re-encode `packages/sim`, so what is validated is a shape we authored — there is no separate `schema.ts`, and `META_ADS_ENABLED` is skipped for the reason at the end of this file.
+So the code moved and the validation is hand-written. The PRD's other boxes, stated rather than quietly left: **no Meta connection is attached**; **no real response was ever captured**, so the fixtures re-encode `packages/sim` and what is validated is a shape we authored — narrowed, not closed, by the documented-field check below; and there is **no separate `schema.ts`**, because the validation is fifty lines inside `adapter.ts` and splitting it would move code without moving risk. `META_ADS_ENABLED` is implemented, off by default, and described below.
 
 ## The rule the whole package turns on
 
@@ -62,7 +62,17 @@ Either CSV can be uploaded. `parseMetaCsv` emits one `CampaignDay` per CSV *row*
 
 ## `META_ADS_ENABLED`
 
-The PRD asks for a flag defaulting to off. It governs **live connections**, which do not exist yet. The fixture arm is not gated by it and should not be: it makes no network call, reaches no account, and needs no credential. Do not switch the demo off believing the PRD asked for that.
+Off by default, as PRD 10 asks, and it gates the distinction that actually carries risk rather than the whole arm.
+
+A payload carrying `__mazal_fixture` is one we generated, whose every number `pnpm meta:fixtures` asserts. **Anything else is a response nobody on this team has ever seen** — and `diagnose_campaign` refuses to diagnose one until `META_ADS_ENABLED=true`. Turning it off leaves the CSV path and the fixtures working exactly as before, which is what the PRD means by the flag preserving them.
+
+The reason for the refusal is the honest limit below: the adapter has only ever read its own generator's output. Set the flag once a real payload has been read against it.
+
+## What we know about the shape, and what we do not
+
+`packages/meta/src/documented-shape.test.ts` pins every field the adapter reads against Meta's published Ads Insights field list, with the reference URLs and the date they were read. It also asserts the negative: no rate field is ever read, and `clicks` comes from `inline_link_clicks` rather than `clicks`, which counts every click on the ad and would inflate every rate downstream.
+
+**That checks names, not behaviour.** Whether a value arrives as `"12"` or `12`, whether an empty `actions` is omitted or sent as `[]`, and whether three purchase aliases carry the same conversion are assumptions no test here can settle. One real insights response — from any account, a dead campaign, a R$5 test — settles all three in ten minutes, and it is the next action in `docs/HANDOFF.md`.
 
 ## What Meta can never tell us
 

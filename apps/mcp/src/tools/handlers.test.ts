@@ -1,6 +1,6 @@
 import { benchmarks } from '@mazal/data';
 import { buildPlan, diagnose, predict } from '@mazal/engine';
-import { describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import { InMemoryActionLog } from '../action-log.js';
 import { buildRecoveryPlan } from './build-recovery-plan.js';
@@ -14,6 +14,19 @@ import {
   sellerAction,
   stockoutDiagnosis,
 } from './test-fixtures.js';
+
+/**
+ * Most of the payload tests below send a hand-built response with no fixture
+ * stamp on it — which is exactly what `META_ADS_ENABLED` gates. They are about
+ * the adapter arm's mechanics rather than about the flag, so the flag is on for
+ * them and has two tests of its own at the end of this block.
+ */
+beforeEach(() => {
+  process.env['META_ADS_ENABLED'] = 'true';
+});
+afterEach(() => {
+  delete process.env['META_ADS_ENABLED'];
+});
 
 describe('diagnose_campaign handler', () => {
   test('injects the server benchmark table and returns the engine diagnosis unchanged', () => {
@@ -185,6 +198,47 @@ describe('diagnose_campaign handler', () => {
 
     expect(diagnoseCampaign({ ...shared, metaInsights: withRealFields }))
       .toEqual(diagnoseCampaign({ ...shared, days }));
+  });
+
+  test('will not diagnose a payload it has never been validated against, by default', () => {
+    // The adapter has only ever read its own generator's output. Diagnosing a
+    // seller's real campaign through code with a closed-loop guard is the kind
+    // of confidence this product exists to refuse — so an unstamped payload
+    // needs META_ADS_ENABLED, and a fixture never does.
+    delete process.env['META_ADS_ENABLED'];
+
+    const days = healthyDays();
+    const row = (d: (typeof days)[number]) => ({
+      date_start: d.date,
+      date_stop: d.date,
+      campaign_id: d.campaignId,
+      campaign_name: 'Apparel',
+      spend: d.spend.toFixed(2),
+      impressions: String(d.impressions),
+      reach: String(d.reach),
+      inline_link_clicks: String(d.clicks),
+      actions: [{ action_type: 'purchase', value: String(d.purchases) }],
+      action_values: [{ action_type: 'purchase', value: d.revenue.toFixed(2) }],
+    });
+    const shared = { card: apparelCard, events: [], reference: { kind: 'benchmark' as const } };
+
+    expect(() => diagnoseCampaign({ ...shared, metaInsights: { data: days.map(row) } }))
+      .toThrow(/META_ADS_ENABLED/);
+
+    // The same payload with our own stamp on it is fine with the flag unset,
+    // which is what "the flag off preserves CSV and fixtures" has to mean.
+    expect(diagnoseCampaign({
+      ...shared,
+      metaInsights: {
+        data: days.map(row),
+        __mazal_fixture: {
+          kind: 'fixture',
+          generator: 'packages/meta/generate.ts',
+          derivedFrom: 'test',
+          note: 'Synthetic.',
+        },
+      },
+    })).toBeDefined();
   });
 
   test('takes days or a payload, never both and never neither', () => {
