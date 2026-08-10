@@ -6,6 +6,7 @@ import { RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps';
 import { beforeAll, expect, test } from 'vitest';
 
 import { createMcpHandler } from '../server.js';
+import { UI_RESOURCES } from './resources.js';
 
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -60,11 +61,19 @@ test('lists both ui:// resources with the MCP Apps mime type', async () => {
 test('serves a self-contained view that performs the MCP Apps handshake', async () => {
   const app = createMcpHandler({ bearerToken: 'test-token' });
 
-  for (const uri of ['ui://mazal/diagnosis', 'ui://mazal/prediction']) {
+  // Every registered resource, not two literals. A view added to UI_RESOURCES
+  // but forgotten in build-ui's VIEWS builds green and then 500s on
+  // resources/read in production — this is the test that has to notice.
+  for (const { uri } of UI_RESOURCES) {
     const response = await app.request('/mcp', rpc('resources/read', { uri }));
     expect(response.status).toBe(200);
 
-    const { contents } = await resultOf(response);
+    const result = await resultOf(response);
+    // Names the culprit: a resource registered here but missing from
+    // build-ui's VIEWS reads as an error, and "cannot destructure" would
+    // send the next person to the wrong place.
+    expect(result, `${uri} did not read — is it in build-ui's VIEWS?`).toBeDefined();
+    const { contents } = result;
     expect(contents[0].uri).toBe(uri);
     expect(contents[0].mimeType).toBe(RESOURCE_MIME_TYPE);
     // The bundled ext-apps SDK sends `ui/initialize`; without it the host's
