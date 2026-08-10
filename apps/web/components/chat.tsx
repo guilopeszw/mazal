@@ -165,6 +165,9 @@ function NarrationTurnView({ turn }: { turn: NarrationTurn }) {
   );
 }
 
+/** Composer ceiling before it scrolls inside itself, in px. */
+const MAX_COMPOSER_PX = 200;
+
 export function Chat({
   answers,
   categories,
@@ -181,6 +184,7 @@ export function Chat({
   const [sidebar, setSidebar] = useState(false);
   const lastTurn = useRef<HTMLDivElement>(null);
   const composer = useRef<HTMLFormElement>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
   const sendingLock = useRef(false);
   /** Where the composer sat before the first turn moved it — the F of the FLIP below. */
   const cameFrom = useRef<number | null>(null);
@@ -254,6 +258,58 @@ export function Chat({
     setTurns((t) => [...t, { id: t.length, kind: "card", asked, answer }]);
   };
 
+  /**
+   * The composer is docked to the bottom, so height added to the field grows
+   * *upward* and the question stays whole in front of the person writing it.
+   * An `<input>` cannot do this at all — it scrolls sideways and hides what you
+   * typed, which is what this replaced.
+   *
+   * Capped: past MAX_COMPOSER_PX the box scrolls internally rather than climbing
+   * over the answer it is asking about.
+   */
+  const grow = (el: HTMLTextAreaElement) => {
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, MAX_COMPOSER_PX)}px`;
+    reserveDockRoom();
+  };
+
+  /**
+   * The docked composer is `fixed`, so it takes no space in the flow and the
+   * transcript has to reserve it by hand. A fixed `pb-32` was enough for a
+   * one-line bar and hides the end of the answer once the field grows — behind
+   * an opaque gradient, so the text is unreachable rather than merely covered.
+   *
+   * Written to a CSS custom property rather than React state: this runs on
+   * every keystroke, and re-rendering the transcript to pad it would be a lot
+   * of work to move one number.
+   */
+  const reserveDockRoom = () => {
+    // The dock element, not the form inside it. The dock carries the chrome —
+    // `pt-6` and a bottom padding that grows with `env(safe-area-inset-bottom)`
+    // — so measuring the form meant guessing that chrome with a constant, and
+    // the guess ran 10px short on a phone with a home indicator. Measuring the
+    // element that actually occupies the space deletes the guess.
+    //
+    // Only once docked: on the landing the composer sits in the flow and takes
+    // its own space, and reserving for it there adds dead scroll to a page that
+    // otherwise does not scroll at all.
+    const height = started ? (composer.current?.parentElement?.offsetHeight ?? 0) : 0;
+    document.documentElement.style.setProperty("--dock", `${height}px`);
+  };
+
+  /**
+   * Re-measure when something other than typing changes the dock's height: a
+   * rotation, a sidebar, the first turn docking it. `submit` runs while
+   * `started` is still false, so the first turn would otherwise write `0px` and
+   * be saved only by the floor until the next keystroke.
+   */
+  useEffect(() => {
+    reserveDockRoom();
+    window.addEventListener("resize", reserveDockRoom);
+    return () => window.removeEventListener("resize", reserveDockRoom);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [started]);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const asked = question.trim();
@@ -263,6 +319,10 @@ export function Chat({
     sendingLock.current = true;
     setSending(true);
     setQuestion("");
+    // The value is controlled but the height is not — clearing one without the
+    // other leaves an empty box standing three lines tall.
+    if (field.current) field.current.style.height = "auto";
+    reserveDockRoom();
 
     try {
       const response = await fetch("/api/chat", {
@@ -341,7 +401,7 @@ export function Chat({
           </div>
         </header>
 
-        <main className="mx-auto max-w-[46rem] px-5 pb-32">
+        <main className="mx-auto max-w-[46rem] px-5 pb-[max(8rem,var(--dock,0px))]">
           {!started && (
             <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
               {/* The promise, not the name. With the wordmark moved into the sidebar this is
@@ -440,7 +500,7 @@ export function Chat({
               onSubmit={submit}
               // The shadow is the identity's, tinted 30/40/30 rather than neutral black: a grey
               // shadow on warm paper reads as a cold patch sitting on top of the sheet.
-              className="mx-auto flex w-full max-w-[34rem] items-center gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
+              className="mx-auto flex w-full max-w-[34rem] items-end gap-2 rounded-[26px] border border-line bg-raised p-2 pl-5 shadow-[0_1px_3px_rgb(30_40_30/0.08),0_8px_28px_rgb(30_40_30/0.07)] transition-[border-color] duration-150 focus-within:border-line-strong"
             >
               <button
                 type="button"
@@ -462,13 +522,32 @@ export function Chat({
                   <path d="M21.4 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.2-9.19a4 4 0 015.65 5.66l-9.2 9.19a2 2 0 01-2.82-2.83l8.49-8.48" />
                 </svg>
               </button>
-              <input
+              <textarea
+                ref={field}
+                rows={1}
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                onChange={(e) => {
+                  setQuestion(e.target.value);
+                  grow(e.currentTarget);
+                }}
+                onKeyDown={(e) => {
+                  // The Enter that commits an IME candidate is not a send. It
+                  // arrives with isComposing true, and treating it as one sends
+                  // a half-composed word — in Japanese, Chinese or Korean, most
+                  // of the Enters a person presses are this one.
+                  if (e.nativeEvent.isComposing) return;
+                  // Enter sends, Shift+Enter breaks the line — the convention
+                  // every chat box has trained people into.
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    composer.current?.requestSubmit();
+                  }
+                }}
+                enterKeyHint="send"
                 placeholder="What's happening with your campaign?"
                 autoComplete="off"
                 aria-label="Ask Mazal about your campaign"
-                className="min-w-0 flex-1 border-0 bg-transparent py-2 text-base text-ink outline-none placeholder:text-ink-faint"
+                className="min-w-0 flex-1 resize-none overflow-y-auto border-0 bg-transparent py-2 text-base leading-6 text-ink outline-none placeholder:text-ink-faint"
               />
               <button
                 type="submit"
