@@ -297,6 +297,19 @@ export function Chat({
     document.documentElement.style.setProperty("--dock", `${height}px`);
   };
 
+  /**
+   * Re-measure when something other than typing changes the dock's height: a
+   * rotation, a sidebar, the first turn docking it. `submit` runs while
+   * `started` is still false, so the first turn would otherwise write `0px` and
+   * be saved only by the floor until the next keystroke.
+   */
+  useEffect(() => {
+    reserveDockRoom();
+    window.addEventListener("resize", reserveDockRoom);
+    return () => window.removeEventListener("resize", reserveDockRoom);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [started]);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const asked = question.trim();

@@ -299,14 +299,18 @@
 
 /*
  * Tailwind v4's preflight sets `cursor: default` on buttons, matching the
- * native control. Every button on this screen is a custom one — chips, the
- * send button, the plan's three choices — and a pointer is the affordance
- * people read before they read the label. Disabled keeps the default, because
- * a pointer over something that will not respond is a small lie.
+ * native control. Every button on this screen is a custom one — chips, send,
+ * the plan's three choices — and the pointer is the affordance people read
+ * before they read the label.
+ *
+ * Buttons only. `label[for]`, `summary` and `[role=button]` match nothing here,
+ * and the label one is worth not writing: every label in this app wraps its own
+ * input, several of them text inputs, so the day someone adds `for=` the rule
+ * would put a pointer over prose that should show an I-beam.
+ *
+ * Neither disabled nor aria-disabled gets one — a pointer over something that
+ * will not respond is a small lie.
  */
-button:not(:disabled),
-[role="button"]:not([aria-disabled="true"]),
-summary,
-label[for] {
+button:not(:disabled):not([aria-disabled="true"]) {
   cursor: pointer;
 }
