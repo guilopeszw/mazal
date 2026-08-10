@@ -270,6 +270,22 @@ export function Chat({
   const grow = (el: HTMLTextAreaElement) => {
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, MAX_COMPOSER_PX)}px`;
+    reserveDockRoom();
+  };
+
+  /**
+   * The docked composer is `fixed`, so it takes no space in the flow and the
+   * transcript has to reserve it by hand. A fixed `pb-32` was enough for a
+   * one-line bar and hides the end of the answer once the field grows — behind
+   * an opaque gradient, so the text is unreachable rather than merely covered.
+   *
+   * Written to a CSS custom property rather than React state: this runs on
+   * every keystroke, and re-rendering the transcript to pad it would be a lot
+   * of work to move one number.
+   */
+  const reserveDockRoom = () => {
+    const height = composer.current?.offsetHeight;
+    if (height) document.documentElement.style.setProperty("--dock", `${height}px`);
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -284,6 +300,7 @@ export function Chat({
     // The value is controlled but the height is not — clearing one without the
     // other leaves an empty box standing three lines tall.
     if (field.current) field.current.style.height = "auto";
+    reserveDockRoom();
 
     try {
       const response = await fetch("/api/chat", {
@@ -362,7 +379,7 @@ export function Chat({
           </div>
         </header>
 
-        <main className="mx-auto max-w-[46rem] px-5 pb-32">
+        <main className="mx-auto max-w-[46rem] px-5 pb-[max(8rem,calc(var(--dock,0px)+3rem))]">
           {!started && (
             <section className="flex flex-col items-center pt-[9vh] text-center sm:pt-[17vh]">
               {/* The promise, not the name. With the wordmark moved into the sidebar this is
@@ -492,6 +509,11 @@ export function Chat({
                   grow(e.currentTarget);
                 }}
                 onKeyDown={(e) => {
+                  // The Enter that commits an IME candidate is not a send. It
+                  // arrives with isComposing true, and treating it as one sends
+                  // a half-composed word — in Japanese, Chinese or Korean, most
+                  // of the Enters a person presses are this one.
+                  if (e.nativeEvent.isComposing) return;
                   // Enter sends, Shift+Enter breaks the line — the convention
                   // every chat box has trained people into.
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -499,6 +521,7 @@ export function Chat({
                     composer.current?.requestSubmit();
                   }
                 }}
+                enterKeyHint="send"
                 placeholder="What's happening with your campaign?"
                 autoComplete="off"
                 aria-label="Ask Mazal about your campaign"
