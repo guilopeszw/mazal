@@ -1,4 +1,8 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["api/**/*.ts", "src/**/*.ts"]
+  "include": ["api/**/*.ts", "src/**/*.ts"],
+  // The MCP App views run in the host's iframe and need the DOM lib, which
+  // would leak browser globals into the server's types — `tsconfig.ui.json`
+  // checks them instead.
+  "exclude": ["src/ui/apps"]
 }

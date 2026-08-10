@@ -20,13 +20,8 @@ const CHIPS: { key: AnswerKey; text: string }[] = [
   { key: "diagnose", text: "My ROAS dropped this week" },
   { key: "atc", text: "Why is my ATC rate low?" },
   { key: "predict", text: "Should I launch this campaign?" },
+  { key: "allocate", text: "Where should my budget go?" },
 ];
-
-function routeOf(question: string): AnswerKey {
-  if (/launch|should i|predict/i.test(question)) return "predict";
-  if (/atc|add.?to.?cart/i.test(question)) return "atc";
-  return "diagnose";
-}
 
 /**
  * Drives one answer's reveal from a single `requestAnimationFrame` loop.
@@ -84,14 +79,43 @@ function Thinking() {
   );
 }
 
-type Turn = { id: number; asked: string; answer: Answer };
+type CardTurn = { id: number; kind: "card"; asked: string; answer: Answer };
 
-function TurnView({
+type NarrationTurn = {
+  id: number;
+  kind: "narration";
+  asked: string;
+  message: string;
+  warning?: string;
+};
+
+type Turn = CardTurn | NarrationTurn;
+
+type NarrationResponse = {
+  message: string;
+  conversationId: string;
+  warning?: string;
+};
+
+function isNarrationResponse(value: unknown): value is NarrationResponse {
+  if (!value || typeof value !== "object") return false;
+
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record["message"] === "string" &&
+    typeof record["conversationId"] === "string" &&
+    record["conversationId"].length >= 40 &&
+    record["conversationId"].length <= 2_000 &&
+    (record["warning"] === undefined || typeof record["warning"] === "string")
+  );
+}
+
+function CardTurnView({
   turn,
   active,
   benchmarkCount,
 }: {
-  turn: Turn;
+  turn: CardTurn;
   active: boolean;
   benchmarkCount: number;
 }) {
@@ -105,15 +129,38 @@ function TurnView({
       {/* The loader appears only when the pending answer carries a plan of
           action — that is the wait it narrates. Every other answer keeps the
           breathing mark. */}
-      {reveal.thinking ? (
-        turn.answer.plan ? (
-          <PlanLoader benchmarkCount={benchmarkCount} />
+      <div aria-live="polite">
+        {reveal.thinking ? (
+          turn.answer.plan ? (
+            <PlanLoader benchmarkCount={benchmarkCount} />
+          ) : (
+            <Thinking />
+          )
         ) : (
-          <Thinking />
-        )
-      ) : (
-        <AnswerBody answer={turn.answer} reveal={reveal} />
-      )}
+          <AnswerBody answer={turn.answer} reveal={reveal} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NarrationTurnView({ turn }: { turn: NarrationTurn }) {
+  return (
+    <div className="flex flex-col gap-3.5">
+      <div className="rise max-w-[92%] self-end rounded-[18px] rounded-br-[6px] bg-sunken px-4 py-2.5 text-[15px] sm:max-w-[80%]">
+        {turn.asked}
+      </div>
+      <div
+        aria-live="polite"
+        className="rise max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-raised px-4 py-2.5 text-[15px] leading-relaxed text-ink sm:max-w-[80%]"
+      >
+        <p className="m-0 whitespace-pre-wrap">{turn.message}</p>
+        {turn.warning !== undefined && (
+          <p className="mt-3 mb-0 text-sm text-ink-soft">
+            Narração ao vivo indisponível. Exibindo uma resposta segura verificada.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -128,10 +175,13 @@ export function Chat({
 }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [question, setQuestion] = useState("");
+  const [sending, setSending] = useState(false);
+  const [conversationId, setConversationId] = useState<string>();
   const [uploading, setUploading] = useState(false);
   const [sidebar, setSidebar] = useState(false);
   const lastTurn = useRef<HTMLDivElement>(null);
   const composer = useRef<HTMLFormElement>(null);
+  const sendingLock = useRef(false);
   /** Where the composer sat before the first turn moved it — the F of the FLIP below. */
   const cameFrom = useRef<number | null>(null);
   const headerMark = useRef<HTMLButtonElement>(null);
@@ -201,15 +251,59 @@ export function Chat({
   const ask = (asked: string, answer: Answer) => {
     // Read here, in the handler: once React has re-rendered, the landing position is gone.
     if (!started) cameFrom.current = composer.current?.getBoundingClientRect().top ?? null;
-    setTurns((t) => [...t, { id: t.length, asked, answer }]);
+    setTurns((t) => [...t, { id: t.length, kind: "card", asked, answer }]);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const asked = question.trim();
-    if (!asked) return;
-    ask(asked, answers[routeOf(asked)]);
+    if (!asked || sendingLock.current) return;
+
+    if (!started) cameFrom.current = composer.current?.getBoundingClientRect().top ?? null;
+    sendingLock.current = true;
+    setSending(true);
     setQuestion("");
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scenarioKey: "case2",
+          userMessage: asked,
+          ...(conversationId ? { conversationId } : {}),
+        }),
+      });
+      if (!response.ok) throw new Error("Chat request failed");
+
+      const narration: unknown = await response.json();
+      if (!isNarrationResponse(narration)) throw new Error("Invalid chat response");
+
+      setTurns((turns) => [
+        ...turns,
+        {
+          id: turns.length,
+          kind: "narration",
+          asked,
+          message: narration.message,
+          ...(narration.warning !== undefined ? { warning: narration.warning } : {}),
+        },
+      ]);
+      setConversationId(narration.conversationId);
+    } catch {
+      setTurns((turns) => [
+        ...turns,
+        {
+          id: turns.length,
+          kind: "narration",
+          asked,
+          message: "Não foi possível obter uma resposta. Tente novamente.",
+        },
+      ]);
+    } finally {
+      sendingLock.current = false;
+      setSending(false);
+    }
   };
 
   return (
@@ -292,11 +386,15 @@ export function Chat({
                    */
                   className="scroll-mt-20"
                 >
-                  <TurnView
-                    turn={turn}
-                    active={i === turns.length - 1}
-                    benchmarkCount={categories.length}
-                  />
+                  {turn.kind === "card" ? (
+                    <CardTurnView
+                      turn={turn}
+                      active={i === turns.length - 1}
+                      benchmarkCount={categories.length}
+                    />
+                  ) : (
+                    <NarrationTurnView turn={turn} />
+                  )}
                 </div>
               ))}
             </div>
@@ -375,7 +473,7 @@ export function Chat({
               <button
                 type="submit"
                 aria-label="Send"
-                disabled={question.trim() === ""}
+                disabled={question.trim() === "" || sending}
                 className="relative grid size-9 flex-none place-items-center rounded-[18px] bg-accent text-ground transition-[opacity,scale] duration-150 after:absolute after:-inset-1 active:scale-[.96] disabled:cursor-default disabled:opacity-35"
               >
                 <svg

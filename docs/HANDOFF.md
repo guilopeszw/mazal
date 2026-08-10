@@ -25,30 +25,157 @@ Entry format:
 **Next:** executar o plano e substituir o README provisório por uma versão em pt-BR que apresente primeiro a tese, depois a solução entregue e por último evidências, limites e próximos experimentos.
 **Blocked / watch out:** não afirmar pesquisa com sellers, clientes, export Meta real, validação independente ou escrita real na Meta; o backtest de 59,0% é um número de wiring/sanity porque o firewall entre engine e simulator não se manteve.
 
-## 2026-08-09 18:48 BRT · Codex · publicação do PR de integração para `main`
+## 2026-08-09 22:10 BRT · Guilherme's agent · Deco Studio renders the charts, not prose
 
-**Done:** a branch `joaquim/feat/sync-e-agent-to-main` foi publicada em `origin` até `1520506`. A validação passou: `pnpm test` (575 testes coletados), `pnpm typecheck`, `pnpm build` e `git diff --check`.
+**Done:** the MCP now exposes two `ui://` resources per the MCP Apps extension (`modelcontextprotocol/ext-apps`, spec 2026-01-26, the contract Deco's `MCPAppRenderer` reads): `ui://mazal/diagnosis` — the funnel with the leak marked — and `ui://mazal/prediction` — the break-even and the band. `diagnose_campaign` and `predict_campaign` carry `_meta.ui.resourceUri`, so a tool result in Studio chat renders as the chart. The agent's `metadata.ui.homeTiles` puts both on the org home board fed by `demo-case2` (eta_shock, stage 4 leak). Every number in a view is engine output or a contract rate function — the views mirror `apps/web/lib/answers.ts` and a stage under the engine's own `minSample` renders "not judged", never a value.
 
-**Next:** reautenticar o GitHub local e abrir o PR de `joaquim/feat/sync-e-agent-to-main` para `main`.
+Deployed to `mazal-mcp` production and verified: 401 without a token, 401 with a wrong one, 403 off-allowlist host, and Deco's `CONNECTION_TEST` healthy (346ms) through the stored credential. The `<language>` section of the agent instructions — pending per `deco-agent.md` — was applied to Studio in the same update; Studio and the doc are in sync again. Branch `feat/mcp-ui-resources`, 60 tests in `@mazal/mcp` (was 40), 195 at the root, typecheck and `next build` green.
 
-**Blocked / watch out:** `gh auth status` reporta token inválido para `JucaGF`; o conector GitHub também retornou `404` ao consultar/criar no repositório. Arquivos locais não commitados (`.pnpm-store/`, `.worktrees/` e o plano do chat) ficaram fora da branch publicada.
+**Next:** eyeball the two tiles on the Studio home board — the code path is pinned by tests end to end, but no human has seen the pixels. Then review and merge the PR.
 
-## 2026-08-09 18:01 BRT · Joaquim · correção do `pnpm build`
+**Blocked / watch out:** three things. A deploy went to the stale `mcp` project first (`vercel link --yes` failed silently on scope and the CLI fell back to the old link) — `mazal-mcp` got the correct deploy right after; the `mcp` project now serves a newer build than its docs claim, harmless but known. `vercel link` writes `apps/mcp/.env.local` with the project's env pulled — it was deleted unread; do not commit or read one. The view HTML is ~390KB each because the ext-apps SDK bundles zod; Studio HTTP-caches reads, so it costs one fetch per session.
+---
 
-**Done:** o workspace raiz agora expõe `pnpm build`, delegando para `apps/web`; o build web usa explicitamente `next build --webpack`, evitando a falha do worker CSS do Turbopack neste ambiente (`Operation not permitted` ao abrir uma porta local). `pnpm build`, `pnpm typecheck` e `git diff --check` passaram.
+## 2026-08-09 21:33 BRT · Codex · resolução dos conflitos do PR #37
 
-**Next:** integrar esta correção pela branch de trabalho conforme o fluxo do projeto.
+**Done:** atualizado `feat/web-chat-api` contra `origin/main`, reconciliando `apps/web/components/chat.tsx` com a rota de narração tipada e preservando o histórico de `docs/HANDOFF.md`. Commit `dcb565a` publicado em `origin`.
 
-**Blocked / watch out:** o build padrão com Turbopack continua sujeito à limitação de sandbox; o caminho versionado usa Webpack para manter o build reproduzível localmente.
+**Next:** revisar o PR #37 no GitHub e fazer o merge quando as verificações hospedadas estiverem verdes.
 
-## 2026-08-09 16:35 BRT · Joaquim · revisão do plano do chat web
+**Blocked / watch out:** `pnpm test` (221 testes), `pnpm typecheck`, `pnpm --filter web build` e `git diff --check` passaram. O checkout principal local não foi alterado.
 
-**Done:** revisado e substituído `docs/superpowers/plans/2026-08-09-web-chat-api.md`: o contexto público agora não aceita benchmark table; handles de conversa são assinados e vinculados à sessão; o cache guarda só conteúdo fixture/template; captura virou script local; e o núcleo da rota ganhou plano de testes, limites de payload, timeout/rate limit e validação Host/Origin. Nenhum código da rota foi implementado nem nenhum segredo/deploy foi alterado.
+---
 
-**Next:** executar a Task 1 do plano em uma branch `feat/` a partir de `stage`.
+## 2026-08-09 18:05 BRT · Codex · web chat API plan
 
-**Blocked / watch out:** o provider live permanece bloqueado até existir uma API/SDK público do Deco que execute o Agent com continuidade; produção deve ficar em `NARRATION_MODE=fixture`.
+**Done:** Implemented and reviewed Tasks 1–5 on `feat/web-chat-api` through commits `bb4b92c`, `aa87b3d`, `f6cedd6`, `16921b7`, `31bea16`, `af7e95f`, `5726475`, and `2e1483f`: strict public schema and deterministic engine resolution; token-guarded fixtures/templates; bounded secure `POST /api/chat`; signed session-bound continuity, rendered-content cache and live limiter; and typed narration turns in the chat shell. The chat API suite is green (46 tests), web typecheck and Webpack production build are green, and the HTTP smoke matrix passed.
 
+**Next:** If a documented public Deco Agent endpoint/SDK with continuation semantics becomes available, implement the server-only provider and local capture workflow; until then keep Production `NARRATION_MODE=fixture`.
+
+**Blocked / watch out:** No public Deco Agent contract is documented in this checkout, so Tasks 6–7 live/capture work was deliberately not invented. The route keeps live unavailable and never falls back silently. The default Turbopack build is blocked by the environment's process-port restriction; `next build --webpack` passes. Deployment still requires `MAZAL_CHAT_SESSION_SECRET`, `MAZAL_CHAT_ALLOWED_HOSTS`, and Production `NARRATION_MODE=fixture`.
+
+---
+
+## 2026-08-09 17:29 BRT · Codex · web chat API Task 4 fix round 1
+
+**Done:** Closed the missing configuration-error boundary in `POST /api/chat`: a request with an existing signed cookie now returns generic `503` when `MAZAL_CHAT_SESSION_SECRET` is absent or too short, instead of rejecting before a response. The same boundary covers cookie/session creation and conversation-handle HMAC verification; invalid handles still return `400`. Task 4 is 27/27, the full chat API suite is 46/46, and web typecheck/diff check are green. Commit follows this handoff entry.
+
+**Next:** Add the server-only Deco provider in its own task; pass any provider-created thread id only into `issueConversationId`, never into browser input.
+
+**Blocked / watch out:** `MAZAL_CHAT_SESSION_SECRET` must be deployed as a high-entropy value of at least 32 bytes. Cache and rate limiting remain process-local, bounded best-effort controls by design.
+
+---
+
+## 2026-08-09 17:22 BRT · Codex · web chat API Task 4
+
+**Done:** Replaced the provisional opaque chat id with HMAC-signed session cookies and signed, expiring conversation envelopes bound to the cookie session. The route rejects external, altered, expired, and cross-session handles; provider thread ids can only emerge after server-side verification. Added a 100-entry canonical rendered-content cache (fixture/template only), with response handles reconstructed per caller, plus a bounded rolling live limiter that returns the exact `429 { error: "RATE_LIMITED" }` and never falls back. The focused chat API suite is 25/25; web typecheck and diff check are green. Commit follows this handoff entry.
+
+**Next:** Add the server-only Deco provider in its own task; pass any provider-created thread id only into `issueConversationId`, never into browser input.
+
+**Blocked / watch out:** `MAZAL_CHAT_SESSION_SECRET` must be a high-entropy server-only secret of at least 32 bytes in every deployed environment. Cache and rate limiting are process-local, bounded best-effort controls by design.
+
+---
+
+## 2026-08-09 17:12 BRT · Codex · web chat API Task 3 fix round 1
+
+**Done:** `readLimitedJson` now catches a rejected `reader.cancel()` after the byte cap is exceeded, then reliably throws `PayloadTooLarge` for the route's 413 response. Added `limits.test.ts` with a controlled `ReadableStream` that proves cancellation was called even when its cleanup rejects. All 30 Task 3 tests, web typecheck, and diff check are green. Commit follows this handoff entry.
+
+**Next:** Task 4 replaces the provisional conversation issuer with signed-cookie identity, expiry, verification, and continuation tests.
+
+**Blocked / watch out:** Nothing. The Task 3 report contains the RED→GREEN evidence in its Fix round 1 section.
+
+## 2026-08-09 17:08 BRT · Codex · web chat API Task 3
+
+**Done:** Implemented `POST /api/chat` on `feat/web-chat-api` with bounded streaming JSON input, exact host/origin validation, fixture/template selection, generic errors, `no-store`, and a provisional opaque server-issued `conversationId`. Added 10 route tests; all 29 chat API tests, Next type generation, web typecheck, diff check, and a local fixture smoke are green. Commit follows this handoff entry.
+
+**Next:** Task 4 replaces the provisional `conversation.ts` issuer with signed-cookie identity, session verification, expiry, and complete continuation tests.
+
+**Blocked / watch out:** Live Deco mode is deliberately not implemented here. The sandbox blocked the first local port bind (`EPERM`); the authorized smoke started and returned the expected fixture response. The report is `.superpowers/sdd/2026-08-09-web-chat-api/task-3-report.md`.
+
+## 2026-08-09 17:00 BRT · Codex · web chat API Task 2 fix round 1
+
+**Done:** `fixtureFor` now falls back to `templateFor` when a known scenario resolves healthy or without a recovery action; it no longer attempts placeholders absent from that context. The narration registry omits text values with digits unless a safe template needs them, preserving rejection when a provider tries to interpolate them. Tests now exercise both engine-resolved demo scenarios plus healthy/actionless fallback paths; 14 narration tests, the web typecheck, and diff check are green.
+
+**Next:** route integration can call `fixtureFor` for either known key without duplicating finding/action guards, then use `templateFor` for raw contexts.
+
+**Blocked / watch out:** a provider reference to any text source containing ASCII digits is deliberately rejected as missing; numeric facts must keep using their typed deterministic formatter.
+
+
+## 2026-08-09 16:56 BRT · Codex · web chat API Task 2
+
+**Done:** deterministic chat narration guard, templates, and known-case fixtures are implemented in `apps/web/app/api/chat/` and will be committed as `feat(web): validate deterministic chat narration`. The guard rejects literal provider digits, unknown/prototype/missing paths, incompatible formatters, unresolved braces, control characters, and digits introduced through text substitutions. Focal narration tests (10) and the web typecheck are green.
+
+**Next:** integrate these functions into `POST /api/chat`, selecting a known fixture only for a resolved `case1`/`case2` and otherwise using `templateFor`.
+
+**Blocked / watch out:** fixture prose assumes a primary finding and first recovery action; `templateFor` is the safe fallback for healthy or actionless contexts. No `packages/contracts` or other package changed.
+
+
+## 2026-08-09 20:20 BRT · Guilherme's agent · end of the long session
+
+**Done:** `main` at `7108c9c`, 175 tests, typecheck (incl. `apps/mcp`), web build, and all three fixture guards green — verified from a clean `--frozen-lockfile` checkout, not this working tree.
+
+The MCP is **live in production**. `https://mazal-mcp.vercel.app/mcp` returns our own `Unauthorized`, not Vercel's wall. Three separate causes, any one of which alone produced the same 404: Vercel Authentication scoped `all_except_custom_domains` (a `.vercel.app` URL is not a custom domain, so the panel appeared to save and nothing changed); the function never existed, because the build wrote gitignored `api/mcp.mjs` and Vercel scans the *source tree* for `api/*.mjs`; and the test that should have caught it read the routes back out of the config file it had just parsed. Now built into the Build Output API, where the build's output IS the deployment.
+
+The **Deco integration did not exist.** `mazal-mcp-vercel-deco.md` claimed a live Custom Connection, an agent, and a real diagnosis in Monitoring. The org held eight Studio Pack defaults and four unrelated connections. Both now exist (`conn_ZovZcL4B9Fplj0h06GO0f`, `vir_s9bfvfwe5vloXTD6Ttn_o`), versioned in `docs/deco-agent.md` because Studio config has no history — which is exactly how that claim survived a day.
+
+The **Allocator is on screen**: four sections on the `allocate` answer — the reallocation, the Money Line, the budget walk, and a plan whose actor split falls straight out of `ExecutableOp` (Mazal runs the cuts; raising a budget is the seller's). 71.4% of achievable profit against 25.3% even-split and -75.4% greedy, `pnpm sim:allocator`.
+
+`docs/deck.md` is nine slides, every figure checked against a live run.
+
+**Next:** the deck is written but not built as slides. Bringel's PR #32 (mocked Meta payload; his own findings unaddressed — leave it to him) and Joaquim's `feat/web-chat-api` are unmerged and unreviewed.
+
+**Blocked / watch out:** the Deco connection has **no `Authorization` header** — set it to Vercel's `MAZAL_MCP_BEARER_TOKEN` and `CONNECTION_TEST` goes healthy. The OAuth grant taken for Studio is ~150 scopes including `ORGANIZATION_DELETE` and `DATABASES_RUN_SQL`; revoke when done. `COLLECTION_CONNECTIONS_LIST` returns `connection_token` in plaintext. `thin_pdp` and `price_too_high` still score 0% and that is deliberate — do not fix it by moving the -1.0 sigma threshold.
+
+---
+
+## 2026-08-09 19:30 BRT · Bringel's agent · the Meta payload, mocked on purpose
+
+**Done:** the Meta Ads MCP is **not** being built — no time, and PRD 10 always had it in the "only if there is buffer" phase. What is built is the half that is useful without it: `packages/meta`, a new package holding the raw insights payload, the adapter that normalises it, and three committed payloads that carry the demo. Branch `feat/meta-insights-payload` off `stage`, sixteen commits, with `origin/stage` merged in at the end.
+
+The chain is: `packages/sim` fixture → payload + Ads Manager CSV → `fromMetaInsights` → `CampaignDay[]` → the same engine as always. **The screen does not move**, and that is the whole design: `pnpm meta:fixtures` writes the files and then asserts the payload folds back to the simulator's committed fixture exactly, both CSVs parse back to it, and the diagnosis through the payload is still stage 4 `icRate` at −1.61σ with the change point on 2026-07-12 and the `eta_change` event attached.
+
+All three fixtures go through it — case 1 and case 2 and the account. An earlier version of this entry claimed that and was, at the time, wrong: case 1 had no payload and a reviewer caught it. It has one now, and the guard checks the pre-flight numbers too (`launch_small`, break-even 4.10, stage 3 `atcRate` at −1.02σ, `thin_pdp`).
+
+Three things worth knowing, in order of how much they will bite:
+
+- **`parseMetaCsv` emits one `CampaignDay` per CSV *row* and does not group by date** — an Ads Manager export broken out by ad set arrives as N rows per day, and `diagnose` reads the last seven *entries*, so its window covered two and a bit real days and answered with full confidence about them. This predates today. **Fixed in `apps/web/app/actions.ts`**, which now folds by date and tells the seller their export was added up. The evidence for why it mattered: uploading the committed ad-set CSV before the fix answered stage 5 `cvr`, `checkout_friction`; after it, stage 4 `icRate`, `eta_shock`, which is the true one. Any Meta export can be uploaded now, not just the campaign-level one.
+- **Absence is not zero, and that is a deliberate split from `packages/ingest`.** A missing `spend` in a payload is refused by name with the row and date attached; an `actions: []` that is present is a real zero. The CSV parser makes the other call — default to 0, warn, carry on — because a spreadsheet is a human artefact with human gaps and an API response is machine output.
+- **`packages/meta` has no zod.** `packages/ingest` is on zod 3 and `apps/mcp` is on zod 4, so a package both import cannot depend on it. Validation is hand-written. This is also why it is a new package rather than an addition to C's.
+
+`diagnose_campaign` now takes `days` **or** `metaInsights`, exactly one, as PRD 10 asks and without a fifth tool. It is an object with a `.refine()` rather than a union, because a union publishes an `anyOf` root in `tools/list` and a client that expects an object stops being able to call the tool.
+
+Green after merging `origin/stage` in: **220 tests** across 29 files, 45 in `@mazal/mcp` including the isolated Vercel bundle, root typecheck, web typecheck, `next build`.
+
+**Next:** **[PR #32](https://github.com/guilopeszw/mazal/pull/32) is open again and `MERGEABLE / CLEAN`.** It was closed without merging at 00:39 UTC — a mis-click, thirteen minutes after the reply to the review — and reopened with `origin/stage` merged in. It needs a second look and a merge, and the branch owner does not merge.
+
+After that, the one thing no code here can do: **someone with any Meta ad account runs one insights call and commits the redacted response.** `packages/meta/src/documented-shape.test.ts` now pins every field the adapter reads against Meta's published Ads Insights reference, which narrows the gap — but it checks *names*, not behaviour. Whether a value arrives as `"12"` or `12`, whether an empty `actions` is omitted or sent as `[]`, and whether the three purchase aliases carry one conversion are the three assumptions this whole package rests on, and one real response settles all three. Until then `META_ADS_ENABLED` is off and `diagnose_campaign` refuses any payload without our own fixture stamp.
+
+The one thing after that which no code here can do: **someone with any Meta ad account runs one insights call and commits the redacted response.** The guard in `packages/meta/generate.ts` is closed-loop — it proves the adapter agrees with the generator, both written by the same person, not that either agrees with the Graph API. A single real payload, from a dead campaign or a R$5 test, turns it into an open one. It is the PRD-10 box that matters most and it takes ten minutes for whoever has the account.
+
+**Blocked / watch out:**
+
+- **`apps/mcp` was changed and it is E's — Joaquim should look.** An earlier version of this entry said "nothing in another owner's package was touched", which was false and a reviewer caught it: `src/schemas.ts`, `src/tools/diagnose-campaign.ts`, `src/tools/index.ts`, `src/tools/handlers.test.ts` and `package.json` all changed. What is true is the narrower claim I had actually checked: **no `packages/*` belonging to someone else was touched** — `contracts`, `ingest`, `engine` and `sim` are untouched, and the new package exists partly so that stayed true. `AGENTS.md` §80 asks for a stop-and-append when a change touches another owner's package; this is that append, saying it plainly.
+- **`AGENTS.md` assigns `packages/meta` to D "pending E's sign-off", and D wrote that line.** The row has to exist — a package nobody owns is a package nobody regenerates — but it is a self-grant in the rules doc for a package built from E's PRD, so it now says so on its face and stays provisional until Joaquim answers.
+- **PRD 10 asked for this code in `apps/mcp/src/meta/`, and it landed in `packages/meta/`.** The reason is real — `apps/web` needs it too and an app cannot import from another app, and zod 3 vs zod 4 forbids putting it in `packages/ingest` — but the divergence was not announced when it was made. Of the PRD's remaining boxes: `META_ADS_ENABLED` **is implemented** and off by default; there is deliberately **no `schema.ts`**, because the validation is fifty lines inside `adapter.ts` and splitting it moves code without moving risk; **no Meta connection is attached** and **no real response was ever captured**, which are the two a person has to close.
+- **The payloads are fixtures and say so in the file.** They carry `__mazal_fixture`, a field the Graph API does not return; the adapter propagates it and warns. `docs/demo-runbook.md` now answers *"did this data come from Meta?"* out loud, and its "What not to claim" section no longer says the Allocator does not render — it does, over the synthetic account, and both halves of that sentence have to be said.
+- **The product card never comes from Meta and cannot.** Price, margin, stock, photos and the delivery promise are the seller's twelve fields; no integration removes the form, and the half of the funnel they explain is the product.
+
+## 2026-08-09 18:10 BRT · Guilherme's agent · end of the build day
+
+**Done:** `main` is at `2350fd4` and green — 169 tests, `@mazal/mcp` 39, typecheck (now including `apps/mcp`), `next build`, and both demo fixtures pass their beat guard. Verified from a fresh `--frozen-lockfile` checkout, not from this working tree.
+
+Landed today, newest first: per-entity margin in the Allocator; question routing fixed; MCP bounds, one shared action log, and a root typecheck that actually runs `apps/mcp`; claim 10 rewritten; `docs/demo-runbook.md`; the Allocator itself; the four bklit charts; the rim-light plan loader; the Deco MCP config; branch protection on `main`.
+
+**Two bugs worth remembering, both found by running the thing rather than reading it:**
+
+`routeOf` matched `launch|should i|predict` and nothing else, so *"Will this campaign work before I spend?"* — the phrasing in our own runbook — fell through to the diagnosis and rendered a complete, confident answer to a question nobody asked. Found by driving the three beats through headless Chrome and noticing beat 3 returned beat 1's payload. The chips always worked; it only bit someone typing, which on stage is the presenter.
+
+An adversarial review of `allocate` found six ways to break it, four of which broke the spend guarantee — a NaN budget produced a split of R$24,494,697/day and `reallocate` rendered it as a move; `alpha = 2` spent R$574 of a R$300 budget. All reproduced, all fixed, all pinned by regression tests. **I had merged before that review landed**, on my own audit, because the reviewers had gone idle twice. My audit covered the frontend axes and caught a real contrast bug; it did not probe the math adversarially, which was exactly what I had delegated. Do not merge on a partial audit when a review is outstanding.
+
+**Next:** the Allocator has no UI. `reallocate` is exported, tested, and called by nothing. The blocker is data, not code — every fixture is a single campaign at a flat daily budget, and a campaign at a flat budget contains no evidence about any other budget (`fitCurve` returns `k ≈ R$1` on 1.15x spread and now refuses, labelling `blended` rather than `fitted`). To put a number on screen, `packages/sim` needs to generate a multi-product account with real spend variation. That is the single highest-value next task.
+
+**Blocked / watch out:** Vercel — `mazal-mcp` has Deployment Protection on and it does not turn off from the project panel; the MCP is deployed and correct but not publicly reachable. `mazal-mcp.vercel.app` belongs to someone else; the real host is `mazal-mcp-guilopeszws-projects.vercel.app`. Vercel is Guilherme's alone — no one else has project access. Deco Studio needs two interactive prompts on the Mac (`/mcp`: approve, then authenticate) and neither can be done remotely. Four contract additions are announced and still unapproved by C. `main` is now protected: PRs only, and a commit authored by anyone without Vercel project access blocks the production deploy.
+---
 ## 2026-08-09 16:15 BRT · Bringel's agent · the chat shell's chrome, and stage→main
 
 **Done:** three things, in this order.
@@ -69,6 +196,22 @@ Open and unmerged: **`fix/sidebar-narrow-overlay`** (off `stage`, one commit `73
 - **`pnpm --filter web lint` reports 46 problems (41 errors, 5 warnings) and that is the floor, not a regression.** They are all in the vendored `components/charts` library. Verified by running eslint against a pristine `origin/stage` worktree: same 46. The two long-standing ones are still there too — `answer.tsx` render-time reassign, and the theme `setState`-in-effect, which now lives in `sidebar.tsx` because the toggle moved.
 - **`--rail` is the coupling between `chat.tsx` and `sidebar.tsx`.** The composer's dock is `fixed`, so it is positioned against the viewport and no ancestor's padding reaches it — it reads `left-[var(--rail)]` directly. Change the rail's width in one place and the dock silently stops meeting the panel's edge. It is padding rather than a transform on purpose: a transformed ancestor would become that dock's containing block and overflow the right edge.
 - **None of this chrome is visually verified.** There is no browser automation in the repo, so the sidebar, the push, the FLIP and the hover swap were checked against the served markup and the generated CSS, not against a screen. Someone should look at it before the projector does.
+
+## 2026-08-09 19:20 BRT · Guilherme's agent · contract additions, reviewed and taken
+
+**Done:** the four additions below — five now, with `ResponseCurve.quality` — were sitting unapproved waiting on C. Guilherme's call: stop waiting, review them here. So they are reviewed rather than rubber-stamped, and two things came out of it.
+
+`'replicates' | 'inconsistent'` was written inline twice, on `LeverReplication` and on `CardFinding` — two places to change and two chances to disagree about what the strings mean. Extracted as `LeverEvidence`. And `SellerLeverName` was used by `SellerBenchmark` before it was declared; type hoisting made it compile and made it harder to read. Both fixed.
+
+The substantive check: every addition is additive — new exported types, no renames, no removals, nothing made required — and root typecheck is clean across every package with 174 tests green. The one change that can reject input the old type accepted is the `OlistCategory` narrowing, from `... | string` (which collapsed the union and typechecked nothing) to the 62-member generated union. Taken deliberately.
+
+`docs/contracts.md` now documents all six groups. It documented none of them before, which was the actual gap — `AGENTS.md` points at that file as "the frozen types and every package's public API", and it had been stale since SAT-A.
+
+**Next:** nothing. These are settled. If C disagrees with any of them later it is a rename or a revert, not a redesign.
+
+**Blocked / watch out:** `ExecutableOp` is the type the spend guarantee rests on. It is a closed union and must not grow a spend-raising member without a conversation — `packages/engine/src/execution.test.ts` fails the moment one appears, which is the intended behaviour and not a broken test.
+
+---
 
 ## 2026-08-09 15:50 BRT · Guilherme's agent · contract additions, announced late
 
@@ -932,3 +1075,13 @@ Also fixed: local dev tooling was missing entirely at the start of this session 
 **Next:** Configure the connected Vercel `mazal` project to build `apps/web` as Next.js, then smoke-test `/` and `/api/chat` on the production deployment.
 
 **Blocked / watch out:** Vercel currently deploys `main` as READY but produces no output and returns 404 because its project root/framework are unset. Local Turbopack still panics on process binding; Webpack is the successful source-level build check. The checkout's `origin` still points to `guilopeszw/mazal`, while the merged PR and Vercel use `JucaGF/mazal`; do not push until that canonical remote is confirmed.
+
+---
+
+## 2026-08-09 · E-agent session · Deco connection health, fixed at the cause
+
+**Done:** On `fix/deco-connection-health`. Deco Studio reported the Mazal MCP connection `healthy: false` with "Tool ON_MCP_CONFIGURATION not found" even after the bearer header was set. Read the actual Studio source (`decocms/studio` on GitHub) instead of guessing: (1) `CONNECTION_TEST` never does an MCP handshake — it POSTs a bare JSON-RPC `ping` whose `Accept: */*` our transport rejected with 406; `apps/mcp/src/server.ts` now expands the wildcard to the two MCP content-types before the transport sees it. (2) `ON_MCP_CONFIGURATION` is a lifecycle callback Studio fires on every connection create/update whose configuration changed; implemented as an authenticated no-op in `apps/mcp/src/tools/index.ts` with the exact input schema from Studio's runtime (`state`, `scopes`, `firstRun?`, `vault?` — vault carries a workload token, never logged). Tests first, then code: 45 in the package (was 40), 180 at the root (was 175), typecheck, web build, `build:vercel` all green; built bundle re-verified by hand — 401 no token, 401 wrong token, 200 `{"result":{}}` on the exact Deco probe. Docs updated: `mazal-mcp-vercel-deco.md` (health-check section + tools/list line), `deco-agent.md` (header now set in Studio).
+
+**Next:** Merge the PR, let Vercel deploy production, then run `CONNECTION_TEST` on `conn_ZovZcL4B9Fplj0h06GO0f` — it should flip to `healthy: true`. Nothing needs changing in Studio.
+
+**Blocked / watch out:** `tools/list` now returns five tools; `ON_MCP_CONFIGURATION` must not be enabled as an agent tool in the connection — it exists for Studio's callback, not for the agent. The connection test stays false until this actually deploys to `mazal-mcp.vercel.app`.

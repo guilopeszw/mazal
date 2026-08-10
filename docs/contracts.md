@@ -217,6 +217,82 @@ export type OlistCategory = 'health_beauty' | 'bed_bath_table' | 'sports_leisure
 
 ---
 
+## Added after SAT-A
+
+Six groups went in after the freeze. `AGENTS.md` allows additive changes and requires they be announced; the announcement was late and is in `docs/HANDOFF.md`. All of them are additive — new exported types, no renames, no removals, nothing made required — so anything that compiled against this file before still does.
+
+### `ExecutableOp` — the type the spend guarantee rests on
+
+```ts
+export type ExecutableOp =
+  | { op: 'pause_campaign' }
+  | { op: 'reduce_daily_budget'; multiplier: number }   // (0, 1]
+  | { op: 'set_frequency_cap'; perWeek: number };
+
+// on Action:
+execution?: ExecutableOp;
+```
+
+**This union is a promise, not a convenience.** Mazal can pause a campaign, slow it, or lower its budget, and there is no operation in the product that raises spend. Adding a spend-raising member here would break that silently, so it does not grow without a conversation — and `packages/engine/src/execution.test.ts` walks every fault at both cause layers to keep it true.
+
+A multiplier above 1 is **rejected, not clamped**: turning "spend 3× more" into "change nothing" and reporting success is a no-op wearing a receipt.
+
+### `ResponseCurve` — what the Allocator fits
+
+```ts
+export type ResponseCurve = {
+  vMax: number;    // conversions per day at unlimited spend
+  k: number;       // the spend at half of that
+  alpha: number;   // held at 1 by the engine
+  n: number;       // days of the campaign's own history behind it
+  source: 'prior' | 'blended' | 'fitted';
+  quality?: number;  // 0–1, how much day-to-day movement the fit explains
+};
+```
+
+`source` is not decoration. A curve fitted to a campaign held at a flat daily budget is unidentifiable — the fit succeeds and returns a confident nonsense — so `fitCurve` refuses and labels it `blended` or `prior`. **Never present a curve as the seller's own unless `source` is `fitted`.**
+
+`quality` is reported and deliberately never spent. Discounting a ceiling by it was tried and measured at −4.7% of achievable profit; `docs/allocator-results.md` says why.
+
+### Peer comparison
+
+```ts
+export type LeverEvidence = 'replicates' | 'inconsistent';
+export type SellerLeverName = 'price' | 'freightRatio' | 'deliveryDays' | 'photos' | 'descriptionLength';
+
+export type SellerLever = { top: number; bottom: number; lift: number };
+export type SellerBenchmark = { category, sellers, outcome, outcomeTop, outcomeBottom, percentiles, levers };
+export type SellerBenchmarkTable = { replication; categories };
+export type CardFinding = { lever, observed, peerMedian, percentile, betterSellers, evidence };
+```
+
+`CardFinding.evidence` is attached to **every** finding so a percentile is never quoted as though it predicted anything. Only 22 of the 62 categories have enough sellers for quartiles; the rest carry `levers: null`.
+
+### Card provenance
+
+```ts
+export type FieldSource = 'stated' | 'inferred' | 'confirmed';
+export type CardProvenance = Partial<Record<keyof ProductCard, FieldSource>>;
+```
+
+Absent fields are `stated`, so a hand-filled card needs no provenance and every existing caller keeps working. **Never render an `inferred` value as fact.**
+
+### `Verdict.limitingFactor`
+
+Names which stage caps the prediction, so "it will be fine" can say what would stop it.
+
+### Simulator types
+
+`LabelledCampaign` and `BacktestReport` live here rather than in `packages/sim` for the same reason the engine's types do: B injects the fault and A predicts it, and the backtest only means anything if neither side gets to define the shape it is scored on.
+
+### Three edits to declarations that already existed
+
+- `StoreEventType` is derived from a `STORE_EVENT_TYPES` const with the same seven members, so the runtime can iterate them. No member changed.
+- `Benchmark.source` gained `'prior'` beside `'olist' | 'kaggle_meta'`.
+- **`OlistCategory` was narrowed** from `'health_beauty' | ... | string` to the 62-member union generated from Olist's own CSV. The old form collapsed to `string` and typechecked nothing. This is the only change of the six that can reject input the previous type accepted.
+
+---
+
 ## The public API of each package
 
 These signatures are the handoff. They are what each brief's **Consume** section refers to.

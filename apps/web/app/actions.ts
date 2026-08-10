@@ -10,6 +10,7 @@ import {
 } from "@mazal/contracts";
 import { benchmarks } from "@mazal/data";
 import { parseMetaCsv, productCardSchema } from "@mazal/ingest";
+import { foldDaysByDate } from "@mazal/meta";
 import { buildUploadAnswer, type Answer } from "@/lib/answers";
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
@@ -30,7 +31,39 @@ export async function parseCsv(
   if (typeof text !== "string" || text.length > 5_000_000) {
     return { days: [], warnings: ["File too large — export a shorter date range (under 5 MB)."] };
   }
-  return parseMetaCsv(text);
+
+  const parsed = parseMetaCsv(text);
+
+  /**
+   * One row per day, whatever the export was broken out by.
+   *
+   * `parseMetaCsv` emits one `CampaignDay` per CSV *row* and does not group by
+   * date, which is right for a parser — the rows are what the file says. But an
+   * Ads Manager export broken out by ad set or by ad has several rows for the
+   * same day, and `diagnose` reads the last seven *entries*. Three ad sets over
+   * thirty days would arrive as ninety "days" and the seven-day window would
+   * cover two and a half real ones, then answer with full confidence about
+   * them. Nothing on screen would look wrong.
+   *
+   * Folding here rather than in the parser keeps that decision where the window
+   * is: this is the only path that hands rows to the engine.
+   */
+  const days = foldDaysByDate(parsed.days);
+  const merged = parsed.days.length - days.length;
+
+  return {
+    ...parsed,
+    days,
+    warnings: [
+      ...parsed.warnings,
+      ...(merged > 0
+        ? [
+            `This export has more than one row per day — it is broken out by ad set or by ad. ` +
+              `${parsed.days.length} rows were added up into ${days.length} days.`,
+          ]
+        : []),
+    ],
+  };
 }
 
 /**

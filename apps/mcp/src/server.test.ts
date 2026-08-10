@@ -191,6 +191,51 @@ test('isolates simulated action logs across two authenticated MCP requests', asy
   ]);
 });
 
+// Deco Studio's CONNECTION_TEST probe POSTs a JSON-RPC ping with the
+// connection headers and nothing else — no MCP `Accept` header (node fetch
+// defaults to `*/*`), no session. The transport's strict reading returned 406,
+// so Studio reported the connection unhealthy while every real MCP call
+// worked. `*/*` means the client accepts anything, including the two types
+// the spec requires — treat it that way.
+test.each([
+  { name: 'no Accept header', accept: undefined },
+  { name: 'Accept: */*', accept: '*/*' },
+])('answers the Deco health probe ping sent with $name', async ({ accept }) => {
+  const app = createMcpHandler({ bearerToken: 'test-token' });
+  const headers = new Headers({
+    Authorization: 'Bearer test-token',
+    'Content-Type': 'application/json',
+    Host: 'localhost',
+  });
+  if (accept) headers.set('Accept', accept);
+
+  const response = await app.request('/mcp', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ jsonrpc: '2.0', method: 'ping', id: 1 }),
+  });
+
+  expect(response.status).toBe(200);
+  expect(await response.text()).toContain('"result":{}');
+});
+
+test('still rejects an explicit Accept header that excludes the MCP types', async () => {
+  const app = createMcpHandler({ bearerToken: 'test-token' });
+
+  const response = await app.request('/mcp', {
+    method: 'POST',
+    headers: {
+      Accept: 'text/html',
+      Authorization: 'Bearer test-token',
+      'Content-Type': 'application/json',
+      Host: 'localhost',
+    },
+    body: JSON.stringify({ jsonrpc: '2.0', method: 'ping', id: 1 }),
+  });
+
+  expect(response.status).toBe(406);
+});
+
 test.each([undefined, 'Bearer test-taken', 'Bearer wrong-token'])(
   'rejects a handshake without the configured bearer token',
   async (authorization) => {
@@ -235,3 +280,34 @@ test.each([undefined, 'Bearer test-taken'])(
     expect(await response.text()).toBe('Unauthorized');
   },
 );
+
+test('keeps one action log across requests when the caller does not supply one', async () => {
+  // Built per request, the array `execute_plan` appended to was discarded the
+  // moment the response ended — so every receipt it returned pointed at a log
+  // that no longer existed. The test above pins that a caller CAN still ask for
+  // per-request isolation; this pins that the default does not do it silently.
+  const seen = new Set<unknown>();
+  const app = createMcpHandler({
+    bearerToken: 'test-token',
+    registerTools: (_server, actionLog) => {
+      seen.add(actionLog);
+    },
+  });
+
+  for (const id of [1, 2]) {
+    const response = await app.request('/mcp', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json, text/event-stream',
+        Authorization: 'Bearer test-token',
+        'Content-Type': 'application/json',
+        Host: 'localhost',
+        'MCP-Protocol-Version': '2025-06-18',
+      },
+      body: JSON.stringify({ ...handshake, id }),
+    });
+    expect(response.status).toBe(200);
+  }
+
+  expect(seen.size).toBe(1);
+});
