@@ -86,4 +86,30 @@ describe('a column Meta never reported is not a column at zero', () => {
     const flagged = [diagnosis.primary, ...diagnosis.secondary].filter(Boolean);
     expect(flagged.some((f) => f!.stage === 3)).toBe(true);
   });
+  test('a logged pixel_error is testimony that a pixel exists', () => {
+    // Same all-zero shape, but the seller's store log says the pixel broke.
+    // Their export simply starts after the break. Silencing this one would
+    // throw away the strongest evidence in the input — the seller telling us
+    // directly that there is a pixel and it stopped.
+    const diagnosis = diagnose({
+      days: offPixelDays(),
+      card: frozenGoods,
+      events: [{ date: '2026-06-28', type: 'pixel_error', detail: 'tag manager removed' }],
+      reference,
+    });
+
+    expect(diagnosis.primary).not.toBeNull();
+    expect(diagnosis.suspectedCause).toBe('pixel_break');
+  });
+
+  test('an off-pixel seller still gets their media stages judged', () => {
+    // The product's dividing line: 0-2 are a media problem, 3-6 are product,
+    // offer or experience. Losing the pixel costs the seller the second half,
+    // never the first — Meta reports impressions and clicks whatever they sell.
+    const days = offPixelDays().map((d, i) => (i < 15 ? d : { ...d, clicks: 8 }));
+
+    const diagnosis = diagnose({ days, card: frozenGoods, events: [], reference });
+
+    expect(diagnosis.primary?.stage).toBe(1);
+  });
 });

@@ -198,8 +198,14 @@ const PIXEL_STAGES = new Set<FunnelStage>([3, 4, 5, 6]);
  * A pixel that reports *something* — even one add-to-cart a day — is a pixel
  * that is working, and a funnel that dies under it is a real break. That is
  * the line this draws, and it is why `pixel_break` still fires.
+ *
+ * A logged `pixel_error` overrides all of it. The seller is telling us there
+ * is a pixel and it broke; their export simply starts after the break. That is
+ * the strongest evidence in the input and silencing it would throw the
+ * seller's own testimony away.
  */
-export function pixelReportedNothing(days: CampaignDay[]): boolean {
+export function pixelReportedNothing(days: CampaignDay[], events: StoreEvent[] = []): boolean {
+  if (events.some((e) => e.type === 'pixel_error')) return false;
   return days.every(
     (d) => d.addToCarts === 0 && d.checkoutsInitiated === 0 && d.purchases === 0 && d.revenue === 0,
   );
@@ -220,7 +226,7 @@ export function diagnose(input: DiagnoseInput): Diagnosis {
     : [];
   const flagged: Finding[] = [];
 
-  const unpixelled = pixelReportedNothing(input.days);
+  const unpixelled = pixelReportedNothing(input.days, input.events);
 
   for (const spec of MEASURED_STAGES) {
     // Nothing downstream was ever reported: judge none of it. See
