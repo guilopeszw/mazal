@@ -1,0 +1,21 @@
+{
+  "name": "@mazal/meta",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@mazal/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@mazal/data": "workspace:*",
+    "@mazal/engine": "workspace:*",
+    "@mazal/ingest": "workspace:*",
+    "@mazal/sim": "workspace:*"
+  }
+}

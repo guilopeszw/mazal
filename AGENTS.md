@@ -29,8 +29,13 @@ Hackathon build. Deadline Sunday 2026-08-09 23:59, code freeze 19:00.
 | `packages/data` | B | import `benchmarks` |
 | `packages/sim` | B | call `generateCampaign`, `runBacktest`; do not read the source if you own `engine` |
 | `packages/ingest` | C | call `parseMetaCsv`, `parseEventLog`, `productCardSchema` |
+| `packages/meta` | D, **pending E's sign-off** | call `fromMetaInsights`, `foldDaysByDate`; the fixtures are written by `pnpm meta:fixtures` and never edited by hand |
 | `apps/web` | D (C joins Sunday) | E owns `POST /api/chat` only |
 | `apps/mcp` | E | — |
+
+`packages/meta` holds the raw Meta insights payload and the adapter that turns it into `CampaignDay`. It is separate from `packages/ingest` for two reasons: that package is C's, and a package imported by both `apps/web` (zod 3) and `apps/mcp` (zod 4) cannot depend on zod at all. The integration itself is not built — the payloads are fixtures derived from `packages/sim`, and they say so in the file.
+
+**That owner row was written by D, for a package built from E's PRD 10, which asked for the code to live in `apps/mcp/src/meta` instead.** The move is argued in `packages/meta/README.md` and the row is provisional until E says yes or moves it. A rules file should not record a claim its own author made about themselves without anyone else agreeing to it.
 
 ## Branches
 

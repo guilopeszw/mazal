@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
@@ -15,6 +15,7 @@
     "@mazal/data": "workspace:*",
     "@mazal/engine": "workspace:*",
     "@mazal/ingest": "workspace:*",
+    "@mazal/meta": "workspace:*",
     "@visx/curve": "4.0.1-alpha.0",
     "@visx/event": "4.0.1-alpha.0",
     "@visx/grid": "4.0.1-alpha.0",

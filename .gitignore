@@ -10,6 +10,8 @@
 .opencode
 
 node_modules
+# pnpm's content-addressable store, if someone runs with a repo-local store dir.
+.pnpm-store
 .next
 .turbo
 dist

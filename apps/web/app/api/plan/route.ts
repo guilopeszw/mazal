@@ -1,6 +1,8 @@
 import type { Diagnosis, ProductCard } from "@mazal/contracts";
 import { buildPlan } from "@mazal/engine";
 
+import { badRequest, readJson } from "../guard";
+
 /**
  * Parse the body, call the engine, return JSON.
  *
@@ -15,9 +17,12 @@ import { buildPlan } from "@mazal/engine";
  * grounds that it "has values now" — check first whether the two cases still return the same band.
  */
 export async function POST(request: Request) {
-  const { diagnosis, card } = (await request.json()) as {
-    diagnosis: Diagnosis;
-    card: ProductCard;
-  };
+  const body = await readJson(request);
+  if (!body.ok) return body.response;
+
+  const { diagnosis, card } = body.value as { diagnosis?: Diagnosis; card?: ProductCard };
+  if (!diagnosis || typeof diagnosis !== "object") return badRequest("`diagnosis` is required.");
+  if (!card) return badRequest("`card` is required.");
+
   return Response.json(buildPlan(diagnosis, card));
 }

@@ -29,6 +29,9 @@ importers:
       '@mazal/engine':
         specifier: workspace:*
         version: link:../../packages/engine
+      '@mazal/meta':
+        specifier: workspace:*
+        version: link:../../packages/meta
       '@modelcontextprotocol/hono':
         specifier: ^2.0.0
         version: 2.0.0(@modelcontextprotocol/server@2.0.0)(hono@4.13.1)
@@ -72,6 +75,9 @@ importers:
       '@mazal/ingest':
         specifier: workspace:*
         version: link:../../packages/ingest
+      '@mazal/meta':
+        specifier: workspace:*
+        version: link:../../packages/meta
       '@visx/curve':
         specifier: 4.0.1-alpha.0
         version: 4.0.1-alpha.0
@@ -181,6 +187,25 @@ importers:
       zod:
         specifier: ^3.25.0
         version: 3.25.76
+
+  packages/meta:
+    dependencies:
+      '@mazal/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@mazal/data':
+        specifier: workspace:*
+        version: link:../data
+      '@mazal/engine':
+        specifier: workspace:*
+        version: link:../engine
+      '@mazal/ingest':
+        specifier: workspace:*
+        version: link:../ingest
+      '@mazal/sim':
+        specifier: workspace:*
+        version: link:../sim
 
   packages/sim:
     dependencies:

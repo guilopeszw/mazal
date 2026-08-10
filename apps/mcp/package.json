@@ -15,6 +15,7 @@
     "@mazal/contracts": "workspace:*",
     "@mazal/data": "workspace:*",
     "@mazal/engine": "workspace:*",
+    "@mazal/meta": "workspace:*",
     "@modelcontextprotocol/hono": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
     "hono": "^4.13.1",

@@ -1,0 +1,853 @@
+{
+  "data": [
+    {
+      "date_start": "2026-07-01",
+      "date_stop": "2026-07-01",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "92.78",
+      "impressions": "4068",
+      "reach": "3537",
+      "inline_link_clicks": "58",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "48"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-02",
+      "date_stop": "2026-07-02",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "106.40",
+      "impressions": "4202",
+      "reach": "3561",
+      "inline_link_clicks": "64",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "52"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-03",
+      "date_stop": "2026-07-03",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "99.36",
+      "impressions": "3927",
+      "reach": "3245",
+      "inline_link_clicks": "64",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "52"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-04",
+      "date_stop": "2026-07-04",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "102.49",
+      "impressions": "4003",
+      "reach": "3228",
+      "inline_link_clicks": "62",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "51"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-05",
+      "date_stop": "2026-07-05",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "102.04",
+      "impressions": "4512",
+      "reach": "3553",
+      "inline_link_clicks": "62",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "51"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-06",
+      "date_stop": "2026-07-06",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "100.00",
+      "impressions": "3647",
+      "reach": "2805",
+      "inline_link_clicks": "56",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "46"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-07",
+      "date_stop": "2026-07-07",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "100.49",
+      "impressions": "3629",
+      "reach": "2729",
+      "inline_link_clicks": "44",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "36"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-08",
+      "date_stop": "2026-07-08",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "98.90",
+      "impressions": "3804",
+      "reach": "2797",
+      "inline_link_clicks": "47",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "39"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-09",
+      "date_stop": "2026-07-09",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "93.92",
+      "impressions": "3729",
+      "reach": "2683",
+      "inline_link_clicks": "51",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "42"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-10",
+      "date_stop": "2026-07-10",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "94.91",
+      "impressions": "4315",
+      "reach": "3039",
+      "inline_link_clicks": "53",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "43"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-11",
+      "date_stop": "2026-07-11",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "99.68",
+      "impressions": "4016",
+      "reach": "2770",
+      "inline_link_clicks": "61",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "50"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-12",
+      "date_stop": "2026-07-12",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "104.23",
+      "impressions": "3779",
+      "reach": "2553",
+      "inline_link_clicks": "53",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "43"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-13",
+      "date_stop": "2026-07-13",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "101.98",
+      "impressions": "4927",
+      "reach": "3263",
+      "inline_link_clicks": "77",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "63"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-14",
+      "date_stop": "2026-07-14",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "95.19",
+      "impressions": "4000",
+      "reach": "2597",
+      "inline_link_clicks": "52",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "43"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-15",
+      "date_stop": "2026-07-15",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "101.39",
+      "impressions": "3668",
+      "reach": "2336",
+      "inline_link_clicks": "62",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "51"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-16",
+      "date_stop": "2026-07-16",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "102.06",
+      "impressions": "3738",
+      "reach": "2336",
+      "inline_link_clicks": "56",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "46"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-17",
+      "date_stop": "2026-07-17",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "95.71",
+      "impressions": "3590",
+      "reach": "2202",
+      "inline_link_clicks": "54",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "44"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-18",
+      "date_stop": "2026-07-18",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "101.22",
+      "impressions": "4819",
+      "reach": "2903",
+      "inline_link_clicks": "66",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "54"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-19",
+      "date_stop": "2026-07-19",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "94.10",
+      "impressions": "3944",
+      "reach": "2334",
+      "inline_link_clicks": "64",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "52"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-20",
+      "date_stop": "2026-07-20",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "99.98",
+      "impressions": "4187",
+      "reach": "2434",
+      "inline_link_clicks": "67",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "55"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-21",
+      "date_stop": "2026-07-21",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "97.76",
+      "impressions": "4021",
+      "reach": "2298",
+      "inline_link_clicks": "54",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "44"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-22",
+      "date_stop": "2026-07-22",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "104.79",
+      "impressions": "3666",
+      "reach": "2060",
+      "inline_link_clicks": "60",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "49"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-23",
+      "date_stop": "2026-07-23",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "97.65",
+      "impressions": "4671",
+      "reach": "2581",
+      "inline_link_clicks": "61",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "50"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    },
+    {
+      "date_start": "2026-07-24",
+      "date_stop": "2026-07-24",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "100.91",
+      "impressions": "3835",
+      "reach": "2084",
+      "inline_link_clicks": "52",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "43"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-25",
+      "date_stop": "2026-07-25",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "101.63",
+      "impressions": "3920",
+      "reach": "2096",
+      "inline_link_clicks": "55",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "45"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-26",
+      "date_stop": "2026-07-26",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "93.42",
+      "impressions": "4260",
+      "reach": "2242",
+      "inline_link_clicks": "62",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "51"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-27",
+      "date_stop": "2026-07-27",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "105.19",
+      "impressions": "4529",
+      "reach": "2347",
+      "inline_link_clicks": "69",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "57"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-28",
+      "date_stop": "2026-07-28",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "96.07",
+      "impressions": "4116",
+      "reach": "2100",
+      "inline_link_clicks": "66",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "54"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-29",
+      "date_stop": "2026-07-29",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "96.16",
+      "impressions": "4548",
+      "reach": "2285",
+      "inline_link_clicks": "65",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "2"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "53"
+        }
+      ],
+      "action_values": []
+    },
+    {
+      "date_start": "2026-07-30",
+      "date_stop": "2026-07-30",
+      "campaign_id": "sim-724705",
+      "campaign_name": "Utilidades — teste",
+      "account_id": "act_2026081",
+      "account_currency": "BRL",
+      "spend": "101.09",
+      "impressions": "3431",
+      "reach": "1699",
+      "inline_link_clicks": "56",
+      "actions": [
+        {
+          "action_type": "add_to_cart",
+          "value": "1"
+        },
+        {
+          "action_type": "initiate_checkout",
+          "value": "1"
+        },
+        {
+          "action_type": "purchase",
+          "value": "1"
+        },
+        {
+          "action_type": "landing_page_view",
+          "value": "46"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "purchase",
+          "value": "53.03"
+        }
+      ]
+    }
+  ],
+  "__mazal_fixture": {
+    "kind": "fixture",
+    "generator": "packages/meta/generate.ts",
+    "derivedFrom": "packages/sim/fixtures/demo-case1.json",
+    "note": "Synthetic. No Meta account was called to produce this file."
+  }
+}
