@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { copyFile, mkdtemp, readFile, rm } from 'node:fs/promises';
+import { copyFile, mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -72,6 +72,14 @@ test('ships both view HTML files inside the function directory', async () => {
   // The resource read resolves `./dist/<view>.html` against the bundle's own
   // location, so the HTML must be deployed inside `mcp.func` — a bundle without
   // it would list the resources and then 500 on every read.
+  // Pinned as a set, not just iterated: a fourth view would otherwise ship
+  // unasserted, and this test would keep passing while saying nothing about
+  // the file that actually broke. Adding one fails here on purpose.
+  const shipped = (
+    await readdir(join(appRoot, '.vercel', 'output', 'functions', 'mcp.func', 'dist'))
+  ).sort();
+  expect(shipped).toEqual(['diagnosis.html', 'prediction.html']);
+
   for (const view of ['diagnosis', 'prediction']) {
     const html = await readFile(
       join(appRoot, '.vercel', 'output', 'functions', 'mcp.func', 'dist', `${view}.html`),
