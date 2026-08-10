@@ -29,7 +29,7 @@ The host allowlist accepts `mazal-mcp.vercel.app` only. Calling any other alias 
 
 ## The agent's instructions
 
-Kept verbatim so a diff against Studio is possible. Rewritten twice on 2026-08-10 — see the next section for why each time. **Sync state:** the `<language>` section is not yet applied in Studio — the `COLLECTION_VIRTUAL_MCP_UPDATE` call was blocked by the session's permission system, so this block is the version to paste into the Studio UI. Delete this sentence once it is.
+Kept verbatim so a diff against Studio is possible. Rewritten twice on 2026-08-10 — see the next section for why each time. **Sync state:** applied in Studio via `COLLECTION_VIRTUAL_MCP_UPDATE` on 2026-08-10; Studio and this block are identical again.
 
 ````
 <role>
@@ -149,6 +149,26 @@ After the rewrite, a real `predict_campaign` ran end to end in 106ms: break-even
 Correct numbers, and still a failure: a seller mid-shift with WhatsApp going off does not parse a p10–p90. That is the maths leaking onto the person the product exists to spare. The product owner's rule: communication is straight to the point and never puts the analytical weight back on the seller.
 
 So `<language>` was added (source: `optimization.md` §4 "Language rules"): decision first, jargon banned in both languages, fixed plain-language substitutes, money in reais with no decimals, one idea per sentence — and an explicit line that plain language is not permission to round or invent, because the one rule still governs every value.
+
+## The home tiles (2026-08-10)
+
+The agent's `metadata.ui.homeTiles` renders two MCP App views on the org home
+board, straight from the server's own `ui://` resources (see
+`apps/mcp/src/ui/`). Each tile names the resource, the connection that owns it,
+and the tool the view calls with the configured input — the host opens a direct
+MCP client to the connection, so the iframe reaches the same bearer-gated
+endpoint as every tool call.
+
+| tileId | resource | tool | input |
+|---|---|---|---|
+| `mazal-funnel` | `ui://mazal/diagnosis` | `diagnose_campaign` | `packages/sim/fixtures/demo-case2.json` (days, card, events; benchmark reference) |
+| `mazal-band` | `ui://mazal/prediction` | `predict_campaign` | the same fixture's card |
+
+The same two resources also render in chat: `diagnose_campaign` and
+`predict_campaign` carry `_meta.ui.resourceUri`, so Studio draws the tool
+result as the funnel or the band instead of prose. Both tiles show demo-case2 —
+the eta_shock campaign — because a home board with a healthy funnel would be a
+tile with nothing to say.
 
 ## Why the instructions read like that
 

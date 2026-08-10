@@ -26,7 +26,7 @@
 // A function directory named `mcp.func` is served at `/mcp`. That is the whole
 // routing story, which is why `config.json` needs no routes.
 
-import { mkdir, writeFile, rm } from 'node:fs/promises';
+import { cp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
@@ -38,6 +38,11 @@ const functionDir = resolve(outputRoot, 'functions/mcp.func');
 // Start clean: a stale function from an earlier layout would still be deployed.
 await rm(outputRoot, { recursive: true, force: true });
 await mkdir(functionDir, { recursive: true });
+
+// The MCP App views first: the function reads `./dist/<view>.html` relative to
+// its own bundle, so the HTML ships inside the function directory.
+await import('./build-ui.mjs');
+await cp(resolve(appRoot, 'src/ui/dist'), resolve(functionDir, 'dist'), { recursive: true });
 
 await build({
   bundle: true,

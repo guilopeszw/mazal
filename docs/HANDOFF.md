@@ -15,6 +15,17 @@ Entry format:
 
 ---
 
+## 2026-08-09 22:10 BRT · Guilherme's agent · Deco Studio renders the charts, not prose
+
+**Done:** the MCP now exposes two `ui://` resources per the MCP Apps extension (`modelcontextprotocol/ext-apps`, spec 2026-01-26, the contract Deco's `MCPAppRenderer` reads): `ui://mazal/diagnosis` — the funnel with the leak marked — and `ui://mazal/prediction` — the break-even and the band. `diagnose_campaign` and `predict_campaign` carry `_meta.ui.resourceUri`, so a tool result in Studio chat renders as the chart. The agent's `metadata.ui.homeTiles` puts both on the org home board fed by `demo-case2` (eta_shock, stage 4 leak). Every number in a view is engine output or a contract rate function — the views mirror `apps/web/lib/answers.ts` and a stage under the engine's own `minSample` renders "not judged", never a value.
+
+Deployed to `mazal-mcp` production and verified: 401 without a token, 401 with a wrong one, 403 off-allowlist host, and Deco's `CONNECTION_TEST` healthy (346ms) through the stored credential. The `<language>` section of the agent instructions — pending per `deco-agent.md` — was applied to Studio in the same update; Studio and the doc are in sync again. Branch `feat/mcp-ui-resources`, 60 tests in `@mazal/mcp` (was 40), 195 at the root, typecheck and `next build` green.
+
+**Next:** eyeball the two tiles on the Studio home board — the code path is pinned by tests end to end, but no human has seen the pixels. Then review and merge the PR.
+
+**Blocked / watch out:** three things. A deploy went to the stale `mcp` project first (`vercel link --yes` failed silently on scope and the CLI fell back to the old link) — `mazal-mcp` got the correct deploy right after; the `mcp` project now serves a newer build than its docs claim, harmless but known. `vercel link` writes `apps/mcp/.env.local` with the project's env pulled — it was deleted unread; do not commit or read one. The view HTML is ~390KB each because the ext-apps SDK bundles zod; Studio HTTP-caches reads, so it costs one fetch per session.
+---
+
 ## 2026-08-09 21:33 BRT · Codex · resolução dos conflitos do PR #37
 
 **Done:** atualizado `feat/web-chat-api` contra `origin/main`, reconciliando `apps/web/components/chat.tsx` com a rota de narração tipada e preservando o histórico de `docs/HANDOFF.md`. Commit `dcb565a` publicado em `origin`.
