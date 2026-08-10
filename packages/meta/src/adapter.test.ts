@@ -91,6 +91,120 @@ test('an empty value is the same refusal as a missing one', () => {
   }
 });
 
+test('three aliases for one purchase are one purchase, not three', () => {
+  // An account wired through the pixel and also reporting omni carries all
+  // three rows with the same value, for the same sales. Summing them tripled
+  // cvr and roas and cut cpa to a third — and left icRate correct, because both
+  // its terms inflated together. The headline finding would still have read
+  // right while the money under it was 3x wrong.
+  const [day] = fromMetaInsights(
+    payload(
+      row({
+        actions: [
+          { action_type: 'purchase', value: '10' },
+          { action_type: 'omni_purchase', value: '10' },
+          { action_type: 'offsite_conversion.fb_pixel_purchase', value: '10' },
+        ],
+        action_values: [
+          { action_type: 'purchase', value: '1000.00' },
+          { action_type: 'omni_purchase', value: '1000.00' },
+        ],
+      }),
+    ),
+  ).total;
+
+  expect(day!.purchases).toBe(10);
+  expect(day!.revenue).toBe(1000);
+});
+
+test('says so when two aliases for one conversion disagree', () => {
+  const account = fromMetaInsights(
+    payload(
+      row({
+        actions: [
+          { action_type: 'purchase', value: '10' },
+          { action_type: 'omni_purchase', value: '4' },
+        ],
+      }),
+    ),
+  );
+
+  // First alias wins, and the disagreement is reported rather than averaged or
+  // silently picked: two numbers this far apart are not one event seen twice.
+  expect(account.total[0]!.purchases).toBe(10);
+  expect(account.warnings.some((w) => w.includes('disagreed'))).toBe(true);
+});
+
+test('an omitted actions key is Metas zero, not a hole', () => {
+  // The Graph API omits an empty field instead of sending []. Refusing that
+  // refused every campaign that had a day without a sale — which is most of
+  // them, and all of them before their first order.
+  const { actions: _a, action_values: _v, ...quiet } = row({ date_start: '2026-07-02', date_stop: '2026-07-02' });
+  const { total } = fromMetaInsights(payload(row(), quiet as MetaInsightsRow));
+
+  expect(total).toHaveLength(2);
+  expect(total[1]!.purchases).toBe(0);
+  expect(total[1]!.revenue).toBe(0);
+  expect(total[1]!.spend).toBe(256.62);
+});
+
+test('refuses a payload where no row anywhere carries actions', () => {
+  // The other reading of the same absence: a caller who never asked for
+  // conversions in `fields`. Reading that as a funnel of zeros would report a
+  // dead campaign to a seller who is selling.
+  const { actions: _a, action_values: _v, ...noConversions } = row();
+
+  try {
+    fromMetaInsights(payload(noConversions as MetaInsightsRow));
+    throw new Error('expected a refusal');
+  } catch (error) {
+    expect((error as MetaInsightsError).code).toBe('META_INSIGHTS_INCOMPLETE');
+    expect((error as Error).message).toContain('not a campaign with no sales');
+  }
+});
+
+test('one unreadable row is dropped and named, and does not take the month with it', () => {
+  const days = Array.from({ length: 5 }, (_, i) =>
+    row({ date_start: `2026-07-0${i + 1}`, date_stop: `2026-07-0${i + 1}` }),
+  );
+  days[2] = { ...days[2]!, spend: '' };
+
+  const account = fromMetaInsights(payload(...days));
+
+  expect(account.total).toHaveLength(4);
+  expect(account.warnings.some((w) => w.includes('2026-07-03'))).toBe(true);
+  // And the reason a gap matters is said, because `diagnose` reads the last
+  // seven entries rather than the last seven dates.
+  expect(account.warnings.some((w) => w.includes('calendar days'))).toBe(true);
+});
+
+test('refuses negative money, because the days door refuses it too', () => {
+  const account = fromMetaInsights(
+    payload(row(), row({ date_start: '2026-07-02', date_stop: '2026-07-02', spend: '-100.00' })),
+  );
+
+  expect(account.total).toHaveLength(1);
+  expect(account.warnings.some((w) => w.includes('spend'))).toBe(true);
+});
+
+test('a row with no date_stop is not quietly taken for a single day', () => {
+  const { date_stop: _dropped, ...unbounded } = row();
+  const account = fromMetaInsights(payload(row({ date_start: '2026-07-02', date_stop: '2026-07-02' }), unbounded as MetaInsightsRow));
+
+  expect(account.total).toHaveLength(1);
+  expect(account.warnings.some((w) => w.includes('date_stop'))).toBe(true);
+});
+
+test('says that a total over several campaigns is not a funnel', () => {
+  const account = fromMetaInsights(
+    payload(row(), row({ campaign_id: '23852', campaign_name: 'Relógios — retargeting' })),
+  );
+
+  // Three ad sets under one campaign are one funnel in pieces. Two campaigns
+  // are two funnels, and adding them describes nothing that exists.
+  expect(account.warnings.some((w) => w.includes('not a funnel'))).toBe(true);
+});
+
 test('an empty actions array is a real zero, because a quiet day carries no action type', () => {
   const [day] = fromMetaInsights(payload(row({ actions: [], action_values: [] }))).total;
 
@@ -101,9 +215,15 @@ test('an empty actions array is a real zero, because a quiet day carries no acti
   expect(day!.spend).toBe(256.62);
 });
 
-test('a missing actions key is a hole, and is refused', () => {
-  const { actions: _dropped, ...noActions } = row();
-  expect(() => fromMetaInsights(payload(noActions as MetaInsightsRow))).toThrow(MetaInsightsError);
+test('a present actions key that is not a list of actions is still a hole', () => {
+  // An omitted key is Meta's zero; a key holding something that is not an
+  // action list is a malformed response, and those are different.
+  const account = fromMetaInsights(
+    payload(row(), row({ date_start: '2026-07-02', date_stop: '2026-07-02', actions: 'lots' as never })),
+  );
+
+  expect(account.total).toHaveLength(1);
+  expect(account.warnings.some((w) => w.includes('actions'))).toBe(true);
 });
 
 test('reads the prefixed aliases a real account emits', () => {

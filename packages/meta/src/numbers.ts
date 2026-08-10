@@ -18,6 +18,12 @@
  * a seller acts on them differently.
  */
 export function parseMetaNumber(raw: unknown): number | null {
+  // A JSON number is accepted as well as Meta's string. The Graph API sends
+  // strings, but this payload also arrives through `diagnose_campaign` from
+  // clients that may have round-tripped it through something that normalises
+  // numerics — and answering "spend is missing" about a field the caller can
+  // see sitting there is a bad error. The strictness that matters is below.
+  if (typeof raw === 'number') return Number.isFinite(raw) ? raw : null;
   if (typeof raw !== 'string') return null;
   const trimmed = raw.trim();
   if (!/^-?\d+(\.\d+)?$/.test(trimmed)) return null;
@@ -30,6 +36,21 @@ export function parseMetaCount(raw: unknown): number | null {
   const value = parseMetaNumber(raw);
   if (value === null || !Number.isInteger(value) || value < 0) return null;
   return value;
+}
+
+/**
+ * Money, refusing a negative.
+ *
+ * `spend` and `revenue` are `nonNegativeNumber` at the MCP boundary, so a
+ * negative one arriving as `days` is rejected. Letting the same value through
+ * the payload door would mean the two routes into the engine disagree about
+ * what a valid day is — and a negative spend produces a ROAS that ends up on a
+ * slide. Meta does issue credits and refunds; they are not a day's spend.
+ */
+export function parseMetaMoneyCents(raw: unknown): number | null {
+  const value = parseMetaNumber(raw);
+  if (value === null || value < 0) return null;
+  return toCents(value);
 }
 
 /**
@@ -77,8 +98,9 @@ export function splitLargestRemainder(total: number, weights: number[]): number[
     .map((x, i) => ({ remainder: x - Math.floor(x), i }))
     .sort((a, b) => b.remainder - a.remainder || a.i - b.i);
 
+  // `leftover` is always below the number of parts, so this cannot wrap.
   for (let n = 0; n < leftover; n++) {
-    const target = byRemainder[n % byRemainder.length]!;
+    const target = byRemainder[n]!;
     parts[target.i] = parts[target.i]! + 1;
   }
 

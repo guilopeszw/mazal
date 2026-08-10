@@ -1,5 +1,12 @@
 import { expect, test } from 'vitest';
-import { fromCents, parseMetaCount, parseMetaNumber, splitLargestRemainder, toCents } from './numbers.ts';
+import {
+  fromCents,
+  parseMetaCount,
+  parseMetaMoneyCents,
+  parseMetaNumber,
+  splitLargestRemainder,
+  toCents,
+} from './numbers.ts';
 
 test('parses the strings the Graph API actually sends', () => {
   expect(parseMetaNumber('256.62')).toBe(256.62);
@@ -11,9 +18,28 @@ test('absence is not zero — every shape of missing returns null', () => {
   // This is the single most important line in the package. Meta omits a field
   // it has no value for, and reading that as zero tells a seller their campaign
   // sold nothing on a day we simply could not read.
-  for (const missing of ['', '  ', '—', '--', '-', 'N/A', 'null', null, undefined, 12, {}]) {
+  for (const missing of ['', '  ', '—', '--', '-', 'N/A', 'null', null, undefined, {}, NaN]) {
     expect(parseMetaNumber(missing)).toBeNull();
   }
+});
+
+test('takes a JSON number as well as Meta\'s string', () => {
+  // The Graph API sends strings, but this payload also arrives through
+  // `diagnose_campaign` from clients that may have normalised it on the way.
+  // Telling them `spend` is missing when it is visibly 100 is a bad error, and
+  // none of the refusals above are weakened by accepting this.
+  expect(parseMetaNumber(100)).toBe(100);
+  expect(parseMetaNumber(256.62)).toBe(256.62);
+  expect(parseMetaCount(17)).toBe(17);
+});
+
+test('money refuses a negative, because the other door does too', () => {
+  // `spend` and `revenue` are non-negative at the MCP boundary, so the same day
+  // sent as `days` is rejected. A negative spend produces a ROAS that ends up
+  // on a slide.
+  expect(parseMetaMoneyCents('-100.00')).toBeNull();
+  expect(parseMetaMoneyCents('100.00')).toBe(10_000);
+  expect(parseMetaMoneyCents('0')).toBe(0);
 });
 
 test('refuses the number formats that belong to a CSV, not to the API', () => {

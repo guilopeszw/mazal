@@ -10,7 +10,7 @@ import type { CampaignDay } from '@mazal/contracts';
 import type { MetaAccount, MetaEntityDays } from './account.ts';
 import { incomplete, MetaInsightsError, type MissingField } from './errors.ts';
 import { foldDaysByDate } from './fold.ts';
-import { fromCents, parseMetaCount, parseMetaNumber, toCents } from './numbers.ts';
+import { fromCents, parseMetaCount, parseMetaMoneyCents, parseMetaNumber, toCents } from './numbers.ts';
 import {
   ACTION_ALIASES,
   type CountedAction,
@@ -24,24 +24,50 @@ const COUNTED: CountedAction[] = ['addToCarts', 'checkoutsInitiated', 'purchases
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
-/** Sum every entry whose `action_type` is one of ours. Unknown types are left alone. */
+/**
+ * Read one conversion kind out of `actions[]` — from **one** alias, not all of
+ * them.
+ *
+ * The three aliases are the same purchase seen through three integrations, and
+ * an account wired through the pixel while also reporting omni carries all
+ * three rows with the same value. Summing them counted every sale three times:
+ * `cvr` and `roas` tripled, `cpa` fell to a third, and `predict` compared a 3×
+ * ROAS against break-even — while `icRate` stayed correct, because both of its
+ * terms inflated together. That is the worst possible shape for the error: the
+ * headline finding still reads right and the money underneath it does not.
+ *
+ * First alias in the list wins. When more than one is present with different
+ * values they are not overlapping views of the same thing, and the caller is
+ * told rather than having one silently picked.
+ */
 function readActions(
   entries: MetaAction[],
   aliases: readonly string[],
-): { total: number; unreadable: boolean } {
-  let total = 0;
-  let unreadable = false;
+  /** Money is accumulated in integer cents, like every other sum in this package. */
+  asCents = false,
+): { total: number; unreadable: string | null; conflict: string[] } {
+  const byAlias = new Map<string, { total: number; unreadable: string | null }>();
 
   for (const entry of entries) {
     if (!aliases.includes(entry.action_type)) continue;
+    const found = byAlias.get(entry.action_type) ?? { total: 0, unreadable: null };
     const value = parseMetaNumber(entry.value);
-    if (value === null) {
-      unreadable = true;
-      continue;
-    }
-    total += value;
+    if (value === null || value < 0) found.unreadable = entry.action_type;
+    else found.total += asCents ? toCents(value) : value;
+    byAlias.set(entry.action_type, found);
   }
-  return { total, unreadable };
+
+  const present = aliases.filter((alias) => byAlias.has(alias));
+  if (present.length === 0) return { total: 0, unreadable: null, conflict: [] };
+
+  const chosen = byAlias.get(present[0]!)!;
+  const disagreeing = present.filter((alias) => byAlias.get(alias)!.total !== chosen.total);
+
+  return {
+    total: chosen.total,
+    unreadable: chosen.unreadable,
+    conflict: disagreeing.length > 0 ? present : [],
+  };
 }
 
 function actionEntries(raw: unknown): MetaAction[] | null {
@@ -101,7 +127,26 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
   const entities = new Map<string, MetaEntityDays>();
   const unknownActions = new Set<string>();
   const campaignIds = new Set<string>();
+  const currencies = new Set<string>();
+  const conflicts = new Set<string>();
   let currency: string | undefined;
+
+  /**
+   * Whether this response carries conversion data at all.
+   *
+   * The Graph API omits an empty field rather than sending `[]`, so a day with
+   * no sales has no `actions` key and refusing it would refuse most real
+   * campaigns before their first order. But a caller who never asked for
+   * `actions` in `fields` gets rows with no key either — and reading *that* as
+   * zero would report a dead funnel for a campaign that is selling fine.
+   *
+   * The two are told apart at the level of the payload, not the row: if no row
+   * anywhere carries the key, the field was not requested and we refuse. If
+   * some rows carry it, the ones that do not are Meta's zeros.
+   */
+  const anyRowHas = (field: 'actions' | 'action_values'): boolean =>
+    rows.some((raw) => isRecord(raw) && Array.isArray(raw[field]));
+  const requested = { actions: anyRowHas('actions'), action_values: anyRowHas('action_values') };
 
   rows.forEach((raw, rowIndex) => {
     if (!isRecord(raw)) {
@@ -120,25 +165,34 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
       warnings.push(`Dropped aggregated row (${date} to ${stop}).`);
       return;
     }
+    // Without `date_stop` there is nothing saying this row is a single day, and
+    // a range that walks in unchallenged becomes a day thirty times too big.
+    if (date && !stop) {
+      missing.push({ rowIndex, date, fields: ['date_stop'] });
+      return;
+    }
 
     const level: 'campaign' | 'adset' = typeof row.adset_id === 'string' ? 'adset' : 'campaign';
     const id = level === 'adset' ? row.adset_id! : row.campaign_id;
     const name = (level === 'adset' ? row.adset_name : row.campaign_name) ?? id;
     if (typeof row.campaign_id === 'string' && row.campaign_id.length > 0) campaignIds.add(row.campaign_id);
 
-    if (typeof row.account_currency === 'string') currency ??= row.account_currency;
+    if (typeof row.account_currency === 'string') {
+      currencies.add(row.account_currency);
+      currency ??= row.account_currency;
+    }
 
     const gaps: string[] = [];
     if (!date) gaps.push('date_start');
     if (typeof id !== 'string' || id.length === 0) gaps.push(level === 'adset' ? 'adset_id' : 'campaign_id');
 
     const spendCents = (() => {
-      const value = parseMetaNumber(row.spend);
-      if (value === null) {
+      const cents = parseMetaMoneyCents(row.spend);
+      if (cents === null) {
         gaps.push('spend');
         return 0;
       }
-      return toCents(value);
+      return cents;
     })();
 
     const counts: Record<'impressions' | 'reach' | 'clicks', number> = {
@@ -156,11 +210,14 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
       else counts[field] = value;
     }
 
-    // The distinction the whole adapter turns on: a missing key is a hole, an
-    // empty array is a real zero. Meta omits the `action_type` of something
-    // that did not happen, so a day with no sales carries `actions: []`.
-    const actions = actionEntries(row.actions);
-    const actionValues = actionEntries(row.action_values);
+    /**
+     * An absent key is Meta's zero here, not a hole — see `requested` above for
+     * the one case where it is not, which is caught at the payload level. A key
+     * that is present but is not an array of actions is still a hole: that is
+     * a malformed response rather than an omitted one.
+     */
+    const actions = row.actions === undefined ? [] : actionEntries(row.actions);
+    const actionValues = row.action_values === undefined ? [] : actionEntries(row.action_values);
     if (actions === null) gaps.push('actions');
     if (actionValues === null) gaps.push('action_values');
 
@@ -171,8 +228,11 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
     };
     if (actions) {
       for (const key of COUNTED) {
-        const { total, unreadable } = readActions(actions, ACTION_ALIASES[key]);
-        if (unreadable) gaps.push(`actions.${ACTION_ALIASES[key][0]}`);
+        const { total, unreadable, conflict } = readActions(actions, ACTION_ALIASES[key]);
+        // Named for the alias that actually failed, not the first one in the
+        // list — pointing the reader at a field that is fine wastes the trip.
+        if (unreadable) gaps.push(`actions.${unreadable}`);
+        if (conflict.length > 0) conflicts.add(conflict.join(' / '));
         converted[key] = total;
       }
       for (const entry of actions) {
@@ -183,9 +243,10 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
 
     let revenueCents = 0;
     if (actionValues) {
-      const { total, unreadable } = readActions(actionValues, ACTION_ALIASES.purchases);
-      if (unreadable) gaps.push('action_values.purchase');
-      revenueCents = toCents(total);
+      const { total, unreadable, conflict } = readActions(actionValues, ACTION_ALIASES.purchases, true);
+      if (unreadable) gaps.push(`action_values.${unreadable}`);
+      if (conflict.length > 0) conflicts.add(conflict.join(' / '));
+      revenueCents = total;
     }
 
     if (gaps.length > 0) {
@@ -211,7 +272,51 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
     else entities.set(id, { id, name, level, days: [day] });
   });
 
-  if (missing.length > 0) throw incomplete(missing);
+  /**
+   * A row we cannot read is dropped and named. It is not read as zero, and it
+   * does not take the other twenty-nine with it.
+   *
+   * The earlier version threw on the first hole, which meant one unreadable day
+   * refused a month of perfectly good data. Refusing the field is right;
+   * refusing the campaign is a different and much bigger decision, and
+   * `packages/ingest` reaches the same shape from the CSV side. The dropped
+   * dates are in `warnings` for a caller to render, and the reason they matter
+   * is said there too: `diagnose` reads the last seven *entries*, so a gap
+   * stretches its window over more calendar days than it thinks.
+   */
+  if (missing.length > 0) {
+    const named = incomplete(missing);
+    warnings.push(
+      `${named.message} Those rows were dropped; the days around them were kept, so the trailing window covers more calendar days than it has entries.`,
+    );
+  }
+
+  if (!requested.actions) {
+    // Not one row in the whole response carries `actions`. That is a query that
+    // never asked for conversions, and reading it as a funnel of zeros would
+    // report a dead campaign to a seller who is selling.
+    throw new MetaInsightsError(
+      'META_INSIGHTS_INCOMPLETE',
+      'No row in this payload carries `actions`, so no conversion was requested from Meta. ' +
+        'Add `actions` and `action_values` to the `fields` of the insights call — a payload without them ' +
+        'is not a campaign with no sales.',
+    );
+  }
+
+  if (conflicts.size > 0) {
+    warnings.push(
+      `Two action types for the same conversion disagreed (${[...conflicts].join('; ')}). ` +
+        'The first was used. They are normally the same event seen through different integrations, so a ' +
+        'disagreement means one of them is measuring something else.',
+    );
+  }
+
+  if (currencies.size > 1) {
+    warnings.push(
+      `The payload mixes currencies (${[...currencies].sort().join(', ')}) and every figure here is added up as though it did not. ` +
+        'Split the request by account.',
+    );
+  }
 
   if (unknownActions.size > 0) {
     warnings.push(
@@ -225,7 +330,27 @@ export function fromMetaInsights(payload: unknown): MetaAccount {
   }));
 
   if (list.length === 0) {
-    throw new MetaInsightsError('META_INSIGHTS_MALFORMED', 'No usable rows in the insights payload.');
+    // Everything was dropped, so there is nothing to be honest *about*. This is
+    // the case where refusing is the only answer left.
+    throw missing.length > 0
+      ? incomplete(missing)
+      : new MetaInsightsError('META_INSIGHTS_MALFORMED', 'No usable rows in the insights payload.');
+  }
+
+  if (campaignIds.size > 1) {
+    /**
+     * `total` sums campaigns that do not share a funnel.
+     *
+     * Three ad sets under one campaign are one funnel seen in pieces, which is
+     * what `total` is for. Three campaigns are three funnels, usually three
+     * products, and adding them up produces a stage-by-stage picture of nothing
+     * that exists — a leak in one of them is diluted by the two that are fine.
+     * Read `.entities` and diagnose them one at a time.
+     */
+    warnings.push(
+      `This payload holds ${campaignIds.size} campaigns and \`total\` adds them together. ` +
+        'That total is not a funnel — diagnose each campaign from `entities` instead.',
+    );
   }
 
   if (list.length > 1) {
