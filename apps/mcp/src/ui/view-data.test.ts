@@ -1,5 +1,11 @@
 import { benchmarks } from '@mazal/data';
-import { predict, MEASURED_STAGES, WINDOW_DAYS } from '@mazal/engine';
+import {
+  predict,
+  MEASURED_STAGES,
+  SELF_MIN_BASELINE_DAYS,
+  SELF_WINDOW_DAYS,
+  WINDOW_DAYS,
+} from '@mazal/engine';
 import { aggregate } from '@mazal/contracts/metrics';
 import type { Diagnosis } from '@mazal/contracts';
 import { describe, expect, test } from 'vitest';
@@ -73,6 +79,51 @@ describe('diagnosisViewModel', () => {
     expect(vm.detail).toContain('1.0% of clicks add to cart');
     expect(vm.detail).toContain('8.0%');
     expect(vm.detail).toContain('1,540 clicks');
+  });
+
+  test('self mode windows on the engine\'s shorter window, not the benchmark one', () => {
+    // `diagnose` measures self mode over SELF_WINDOW_DAYS and checks every
+    // stage's minSample against *that* window. The view aggregated seven days
+    // regardless, so its sample was always the larger one and a stage the
+    // engine had skipped rendered ok with a value.
+    const days = healthyDays();
+    const vm = diagnosisViewModel(days, healthyDiagnosis, { kind: 'self', baselineDays: 20 });
+    const window = aggregate(days.slice(-SELF_WINDOW_DAYS));
+
+    expect(vm.slices.map((s) => s.value)).toEqual([
+      window.impressions,
+      window.clicks,
+      window.addToCarts,
+      window.checkoutsInitiated,
+      window.purchases,
+    ]);
+
+    // Every stage the engine could not have judged on this window is silent.
+    for (const spec of MEASURED_STAGES) {
+      if (spec.sample(window) >= spec.minSample) continue;
+      const row = vm.stages.find((s) => s.name.startsWith(`${spec.stage} ·`))!;
+      expect(row.state, `stage ${spec.stage}`).toBe('mute');
+    }
+  });
+
+  test('no baseline is not health: silence must not render as "no stage broke"', () => {
+    // Under SELF_MIN_BASELINE_DAYS of baseline, `selfReference` returns null for
+    // every stage, so `diagnose` compares nothing and returns primary: null —
+    // the same shape a genuinely healthy campaign returns. They must not read
+    // the same on screen.
+    const days = healthyDays();
+    const vm = diagnosisViewModel(days, healthyDiagnosis, {
+      kind: 'self',
+      baselineDays: SELF_MIN_BASELINE_DAYS - 1,
+    });
+
+    expect(vm.headline).not.toContain('No stage broke');
+    expect(vm.headline).toContain('Not enough history');
+    expect(vm.stages.some((s) => s.state === 'ok')).toBe(false);
+
+    // A real healthy answer, same days, still says so.
+    const healthy = diagnosisViewModel(days, healthyDiagnosis, { kind: 'benchmark', table: benchmarks });
+    expect(healthy.headline).toContain('No stage broke');
   });
 
   test('stage 2 is never judged: the store sends no analytics', () => {

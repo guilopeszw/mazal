@@ -10,9 +10,14 @@
 // decision leads, the number is the evidence, and translating a label is
 // allowed while changing a value never is.
 
-import type { CampaignDay, Diagnosis, FunnelStage, Verdict } from '@mazal/contracts';
+import type { CampaignDay, Diagnosis, FunnelStage, ReferenceMode, Verdict } from '@mazal/contracts';
 import { aggregate, atcRate, cpm, ctr, cvr, icRate, roas } from '@mazal/contracts/metrics';
-import { MEASURED_STAGES, WINDOW_DAYS } from '@mazal/engine';
+import {
+  MEASURED_STAGES,
+  SELF_MIN_BASELINE_DAYS,
+  SELF_WINDOW_DAYS,
+  WINDOW_DAYS,
+} from '@mazal/engine';
 
 // ─── formatting — locale `en` to match the web sheet, money stays BRL ─────
 
@@ -163,8 +168,30 @@ export type DiagnosisViewModel = {
   evidence?: string;
 };
 
-export function diagnosisViewModel(days: CampaignDay[], diagnosis: Diagnosis): DiagnosisViewModel {
-  const window = aggregate(days.slice(-WINDOW_DAYS));
+/**
+ * `reference` is the one the tool was called with. It decides two things the
+ * view cannot get from a `Diagnosis`: which window `diagnose` measured over —
+ * self mode uses a shorter one, and the sample minimums are checked against it
+ * — and whether the engine had a baseline to judge against at all.
+ *
+ * Omitted means benchmark, which is what both home tiles send.
+ */
+export function diagnosisViewModel(
+  days: CampaignDay[],
+  diagnosis: Diagnosis,
+  reference?: ReferenceMode,
+): DiagnosisViewModel {
+  const self = reference?.kind === 'self';
+  const window = aggregate(days.slice(-(self ? SELF_WINDOW_DAYS : WINDOW_DAYS)));
+  // The engine's own baseline slice: history before the window it is compared
+  // against, capped at what the caller asked for. Under a week of it,
+  // `selfReference` returns null for every stage and nothing is judged.
+  const judged =
+    !self ||
+    Math.min(
+      (reference as { baselineDays: number }).baselineDays,
+      Math.max(days.length - SELF_WINDOW_DAYS, 0),
+    ) >= SELF_MIN_BASELINE_DAYS;
   const leak = diagnosis.primary?.stage ?? null;
 
   const slices = FUNNEL_COUNTS.map(({ stage, of }) => ({
@@ -189,6 +216,17 @@ export function diagnosisViewModel(days: CampaignDay[], diagnosis: Diagnosis): D
       };
     }
     if (tone === 'after') return { name, state: 'mute', value: 'symptom' };
+
+    // No baseline, no judgment. `selfReference` returned null for every stage,
+    // so the engine compared nothing — printing a value here would turn silence
+    // into health, which is the one thing this view must never do.
+    if (!judged) {
+      return {
+        name,
+        state: 'mute',
+        value: `no history to compare against yet — needs ${SELF_MIN_BASELINE_DAYS} days before the window`,
+      };
+    }
 
     // Below the engine's own minimum sample the stage was never judged, and a
     // printed value would read as a verdict. The threshold is the engine's, not
@@ -216,7 +254,9 @@ export function diagnosisViewModel(days: CampaignDay[], diagnosis: Diagnosis): D
     ? `Your ${STAGE_NOUN[p.stage]} broke${
         diagnosis.changePoint ? ` on ${formatDate(diagnosis.changePoint.date)}` : ''
       }.`
-    : 'No stage broke — and that is a real answer.';
+    : judged
+      ? 'No stage broke — and that is a real answer.'
+      : 'Not enough history to judge this yet.';
   const detail = p
     ? `Yours: ${metricPhrase(p.metric, p.observed)}. Stores like yours: ${metricPhrase(
         p.metric,
