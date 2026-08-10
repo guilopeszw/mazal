@@ -156,9 +156,10 @@ Measured against curves the engine never sees, over 200 simulated accounts:
 >
 > | | |
 > |---|---|
-> | Tests | **175** |
+> | Tests | **294** |
 > | Categories benchmarked | 62 — 99.84% of Olist orders |
 > | MCP server | live, bearer-gated, in production |
+> | Renders inside Deco Studio | two `ui://` views — the funnel and the band |
 > | Execution against Meta | opt-in, off by default, decrease-only |
 >
 > **Roadmap, in order:** rung 1 of the execution ladder — Mazal composes the change, the seller confirms *inside Meta*, and we hold no credential at all. Then bandits, then effective ROAS with the organic tail.
