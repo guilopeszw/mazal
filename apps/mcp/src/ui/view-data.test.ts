@@ -239,16 +239,44 @@ describe('bandViewModel', () => {
       for (const text of strings) expect(text).not.toMatch(banned);
     }
 
-    const band = bandViewModel({
-      decision: 'launch_small',
-      predictedRoas: { p10: 0.28, p50: 1.66, p90: 9.97 },
-      breakEvenRoas: 2.38,
-      killTrigger:
-        'Stop if ROAS is below 2.38 after 100 clicks. Cvr is at 34% of the category median — the factor holding this band down.',
-      limitingFactor: 'cvr is at 34% of the category median — the factor holding this band down',
-    });
-    for (const text of [...band.ends, band.breakEvenLabel, band.limitingFactor!, band.killTrigger!]) {
-      expect(text).not.toMatch(banned);
+    // Every factor `predict` can name, not just the one that was easy to
+    // transcribe. `killTrigger` capitalises the factor at sentence start, and
+    // AtcRate/IcRate reached the seller verbatim while this loop was one case.
+    for (const factor of ['ctr', 'atcRate', 'icRate', 'cvr', 'aov']) {
+      const sentence = `${factor} is at 34% of the category median — the factor holding this band down`;
+      const capitalised = `${factor.charAt(0).toUpperCase()}${factor.slice(1)}`;
+      const band = bandViewModel({
+        decision: 'launch_small',
+        predictedRoas: { p10: 0.28, p50: 1.66, p90: 9.97 },
+        breakEvenRoas: 2.38,
+        killTrigger: `Stop if ROAS is below 2.38 after 100 clicks. ${capitalised} is at 34% of the category median — the factor holding this band down.`,
+        limitingFactor: sentence,
+      });
+      for (const text of [...band.ends, band.breakEvenLabel, band.limitingFactor!, band.killTrigger!]) {
+        expect(text, `${factor}: ${text}`).not.toMatch(banned);
+      }
+      // The value survives the translation.
+      expect(band.limitingFactor).toContain('34%');
+      // And it reads as a sentence: no orphaned article, no lowercase start.
+      for (const text of [band.limitingFactor!, band.killTrigger!]) {
+        expect(text, `${factor}: ${text}`).not.toContain('the what is typical');
+      }
+      expect(band.killTrigger).toMatch(/\. [A-Z]/);
+    }
+
+    // The two shapes with no factor name in them still have to survive.
+    for (const limitingFactor of [
+      'every factor is at or near the category median — the band is limited by category spread, not by this account',
+      'no campaign history yet, so the band is category-wide — instrument aov first, it is the widest factor here',
+    ]) {
+      const band = bandViewModel({
+        decision: 'launch',
+        predictedRoas: { p10: 1, p50: 2, p90: 3 },
+        breakEvenRoas: 1.5,
+        limitingFactor,
+      });
+      expect(band.limitingFactor).not.toMatch(banned);
+      expect(band.limitingFactor).not.toContain('the what is typical');
     }
   });
 });

@@ -293,21 +293,27 @@ export function plainProse(text: string): string {
     text
       .replace(/Stop if ROAS is below (\d+(?:\.\d+)?)/, (_, v: string) =>
         `Stop if each R$1 spent is bringing back less than ${brl.format(Number(v))}`)
+      // Case-insensitive on every factor: `killTrigger` capitalises the factor
+      // at sentence start (predict.ts), so `AtcRate` and `IcRate` reach here
+      // capitalised and a case-sensitive match leaves them on the seller's screen.
       .replace(/\bctr\b/gi, 'the share of views that click')
-      .replace(/\batcRate\b/g, 'the share of clicks that add to cart')
-      .replace(/\bicRate\b/g, 'the share of carts that start checkout')
+      .replace(/\batcRate\b/gi, 'the share of clicks that add to cart')
+      .replace(/\bicRate\b/gi, 'the share of carts that start checkout')
       .replace(/\bcvr\b/gi, 'the share of clicks that turn into sales')
       .replace(/\baov\b/gi, 'what each sale is worth')
       .replace(/the band is category-wide/g, 'the estimate is as wide as the category')
       .replace(/holding this band down/g, 'holding this estimate down')
       .replace(/\bthe band\b/g, 'the estimate')
-      .replace(/category median/g, 'what is typical for the category')
+      // Absorb the article: "of the category median" → "of what is typical for
+      // the category". Replacing the noun alone left "of the what is typical".
+      .replace(/the category median/g, 'what is typical for the category')
       .replace(/the widest factor here/g, 'the number that varies most here')
-      // Grammar seam: a replacement can land right after a period; the engine
-      // also capitalises a factor name at sentence start. Normalise both.
-      .replace(/(^|\. )the share/g, (_, lead: string) => `${lead}The share`)
-      .replace(/\bCvr\b|\bCtr\b|\bAov\b/g, (m) =>
-        m === 'Aov' ? 'What each sale is worth' : `The share of ${m === 'Cvr' ? 'clicks that turn into sales' : 'views that click'}`)
+      // Grammar seam: a replacement lands where the engine had a capitalised
+      // factor at sentence start, so re-capitalise whichever phrase landed there.
+      .replace(
+        /(^|\. )(the share|what each sale is worth)/g,
+        (_, lead: string, phrase: string) => `${lead}${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}`,
+      )
   );
 }
 

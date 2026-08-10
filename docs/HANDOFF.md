@@ -15,6 +15,35 @@ Entry format:
 
 ---
 
+## 2026-08-10 12:55 BRT · Guilherme's agent · the Studio agent was answering nothing
+
+**Done:** the thing that matters in this entry is one line long. **Studio's org settings pinned all three chat tiers to `gemini-2.5-flash`, and Google now refuses to serve it** — *"This model models/gemini-2.5-flash is no longer available to new users."* The 02:49 thread against the `Mazal` agent has exactly two messages in it: a real seller question — *"I have a product I have not advertised yet. Can you tell me if it can pay for itself before I spend anything?"* — and that error. Every Studio chat with the agent was failing. Tiers now point at `gemini-3.5-flash` (same key, tools + reasoning, 1M context).
+
+**`CONNECTION_TEST` was healthy the entire time**, because the connection *was* healthy — 227ms, tool list loading, bearer accepted. The model behind the agent was not, and nothing we check looks at that. "The wire format is verified" and "it works" are different claims, and this is the third time this weekend that gap has bitten: the runbook that described a Deco integration that did not exist, the `/mcp` route that returned 404 through three separate causes, and now an agent that could not speak.
+
+**PR #42 is merged** — `c5bd1c0`, by Bringel at 01:52 UTC, with his own conflict resolution in `53bbff3`. That resolution was checked here rather than assumed: `docs/deco-agent.md` on `main` keeps all three edits (the `<language>` block, the health-probe and bearer sections, the `metadata.ui.homeTiles` record), carries no duplicated "Why they were rewritten" section, and has no stale paste marker.
+
+**And that file is now provably in sync with Studio, not asserted to be.** Pull `metadata.instructions` with `COLLECTION_VIRTUAL_MCP_GET` on `vir_s9bfvfwe5vloXTD6Ttn_o`, extract the four-backtick block out of the doc, `diff` the two: identical. Run it whenever that file is touched — Studio keeps no history, so this is the only check it has. If you want a size to compare, say which one you mean: the block is **6246 bytes** (`wc -c`, minus the trailing newline) and **6197 characters** to JavaScript, because `—`, `–` and `ã` are one character and several bytes each. The whole 49-byte gap is those: fourteen em dashes and three en dashes at three bytes, fifteen accented letters at two. (`R$` is not one of them — it is two plain ASCII bytes, and I had it in this list until a review took the list seriously.) A count with no unit on it is how the next person concludes the file drifted when it did not.
+
+**A correction to the 22:10 entry below, and a correction to my own first draft of this one.** That entry says *"60 tests in `@mazal/mcp` (was 40), 195 at the root"*, and I first wrote here that none of it reproduced anywhere. **That was wrong, and it was the same mistake I was accusing it of.** At `15caa68` — the commit that entry was written on — those commands print exactly **60** and **195**. The numbers moved to **68** and **294** when `53bbff3` merged `main` in. The one figure that does not reproduce is *"was 40"*: the branch's base `a967c6b` prints **45**.
+
+So the lesson is not that the entry lied. It is that **a test count with no commit beside it stops being true without anyone editing it** — and then it reads as a fabrication to whoever checks next. Quote the commit, or quote the command and the day.
+
+Separately: the `optimization.md` §4 citation is in [`deco-agent.md`](deco-agent.md), not in the entry below — I misattributed it. The file is real, tracked at the repo root, and referenced from `docs/allocator.md`, `docs/allocator-results.md`, `docs/deck.md` and `docs/deco-agent.md`. Nothing to fix there.
+
+**A review of #42 after it merged found three bugs, all on the seller-facing line** — PR #49. `plainProse` matched the factor names case-sensitively while `killTrigger` capitalises the limiting factor at sentence start, so **`AtcRate` and `IcRate` reached the seller verbatim**: the exact jargon the views were rewritten to remove. Every shape also read *"at 34% of **the what is typical for the category**"*, because the replace took the noun and left the engine's article. The ban test stayed green through all of it because it fed one hand-transcribed `Cvr` shape; it now runs every factor `predict` can name.
+
+**Next:** send one message to `Mazal` in Studio — *"tenho um produto que ainda não anunciei, vale a pena?"* — then read the reply back with `COLLECTION_THREAD_MESSAGES_LIST`. It confirms two things at once: that the model fix took, and that the `<language>` rules land (decision first; no `p10`, `banda`, `mediana`, `gatilho`). It needs a human in Studio — no MCP tool runs an agent, and the Chrome extension is not connected to this machine.
+
+**Blocked / watch out:** four things.
+
+- **Nobody has still seen the home tiles paint**, and this session could not look either (`list_connected_browsers` returns empty). What is confirmed, from Studio's own record rather than from our docs: the agent carries `metadata.ui.homeTiles` with both tiles — `mazal-funnel` → `ui://mazal/diagnosis` → `diagnose_campaign` and `mazal-band` → `ui://mazal/prediction` → `predict_campaign` — each with its connection id and a full `toolInput`. Stored and well-formed. Still not pixels.
+- **The stale `mcp` Vercel project now runs a *newer* build than it should.** `mazal-mcp` is authoritative and the only host on the allowlist. A `vercel link --yes` failed silently on scope, the CLI fell back to the old `mcp` link, and a deploy landed there first. Nothing points at it, but do not read that project's dashboard and conclude anything about production.
+- **`vercel link` writes `apps/mcp/.env.local` with the project's environment pulled down.** Delete it unread; never open or commit one. `apps/mcp/.gitignore` carries `.env*` so git will not offer to.
+- **One session per worktree.** Two agents were live in the same worktree during this merge; a peer's `git commit` swallowed an in-progress merge index and produced a merge commit whose message described only its own change and which dropped a file `main` adds. The peer caught it and fixed itself before dying on a session limit, so nothing was lost — but `git worktree list` before you start, and do not borrow one that is already checked out.
+
+---
+
 ## 2026-08-09 22:10 BRT · Guilherme's agent · Deco Studio renders the charts, not prose
 
 **Done:** the MCP now exposes two `ui://` resources per the MCP Apps extension (`modelcontextprotocol/ext-apps`, spec 2026-01-26, the contract Deco's `MCPAppRenderer` reads): `ui://mazal/diagnosis` — the funnel with the leak marked — and `ui://mazal/prediction` — the break-even and the band. `diagnose_campaign` and `predict_campaign` carry `_meta.ui.resourceUri`, so a tool result in Studio chat renders as the chart. The agent's `metadata.ui.homeTiles` puts both on the org home board fed by `demo-case2` (eta_shock, stage 4 leak). Every number in a view is engine output or a contract rate function — the views mirror `apps/web/lib/answers.ts` and a stage under the engine's own `minSample` renders "not judged", never a value.
