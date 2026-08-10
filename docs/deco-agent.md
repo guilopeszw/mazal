@@ -21,9 +21,9 @@ Either it was built in a different organization, or the runbook described an int
 
 ## The one thing not set here
 
-The connection has **no `Authorization` header**, so `CONNECTION_TEST` reports `healthy: false`. That is expected and is the correct end state for a file in git.
+The connection's `Authorization: Bearer <token>` header is set in Studio (2026-08-09 — the tool list loads, so auth passes). The token is Vercel's `MAZAL_MCP_BEARER_TOKEN` for the `mazal-mcp` project. It lives in exactly two places — Vercel's environment variables and Studio's connection — and in neither a repository, an agent's instructions, a URL, nor a chat. Its value is deliberately not recorded here.
 
-Set it in Studio: the connection's headers, `Authorization: Bearer <token>`, where the token is Vercel's `MAZAL_MCP_BEARER_TOKEN` for the `mazal-mcp` project. It lives in exactly two places — Vercel's environment variables and Studio's connection — and in neither a repository, an agent's instructions, a URL, nor a chat.
+`CONNECTION_TEST` stayed `healthy: false` even with the header correct: the probe is a bare JSON-RPC ping without an MCP `Accept` header, which the server used to `406`. Fixed server-side — see the health-check section of [`mazal-mcp-vercel-deco.md`](mazal-mcp-vercel-deco.md); it turns healthy once that change is deployed to production.
 
 The host allowlist accepts `mazal-mcp.vercel.app` only. Calling any other alias returns our own `Invalid Host`, not a Vercel error.
 

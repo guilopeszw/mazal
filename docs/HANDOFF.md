@@ -948,3 +948,13 @@ Also fixed: local dev tooling was missing entirely at the start of this session 
 **Next:** Configure the connected Vercel `mazal` project to build `apps/web` as Next.js, then smoke-test `/` and `/api/chat` on the production deployment.
 
 **Blocked / watch out:** Vercel currently deploys `main` as READY but produces no output and returns 404 because its project root/framework are unset. Local Turbopack still panics on process binding; Webpack is the successful source-level build check. The checkout's `origin` still points to `guilopeszw/mazal`, while the merged PR and Vercel use `JucaGF/mazal`; do not push until that canonical remote is confirmed.
+
+---
+
+## 2026-08-09 · E-agent session · Deco connection health, fixed at the cause
+
+**Done:** On `fix/deco-connection-health`. Deco Studio reported the Mazal MCP connection `healthy: false` with "Tool ON_MCP_CONFIGURATION not found" even after the bearer header was set. Read the actual Studio source (`decocms/studio` on GitHub) instead of guessing: (1) `CONNECTION_TEST` never does an MCP handshake — it POSTs a bare JSON-RPC `ping` whose `Accept: */*` our transport rejected with 406; `apps/mcp/src/server.ts` now expands the wildcard to the two MCP content-types before the transport sees it. (2) `ON_MCP_CONFIGURATION` is a lifecycle callback Studio fires on every connection create/update whose configuration changed; implemented as an authenticated no-op in `apps/mcp/src/tools/index.ts` with the exact input schema from Studio's runtime (`state`, `scopes`, `firstRun?`, `vault?` — vault carries a workload token, never logged). Tests first, then code: 45 in the package (was 40), 180 at the root (was 175), typecheck, web build, `build:vercel` all green; built bundle re-verified by hand — 401 no token, 401 wrong token, 200 `{"result":{}}` on the exact Deco probe. Docs updated: `mazal-mcp-vercel-deco.md` (health-check section + tools/list line), `deco-agent.md` (header now set in Studio).
+
+**Next:** Merge the PR, let Vercel deploy production, then run `CONNECTION_TEST` on `conn_ZovZcL4B9Fplj0h06GO0f` — it should flip to `healthy: true`. Nothing needs changing in Studio.
+
+**Blocked / watch out:** `tools/list` now returns five tools; `ON_MCP_CONFIGURATION` must not be enabled as an agent tool in the connection — it exists for Studio's callback, not for the agent. The connection test stays false until this actually deploys to `mazal-mcp.vercel.app`.
