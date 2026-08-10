@@ -26,8 +26,26 @@ import accountInsights from "../../../packages/meta/fixtures/demo-account.meta-i
  * in the store rather than in Ads Manager, and diagnosing the half of the funnel
  * that they explain is the whole product.
  */
-const case2Meta = fromMetaInsights(case2Insights);
-const accountMeta = fromMetaInsights(accountInsights);
+/**
+ * This runs at module scope, so a payload the adapter refuses fails the build.
+ * That is the right moment for it to fail — but the raw `MetaInsightsError`
+ * stack says nothing about which file to regenerate, and whoever meets it will
+ * be in a hurry.
+ */
+function read(payload: unknown, file: string) {
+  try {
+    return fromMetaInsights(payload);
+  } catch (cause) {
+    throw new Error(
+      `packages/meta/fixtures/${file} is not a payload the adapter can read. ` +
+        'Run `pnpm meta:fixtures` to regenerate it.',
+      { cause },
+    );
+  }
+}
+
+const case2Meta = read(case2Insights, 'demo-case2.meta-insights.json');
+const accountMeta = read(accountInsights, 'demo-account.meta-insights.json');
 
 const case2Fixture = case2Json as unknown as LabelledCampaign;
 
@@ -82,13 +100,3 @@ export const demoAccount = {
   }),
 };
 
-/**
- * What the adapter had to say about the payloads it read — the fixture stamp,
- * the summed reach, the page it did not have. Nothing renders these today; they
- * are here so that whoever wires a live account has the sentences already
- * written rather than inventing them under time pressure.
- */
-export const metaProvenance = {
-  case2: case2Meta.warnings,
-  account: accountMeta.warnings,
-} as const;

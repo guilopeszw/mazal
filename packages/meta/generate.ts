@@ -229,7 +229,12 @@ writeFileSync(here('demo-account.campaigns.csv'), toAdsManagerCsv(accountAccount
 const fail: string[] = [];
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
-/** Key order differs between the fixture and a rebuilt day; value equality does not. */
+/**
+ * Key order differs between the fixture and a rebuilt day; value equality does
+ * not. `sessions` and `bounceRate` are in here even though no fixture carries
+ * them today — leaving them out would mean that if the simulator ever adds
+ * them, the payload would silently drop them and this guard would stay green.
+ */
 const canonical = (days: CampaignDay[]) =>
   days.map((d) => [
     d.date,
@@ -242,6 +247,8 @@ const canonical = (days: CampaignDay[]) =>
     d.checkoutsInitiated,
     d.purchases,
     d.revenue,
+    d.sessions ?? null,
+    d.bounceRate ?? null,
   ]);
 
 // The payload, folded back up, has to be the fixture. Not close to it.
