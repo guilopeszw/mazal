@@ -15,6 +15,40 @@ Entry format:
 
 ---
 
+## 2026-08-10 · Codex · entrega do README de produto
+**Done:** substituído o README provisório por uma narrativa em pt-BR sobre a tese de Mazal, o problema do leak, o fluxo pre-flight/in-flight, o engine, os dados, o simulator, a ingestão, a web, o MCP, as evidências, os limites e os próximos passos. `pnpm sim:fixtures` confirmou os dois casos da demo; `pnpm sim:backtest` reproduziu 59,0% top-1, 59,0% top-2 em estágio e 12,0% de falsos alarmes em 25 saudáveis. Também passaram `pnpm test` (603 testes), `pnpm typecheck`, `pnpm build`, links locais e `git diff --check`.
+**Next:** revisar o texto no contexto da apresentação e, se aprovado, integrar esta branch pelo fluxo normal em direção a `stage`.
+**Blocked / watch out:** `pnpm test` percorre também cópias sob `.worktrees/` e `.pnpm-store/`, por isso coletou 603 testes; os artefatos não relacionados continuam fora do escopo. O backtest permanece um número de wiring/sanity, pois o firewall entre engine e simulator não se manteve.
+
+## 2026-08-10 · Codex · análise e plano de reescrita do README
+**Done:** analisado o `README.md` atual contra `apps/web/PRODUCT.md`, `docs/contracts.md`, `docs/acceptance.md`, `docs/demo-contract.md`, `docs/backtest-results.md`, `docs/benchmark-provenance.md`, `docs/peer-comparison.md`, `docs/allocator.md` e a operação MCP. Criado `docs/superpowers/plans/2026-08-10-readme-rewrite.md` com a narrativa recomendada, matriz de fatos, estrutura de seções, evidências, limites, roadmap e checklist de validação. O `README.md` ainda não foi alterado.
+**Next:** executar o plano e substituir o README provisório por uma versão em pt-BR que apresente primeiro a tese, depois a solução entregue e por último evidências, limites e próximos experimentos.
+**Blocked / watch out:** não afirmar pesquisa com sellers, clientes, export Meta real, validação independente ou escrita real na Meta; o backtest de 59,0% é um número de wiring/sanity porque o firewall entre engine e simulator não se manteve.
+
+## 2026-08-09 18:48 BRT · Codex · publicação do PR de integração para `main`
+
+**Done:** a branch `joaquim/feat/sync-e-agent-to-main` foi publicada em `origin` até `1520506`. A validação passou: `pnpm test` (575 testes coletados), `pnpm typecheck`, `pnpm build` e `git diff --check`.
+
+**Next:** reautenticar o GitHub local e abrir o PR de `joaquim/feat/sync-e-agent-to-main` para `main`.
+
+**Blocked / watch out:** `gh auth status` reporta token inválido para `JucaGF`; o conector GitHub também retornou `404` ao consultar/criar no repositório. Arquivos locais não commitados (`.pnpm-store/`, `.worktrees/` e o plano do chat) ficaram fora da branch publicada.
+
+## 2026-08-09 18:01 BRT · Joaquim · correção do `pnpm build`
+
+**Done:** o workspace raiz agora expõe `pnpm build`, delegando para `apps/web`; o build web usa explicitamente `next build --webpack`, evitando a falha do worker CSS do Turbopack neste ambiente (`Operation not permitted` ao abrir uma porta local). `pnpm build`, `pnpm typecheck` e `git diff --check` passaram.
+
+**Next:** integrar esta correção pela branch de trabalho conforme o fluxo do projeto.
+
+**Blocked / watch out:** o build padrão com Turbopack continua sujeito à limitação de sandbox; o caminho versionado usa Webpack para manter o build reproduzível localmente.
+
+## 2026-08-09 16:35 BRT · Joaquim · revisão do plano do chat web
+
+**Done:** revisado e substituído `docs/superpowers/plans/2026-08-09-web-chat-api.md`: o contexto público agora não aceita benchmark table; handles de conversa são assinados e vinculados à sessão; o cache guarda só conteúdo fixture/template; captura virou script local; e o núcleo da rota ganhou plano de testes, limites de payload, timeout/rate limit e validação Host/Origin. Nenhum código da rota foi implementado nem nenhum segredo/deploy foi alterado.
+
+**Next:** executar a Task 1 do plano em uma branch `feat/` a partir de `stage`.
+
+**Blocked / watch out:** o provider live permanece bloqueado até existir uma API/SDK público do Deco que execute o Agent com continuidade; produção deve ficar em `NARRATION_MODE=fixture`.
+
 ## 2026-08-09 16:15 BRT · Bringel's agent · the chat shell's chrome, and stage→main
 
 **Done:** three things, in this order.
