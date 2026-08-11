@@ -10,7 +10,7 @@ import {
 } from '../schemas.js';
 import { UI_RESOURCE_URI_BY_TOOL } from '../ui/resources.js';
 import { buildRecoveryPlan } from './build-recovery-plan.js';
-import { diagnoseCampaignWithNotes } from './diagnose-campaign.js';
+import { diagnoseCampaignWithNotesAsync } from './diagnose-campaign.js';
 import { executePlan } from './execute-plan.js';
 import { predictCampaign } from './predict-campaign.js';
 
@@ -76,20 +76,21 @@ export function registerMazalTools(
   server.registerTool(
     'diagnose_campaign',
     {
-      // The exactly-one rule cannot be expressed in JSON Schema, so both fields
-      // publish as plain optionals and a client author would otherwise meet the
-      // rule as a runtime error. It is said here instead.
+      // The exactly-one rule cannot be expressed in JSON Schema, so all three
+      // fields publish as plain optionals and a client author would otherwise
+      // meet the rule as a runtime error. It is said here instead.
       description:
-        'Diagnose the earliest broken campaign funnel stage. Send either `days` (CampaignDay[]) ' +
-        'or `metaInsights` (a raw Meta /insights response, one campaign per call) — exactly one of ' +
-        'the two, never both. Do not convert a Meta payload into days yourself.',
+        'Diagnose the earliest broken campaign funnel stage. Send exactly one of: `days` ' +
+        '(CampaignDay[]), `metaInsights` (a raw Meta /insights response, one campaign per call), ' +
+        'or `metaQuery` (account, campaign and date range — the server reads Meta itself, ' +
+        'read-only). Never send two. Do not convert a Meta payload into days yourself.',
       inputSchema: diagnoseCampaignInputSchema,
       // MCP Apps (spec 2026-01-26): hosts that support `ui://` resources render
       // the tool result through this view instead of prose.
       _meta: { ui: { resourceUri: UI_RESOURCE_URI_BY_TOOL['diagnose_campaign'] } },
     },
-    (input) => {
-      const { diagnosis, notes } = diagnoseCampaignWithNotes(input);
+    async (input) => {
+      const { diagnosis, notes } = await diagnoseCampaignWithNotesAsync(input);
       return jsonResult(diagnosis, notes);
     },
   );

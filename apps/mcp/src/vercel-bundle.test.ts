@@ -41,6 +41,21 @@ test('emits a self-contained ESM Vercel function', async () => {
   expect(bundle).not.toContain('src/index.ts');
 });
 
+test('the deployed bundle cannot spell a Meta write call', async () => {
+  // The allowlist is the real guard — this is belt and braces over what
+  // actually ships. esbuild minifies identifiers but preserves string
+  // literals, so a write tool name reaching the allowlist would appear here.
+  const bundle = await readFile(bundlePath, 'utf8');
+
+  for (const forbidden of [
+    'create_campaign', 'create_adset', 'create_ad',
+    'update_adset', 'update_ad', 'update_ad_creative',
+    'create_budget_schedule', 'upload_ad_image',
+  ]) {
+    expect(bundle, `bundle contains "${forbidden}"`).not.toContain(forbidden);
+  }
+});
+
 test('the isolated bundle exposes named MCP HTTP methods and rejects an unauthenticated POST', async () => {
   const isolatedDirectory = await mkdtemp(join(tmpdir(), 'mazal-mcp-bundle-'));
   const isolatedBundle = join(isolatedDirectory, 'mcp.mjs');

@@ -5,7 +5,11 @@ import { apparelCard, healthyDays } from './test-fixtures.js';
 
 type JsonRpcResponse = {
   result?: {
-    tools?: Array<{ name: string }>;
+    tools?: Array<{
+      name: string;
+      description?: string;
+      inputSchema?: { properties?: Record<string, unknown> };
+    }>;
     structuredContent?: Record<string, unknown>;
     content?: Array<{ type: string; text?: string }>;
     isError?: boolean;
@@ -119,4 +123,31 @@ test('returns a structured MCP tool error for invalid input', async () => {
   expect(response.error).toBeUndefined();
   expect(response.result?.isError).toBe(true);
   expect(response.result?.content?.[0]?.text).toContain('Input validation error');
+});
+
+test('diagnose_campaign advertises the metaQuery arm in its description', async () => {
+  const response = await callMcp('tools/list', {}, 90);
+  const tool = response.result?.tools?.find((t) => t.name === 'diagnose_campaign');
+
+  expect(tool?.description).toMatch(/metaQuery/);
+});
+
+test('diagnose_campaign publishes all three input arms', async () => {
+  const response = await callMcp('tools/list', {}, 91);
+  const tool = response.result?.tools?.find((t) => t.name === 'diagnose_campaign');
+
+  expect(Object.keys(tool?.inputSchema?.properties ?? {})).toEqual(
+    expect.arrayContaining(['days', 'metaInsights', 'metaQuery', 'card', 'events', 'reference']),
+  );
+});
+
+test('reading a live account added no public tool', async () => {
+  // PRD 10 asked for no fifth tool, and the first test in this file already
+  // pins the exact five names. This one says why that matters here: the
+  // metaQuery arm must not have become `diagnose_meta_campaign`.
+  const response = await callMcp('tools/list', {}, 92);
+  const names = response.result?.tools?.map((t) => t.name) ?? [];
+
+  expect(names).toHaveLength(5);
+  expect(names).not.toContain('diagnose_meta_campaign');
 });
