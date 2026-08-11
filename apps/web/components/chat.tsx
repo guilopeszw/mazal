@@ -256,6 +256,11 @@ export function Chat({
     // Read here, in the handler: once React has re-rendered, the landing position is gone.
     if (!started) cameFrom.current = composer.current?.getBoundingClientRect().top ?? null;
     setTurns((t) => [...t, { id: t.length, kind: "card", asked, answer }]);
+    // Asking anything else puts the upload away. It is a panel for one job, and
+    // leaving it open under a new answer left two unrelated things competing for
+    // the same screen — the answer the seller just asked for, and a form about a
+    // file they have moved on from.
+    setUploading(false);
   };
 
   /**
