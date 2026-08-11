@@ -15,6 +15,22 @@ Entry format:
 
 ---
 
+## 2026-08-10 21:40 BRT · Miguel · Meta Ads MCP integration, built against an assumed shape
+
+**Done:** `apps/mcp/src/meta-client/` — Mazal's MCP server is now a read-only MCP *client* of Meta's Ads MCP. `diagnose_campaign` takes a third arm, `metaQuery` (account, campaign, date range), fetches insights itself and delegates to the existing `metaInsights` path, so there is one adapter and one engine call. Meta's dataset health becomes a synthesized `pixel_error` `StoreEvent`, which `packages/engine/src/index.ts:325` already privileges over pattern inference — so `pixel_break` stops being a funnel-shape guess with **no change to `packages/contracts`**. Tool surface is still four. Tasks 1–10 of the plan, on `feat/meta-mcp-integration`, ten commits `30c334c`..`2a2f1c5`; `@mazal/mcp` at 127 tests. Design: `docs/superpowers/specs/2026-08-10-meta-mcp-integration-design.md`. Plan: `docs/superpowers/plans/2026-08-10-meta-mcp-integration.md`.
+
+**Next:** run `pnpm meta:probe` with a real Meta token and reconcile — Task 11 of the plan. It needs a human with an ad account and a browser, and **nothing here has ever spoken to Meta.**
+
+**Blocked / watch out:**
+
+- **The wire format is assumed, not observed.** Tool names, the response envelope and how daily granularity is requested are all guesses, grouped in `META_TOOLS` and `fixtures/meta-mcp/assumed-*.json` so reconciliation is a small edit. If Meta answers in prose, `fromMetaInsights` cannot read it and the design changes rather than the code. This is the same "the wire format is verified / it works" gap that has bitten this repo three times; it is written down here so the fourth time is not a surprise.
+- **`META_ADS_ENABLED` is off and should stay off** until a capture has been read against the adapter.
+- **The token is one account's.** There is no per-seller OAuth and no durable store; `MAZAL_META_MCP_TOKEN` is a single server-only secret and expires without warning.
+- **No write path.** The allowlist holds two read tools and a test fails if a write-shaped name joins them. `execute_plan` is still simulated. Real writes are PRD 11 and need the threat model, dry-run diffs, idempotency keys and durable audit log it lists.
+- **Root `pnpm typecheck` does not check `apps/`.** The root `tsconfig.json` includes `packages/*` only, so nothing under `apps/mcp` or `apps/web` is type-checked by it. A `RequestInfo` reference committed earlier in this branch was green at the root and red in the package for that reason (fixed in `9671f0a`). Run `pnpm --filter @mazal/mcp test` — it runs both of the package's own typechecks — before believing a green root.
+
+---
+
 ## 2026-08-10 16:20 BRT · Guilherme's agent · somebody finally looked at the tiles
 
 **Done:** five PRs on `stage` — #48, #49, #50, #51, #52. `stage` at `08f9a9f`, verified as a whole rather than branch by branch: typecheck, **298 root tests**, **72 `@mazal/mcp`**, both fixture guards, `next build`, and `sim:backtest` regenerating `docs/backtest-results.md` byte-identical.
