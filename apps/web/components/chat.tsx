@@ -195,6 +195,21 @@ export function Chat({
 
   useEffect(() => {
     if (turns.length === 0) return;
+    /*
+     * `start`, deliberately, and it is not what makes a short first answer sit
+     * in an empty viewport.
+     *
+     * Measured: on the first turn the document is exactly viewport-tall, so
+     * `maxScroll` is 0 and this call moves nothing — `start` and `nearest` are
+     * byte-identical there. The bare ground under a streaming answer is simply
+     * an answer shorter than the screen, and it wants a layout answer rather
+     * than a scroll option.
+     *
+     * `nearest` was tried and is worse: it scrolls the minimum, which
+     * bottom-aligns a new turn against the fixed composer and buries the
+     * question behind it. `scroll-mt-20` cannot save that — scroll-margin-top
+     * only applies to a top-aligned element.
+     */
     lastTurn.current?.scrollIntoView({
       behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
       block: "start",
