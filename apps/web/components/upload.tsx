@@ -199,10 +199,10 @@ export function Upload({
                   ))}
                 </select>
                 <span className="text-[12px] text-ink-faint">
-                  Picks which sellers yours is compared against, and nothing else — the
-                  arithmetic is the same either way. Choose the closest; where the category
-                  has too few Olist sellers to measure, Mazal says so on the answer rather
-                  than comparing you to a guess.
+                  Picks which sellers yours is compared against, and the three product details
+                  below that Mazal fills in for you. The arithmetic is the same either way.
+                  Choose the closest; where the category has too few Olist sellers to
+                  measure, Mazal says so on the answer rather than comparing you to a guess.
                 </span>
               </label>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
