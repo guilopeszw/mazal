@@ -161,7 +161,7 @@ export function Upload({
                 onChange={(e) => void handleFile(e.target.files?.[0])}
               />
               <span className="font-[540] text-ink">
-                {busy === "parse" ? "Parsing…" : "Drop your Meta Ads CSV here"}
+                {busy === "parse" ? "Parsing…" : "Drop your Meta Ads CSV here, or click to choose one"}
               </span>
               <span className="text-[13px] text-ink-faint">or press Enter to browse files</span>
             </label>

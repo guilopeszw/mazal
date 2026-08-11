@@ -195,9 +195,23 @@ export function Chat({
 
   useEffect(() => {
     if (turns.length === 0) return;
+    /*
+     * `nearest`, not `start`.
+     *
+     * `start` pinned the new turn to the top of the viewport the moment it was
+     * created — while it still held one streamed word. Everything under it was
+     * bare ground until the sections revealed, which on a plan answer is seven
+     * seconds of what reads as a large empty box rather than an answer being
+     * written. On the cream ground it reads as a white one.
+     *
+     * `nearest` scrolls the minimum needed to bring the turn into view, so the
+     * answer grows from where the conversation already was. `scroll-mt-20` on
+     * the turn still keeps the verdict clear of the sticky header whenever a
+     * scroll does happen.
+     */
     lastTurn.current?.scrollIntoView({
       behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-      block: "start",
+      block: "nearest",
     });
   }, [turns]);
 
