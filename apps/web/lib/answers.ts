@@ -451,6 +451,61 @@ function diagnoseAnswer(args: {
  * trustworthy self-baseline for a file we just met. Called from a server action, so the
  * benchmark table still never reaches the browser.
  */
+/**
+ * The pre-flight for a card the seller uploaded, rather than the fixture's.
+ *
+ * This is the one answer a seller whose checkout Mazal cannot observe can still
+ * get in full: `predict` reads the product and the category table, and needs no
+ * pixel, no conversions and no campaign history. For an iFood or WhatsApp
+ * seller it is the difference between a product and nothing.
+ *
+ * Deliberately narrower than the demo's pre-flight: no recovery plan, because a
+ * plan repairs a flight and there is none here, and no budget note, because
+ * nobody has stated a budget. Everything printed is engine output.
+ */
+export function buildPreflightAnswer(card: ProductCard, asked: string, noteSuffix = ""): Answer {
+  const verdict = predict({ card, table: benchmarks });
+  const { p10, p50, p90 } = verdict.predictedRoas;
+  const breakEven = verdict.breakEvenRoas;
+  const scale = Math.max(p90, breakEven) * 1.06 || 1;
+  const at = (v: number) => Math.min(100, Math.max(0, (v / scale) * 100));
+
+  const decisionVerdict: Record<typeof verdict.decision, VerdictSegment[]> = {
+    dont_launch: [
+      { text: "Don't launch yet. ", tone: "bad" },
+      { text: `Your break-even needs ${formatRoas(breakEven)} and the best case is ${formatRoas(p90)}.` },
+    ],
+    launch_small: [
+      { text: "Launch small. ", tone: "good" },
+      { text: `Break-even is ${formatRoas(breakEven)} and the likely case is ${formatRoas(p50)}.` },
+    ],
+    launch: [
+      { text: "Launch. ", tone: "good" },
+      { text: `Break-even is ${formatRoas(breakEven)} and even the worst case is ${formatRoas(p10)}.` },
+    ],
+  };
+
+  return {
+    asked,
+    verdict: decisionVerdict[verdict.decision],
+    said: `At a ${formatPercent(card.grossMargin)} margin every real spent has to return ${formatRoas(breakEven)}. The likely case is ${formatRoas(p50)}.${
+      verdict.limitingFactor
+        ? ` ${verdict.limitingFactor[0]!.toUpperCase()}${verdict.limitingFactor.slice(1)}.`
+        : ""
+    }`,
+    band: {
+      ends: [formatRoas(p10), `likely ${formatRoas(p50)}`, formatRoas(p90)],
+      fill: { left: at(p10), width: at(p90) - at(p10) },
+      mid: at(p50),
+      breakEven: at(breakEven),
+    },
+    rows: [],
+    note:
+      "A pre-flight reads the product and the category, never the campaign — so it needs no pixel and no sales history. Nothing here was measured from your ads." +
+      noteSuffix,
+  };
+}
+
 export function buildUploadAnswer(
   days: CampaignDay[],
   card: ProductCard,

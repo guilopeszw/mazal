@@ -3,7 +3,7 @@ import type { CampaignDay, ProductCard } from "@mazal/contracts";
 
 import { parseMetaCsv } from "@mazal/ingest";
 
-import { buildUploadAnswer } from "./answers.ts";
+import { buildPreflightAnswer, buildUploadAnswer } from "./answers.ts";
 
 /**
  * A bakery selling frozen goods through iFood and WhatsApp. Meta reports the
@@ -112,4 +112,26 @@ test("a ROAS-only export is not diagnosed as a broken product page", () => {
   expect(verdict).not.toContain("product page");
   expect(verdict).toContain("cannot see");
   expect(answer.said).toContain("conversion count columns");
+});
+
+test("a pre-flight answers for a card with no campaign behind it at all", () => {
+  // The one beat an off-pixel seller's setup does not break: predict reads the
+  // product and the category, never the campaign, so it needs no pixel, no
+  // conversions and no history. This is what the bakery can actually use.
+  const answer = buildPreflightAnswer(frozenGoods, "Is this product worth advertising?");
+  const verdict = answer.verdict.map((v) => v.text).join("");
+
+  // A decision, not a hedge.
+  expect(verdict).toMatch(/Launch|Don't launch/);
+  // Break-even is engine output and has to be on screen.
+  expect(answer.said).toMatch(/R\$|×/);
+  expect(answer.band).toBeDefined();
+  // The band sits on the track.
+  const { fill, mid, breakEven } = answer.band!;
+  for (const v of [fill.left, fill.left + fill.width, mid, breakEven]) {
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(100);
+  }
+  // And it says plainly that nothing here came from his ads.
+  expect(answer.note).toContain("no pixel");
 });
