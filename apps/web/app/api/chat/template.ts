@@ -1,6 +1,8 @@
 import type { ResolvedContext } from "./context.ts";
 import { noPixelEvidence } from "@mazal/engine";
 
+import { planTitlePt } from "./plan-pt.ts";
+
 import { renderNarration, type StructuredNarration } from "./narration.ts";
 
 function templateForPrimary(context: ResolvedContext): StructuredNarration {
@@ -28,8 +30,11 @@ function templateForPrimary(context: ResolvedContext): StructuredNarration {
   return {
     verdict: "O vazamento começa no estágio {{diagnosis.primary.stage|integer}}.",
     evidence: "A taxa observada é {{diagnosis.primary.observed|percent}}, abaixo da referência de {{diagnosis.primary.reference|percent}}.",
-    plan: context.plan.actions[0]
-      ? "Priorize {{plan.firstAction.title|text}}."
+    // `titlePt`, not `title`: the engine writes titles in English and this
+    // route answers in Portuguese. An action with no translation publishes no
+    // `titlePt`, so this falls through to the generic line below.
+    plan: planTitlePt(context.plan.actions[0]?.id)
+      ? "Priorize {{plan.firstAction.titlePt|text}}."
       : "Revise a oferta antes de escalar a campanha.",
   };
 }

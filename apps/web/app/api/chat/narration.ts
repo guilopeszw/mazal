@@ -1,4 +1,5 @@
 import type { ResolvedContext } from "./context.ts";
+import { planTitlePt } from "./plan-pt.ts";
 import { z } from "zod";
 
 const ASCII_DIGIT = /[0-9]/;
@@ -74,6 +75,13 @@ function buildValues(context: ResolvedContext): Record<Path, ValueSpec> {
 
   if (plan.actions[0]) {
     addText(values, "plan.firstAction.title", plan.actions[0].title);
+    // The engine writes titles in English and this route answers in Portuguese.
+    // Published beside the original rather than replacing it, so a template that
+    // wants the engine's own words can still have them, and an untranslated
+    // action simply has no `titlePt` — the placeholder fails to resolve and the
+    // narration is rejected, which is louder than shipping English.
+    const titlePt = planTitlePt(plan.actions[0].id);
+    if (titlePt) addText(values, "plan.firstAction.titlePt", titlePt);
     addText(values, "plan.firstAction.change", plan.actions[0].change);
   }
 
