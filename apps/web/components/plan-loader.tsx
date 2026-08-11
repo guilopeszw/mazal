@@ -367,7 +367,7 @@ export function PlanLoader({ benchmarkCount }: { benchmarkCount: number }) {
             )}
             <div
               className="pl-face"
-data-invert={v.invert ? "true" : undefined}
+              data-invert={v.invert ? "true" : undefined}
               style={{ borderRadius: Math.max(box.r - 1, 0) }}
             >
               {/* Keyed on the lit counter so letters arrive on every handover
