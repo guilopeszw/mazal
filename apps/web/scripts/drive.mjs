@@ -25,7 +25,7 @@
 //   })()'
 
 import { spawn } from 'node:child_process';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -50,18 +50,22 @@ const chrome = spawn(CHROME, [
   '--disable-gpu',
   '--no-first-run',
   '--no-default-browser-check',
-  '--remote-debugging-port=9222',
+  // Port 0, not 9222. On a fixed port a second run's Chrome cannot bind, attaches
+  // to the first one's browser and navigates its page — and the first run then
+  // prints `undefined` for a measurement it never made. Both exit 0.
+  '--remote-debugging-port=0',
   `--user-data-dir=${profile}`,
   `--window-size=${width},${height}`,
   '--hide-scrollbars',
   'about:blank',
 ], { stdio: 'ignore' });
 
-/** Chrome needs a moment before its debugging port answers. */
+/** Chrome needs a moment before its debugging port answers, and it writes the port it chose. */
 async function target() {
   for (let i = 0; i < 60; i++) {
     try {
-      const list = await fetch('http://127.0.0.1:9222/json/list').then((r) => r.json());
+      const port = (await readFile(join(profile, 'DevToolsActivePort'), 'utf8')).split('\n')[0];
+      const list = await fetch(`http://127.0.0.1:${port}/json/list`).then((r) => r.json());
       const page = list.find((t) => t.type === 'page');
       if (page?.webSocketDebuggerUrl) return page.webSocketDebuggerUrl;
     } catch {
@@ -83,15 +87,19 @@ const pending = new Map();
 ws.addEventListener('message', (event) => {
   const msg = JSON.parse(event.data);
   if (msg.id && pending.has(msg.id)) {
-    pending.get(msg.id)(msg);
+    const { resolve, reject } = pending.get(msg.id);
     pending.delete(msg.id);
+    // A CDP-level error carries the id like any reply. Resolving it would hand the
+    // caller an envelope with no `result`, print `undefined`, and exit 0.
+    if (msg.error) reject(new Error(`${msg.error.message} (${msg.error.code})`));
+    else resolve(msg);
   }
 });
 
 const send = (method, params = {}) =>
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
     const id = nextId++;
-    pending.set(id, resolve);
+    pending.set(id, { resolve, reject });
     ws.send(JSON.stringify({ id, method, params }));
   });
 
@@ -110,7 +118,14 @@ try {
     };
     ws.addEventListener('message', onLoad);
   });
-  await send('Page.navigate', { url });
+  // Chrome fires `Page.loadEventFired` for its own "site can't be reached" page, so
+  // the load wait alone cannot tell a running app from a refused connection — and a
+  // driver that reports on Chrome's error page is worse than no driver, because its
+  // output looks like a measurement. `errorText` is the only thing that knows.
+  const navigated = await send('Page.navigate', { url });
+  if (navigated.result?.errorText) {
+    throw new Error(`${url} — ${navigated.result.errorText}`);
+  }
   await loaded;
 
   // Settle rather than race the framework: the app streams its answers in, so
