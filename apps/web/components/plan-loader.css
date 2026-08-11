@@ -249,6 +249,12 @@
     border-radius 380ms var(--pl-ease-out);
 }
 
+/* Unreachable today: every variant in `plan-loader.tsx` is `invert: false`, so
+   `data-invert` is never written and this rule never matches. Kept, with the
+   `--pl-inv-*` tokens in all three theme blocks, because it is the palette a
+   restored inversion would use — see the `invert: false` comment in the tsx for
+   what a restoration has to change. Delete both together if that never happens;
+   nothing else reads these tokens. */
 .pl-face[data-invert="true"] {
   --pl-face: var(--pl-inv-face);
   --pl-face-2: var(--pl-inv-face-2);

@@ -271,6 +271,23 @@ export function Chat({
     // Read here, in the handler: once React has re-rendered, the landing position is gone.
     if (!started) cameFrom.current = composer.current?.getBoundingClientRect().top ?? null;
     setTurns((t) => [...t, { id: t.length, kind: "card", asked, answer }]);
+    /*
+     * No `setUploading(false)` here, and the reason is worth keeping.
+     *
+     * It was added to stop a panel sitting open under a new answer. It cannot
+     * reach that case: `ask` has two callers — a landing chip, and the upload's
+     * own `onAnswer`, which closes the panel on the next line anyway. A question
+     * typed into the composer goes through `submit` and `setTurns` directly and
+     * never touches this function, so the one path the panel actually lingers on
+     * is the one path this never ran on.
+     *
+     * On the path where it did run it destroyed work. `<Upload>` is mounted
+     * conditionally, so closing it unmounts it, and the parsed file, the chosen
+     * category and every typed field are its own `useState` — measured going
+     * from a parsed CSV and a filled form to a blank panel on one chip click,
+     * with no warning and nothing to reopen. Anything that closes this panel has
+     * to know whether it is holding a file first.
+     */
   };
 
   /**
