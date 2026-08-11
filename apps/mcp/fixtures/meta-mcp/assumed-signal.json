@@ -1,0 +1,13 @@
+{
+  "__mazal_assumed": {
+    "note": "NOT a real Meta response. The dataset-health shape apps/mcp/src/meta-client/signal.ts is written against, pending `pnpm meta:probe`. Task 11 replaces it with a redacted capture.",
+    "assumes": [
+      "a status field carrying one of healthy | degraded | broken",
+      "a human-readable reason",
+      "an ISO date marking when the problem started"
+    ]
+  },
+  "status": "broken",
+  "reason": "No purchase events received for 6 days on the connected dataset",
+  "since": "2026-07-12"
+}
