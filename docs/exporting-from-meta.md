@@ -49,6 +49,12 @@ and *Purchases* will be zero however you export. That is not your export being
 wrong — it is a funnel Mazal cannot see, and it will tell you so instead of
 inventing a diagnosis.
 
-What still works for you is the pre-flight: **"Is it worth advertising?"** on
-the upload form reads the product and its category, needs no pixel and no sales
-history, and answers whether the product can pay for its own ads at all.
+What still works for you is the pre-flight: **"Is it worth advertising?"** reads
+the product and its category, needs no pixel and no sales history, and answers
+whether the product can pay for its own ads at all.
+
+**And it needs no export.** Open the panel next to the composer, skip the drop
+zone, fill in the product, and ask. Only *"Diagnose this campaign"* waits on a
+file — everything above it is the product, and the product is what this answer
+is about. This page is the long way round for you; nothing here is a
+prerequisite.

@@ -80,6 +80,9 @@ export function Upload({
   }, []);
   const [error, setError] = useState<string | null>(null);
 
+  /** A file that parsed to nothing is not an export — it is the warnings and a retry. */
+  const hasRows = parsed !== null && parsed.days.length > 0;
+
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
     setBusy("parse");
@@ -135,6 +138,14 @@ export function Upload({
   const preflight = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const form = e.currentTarget.form;
     if (!form || category === "") return;
+    /*
+     * The pre-flight is a `type="button"`, so it skips the form's own validation
+     * — and it is now the button a seller with no export reaches first, on an
+     * empty form. Without this, a blank price arrives as `Number("") === 0` and
+     * comes back as the zod message for a field they were never told about.
+     * `reportValidity` is the browser saying which box, in place.
+     */
+    if (!form.reportValidity()) return;
     setBusy("preflight");
     setError(null);
     try {
@@ -171,7 +182,9 @@ export function Upload({
   return (
     <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
       <h3 className="m-0 flex items-center justify-between border-b border-line bg-sunken px-4 py-2 text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
-        Diagnose your own export
+        {/* Not "Diagnose your own export" any more: the export is one of two ways
+            out of this panel, and naming only that one is what hid the other. */}
+        Your own product — and your export, if you have one
         <button
           type="button"
           onClick={onClose}
@@ -185,7 +198,29 @@ export function Upload({
       </h3>
 
       <div className="flex flex-col gap-4 p-4">
-        {!parsed || parsed.days.length === 0 ? (
+        {/*
+         * One form, always. The card fields used to render only once a CSV had
+         * parsed, which put the one answer an off-pixel seller can get behind an
+         * export they do not have: selling through iFood or WhatsApp means no
+         * pixel on the checkout, so their Meta export reports zero conversions
+         * and `diagnose` refuses it by design. They had to hand over a file
+         * Mazal would tell them it could not read, to reach the question that
+         * never needed the file. `preflightUpload` takes the card and no days.
+         *
+         * So the export is now the optional half. The drop zone stays where it
+         * was and the diagnosis stays gated on real rows — it cannot run without
+         * them — but the button says why it is waiting instead of the form being
+         * absent.
+         */}
+        {hasRows ? (
+          <>
+            <p className="tnum m-0 text-sm text-ink-soft">
+              <span className="font-[560] text-ink">{parsed.fileName}</span> — {parsed.days.length}{" "}
+              days parsed{parsed.currency ? ` · amounts in ${parsed.currency}` : ""}.
+            </p>
+            {parsed.warnings.length > 0 && <Warnings warnings={parsed.warnings} />}
+          </>
+        ) : (
           <>
             {/* Drop zone AND a real file input — drag-and-drop alone is not accessible. */}
             <label
@@ -225,15 +260,16 @@ export function Upload({
             {parsed && parsed.days.length === 0 && (
               <Warnings warnings={parsed.warnings.length ? parsed.warnings : ["No daily rows found in that file."]} />
             )}
-          </>
-        ) : (
-          <form onSubmit={submit} className="flex flex-col gap-4">
-            <p className="tnum m-0 text-sm text-ink-soft">
-              <span className="font-[560] text-ink">{parsed.fileName}</span> — {parsed.days.length}{" "}
-              days parsed{parsed.currency ? ` · amounts in ${parsed.currency}` : ""}.
+            <p className="m-0 text-[12.5px] text-ink-faint">
+              No export, or one Meta cannot fill in? Sales through iFood, WhatsApp or a
+              marketplace never reach the pixel, so there is no funnel to read. Fill in the
+              product below and ask whether it is worth advertising — that answer needs the
+              product, not the campaign.
             </p>
-            {parsed.warnings.length > 0 && <Warnings warnings={parsed.warnings} />}
+          </>
+        )}
 
+        <form onSubmit={submit} className="flex flex-col gap-4">
             <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
               <legend className="mb-1 p-0 text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
                 About the product — 4 fields, that&rsquo;s all
@@ -330,7 +366,8 @@ export function Upload({
             <div className="flex flex-wrap items-center gap-2">
             <button
               type="submit"
-              disabled={busy !== null || category === ""}
+              disabled={busy !== null || category === "" || !hasRows}
+              title={hasRows ? undefined : "Needs a Meta Ads export — there is no funnel to read without one"}
               className="flex min-h-11 items-center justify-center self-start rounded-full bg-accent px-5 text-sm font-[540] text-ground transition-[opacity,scale] duration-150 active:scale-[.97] disabled:opacity-40 disabled:active:scale-100"
             >
               {busy === "diagnose" ? "Diagnosing…" : "Diagnose this campaign"}
@@ -345,8 +382,13 @@ export function Upload({
               {busy === "preflight" ? "Checking…" : "Is it worth advertising?"}
             </button>
             </div>
+            {!hasRows && (
+              <p className="m-0 text-[12.5px] text-ink-faint">
+                &ldquo;Diagnose this campaign&rdquo; stays off until an export is read — the
+                funnel is measured from it and Mazal will not infer one.
+              </p>
+            )}
           </form>
-        )}
       </div>
     </section>
   );
