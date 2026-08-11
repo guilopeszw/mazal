@@ -537,7 +537,7 @@ export function Chat({
               <button
                 type="button"
                 onClick={() => setUploading((v) => !v)}
-                aria-label="Upload a Meta Ads CSV export"
+                aria-label="Ask about your own product, with or without a Meta Ads export"
                 aria-expanded={uploading}
                 className="relative -ml-2.5 grid size-9 flex-none place-items-center rounded-[18px] text-ink-soft transition-[background-color,color,scale] duration-150 after:absolute after:-inset-1 hover:bg-sunken hover:text-ink active:scale-[.96]"
               >

@@ -66,7 +66,7 @@ export function Upload({
   const [category, setCategory] = useState<"" | OlistCategory>("");
   const [assumed, setAssumed] = useState<Partial<Record<InferredNumericField, string>>>(STATIC_DEFAULTS);
   const [edited, setEdited] = useState<ReadonlySet<InferredNumericField>>(new Set());
-  const [busy, setBusy] = useState<"parse" | "diagnose" | "preflight" | null>(null);
+  const [busy, setBusy] = useState<"parse" | "category" | "diagnose" | "preflight" | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   /**
@@ -79,6 +79,9 @@ export function Upload({
     fileInput.current?.focus();
   }, []);
   const [error, setError] = useState<string | null>(null);
+
+  /** A file that parsed to nothing is not an export — it is the warnings and a retry. */
+  const hasRows = parsed !== null && parsed.days.length > 0;
 
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
@@ -96,16 +99,35 @@ export function Upload({
 
   const pickCategory = async (value: OlistCategory) => {
     setCategory(value);
+    /*
+     * Busy until the guesses land. `setCategory` is synchronous and both buttons
+     * are enabled the moment a category exists, but `reviewAvg`, `pdpImages` and
+     * `pdpDescriptionLength` are empty until this await returns — and they are
+     * `required` now, so a click inside that window is refused by the browser
+     * pointing at three boxes the seller was never asked to fill. Measured: one
+     * frame after the change event, `preflightEnabled: true` with
+     * `emptyRequiredBoxes: 3` and `formValid: false`.
+     */
+    setBusy("category");
     // The three category-sensitive guesses come from the server; a corrected field is
     // the seller's and is never overwritten by a guess.
-    const defaults = await categoryDefaults(value);
-    setAssumed((prev) => {
-      const next = { ...prev };
-      for (const [field, v] of Object.entries(defaults) as [InferredNumericField, number][]) {
-        if (!edited.has(field)) next[field] = String(v);
-      }
-      return next;
-    });
+    try {
+      const defaults = await categoryDefaults(value);
+      setAssumed((prev) => {
+        const next = { ...prev };
+        for (const [field, v] of Object.entries(defaults) as [InferredNumericField, number][]) {
+          if (!edited.has(field)) next[field] = String(v);
+        }
+        return next;
+      });
+    } catch {
+      // Said out loud rather than swallowed: the three boxes stay empty and are
+      // `required`, so silence here becomes the browser refusing a click and
+      // pointing at fields the seller has no way to know the right value for.
+      setError("Could not load the category's typical values. Pick the category again.");
+    } finally {
+      setBusy(null);
+    }
   };
 
   /** The card the form currently describes — the same one both buttons ask about. */
@@ -135,6 +157,14 @@ export function Upload({
   const preflight = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const form = e.currentTarget.form;
     if (!form || category === "") return;
+    /*
+     * The pre-flight is a `type="button"`, so it skips the form's own validation
+     * — and it is now the button a seller with no export reaches first, on an
+     * empty form. Without this, a blank price arrives as `Number("") === 0` and
+     * comes back as the zod message for a field they were never told about.
+     * `reportValidity` is the browser saying which box, in place.
+     */
+    if (!form.reportValidity()) return;
     setBusy("preflight");
     setError(null);
     try {
@@ -150,7 +180,12 @@ export function Upload({
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!parsed || category === "") return;
+    // `hasRows` spelled out rather than referenced, because this is also what
+    // narrows `parsed` for the call below. It was `!parsed`, which let a file
+    // that parsed to zero rows through a guard the button beside it refuses —
+    // unreachable today, but a guard and its control should not disagree about
+    // what counts as an export.
+    if (!parsed || parsed.days.length === 0 || category === "") return;
     setBusy("diagnose");
     setError(null);
     try {
@@ -171,7 +206,9 @@ export function Upload({
   return (
     <section className="rise overflow-hidden rounded-[14px] border border-line bg-raised">
       <h3 className="m-0 flex items-center justify-between border-b border-line bg-sunken px-4 py-2 text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
-        Diagnose your own export
+        {/* Not "Diagnose your own export" any more: the export is one of two ways
+            out of this panel, and naming only that one is what hid the other. */}
+        Your product, and your export if you have one
         <button
           type="button"
           onClick={onClose}
@@ -185,7 +222,29 @@ export function Upload({
       </h3>
 
       <div className="flex flex-col gap-4 p-4">
-        {!parsed || parsed.days.length === 0 ? (
+        {/*
+         * One form, always. The card fields used to render only once a CSV had
+         * parsed, which put the one answer an off-pixel seller can get behind an
+         * export they do not have: selling through iFood or WhatsApp means no
+         * pixel on the checkout, so their Meta export reports zero conversions
+         * and `diagnose` refuses it by design. They had to hand over a file
+         * Mazal would tell them it could not read, to reach the question that
+         * never needed the file. `preflightUpload` takes the card and no days.
+         *
+         * So the export is now the optional half. The drop zone stays where it
+         * was and the diagnosis stays gated on real rows — it cannot run without
+         * them — but the button says why it is waiting instead of the form being
+         * absent.
+         */}
+        {hasRows ? (
+          <>
+            <p className="tnum m-0 text-sm text-ink-soft">
+              <span className="font-[560] text-ink">{parsed.fileName}</span> — {parsed.days.length}{" "}
+              days parsed{parsed.currency ? ` · amounts in ${parsed.currency}` : ""}.
+            </p>
+            {parsed.warnings.length > 0 && <Warnings warnings={parsed.warnings} />}
+          </>
+        ) : (
           <>
             {/* Drop zone AND a real file input — drag-and-drop alone is not accessible. */}
             <label
@@ -225,128 +284,146 @@ export function Upload({
             {parsed && parsed.days.length === 0 && (
               <Warnings warnings={parsed.warnings.length ? parsed.warnings : ["No daily rows found in that file."]} />
             )}
-          </>
-        ) : (
-          <form onSubmit={submit} className="flex flex-col gap-4">
-            <p className="tnum m-0 text-sm text-ink-soft">
-              <span className="font-[560] text-ink">{parsed.fileName}</span> — {parsed.days.length}{" "}
-              days parsed{parsed.currency ? ` · amounts in ${parsed.currency}` : ""}.
+            <p className="m-0 text-[12.5px] text-ink-faint">
+              No export, or one Meta cannot fill in? Sales through iFood, WhatsApp or a
+              marketplace never reach the pixel, so there is no funnel to read. Fill in the
+              product below and ask whether it is worth advertising — that answer needs the
+              product, not the campaign.
             </p>
-            {parsed.warnings.length > 0 && <Warnings warnings={parsed.warnings} />}
+          </>
+        )}
 
-            <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
-              <legend className="mb-1 p-0 text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
-                About the product — 4 fields, that&rsquo;s all
-              </legend>
-              <label className="flex flex-col gap-1 text-[13px] text-ink-soft">
-                Category
-                <select
-                  required
-                  value={category}
-                  onChange={(e) => void pickCategory(e.target.value as OlistCategory)}
-                  className={`${input} border-line`}
-                >
-                  <option value="" disabled>
-                    Choose a category…
+        <form onSubmit={submit} className="flex flex-col gap-4">
+          <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
+            <legend className="mb-1 p-0 text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+              About the product — 4 fields, that&rsquo;s all
+            </legend>
+            <label className="flex flex-col gap-1 text-[13px] text-ink-soft">
+              Category
+              <select
+                required
+                value={category}
+                onChange={(e) => void pickCategory(e.target.value as OlistCategory)}
+                className={`${input} border-line`}
+              >
+                <option value="" disabled>
+                  Choose a category…
+                </option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>
+                    {c.replace(/_/g, " ")}
                   </option>
-                  {categories.map((c) => (
-                    <option key={c} value={c}>
-                      {c.replace(/_/g, " ")}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-[12px] text-ink-faint">
-                  Picks which sellers yours is compared against, and the three product details
-                  below that Mazal fills in for you. The arithmetic is the same either way.
-                  Choose the closest; where the category has too few Olist sellers to
-                  measure, Mazal says so on the answer rather than comparing you to a guess.
-                </span>
-              </label>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                {STATED.map((f) => (
+                ))}
+              </select>
+              <span className="text-[12px] text-ink-faint">
+                Picks which sellers yours is compared against, and the three product details
+                below that Mazal fills in for you. The arithmetic is the same either way.
+                Choose the closest; where the category has too few Olist sellers to
+                measure, Mazal says so on the answer rather than comparing you to a guess.
+              </span>
+            </label>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {STATED.map((f) => (
+                <label key={f.name} className="flex flex-col gap-1 text-[13px] text-ink-soft">
+                  {f.label}
+                  <input
+                    name={f.name}
+                    type="number"
+                    required
+                    step={f.step}
+                    min={f.min}
+                    inputMode="decimal"
+                    className={`${input} border-line`}
+                  />
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
+            <legend className="mb-1 p-0 text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
+              Mazal will assume — correct anything wrong
+            </legend>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {INFERRED.map((f) => {
+                const isEdited = edited.has(f.name);
+                return (
                   <label key={f.name} className="flex flex-col gap-1 text-[13px] text-ink-soft">
-                    {f.label}
+                    <span className="flex items-center justify-between gap-1">
+                      {f.label}
+                      <span
+                        className={`rounded px-1 py-px text-[10px] font-[580] uppercase tracking-[0.05em] ${
+                          isEdited ? "bg-accent-soft text-accent-ink" : "bg-sunken text-ink-faint"
+                        }`}
+                      >
+                        {isEdited ? "yours" : "guessed"}
+                      </span>
+                    </span>
                     <input
-                      name={f.name}
                       type="number"
+                      /*
+                       * `required`, even though every one of these arrives
+                       * filled. An empty value on a non-required number input
+                       * is *valid* — `min` only constrains a value that is
+                       * there — so a seller who clears a box sails past
+                       * `reportValidity` and the blank arrives as
+                       * `Number("") === 0`, coming back as a zod message about
+                       * a field nobody said was mandatory, with the badge
+                       * reading YOURS over an empty box. This is the only
+                       * thing that makes the browser name the box instead.
+                       */
                       required
                       step={f.step}
                       min={f.min}
+                      max={f.max}
                       inputMode="decimal"
-                      className={`${input} border-line`}
+                      value={assumed[f.name] ?? ""}
+                      placeholder={assumed[f.name] === undefined ? "from category" : undefined}
+                      onChange={(e) => {
+                        setAssumed((prev) => ({ ...prev, [f.name]: e.target.value }));
+                        setEdited((prev) => new Set(prev).add(f.name));
+                      }}
+                      className={`${input} ${
+                        isEdited ? "border-line text-ink" : "border-dashed border-line-strong text-ink-soft"
+                      }`}
                     />
                   </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
-              <legend className="mb-1 p-0 text-[11px] font-[580] uppercase tracking-[0.07em] text-ink-faint">
-                Mazal will assume — correct anything wrong
-              </legend>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {INFERRED.map((f) => {
-                  const isEdited = edited.has(f.name);
-                  return (
-                    <label key={f.name} className="flex flex-col gap-1 text-[13px] text-ink-soft">
-                      <span className="flex items-center justify-between gap-1">
-                        {f.label}
-                        <span
-                          className={`rounded px-1 py-px text-[10px] font-[580] uppercase tracking-[0.05em] ${
-                            isEdited ? "bg-accent-soft text-accent-ink" : "bg-sunken text-ink-faint"
-                          }`}
-                        >
-                          {isEdited ? "yours" : "guessed"}
-                        </span>
-                      </span>
-                      <input
-                        type="number"
-                        step={f.step}
-                        min={f.min}
-                        max={f.max}
-                        inputMode="decimal"
-                        value={assumed[f.name] ?? ""}
-                        placeholder={assumed[f.name] === undefined ? "from category" : undefined}
-                        onChange={(e) => {
-                          setAssumed((prev) => ({ ...prev, [f.name]: e.target.value }));
-                          setEdited((prev) => new Set(prev).add(f.name));
-                        }}
-                        className={`${input} ${
-                          isEdited ? "border-line text-ink" : "border-dashed border-line-strong text-ink-soft"
-                        }`}
-                      />
-                    </label>
-                  );
-                })}
-              </div>
-              <p className="m-0 text-[12.5px] text-ink-faint">
-                Payment methods and offer type are also assumed (all methods, no offer) — this
-                diagnosis never reads them.
-              </p>
-            </fieldset>
-
-            {error && <p className="m-0 text-[13px] font-[540] text-warn">{error}</p>}
-
-            <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="submit"
-              disabled={busy !== null || category === ""}
-              className="flex min-h-11 items-center justify-center self-start rounded-full bg-accent px-5 text-sm font-[540] text-ground transition-[opacity,scale] duration-150 active:scale-[.97] disabled:opacity-40 disabled:active:scale-100"
-            >
-              {busy === "diagnose" ? "Diagnosing…" : "Diagnose this campaign"}
-            </button>
-            <button
-              type="button"
-              onClick={preflight}
-              disabled={busy !== null || category === ""}
-              title="Reads the product and its category — no campaign data needed"
-              className="flex min-h-11 items-center justify-center self-start rounded-full border border-line px-5 text-sm font-[540] text-ink transition-[opacity,scale,border-color] duration-150 hover:border-line-strong active:scale-[.97] disabled:opacity-40 disabled:active:scale-100"
-            >
-              {busy === "preflight" ? "Checking…" : "Is it worth advertising?"}
-            </button>
+                );
+              })}
             </div>
-          </form>
-        )}
+            <p className="m-0 text-[12.5px] text-ink-faint">
+              Payment methods and offer type are also assumed (all methods, no offer) —
+              neither answer reads them.
+            </p>
+          </fieldset>
+
+          {error && <p className="m-0 text-[13px] font-[540] text-warn">{error}</p>}
+
+          <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="submit"
+            disabled={busy !== null || category === "" || !hasRows}
+            className="flex min-h-11 items-center justify-center self-start rounded-full bg-accent px-5 text-sm font-[540] text-ground transition-[opacity,scale] duration-150 active:scale-[.97] disabled:opacity-40 disabled:active:scale-100"
+          >
+            {busy === "diagnose" ? "Diagnosing…" : "Diagnose this campaign"}
+          </button>
+          <button
+            type="button"
+            onClick={preflight}
+            disabled={busy !== null || category === ""}
+            title="Reads the product and its category — no campaign data needed"
+            className="flex min-h-11 items-center justify-center self-start rounded-full border border-line px-5 text-sm font-[540] text-ink transition-[opacity,scale,border-color] duration-150 hover:border-line-strong active:scale-[.97] disabled:opacity-40 disabled:active:scale-100"
+          >
+            {busy === "preflight" ? "Checking…" : "Is it worth advertising?"}
+          </button>
+          </div>
+          {!hasRows && (
+            <p className="m-0 text-[12.5px] text-ink-faint">
+              &ldquo;Diagnose this campaign&rdquo; stays off until an export is read — the
+              funnel is measured from it and Mazal will not infer one.
+            </p>
+          )}
+        </form>
       </div>
     </section>
   );
