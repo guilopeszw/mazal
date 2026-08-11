@@ -182,14 +182,19 @@ export async function preflightUpload(input: {
    * assumption *is* the verdict. Said out loud, the way the diagnosis path says
    * it — a number the seller never gave should never arrive unlabelled.
    */
-  const assumedMargin = built.card.grossMargin === STATIC_DEFAULTS.grossMargin;
+  // Touched, not equal. Comparing the value cannot tell Mazal's default from a
+  // seller who typed the same number, and told that seller Mazal had assumed a
+  // figure they had just stated — then asked them to go correct it. This is the
+  // signal `diagnoseUpload` already keys on, so the two paths agree about who
+  // authored a number.
+  const assumedMargin = input.corrections?.grossMargin === undefined;
   return {
     ok: true,
     answer: buildPreflightAnswer(
       built.card,
       "Is this product worth advertising?",
       assumedMargin
-        ? ` Mazal assumed, not you: a gross margin of ${Math.round(STATIC_DEFAULTS.grossMargin * 100)}%. Break-even is that number inverted, so correct it above if it is wrong and ask again.`
+        ? ` Mazal assumed, not you: a gross margin of ${formatPercent(STATIC_DEFAULTS.grossMargin)}. Break-even is that number inverted, so correct it above if it is wrong and ask again.`
         : "",
     ),
   };
@@ -202,6 +207,7 @@ export async function diagnoseUpload(input: {
   /** Inferred fields the seller corrected — those become `stated` too. */
   corrections: Partial<Record<InferredNumericField, number>>;
 }): Promise<{ ok: true; answer: Answer } | { ok: false; error: string }> {
+  if (!input?.stated) return { ok: false, error: "No campaign to diagnose." };
   const { days, stated, corrections } = input;
 
   // ponytail: shape guard only — the values inside came out of our own parser, and the
@@ -209,9 +215,6 @@ export async function diagnoseUpload(input: {
   if (!Array.isArray(days) || days.length === 0 || days.length > 400) {
     return { ok: false, error: "No usable daily rows to diagnose." };
   }
-
-  const m = benchmarks[stated.category]?.metrics;
-  if (!m) return { ok: false, error: `Unknown category: ${String(stated.category)}` };
 
   const built = cardFrom(stated, corrections);
   if (!built.ok) return built;
