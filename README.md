@@ -1,140 +1,190 @@
 # Mazal
 
-Mazal is a campaign underwriter for Brazilian e-commerce sellers. Given a Meta Ads export and twelve fields about the product, it finds the earliest broken stage of the sales funnel — the **leak** — names what caused it, and proposes a plan the seller approves before anything runs.
+### Campanhas não deveriam depender de sorte.
 
-Ad performance has four layers: creative, audience, product/offer, and experience. Every existing tool optimises the first two, because that is what lives in Ads Manager. Mazal diagnoses the last two, because that data lives in the store.
+Mazal é um *campaign underwriter* para sellers brasileiros de e-commerce. Antes de lançar, estima o risco da campanha. Depois que ela roda, localiza o primeiro vazamento do funil, explica a causa e propõe um plano que o seller aprova.
 
-> **Stages 0–2 are a media problem. Stages 3–6 are a product, offer, or experience problem.**
-> That dividing line is the product.
+> Hackathon build · Meta Ads · TypeScript determinístico · interface em pt-BR
 
-Hackathon build. Working rules, ownership, and branch policy live in [`AGENTS.md`](AGENTS.md) — read it before touching anything here.
+## A tese
 
-## The one rule that shapes the codebase
+Ad spend é uma decisão de risco: o seller coloca dinheiro na campanha antes de saber se o produto, a oferta e a experiência de compra conseguem transformar aquele tráfego em margem.
 
-**Every number comes from deterministic TypeScript.** The LLM narrates findings, drafts plans, and converses. It never computes, estimates, or rounds. If a number appears on screen, a function in `packages/engine` produced it and a `Finding.rule` names the rule that fired — so *"how do I know it isn't hallucinating"* is answered with a rule id and a formula, not a paragraph.
+A performance de uma campanha tem quatro camadas: **creative**, **audience**, **product/offer** e **experience**. As ferramentas tradicionais otimizam principalmente as duas primeiras, porque é isso que vive no Ads Manager. O restante dos sinais está na loja: preço, estoque, frete, ETA, página de produto, checkout, pagamento e margem.
 
-Two consequences worth knowing before you write a line:
+Quando a campanha falha, o seller costuma criar outro anúncio porque é a alavanca que a ferramenta oferece. Mazal cruza a mídia com os dados do produto para responder a pergunta mais importante: o problema está no anúncio ou no destino?
 
-- **The contract stores counts; rates are derived.** No `ctr`, `cvr`, `roas`, `atcRate`, `cpc`, `cpa`, or `cpm` field exists in any type. Import the rate functions from `@mazal/contracts/metrics` — in components and in tests too.
-- **A stage below its minimum sample is not judged.** It renders "not judged", never a value. The engine declines rather than guesses.
+**Estágios 0–2 são um problema de mídia. Estágios 3–6 são um problema de produto, oferta ou experiência. Essa fronteira é o wedge de Mazal.**
 
-## Quick start
+## O problema que Mazal resolve
 
-Requires Node ≥ 24 and pnpm 11.
+“A campanha está underperforming” não é um diagnóstico. Se o CTR está saudável, mas o add-to-cart desaba, criar outro anúncio trata o sintoma. O vazamento pode estar no preço, no estoque, no frete, no ETA, na página do produto ou no checkout.
+
+Mazal encontra a primeira etapa do funil que desviou da referência. Tudo depois dela é tratado como sintoma, não como uma nova causa. O resultado é uma recomendação causal: **o anúncio funcionou; a página do produto não**.
+
+## Como a solução funciona
+
+1. **Entrada:** o seller envia um CSV exportado do Meta Ads Manager, um log opcional de eventos da loja e um Product Card com os campos do produto.
+2. **Referência:** o sistema usa benchmarks da categoria no pré-lançamento ou o histórico da própria campanha no modo in-flight.
+3. **Diagnóstico:** o engine determinístico percorre os estágios em ordem, encontra a primeira quebra, detecta o change point e cruza o evento com a evidência da loja.
+4. **Ação:** `buildPlan` cria ações com efeito esperado, confiança, reversibilidade e `actor: 'mazal' | 'seller'`. O seller decide antes de qualquer execução.
+
+| Estágio | O que observa | Camada provável |
+|---|---|---|
+| 0–2 | entrega, atenção e landing | mídia |
+| 3 | interesse no produto / add-to-cart | produto |
+| 4 | intenção / checkout | experiência ou oferta |
+| 5 | compra | experiência |
+| 6 | economia / AOV e ROAS | oferta e margem |
+
+O princípio é simples: **a primeira etapa quebrada é a causa; as etapas seguintes são sintomas**.
+
+## Dois momentos, um mesmo motor
+
+### Pre-flight
+
+Antes de lançar, `predict` combina benchmarks de categoria, margem e, quando existir, histórico da campanha. Ele devolve uma decisão (`launch`, `launch_small` ou `dont_launch`), uma banda p10–p90 de ROAS, o break-even do seller e o fator que limita a previsão.
+
+### In-flight
+
+Durante a campanha, `diagnose` compara a série diária com o benchmark ou com um baseline da própria campanha. Ele localiza a quebra, informa a regra que disparou e usa o event log para transformar “checkout caiu” em uma causa verificável, como uma mudança no ETA de entrega.
+
+O headline é **“don’t launch”**: evitar gasto ruim antes que ele aconteça. A recuperação de uma campanha em andamento é o segundo ato do mesmo problema — localizar o leak.
+
+## Princípios de confiança
+
+- **O LLM narra; não calcula.** Números, datas e métricas vêm do engine e dos contratos TypeScript.
+- **Toda finding é auditável.** Cada achado carrega observado, referência, spread, amostra, regra e camada.
+- **A incerteza aparece.** Pouco histórico mantém a banda larga e informa qual dado precisa ser instrumentado primeiro.
+- **Cada ação tem dono.** O seller recebe orientação; Mazal só recebe operações explicitamente permitidas.
+- **Mazal não aumenta o gasto.** As operações executáveis são pausar campanha, reduzir orçamento e definir limite de frequência.
+- **Execução é simulada.** O sistema registra log e receipt; este build não possui cliente de escrita real da Meta.
+
+## O que construímos no hackathon
+
+### Contracts e métricas
+
+Tipos compartilhados para contagens diárias, Product Card, eventos da loja, findings, veredictos, planos, atores e operações executáveis. As taxas e métricas derivadas ficam centralizadas em `@mazal/contracts/metrics`; os contratos não armazenam CTR, CVR, ROAS, CPA, CPC ou CPM como campos.
+
+### Engine
+
+O pacote [`@mazal/engine`](packages/engine) implementa:
+
+- `diagnose`: localização do leak, change point, evidência de evento e causa provável;
+- `predict`: decisão pré-flight, banda de ROAS e break-even;
+- `buildPlan`: plano de recuperação com ações para Mazal e para o seller;
+- `profileCard` e `measurability`: comparação do produto com sellers da categoria e identificação do dado que falta;
+- response curves, allocation e reallocation de orçamento existente, sem propor aumento de spend.
+
+### Dados e benchmarks
+
+[`packages/data`](packages/data) deriva agregados do [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). O repositório commita somente medianas, quartis e tamanhos de amostra; os CSVs brutos permanecem em `data/raw/`, fora do Git.
+
+Há benchmarks para 62 das 71 categorias do Olist, cobrindo 99,84% dos pedidos. Sete das doze métricas são medidas no Olist. As cinco métricas de mídia — `cpm`, `ctr`, `cvr`, `atcRate` e `icRate` — são priors publicados, carregam `source: 'prior'` e `n: 0`, e não devem ser confundidos com medição própria. A proveniência completa está em [`docs/benchmark-provenance.md`](docs/benchmark-provenance.md).
+
+O Olist é usado sob [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+### Simulator e fixtures
+
+[`packages/sim`](packages/sim) gera campanhas sintéticas de forma determinística: primeiro injeta uma causa conhecida, depois expressa essa causa nos dados. Os dois casos da demo são regeneráveis:
+
+- `demo-case1.json`: pré-flight em `housewares`, com `thin_pdp` como condição do produto;
+- `demo-case2.json`: in-flight em `watches_gifts`, com `eta_shock` em 2026-07-13 e change point detectado em 2026-07-12.
+
+O contrato exato desses casos está em [`docs/demo-contract.md`](docs/demo-contract.md).
+
+### Ingestão
+
+[`packages/ingest`](packages/ingest) lê exportações do Meta Ads Manager com nomes de coluna reais, números em formato pt-BR, separadores de milhar, moedas entre parênteses, valores ausentes e linhas de total. Também valida o Product Card e lê eventos da loja.
+
+### Web app
+
+[`apps/web`](apps/web) entrega uma experiência one-screen em pt-BR, com chat, funil, gráficos diários, change point, banda de previsão, comparação com peers, upload de CSV e painel de plano. O seller pode revisar as ações individualmente antes de executar as operações permitidas.
+
+### MCP e operação
+
+[`apps/mcp`](apps/mcp) expõe quatro tools MCP:
+
+- `diagnose_campaign`;
+- `predict_campaign`;
+- `build_recovery_plan`;
+- `execute_plan`.
+
+O endpoint possui autenticação, validação de Host/Origin e bundle para Vercel. A operação publicada e a conexão `Mazal MCP` no Deco estão documentadas em [`docs/mazal-mcp-vercel-deco.md`](docs/mazal-mcp-vercel-deco.md). O agente segue as regras de narração segura em [`docs/deco-agent-instructions.md`](docs/deco-agent-instructions.md).
+
+## Evidências atuais
+
+O backtest é determinístico e usa 100 campanhas held-out:
+
+- **59,0% top-1**;
+- **59,0% top-2** em nível de estágio;
+- **12,0% de falsos alarmes** em 25 campanhas saudáveis;
+- baseline *always-healthy* de **25,0% top-1 com 0% de falsos alarmes**.
+
+Esses números devem ser lidos com o denominador e com uma ressalva importante: o engine e o simulator acabaram escritos pela mesma pessoa, então o firewall A/B não se manteve. O resultado é um número de wiring e sanity, não uma validação independente de acurácia.
+
+O resultado detalhado, a matriz de confusão, o recall por classe e as limitações de `thin_pdp`, `price_too_high` e `checkout_friction` estão em [`docs/backtest-results.md`](docs/backtest-results.md).
+
+## Como reproduzir
+
+Requer Node.js 24 e pnpm 11.
 
 ```bash
 pnpm install
-pnpm typecheck                 # tsc --build, plus apps/mcp
-pnpm test                      # 294 tests across 39 files
-pnpm --filter web dev          # the app on :3000
+pnpm test
+pnpm typecheck
+pnpm build
+pnpm sim:fixtures
+pnpm sim:backtest
 ```
 
-Before a demo, run the guards as well — [`docs/demo-runbook.md`](docs/demo-runbook.md) has the full order and the script:
+Para regenerar os benchmarks, mantenha os CSVs aprovados em `data/raw/` e rode:
 
 ```bash
-pnpm sim:fixtures              # fails if either demo fixture stops proving its beat
-pnpm meta:fixtures             # fails if the Meta payloads stop folding back to those fixtures
+pnpm derive
 ```
 
-Other scripts: `pnpm derive` rebuilds the benchmarks from the raw datasets, `pnpm sim:backtest` regenerates [`docs/backtest-results.md`](docs/backtest-results.md), `pnpm sim:allocator` regenerates [`docs/allocator-results.md`](docs/allocator-results.md), `pnpm sim:eyeball` prints a generated campaign to look at.
+`pnpm test` executa a suíte; `pnpm typecheck` valida o grafo TypeScript; `pnpm build` gera o web build; `pnpm sim:fixtures` verifica os dois casos da demo; `pnpm sim:backtest` reproduz o número de sanity; e `pnpm derive` reescreve os agregados de dados, as categorias e os seller benchmarks.
 
-## Layout
+## Estado atual e limites
 
-```
-packages/contracts   the six types, the rate functions — frozen, changed only with an announcement
-packages/engine      diagnose · predict · buildPlan · allocate. Deterministic, no LLM, no randomness
-packages/data        category benchmarks derived from Olist. Aggregate statistics only
-packages/sim         labelled campaign generator and the backtest harness
-packages/ingest      Meta CSV parser, event-log parser, product-card schema
-packages/meta        the raw Meta insights payload and its adapter to CampaignDay
-apps/web             Next.js app — the funnel, the plan, the chat
-apps/mcp             the MCP server: diagnose_campaign · predict_campaign · build_recovery_plan · execute_plan
-```
-
-**`packages/engine` and `packages/sim` have separate owners who do not read each other's code.** They share only the `FaultKind` union in `packages/contracts`. The simulator injects a fault, the engine predicts one, the backtest compares — that firewall is what makes the accuracy number mean anything. It did not fully hold for the numbers below; [`docs/backtest-results.md`](docs/backtest-results.md) says so at the top.
-
-Every package's public API is specified in [`docs/contracts.md`](docs/contracts.md).
-
-## How a diagnosis works
-
-1. **Ingest.** A Meta Ads CSV becomes `CampaignDay[]` — counts and money, one row per campaign per day. The seller fills a twelve-field `ProductCard`; `grossMargin` is first, because break-even ROAS is `1 / grossMargin` and it is what makes the verdict belong to this seller rather than to the category.
-2. **Compare.** Each stage's metric is scored against a reference — the category benchmark, or the campaign's own trailing baseline — in robust sigmas off the interquartile range. A stage more than one sigma below is flagged, and only if it clears its minimum sample.
-3. **Localise.** The *first* flagged stage is the cause; everything after it is a symptom. This is why Mazal never says "your ROAS is low", a sentence with no information in it.
-4. **Date it.** A rolling window scanned forward names the day the metric turned.
-5. **Explain it.** A `StoreEvent` within a day of that change point, and of a type that stage can produce, becomes the finding's evidence. *"Add-to-cart went from 6.8% to 0.4% overnight. On the same day, your supplier delivery estimate changed from 9 days to 22."* That sentence is the difference between Mazal and a dashboard, and it costs four fields.
-6. **Plan.** Every `Action` carries `actor: 'mazal' | 'seller'`. Mazal never offers to execute what only the seller can do, and it has no operation that raises spend. Writes are simulated in this build: `execute_plan` appends to a log and returns a receipt marked `simulated`.
-
-## Measured results
-
-Reproduce each of these with the command beside it. Read the caveats in the linked files before quoting any of them.
-
-| | | reproduce |
-|---|---|---|
-| Top-1 cause accuracy, 100 held-out campaigns | **59.0%** | `pnpm sim:backtest` |
-| Floor — always answer "healthy" | 25.0% | same report |
-| False alarms, 25 healthy campaigns | 12.0% | same report |
-| Change point named on detected breaks | 100% | same report |
-| Change point within ±1 day — sudden breaks | 93% | same report |
-| Change point within ±1 day — gradual ramps | 0% | same report |
-| Profit captured by the allocator | 71.4% | `pnpm sim:allocator` |
-| Profit captured by an even split | 25.3% | same report |
-| Profit captured by greedy | −75.4% | same report |
-
-The floor belongs next to the accuracy number: a diagnoser that answers *"nothing is wrong"* to everything scores 25% on this cohort, so anything below that is worse than silence. And the allocator's headline is the last row, not the first — putting the whole wallet on the best historical ROAS returns *less than doing nothing*, because the best product fills up. That is what sellers actually do.
-
-## Data
-
-Category benchmarks in `packages/data` are derived from two public datasets. Only aggregate statistics — median, p25, p75 and n — are committed; the raw files stay in gitignored `data/raw/`.
-
-- [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — 100k real orders, 2016–2018. Licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
-- [Facebook Ad Campaign dataset](https://www.kaggle.com/datasets/madislemsalu/facebook-ad-campaign) by Madis Lemsalu — 1,143 rows of ad performance.
-
-Regenerate with `pnpm derive`. Media metrics (`cpm`, `ctr`, `cvr`, `atcRate`, `icRate`) are published priors, not measurements, and carry `n: 0` — `packages/data/derive.ts` says why. Provenance per row: [`docs/benchmark-provenance.md`](docs/benchmark-provenance.md).
-
-The campaigns in the demo and in the backtest are generated by `packages/sim`, and the Meta insights payloads in `packages/meta` are fixtures derived from them. The Meta integration itself is not built, and the fixtures say so in the file.
-
-## The Allocator
-
-`packages/engine/src/allocate.ts` fits a response curve per adset — conversions as a function of daily spend — and splits a budget so the next real earns the same wherever it lands. It never proposes a larger budget: `reallocate` reads the total the seller already spends and redistributes exactly that.
-
-No neural network, no training step, no dependency, no randomness. That is the finding rather than the shortcut — see [`docs/allocator.md`](docs/allocator.md) for what is built, what deliberately is not, and the four sources it draws on:
-
-- Jha, A., Sharma, P., Upmanyu, R., Sharma, Y. & Tiwari, K. (2024). *Machine Learning-Based Optimization of E-Commerce Advertising Campaigns.* ICAART 2024, vol. 2, pp. 531–541. [DOI](https://doi.org/10.5220/0012456700003636) — on this exact problem, linear regression scored R² 0.74 against 0.56 for LSTM.
-- Hu, H., Cai, J. & Xu, C. (2026). *A Mathematical Framework for E-Commerce Sales Prediction Using Attention-Enhanced BiLSTM and Bayesian Optimization.* Math. Comput. Appl. 31(17). [DOI](https://doi.org/10.3390/mca31010017) — their Bayesian optimization formulation; their forecasting results are on their data, not ours.
-- Liu, Y., Liang, X. & Liu, Y. (2022). *The Application of Mathematical Modeling in e-Commerce Mode in Digital Marketing Mode.* IEESASM 2022. [DOI](https://doi.org/10.25236/ieesasm.2022.004) — **concept only, not cited as evidence**; methodologically weak.
-- Chua, M. (2025). *The Math Behind Going Viral.* mervynchua.com — **practitioner blog, not peer-reviewed**; the K-factor idea, which is not built.
-
-## The MCP server
-
-`apps/mcp` exposes the engine as four MCP tools — `diagnose_campaign`, `predict_campaign`, `build_recovery_plan`, `execute_plan` — plus two `ui://` resources (MCP Apps extension) so a tool result renders as the funnel chart or the prediction band instead of prose. Every number in a view is engine output or a contract rate function.
-
-Deployment, the Deco Studio connection, and the agent's configuration: [`docs/mazal-mcp-vercel-deco.md`](docs/mazal-mcp-vercel-deco.md) and [`docs/deco-agent.md`](docs/deco-agent.md).
-
-Environment variables, all server-side:
-
-| | |
+| Entregue | Ainda não entregue |
 |---|---|
-| `MAZAL_MCP_BEARER_TOKEN` | required; requests without it get 401 |
-| `MAZAL_MCP_ALLOWED_HOSTS` / `MAZAL_MCP_ALLOWED_ORIGINS` | hostname allowlist; off-list gets 403 |
-| `MAZAL_CHAT_SESSION_SECRET` | ≥ 32 bytes, required by `POST /api/chat` |
-| `MAZAL_CHAT_ALLOWED_HOSTS` | host/origin allowlist for the chat route |
-| `NARRATION_MODE` | `fixture` \| `template` \| `live`; production runs `fixture` |
-| `MAZAL_EXECUTE_SECRET` | gates the simulated-execution unlock in the web app |
+| diagnóstico determinístico e plano auditável | escrita real na Meta |
+| demo web com fixtures e upload de CSV | OAuth e Meta App Review |
+| MCP deployado e conectado ao Deco | multi-conta, billing e permissões |
+| benchmarks agregados e simulator reproduzível | validação independente com dados reais de sellers |
+| allocator que redistribui o orçamento existente | bandits, Bayesian optimization e expansão de spend |
 
-`.mcp.json` registers the Deco Studio workspace so any agent working in this repo gets the deco tools without configuring them by hand. It holds a URL and nothing else; authenticate once per machine (`/mcp` → `deco-studio` in Claude Code). The credential never enters the repo.
+Este é um build de hackathon. Não há clientes, pricing validado, seller research concluído, case studies ou export real de uma conta Meta no repositório. A fixture de ingestão é construída a partir dos nomes de coluna documentados pelo Meta. Essas ausências são limites conhecidos, não evidências a serem preenchidas por narrativa.
 
-## Where to look next
+## Próximos passos
 
-| | |
-|---|---|
-| Starting a session | [`docs/HANDOFF.md`](docs/HANDOFF.md) — who is who, what landed, what is next |
-| Building anything | [`docs/contracts.md`](docs/contracts.md) — the frozen types and every package's public API |
-| Writing a test | [`docs/testing.md`](docs/testing.md) — TDD is mandatory in `engine` and `ingest` |
-| Deciding whether something is done | [`docs/acceptance.md`](docs/acceptance.md) — the ten claims, each with its demo beat and its test |
-| Scheduling and the cut list | [`docs/plan/README.md`](docs/plan/README.md) |
+1. **Reforçar a validação:** repetir o backtest com owners separados, conjunto maior e dados de sellers reais; corrigir as classes hoje não detectadas sem tunar no held-out.
+2. **Validar com sellers:** observar o onboarding por CSV + Product Card, verificar se a distinção entre mídia e produto muda a decisão e medir se o plano é executável.
+3. **Melhorar a evidência:** substituir priors de mídia por dados brasileiros identificados, sempre informando janela, denominador e unidade.
+4. **Modelar a projeção do plano:** implementar uma projeção validada ou retirar o `projected` zerado da apresentação, sem esconder a limitação com copy.
+5. **Endurecer ingestão e operação:** melhorar warnings do event log, erros da web, observabilidade, rotação de secrets e validação completa do endpoint MCP.
+6. **Só depois avaliar Meta write access:** preservar consentimento explícito, operações decrease-only e feature flag; escrita real nunca deve ser pré-requisito para o diagnóstico.
 
-`prd.md` and `demo-script.md` are background reading. `AGENTS.md` wins wherever they disagree, and it lists the two things in them that are stale.
+## Estrutura do monorepo
 
-## License
+```text
+apps/web        experiência one-screen e upload
+apps/mcp        tools MCP e endpoint Vercel
+packages/engine diagnóstico, previsão, planos e alocação
+packages/ingest parsers e validação de entrada
+packages/data   benchmarks derivados e proveniência
+packages/sim    campanhas sintéticas, fixtures e backtest
+packages/contracts tipos congelados e métricas
+```
 
-[MIT](LICENSE). The Olist dataset it derives benchmarks from is CC BY-NC-SA 4.0 and is not redistributed here.
+Documentação complementar:
+
+- [`docs/contracts.md`](docs/contracts.md) — contratos e APIs públicas;
+- [`docs/acceptance.md`](docs/acceptance.md) — claims, demo beats e testes;
+- [`docs/demo-contract.md`](docs/demo-contract.md) — entradas e respostas das fixtures;
+- [`docs/backtest-results.md`](docs/backtest-results.md) — resultados e limitações do backtest;
+- [`docs/allocator.md`](docs/allocator.md) — response curves e alocação;
+- [`docs/peer-comparison.md`](docs/peer-comparison.md) — benchmarks de sellers e levers;
+- [`docs/HANDOFF.md`](docs/HANDOFF.md) — estado operacional do projeto.

@@ -15,6 +15,21 @@ Entry format:
 
 ---
 
+## 2026-08-10 04:06 UTC · Codex · resolução de conflitos do PR README
+**Done:** merge de `origin/main` em `joaquim/feat/sync-e-agent-to-main` com conflitos resolvidos em `README.md` e `docs/HANDOFF.md`. O README manteve a versão em pt-BR desta branch; o HANDOFF preservou o histórico de `main` e manteve as entradas desta branch no topo. Commit: `585735d`.
+**Next:** revisar o PR no GitHub e confirmar que o conflito foi marcado como resolvido.
+**Blocked / watch out:** `code_review` falhou duas vezes com `HTTP 400: requested model is not supported`; `codeql_checker` rodou sem alertas.
+
+## 2026-08-10 · Codex · entrega do README de produto
+**Done:** substituído o README provisório por uma narrativa em pt-BR sobre a tese de Mazal, o problema do leak, o fluxo pre-flight/in-flight, o engine, os dados, o simulator, a ingestão, a web, o MCP, as evidências, os limites e os próximos passos. `pnpm sim:fixtures` confirmou os dois casos da demo; `pnpm sim:backtest` reproduziu 59,0% top-1, 59,0% top-2 em estágio e 12,0% de falsos alarmes em 25 saudáveis. Também passaram `pnpm test` (603 testes), `pnpm typecheck`, `pnpm build`, links locais e `git diff --check`.
+**Next:** revisar o texto no contexto da apresentação e, se aprovado, integrar esta branch pelo fluxo normal em direção a `stage`.
+**Blocked / watch out:** `pnpm test` percorre também cópias sob `.worktrees/` e `.pnpm-store/`, por isso coletou 603 testes; os artefatos não relacionados continuam fora do escopo. O backtest permanece um número de wiring/sanity, pois o firewall entre engine e simulator não se manteve.
+
+## 2026-08-10 · Codex · análise e plano de reescrita do README
+**Done:** analisado o `README.md` atual contra `apps/web/PRODUCT.md`, `docs/contracts.md`, `docs/acceptance.md`, `docs/demo-contract.md`, `docs/backtest-results.md`, `docs/benchmark-provenance.md`, `docs/peer-comparison.md`, `docs/allocator.md` e a operação MCP. Criado `docs/superpowers/plans/2026-08-10-readme-rewrite.md` com a narrativa recomendada, matriz de fatos, estrutura de seções, evidências, limites, roadmap e checklist de validação. O `README.md` ainda não foi alterado.
+**Next:** executar o plano e substituir o README provisório por uma versão em pt-BR que apresente primeiro a tese, depois a solução entregue e por último evidências, limites e próximos experimentos.
+**Blocked / watch out:** não afirmar pesquisa com sellers, clientes, export Meta real, validação independente ou escrita real na Meta; o backtest de 59,0% é um número de wiring/sanity porque o firewall entre engine e simulator não se manteve.
+
 ## 2026-08-09 22:10 BRT · Guilherme's agent · Deco Studio renders the charts, not prose
 
 **Done:** the MCP now exposes two `ui://` resources per the MCP Apps extension (`modelcontextprotocol/ext-apps`, spec 2026-01-26, the contract Deco's `MCPAppRenderer` reads): `ui://mazal/diagnosis` — the funnel with the leak marked — and `ui://mazal/prediction` — the break-even and the band. `diagnose_campaign` and `predict_campaign` carry `_meta.ui.resourceUri`, so a tool result in Studio chat renders as the chart. The agent's `metadata.ui.homeTiles` puts both on the org home board fed by `demo-case2` (eta_shock, stage 4 leak). Every number in a view is engine output or a contract rate function — the views mirror `apps/web/lib/answers.ts` and a stage under the engine's own `minSample` renders "not judged", never a value.
