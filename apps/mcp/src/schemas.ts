@@ -214,12 +214,29 @@ export const metaInsightsPayloadSchema = z.object({
 }).strict();
 
 /**
- * `days` or `metaInsights`, exactly one.
+ * What to fetch from Meta, when the caller has an account rather than a file.
+ *
+ * The agent supplies identifiers and dates and nothing else — no fields, no
+ * metrics, no date presets. Everything about *what* is read is decided in
+ * TypeScript, so a model cannot widen a query into data the product does not
+ * know how to normalise.
+ */
+export const metaQuerySchema = z.object({
+  accountId: z.string().regex(/^act_\d{1,32}$/, 'Expected act_<digits>'),
+  campaignId: z.string().regex(/^\d{1,32}$/, 'Expected a numeric campaign id'),
+  since: isoDate,
+  until: isoDate,
+}).strict().refine((q) => q.since <= q.until, {
+  message: '`since` must not be after `until`.',
+});
+
+/**
+ * `days`, `metaInsights` or `metaQuery`, exactly one.
  *
  * An object with a refinement rather than a union, on purpose: a union publishes
  * a JSON Schema whose root is `anyOf` in `tools/list`, and a client that expects
  * an object at the root stops being able to call the tool at all. This keeps the
- * root an object, keeps `.strict()`, and still refuses both-or-neither.
+ * root an object, keeps `.strict()`, and still refuses more-or-fewer than one.
  *
  * The agent never converts a payload into days itself. If it did, the numbers
  * would come from an arithmetic no test in this repo covers — the same reason
@@ -228,12 +245,14 @@ export const metaInsightsPayloadSchema = z.object({
 export const diagnoseCampaignInputSchema = z.object({
   days: z.array(campaignDaySchema).min(1).max(MAX_DAYS).optional(),
   metaInsights: metaInsightsPayloadSchema.optional(),
+  metaQuery: metaQuerySchema.optional(),
   card: productCardSchema,
   events: z.array(storeEventSchema).max(MAX_EVENTS),
   reference: publicReferenceSchema,
 }).strict().refine(
-  (input) => (input.days === undefined) !== (input.metaInsights === undefined),
-  { message: 'Send `days` or `metaInsights`, exactly one of the two.' },
+  (input) =>
+    [input.days, input.metaInsights, input.metaQuery].filter((arm) => arm !== undefined).length === 1,
+  { message: 'Send `days`, `metaInsights` or `metaQuery` — exactly one of the three.' },
 );
 
 export const predictCampaignInputSchema = z.object({

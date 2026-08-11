@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { z } from 'zod';
 
 import {
   buildRecoveryPlanInputSchema,
@@ -96,4 +97,57 @@ test('rejects a string long enough to be a payload', () => {
     events: [],
     reference: { kind: 'benchmark' },
   }).success).toBe(false);
+});
+
+describe('diagnoseCampaignInputSchema — the metaQuery arm', () => {
+  const card = {
+    category: 'bed_bath_table' as const,
+    price: 100, grossMargin: 0.4, shippingCost: 10, deliveryEtaDays: 5,
+    stockOnHand: 10, reviewCount: 5, reviewAvg: 4, pdpImages: 3,
+    pdpDescriptionLength: 400, returnPolicyDays: 7,
+    paymentMethods: ['pix' as const], offer: 'none' as const,
+  };
+  const base = { card, events: [], reference: { kind: 'benchmark' as const } };
+  const metaQuery = {
+    accountId: 'act_1234567890',
+    campaignId: '23851234567890123',
+    since: '2026-07-01',
+    until: '2026-07-30',
+  };
+
+  test('accepts a well-formed metaQuery', () => {
+    expect(diagnoseCampaignInputSchema.parse({ ...base, metaQuery })).toMatchObject({ metaQuery });
+  });
+
+  test('refuses an account id that is not act_<digits>', () => {
+    expect(() => diagnoseCampaignInputSchema.parse({
+      ...base, metaQuery: { ...metaQuery, accountId: '1234567890' },
+    })).toThrow();
+  });
+
+  test('refuses a range that ends before it starts', () => {
+    expect(() => diagnoseCampaignInputSchema.parse({
+      ...base, metaQuery: { ...metaQuery, since: '2026-07-30', until: '2026-07-01' },
+    })).toThrow();
+  });
+
+  test('refuses two of the three arms at once', () => {
+    const days = [{
+      date: '2026-07-01', campaignId: 'c', spend: 1, impressions: 1, reach: 1,
+      clicks: 1, addToCarts: 0, checkoutsInitiated: 0, purchases: 0, revenue: 0,
+    }];
+    expect(() => diagnoseCampaignInputSchema.parse({ ...base, days, metaQuery })).toThrow();
+  });
+
+  test('refuses all three arms missing', () => {
+    expect(() => diagnoseCampaignInputSchema.parse(base)).toThrow();
+  });
+
+  test('publishes an object at the schema root, not an anyOf', () => {
+    // A union root breaks clients that expect an object in tools/list, which is
+    // why the exactly-one rule is a refinement rather than a discriminated union.
+    const json = z.toJSONSchema(diagnoseCampaignInputSchema, { io: 'input' }) as Record<string, unknown>;
+    expect(json['type']).toBe('object');
+    expect(json['anyOf']).toBeUndefined();
+  });
 });
