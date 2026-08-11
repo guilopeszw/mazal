@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CampaignDay, OlistCategory } from "@mazal/contracts";
 import {
   categoryDefaults,
@@ -67,6 +67,17 @@ export function Upload({
   const [assumed, setAssumed] = useState<Partial<Record<InferredNumericField, string>>>(STATIC_DEFAULTS);
   const [edited, setEdited] = useState<ReadonlySet<InferredNumericField>>(new Set());
   const [busy, setBusy] = useState<"parse" | "diagnose" | "preflight" | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  /**
+   * Focus the file input the moment the panel opens, so the Enter the zone
+   * advertises works without tabbing to find it first. It is `sr-only`, so this
+   * moves the keyboard's attention without moving anything on screen — the
+   * dashed zone shows the focus ring through `has-[:focus-visible]`.
+   */
+  useEffect(() => {
+    fileInput.current?.focus();
+  }, []);
   const [error, setError] = useState<string | null>(null);
 
   const handleFile = async (file: File | undefined) => {
@@ -183,9 +194,24 @@ export function Upload({
                 e.preventDefault();
                 void handleFile(e.dataTransfer.files[0]);
               }}
+              /**
+               * The zone says "or press Enter to browse files" and it did not.
+               * The input is `sr-only`, so it is focusable but nothing put focus
+               * there, and a `<label>` is not focusable at all — the key had
+               * nowhere to land. The effect below focuses the input when the
+               * panel opens; this answers the key from anywhere inside the zone,
+               * and `preventDefault` stops a focused file input from also
+               * opening its own dialog and getting two.
+               */
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                e.preventDefault();
+                fileInput.current?.click();
+              }}
               className="flex min-h-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-[10px] border-2 border-dashed border-line-strong px-4 py-6 text-center text-sm text-ink-soft transition-[border-color] duration-150 hover:border-ink-faint has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent"
             >
               <input
+                ref={fileInput}
                 type="file"
                 accept=".csv,text/csv"
                 className="sr-only"
