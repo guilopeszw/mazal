@@ -15,6 +15,26 @@ Entry format:
 
 ---
 
+## 2026-08-10 21:30 BRT · Guilherme's agent · the web app is public, and six checks that could not fail
+
+**Done:** `apps/web` is **live and public** at `https://mazal-web-puce.vercel.app` — page 200, `POST /api/chat` 200, answering in Portuguese from the real engine. `stage` at 319 tests.
+
+**The bakery drove everything.** A friend's frozen-goods business selling through **iFood and WhatsApp**: no pixel on either checkout, so Meta reports every conversion column as zero. Four surfaces had to stop lying about it, found one at a time by review — the engine flagged `thin_pdp` and told the seller their product page was thin (#55); the sheet then said "No leak found. Every measured stage sits inside its reference" when four were never measured; the chat route said the same in Portuguese; and the MCP tile said it, then said it again in the success colour after the text was fixed (#57). A seller can now also ask **"Is it worth advertising?"** — `predict` needs the product and the category, not the pixel, so it is the one answer their setup does not break (#59).
+
+**Open PRs:** #60 the browser driver, #61 the loader's white flash, #62 Portuguese plan titles and a 400 that ate whole answers, #63 the drop zone's Enter promise, #58 the previous session's handoff. All unreviewed or mid-review.
+
+**Next:** get those five reviewed and merged, then redeploy. After that, the pre-flight is reachable only by uploading a CSV first — an off-pixel seller has to hand over an export that Mazal will tell them it cannot read, to reach the answer that needs no export.
+
+**Blocked / watch out:** five things.
+
+- **`apps/web/scripts/drive.mjs` exists now; use it before claiming anything about the UI.** Chrome over CDP, no dependencies. Six wrong calls were made against this interface in one session by reading the source instead of running it, and every one was caught by someone who executed it: a `minSample` loop whose guard skipped every iteration, a boundary test that never sampled the boundary, a build gate that grepped for "Compiled successfully" — which webpack prints *before* the type check that then failed — a pre-flight button that could never succeed because its test called the function underneath the action, a scroll option that "fixed" a bug it could not reach (`maxScroll` is 0 on the first turn), and a margin disclosure that fired backwards. **A green suite is not evidence until something has been broken on purpose and watched to fail.**
+- **The plan loader's `log` variant no longer inverts, and that is a deliberate loss.** Its inverted face is near-white in dark mode by design, but `.pl-content` is at `opacity: 0` through the morph, so it painted an empty white rectangle — luminance 0.898 against a ground of 0.104 — for ~200ms. Gating the flip on the settled phase was tried and *silently deleted the effect*: the log face is never mounted in that phase. Restoring it needs the polarity to change while there is content to see it against.
+- **Vercel: Root Directory `apps/web` and "Include files outside the Root Directory" are needed together.** Either alone fails, differently, and a root `vercel.json` declaring `framework: nextjs` cannot substitute — the Next builder checks the Root Directory's `package.json` regardless. Three aliases point at the project and only `mazal-web-puce.vercel.app` is public; all three must be in `MAZAL_CHAT_ALLOWED_HOSTS` or the page loads while its chat 403s, which looks like a working demo until someone types.
+- **The backtest cannot be evidence about `noPixelEvidence`.** The simulator derives `revenue = purchases × aov`, so a day with revenue and no purchases is unconstructible in the cohort. 59.0% unmoved means the cohort never exercises that clause.
+- **`pnpm typecheck` green does not mean `next build` green** — they check different files, and the app tsconfig picks up `apps/web/**/*.test.ts`. Read exit codes.
+
+---
+
 ## 2026-08-10 19:40 BRT · Guilherme's agent · Mazal told a bakery to rewrite a page that was fine
 
 **Done:** a guard in `packages/engine` — A's package, taken on Guilherme's call because A is unavailable. **The engine was fabricating a diagnosis for any seller whose checkout Meta cannot see.**
