@@ -52,7 +52,10 @@ describe('unwrapToolResult', () => {
 describe('connectMetaMcp', () => {
   test('sends the bearer token and never the token alone in an error', async () => {
     const seen: { authorization?: string } = {};
-    const fetchImpl = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+    // `string | URL | Request`, not `RequestInfo`: this package compiles with
+    // `types: ["node"]` and no DOM lib, and @types/node declares fetch's own
+    // parameter type rather than the DOM's `RequestInfo` alias.
+    const fetchImpl = (async (_input: string | URL | Request, init?: RequestInit) => {
       seen.authorization = new Headers(init?.headers).get('authorization') ?? undefined;
       return new Response('nope', { status: 401, statusText: 'Unauthorized' });
     }) as typeof fetch;
