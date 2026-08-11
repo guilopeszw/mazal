@@ -66,7 +66,7 @@ export function Upload({
   const [category, setCategory] = useState<"" | OlistCategory>("");
   const [assumed, setAssumed] = useState<Partial<Record<InferredNumericField, string>>>(STATIC_DEFAULTS);
   const [edited, setEdited] = useState<ReadonlySet<InferredNumericField>>(new Set());
-  const [busy, setBusy] = useState<"parse" | "diagnose" | "preflight" | null>(null);
+  const [busy, setBusy] = useState<"parse" | "category" | "diagnose" | "preflight" | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   /**
@@ -99,16 +99,35 @@ export function Upload({
 
   const pickCategory = async (value: OlistCategory) => {
     setCategory(value);
+    /*
+     * Busy until the guesses land. `setCategory` is synchronous and both buttons
+     * are enabled the moment a category exists, but `reviewAvg`, `pdpImages` and
+     * `pdpDescriptionLength` are empty until this await returns — and they are
+     * `required` now, so a click inside that window is refused by the browser
+     * pointing at three boxes the seller was never asked to fill. Measured: one
+     * frame after the change event, `preflightEnabled: true` with
+     * `emptyRequiredBoxes: 3` and `formValid: false`.
+     */
+    setBusy("category");
     // The three category-sensitive guesses come from the server; a corrected field is
     // the seller's and is never overwritten by a guess.
-    const defaults = await categoryDefaults(value);
-    setAssumed((prev) => {
-      const next = { ...prev };
-      for (const [field, v] of Object.entries(defaults) as [InferredNumericField, number][]) {
-        if (!edited.has(field)) next[field] = String(v);
-      }
-      return next;
-    });
+    try {
+      const defaults = await categoryDefaults(value);
+      setAssumed((prev) => {
+        const next = { ...prev };
+        for (const [field, v] of Object.entries(defaults) as [InferredNumericField, number][]) {
+          if (!edited.has(field)) next[field] = String(v);
+        }
+        return next;
+      });
+    } catch {
+      // Said out loud rather than swallowed: the three boxes stay empty and are
+      // `required`, so silence here becomes the browser refusing a click and
+      // pointing at fields the seller has no way to know the right value for.
+      setError("Could not load the category's typical values. Pick the category again.");
+    } finally {
+      setBusy(null);
+    }
   };
 
   /** The card the form currently describes — the same one both buttons ask about. */
