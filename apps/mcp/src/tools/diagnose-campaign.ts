@@ -1,8 +1,17 @@
 import { benchmarks } from '@mazal/data';
 import { diagnose } from '@mazal/engine';
 import { fromMetaInsights, MetaInsightsError } from '@mazal/meta';
-import type { CampaignDay, Diagnosis, ReferenceMode } from '@mazal/contracts';
+import type { CampaignDay, Diagnosis, ReferenceMode, StoreEvent } from '@mazal/contracts';
 
+import {
+  connectMetaMcp,
+  fetchInsights,
+  fetchSignalEvents,
+  isMetaAdsEnabled,
+  MetaMcpError,
+  readMetaMcpConfig,
+  type MetaMcpClient,
+} from '../meta-client/index.js';
 import { MAX_DAYS, diagnoseCampaignInputSchema } from '../schemas.js';
 
 /**
@@ -115,4 +124,73 @@ export function diagnoseCampaignWithNotes(input: unknown): DiagnoseCampaignResul
  */
 export function diagnoseCampaign(input: unknown): Diagnosis {
   return diagnoseCampaignWithNotes(input).diagnosis;
+}
+
+/**
+ * Injected so the tests never open a socket. Production passes nothing.
+ */
+export type MetaDeps = {
+  connect?: (options: { config: ReturnType<typeof readMetaMcpConfig> }) => Promise<MetaMcpClient>;
+  env?: NodeJS.ProcessEnv;
+};
+
+/**
+ * The three doors, and the one engine behind them.
+ *
+ * `days` and `metaInsights` are unchanged and stay synchronous. `metaQuery`
+ * fetches from Meta and then **becomes** the `metaInsights` arm — same adapter,
+ * same guards, same engine call. There is no second normalisation path, which
+ * is the point: a live account and an uploaded payload cannot disagree about
+ * what a day is.
+ */
+export async function diagnoseCampaignWithNotesAsync(
+  input: unknown,
+  deps: MetaDeps = {},
+): Promise<DiagnoseCampaignResult> {
+  const parsed = diagnoseCampaignInputSchema.parse(input);
+  if (!parsed.metaQuery) return diagnoseCampaignWithNotes(input);
+
+  const env = deps.env ?? process.env;
+
+  // Checked before anything is opened. An off switch that only takes effect
+  // after a credential has been used is not an off switch.
+  if (!isMetaAdsEnabled(env)) {
+    throw new MetaMcpError(
+      'META_MCP_DISABLED',
+      'META_ADS_ENABLED is not set, so this server will not read a live Meta ad account. ' +
+        'Upload a CSV export or send `metaInsights` instead.',
+    );
+  }
+
+  const config = readMetaMcpConfig(env);
+  const connect = deps.connect ?? connectMetaMcp;
+  const client = await connect({ config });
+
+  let metaInsights;
+  let signalEvents: StoreEvent[];
+  try {
+    metaInsights = await fetchInsights(client, parsed.metaQuery);
+    signalEvents = await fetchSignalEvents(client, parsed.metaQuery);
+  } finally {
+    // The credential's session ends with the request that authorised it,
+    // whether or not the request succeeded.
+    await client.close();
+  }
+
+  const result = diagnoseCampaignWithNotes({
+    metaInsights,
+    card: parsed.card,
+    events: [...parsed.events, ...signalEvents],
+    reference: parsed.reference,
+  });
+
+  return {
+    diagnosis: result.diagnosis,
+    notes: [
+      `Read from a live Meta ad account (campaign ${parsed.metaQuery.campaignId}, ` +
+        `${parsed.metaQuery.since} to ${parsed.metaQuery.until}).`,
+      ...signalEvents.map((event) => `${event.detail} (${event.date})`),
+      ...result.notes,
+    ],
+  };
 }
