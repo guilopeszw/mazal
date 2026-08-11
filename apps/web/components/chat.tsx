@@ -196,22 +196,23 @@ export function Chat({
   useEffect(() => {
     if (turns.length === 0) return;
     /*
-     * `nearest`, not `start`.
+     * `start`, deliberately, and it is not what makes a short first answer sit
+     * in an empty viewport.
      *
-     * `start` pinned the new turn to the top of the viewport the moment it was
-     * created — while it still held one streamed word. Everything under it was
-     * bare ground until the sections revealed, which on a plan answer is seven
-     * seconds of what reads as a large empty box rather than an answer being
-     * written. On the cream ground it reads as a white one.
+     * Measured: on the first turn the document is exactly viewport-tall, so
+     * `maxScroll` is 0 and this call moves nothing — `start` and `nearest` are
+     * byte-identical there. The bare ground under a streaming answer is simply
+     * an answer shorter than the screen, and it wants a layout answer rather
+     * than a scroll option.
      *
-     * `nearest` scrolls the minimum needed to bring the turn into view, so the
-     * answer grows from where the conversation already was. `scroll-mt-20` on
-     * the turn still keeps the verdict clear of the sticky header whenever a
-     * scroll does happen.
+     * `nearest` was tried and is worse: it scrolls the minimum, which
+     * bottom-aligns a new turn against the fixed composer and buries the
+     * question behind it. `scroll-mt-20` cannot save that — scroll-margin-top
+     * only applies to a top-aligned element.
      */
     lastTurn.current?.scrollIntoView({
       behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-      block: "nearest",
+      block: "start",
     });
   }, [turns]);
 
