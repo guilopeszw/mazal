@@ -175,7 +175,24 @@ export function PlanLoader({ benchmarkCount }: { benchmarkCount: number }) {
     () =>
       [
         { key: "funnel", radius: 14, invert: false, node: <FunnelWalk count={benchmarkCount} /> },
-        { key: "log", radius: 10, invert: true, node: <EventLog /> },
+        /*
+         * `invert: false`, and this is a deliberate loss.
+         *
+         * The inverted face is `--pl-inv-face`, which in dark mode is #edeae1 —
+         * a light card on a dark ground, as designed. But `.pl-content` sits at
+         * `opacity: 0` through the fade and morph, so the 380ms background
+         * transition painted an empty near-white rectangle on a near-black page
+         * for ~200ms: measured at luminance 0.898 against a ground of 0.104.
+         * It reads as a hole in the screen, and it is what the white-box report
+         * was about.
+         *
+         * Gating the flip on the settled phase was tried and silently removed
+         * the effect instead of retiming it — the log face is never mounted in
+         * that phase. Restoring the inversion needs the polarity to change
+         * while there is content to see it against; until someone does that,
+         * not flipping is the honest version.
+         */
+        { key: "log", radius: 10, invert: false, node: <EventLog /> },
         { key: "draft", radius: 14, invert: false, node: <ActionDraft /> },
       ] as const,
     [benchmarkCount],
@@ -350,7 +367,7 @@ export function PlanLoader({ benchmarkCount }: { benchmarkCount: number }) {
             )}
             <div
               className="pl-face"
-              data-invert={v.invert ? "true" : undefined}
+data-invert={v.invert ? "true" : undefined}
               style={{ borderRadius: Math.max(box.r - 1, 0) }}
             >
               {/* Keyed on the lit counter so letters arrive on every handover
